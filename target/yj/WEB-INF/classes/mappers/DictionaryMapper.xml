@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.DictionaryMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Dictionary" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="word" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="meaning" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phonetic_symbol_en" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pronunciation_en" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="sentence" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pic" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="tv" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="phonetic_symbol_us" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pronunciation_us" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phonetic_symbol" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pronunciation" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="sentence_cn" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="sentence_audio" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="real_meaning" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phonetic_symbol_en_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pronunciation_en_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phonetic_symbol_us_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pronunciation_us_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="meaning_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, word, meaning, phonetic_symbol_en, pronunciation_en, sentence, pic, tv, type, 
+    phonetic_symbol_us, pronunciation_us, phonetic_symbol, pronunciation, sentence_cn, 
+    sentence_audio, real_meaning, phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
+    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dictionary
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dictionary
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Dictionary" >
+    insert into dictionary (id, word, meaning, 
+      phonetic_symbol_en, pronunciation_en, sentence, 
+      pic, tv, type, phonetic_symbol_us, 
+      pronunciation_us, phonetic_symbol, pronunciation, 
+      sentence_cn, sentence_audio, real_meaning, 
+      phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
+      phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, 
+      meaning_Mumbler)
+    values (#{id,jdbcType=INTEGER}, #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR}, 
+      #{phoneticSymbolEn,jdbcType=VARCHAR}, #{pronunciationEn,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR}, 
+      #{pic,jdbcType=VARCHAR}, #{tv,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{phoneticSymbolUs,jdbcType=VARCHAR}, 
+      #{pronunciationUs,jdbcType=VARCHAR}, #{phoneticSymbol,jdbcType=VARCHAR}, #{pronunciation,jdbcType=VARCHAR}, 
+      #{sentenceCn,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, 
+      #{phoneticSymbolEnMumbler,jdbcType=VARCHAR}, #{pronunciationEnMumbler,jdbcType=VARCHAR}, 
+      #{phoneticSymbolUsMumbler,jdbcType=VARCHAR}, #{pronunciationUsMumbler,jdbcType=VARCHAR}, 
+      #{meaningMumbler,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Dictionary" >
+    insert into dictionary
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="word != null" >
+        word,
+      </if>
+      <if test="meaning != null" >
+        meaning,
+      </if>
+      <if test="phoneticSymbolEn != null" >
+        phonetic_symbol_en,
+      </if>
+      <if test="pronunciationEn != null" >
+        pronunciation_en,
+      </if>
+      <if test="sentence != null" >
+        sentence,
+      </if>
+      <if test="pic != null" >
+        pic,
+      </if>
+      <if test="tv != null" >
+        tv,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="phoneticSymbolUs != null" >
+        phonetic_symbol_us,
+      </if>
+      <if test="pronunciationUs != null" >
+        pronunciation_us,
+      </if>
+      <if test="phoneticSymbol != null" >
+        phonetic_symbol,
+      </if>
+      <if test="pronunciation != null" >
+        pronunciation,
+      </if>
+      <if test="sentenceCn != null" >
+        sentence_cn,
+      </if>
+      <if test="sentenceAudio != null" >
+        sentence_audio,
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning,
+      </if>
+      <if test="phoneticSymbolEnMumbler != null" >
+        phonetic_symbol_en_Mumbler,
+      </if>
+      <if test="pronunciationEnMumbler != null" >
+        pronunciation_en_Mumbler,
+      </if>
+      <if test="phoneticSymbolUsMumbler != null" >
+        phonetic_symbol_us_Mumbler,
+      </if>
+      <if test="pronunciationUsMumbler != null" >
+        pronunciation_us_Mumbler,
+      </if>
+      <if test="meaningMumbler != null" >
+        meaning_Mumbler,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="word != null" >
+        #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="meaning != null" >
+        #{meaning,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolEn != null" >
+        #{phoneticSymbolEn,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationEn != null" >
+        #{pronunciationEn,jdbcType=VARCHAR},
+      </if>
+      <if test="sentence != null" >
+        #{sentence,jdbcType=VARCHAR},
+      </if>
+      <if test="pic != null" >
+        #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="tv != null" >
+        #{tv,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="phoneticSymbolUs != null" >
+        #{phoneticSymbolUs,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationUs != null" >
+        #{pronunciationUs,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbol != null" >
+        #{phoneticSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciation != null" >
+        #{pronunciation,jdbcType=VARCHAR},
+      </if>
+      <if test="sentenceCn != null" >
+        #{sentenceCn,jdbcType=VARCHAR},
+      </if>
+      <if test="sentenceAudio != null" >
+        #{sentenceAudio,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolEnMumbler != null" >
+        #{phoneticSymbolEnMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationEnMumbler != null" >
+        #{pronunciationEnMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolUsMumbler != null" >
+        #{phoneticSymbolUsMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationUsMumbler != null" >
+        #{pronunciationUsMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="meaningMumbler != null" >
+        #{meaningMumbler,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Dictionary" >
+    update dictionary
+    <set >
+      <if test="word != null" >
+        word = #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="meaning != null" >
+        meaning = #{meaning,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolEn != null" >
+        phonetic_symbol_en = #{phoneticSymbolEn,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationEn != null" >
+        pronunciation_en = #{pronunciationEn,jdbcType=VARCHAR},
+      </if>
+      <if test="sentence != null" >
+        sentence = #{sentence,jdbcType=VARCHAR},
+      </if>
+      <if test="pic != null" >
+        pic = #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="tv != null" >
+        tv = #{tv,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="phoneticSymbolUs != null" >
+        phonetic_symbol_us = #{phoneticSymbolUs,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationUs != null" >
+        pronunciation_us = #{pronunciationUs,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbol != null" >
+        phonetic_symbol = #{phoneticSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciation != null" >
+        pronunciation = #{pronunciation,jdbcType=VARCHAR},
+      </if>
+      <if test="sentenceCn != null" >
+        sentence_cn = #{sentenceCn,jdbcType=VARCHAR},
+      </if>
+      <if test="sentenceAudio != null" >
+        sentence_audio = #{sentenceAudio,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolEnMumbler != null" >
+        phonetic_symbol_en_Mumbler = #{phoneticSymbolEnMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationEnMumbler != null" >
+        pronunciation_en_Mumbler = #{pronunciationEnMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneticSymbolUsMumbler != null" >
+        phonetic_symbol_us_Mumbler = #{phoneticSymbolUsMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="pronunciationUsMumbler != null" >
+        pronunciation_us_Mumbler = #{pronunciationUsMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="meaningMumbler != null" >
+        meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Dictionary" >
+    update dictionary
+    set word = #{word,jdbcType=VARCHAR},
+      meaning = #{meaning,jdbcType=VARCHAR},
+      phonetic_symbol_en = #{phoneticSymbolEn,jdbcType=VARCHAR},
+      pronunciation_en = #{pronunciationEn,jdbcType=VARCHAR},
+      sentence = #{sentence,jdbcType=VARCHAR},
+      pic = #{pic,jdbcType=VARCHAR},
+      tv = #{tv,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      phonetic_symbol_us = #{phoneticSymbolUs,jdbcType=VARCHAR},
+      pronunciation_us = #{pronunciationUs,jdbcType=VARCHAR},
+      phonetic_symbol = #{phoneticSymbol,jdbcType=VARCHAR},
+      pronunciation = #{pronunciation,jdbcType=VARCHAR},
+      sentence_cn = #{sentenceCn,jdbcType=VARCHAR},
+      sentence_audio = #{sentenceAudio,jdbcType=VARCHAR},
+      real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      phonetic_symbol_en_Mumbler = #{phoneticSymbolEnMumbler,jdbcType=VARCHAR},
+      pronunciation_en_Mumbler = #{pronunciationEnMumbler,jdbcType=VARCHAR},
+      phonetic_symbol_us_Mumbler = #{phoneticSymbolUsMumbler,jdbcType=VARCHAR},
+      pronunciation_us_Mumbler = #{pronunciationUsMumbler,jdbcType=VARCHAR},
+      meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
