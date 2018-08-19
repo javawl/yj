@@ -256,7 +256,7 @@
     </dependency>
   </dependencies>
 
-  <!--<build>-->
+  <build>
     <!--<finalName>yj</finalName>-->
     <!--&lt;!&ndash;<pluginManagement>&lt;!&ndash; lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) &ndash;&gt;&ndash;&gt;-->
       <!--<plugins>-->
@@ -316,5 +316,5 @@
         <!--&lt;!&ndash;</configuration>&ndash;&gt;-->
       <!--&lt;!&ndash;</plugin>&ndash;&gt;-->
     <!--</plugins>-->
-  <!--</build>-->
+  </build>
 </project>
