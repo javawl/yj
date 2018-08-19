@@ -38,20 +38,21 @@ public class UserServiceImpl implements IUserService {
     }
 
 
-    public ServerResponse<String> register(User user){
-        //检查用户是否存在
-        int resultCount = userMapper.checkUsername(user.getUsername());
-        if (resultCount > 0){
-            return ServerResponse.createByErrorMessage("用户名已存在");
-        }
-
-        //MD5加密
-        user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
-
-        resultCount = userMapper.insert(user);
-        if (resultCount == 0){
-            return ServerResponse.createByErrorMessage("注册失败");
-        }
+    public ServerResponse<String> register(String user){
+//        //检查用户是否存在
+//        int resultCount = userMapper.checkUsername(user.getUsername());
+//        if (resultCount > 0){
+//            return ServerResponse.createByErrorMessage("用户名已存在");
+//        }
+//
+//        //MD5加密
+//        user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
+//
+//        resultCount = userMapper.insert(user);
+//        if (resultCount == 0){
+//            return ServerResponse.createByErrorMessage("注册失败");
+//        }
         return ServerResponse.createBySuccessMessage("注册成功");
+
     }
 }

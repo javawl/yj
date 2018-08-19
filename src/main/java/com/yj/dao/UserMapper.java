@@ -16,6 +16,8 @@ public interface UserMapper {
 
     int updateByPrimaryKey(User record);
 
+//    下面的是自己创建的
+
     int checkUsername(String username);
 
     User selectLogin(@Param("username") String username, @Param("password") String password);
