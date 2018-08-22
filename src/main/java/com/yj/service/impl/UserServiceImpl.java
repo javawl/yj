@@ -89,12 +89,12 @@ public class UserServiceImpl implements IUserService {
         //转json对象
         JSONObject JSON2 = JSONObject.parseObject(JSONString2);
 
-
         return ServerResponse.createBySuccess("发送成功!",JSON2);
     }
 
     @Override
     public ServerResponse<String> register_b(String register_token, String phone_code, HttpServletRequest Request, HttpServletResponse Response){
+        if (register_token == null || phone_code == null) return ServerResponse.createByErrorMessage("请补全参数");
         CommonFunc func = new CommonFunc();
         //查看cookie中是否有值
         String check = func.getCookieValueBykey(Request,register_token);
@@ -126,6 +126,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<String> register_c(String register_token, String password, HttpServletRequest Request){
+        if (register_token == null || password == null) return ServerResponse.createByErrorMessage("请补全参数");
         CommonFunc func = new CommonFunc();
         //查看cookie中是否有值
         String check = func.getCookieValueBykey(Request,register_token);

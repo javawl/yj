@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -204,5 +205,10 @@ public class CommonFunc {
                 }
             }
         }
+    }
+
+    //验证传入数据是否为空
+    public String first_Validate(Map<String,String> m1){
+        return null;
     }
 }

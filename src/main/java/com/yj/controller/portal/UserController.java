@@ -10,6 +10,7 @@ import com.yj.service.IUserService;
 import com.yj.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,7 +72,11 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "register_a.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<JSONObject> register_a(String phone, HttpServletResponse response){
+    public ServerResponse<JSONObject> register_a(String token, String phone, HttpServletResponse response){
+        if (token == null || phone == null) return ServerResponse.createByErrorMessage("请补全参数");
+        if (!token.equals("sendCode")){
+            return ServerResponse.createByErrorMessage("接口身份认证错误");
+        }
         //验证手机号是否11位数字
         String ValidateResult = PhoneValidate(phone);
         if (ValidateResult != null) {
