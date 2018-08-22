@@ -254,7 +254,35 @@
       <artifactId>jedis</artifactId>
       <version>2.9.0</version>
     </dependency>
+
+    <!--腾讯云短信SDK-->
+    <dependency>
+      <groupId>com.github.qcloudsms</groupId>
+      <artifactId>qcloudsms</artifactId>
+      <version>1.0.5</version>
+    </dependency>
+
+    <!--java爬虫-->
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>2.1.1</version>
+    </dependency>
+
+    <!--实现序列化的JSON-->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.49</version>
+    </dependency>
   </dependencies>
+
+
 
   <build>
     <finalName>yj</finalName>

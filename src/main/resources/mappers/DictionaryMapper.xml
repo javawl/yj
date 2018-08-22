@@ -24,13 +24,18 @@
       <arg column="phonetic_symbol_us_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="pronunciation_us_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="meaning_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="phrase" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="synonym" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="word_of_similar_form" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="stem_affix" jdbcType="VARCHAR" javaType="java.lang.String" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
     id, word, meaning, phonetic_symbol_en, pronunciation_en, sentence, pic, tv, type, 
     phonetic_symbol_us, pronunciation_us, phonetic_symbol, pronunciation, sentence_cn, 
     sentence_audio, real_meaning, phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
-    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler
+    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler, phrase, synonym, 
+    word_of_similar_form, stem_affix
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -50,7 +55,8 @@
       sentence_cn, sentence_audio, real_meaning, 
       phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
       phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, 
-      meaning_Mumbler)
+      meaning_Mumbler, phrase, synonym, 
+      word_of_similar_form, stem_affix)
     values (#{id,jdbcType=INTEGER}, #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR}, 
       #{phoneticSymbolEn,jdbcType=VARCHAR}, #{pronunciationEn,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR}, 
       #{pic,jdbcType=VARCHAR}, #{tv,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{phoneticSymbolUs,jdbcType=VARCHAR}, 
@@ -58,7 +64,8 @@
       #{sentenceCn,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, 
       #{phoneticSymbolEnMumbler,jdbcType=VARCHAR}, #{pronunciationEnMumbler,jdbcType=VARCHAR}, 
       #{phoneticSymbolUsMumbler,jdbcType=VARCHAR}, #{pronunciationUsMumbler,jdbcType=VARCHAR}, 
-      #{meaningMumbler,jdbcType=VARCHAR})
+      #{meaningMumbler,jdbcType=VARCHAR}, #{phrase,jdbcType=VARCHAR}, #{synonym,jdbcType=VARCHAR}, 
+      #{wordOfSimilarForm,jdbcType=VARCHAR}, #{stemAffix,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.yj.pojo.Dictionary" >
     insert into dictionary
@@ -126,6 +133,18 @@
       <if test="meaningMumbler != null" >
         meaning_Mumbler,
       </if>
+      <if test="phrase != null" >
+        phrase,
+      </if>
+      <if test="synonym != null" >
+        synonym,
+      </if>
+      <if test="wordOfSimilarForm != null" >
+        word_of_similar_form,
+      </if>
+      <if test="stemAffix != null" >
+        stem_affix,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -190,6 +209,18 @@
       </if>
       <if test="meaningMumbler != null" >
         #{meaningMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="phrase != null" >
+        #{phrase,jdbcType=VARCHAR},
+      </if>
+      <if test="synonym != null" >
+        #{synonym,jdbcType=VARCHAR},
+      </if>
+      <if test="wordOfSimilarForm != null" >
+        #{wordOfSimilarForm,jdbcType=VARCHAR},
+      </if>
+      <if test="stemAffix != null" >
+        #{stemAffix,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -256,6 +287,18 @@
       <if test="meaningMumbler != null" >
         meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
       </if>
+      <if test="phrase != null" >
+        phrase = #{phrase,jdbcType=VARCHAR},
+      </if>
+      <if test="synonym != null" >
+        synonym = #{synonym,jdbcType=VARCHAR},
+      </if>
+      <if test="wordOfSimilarForm != null" >
+        word_of_similar_form = #{wordOfSimilarForm,jdbcType=VARCHAR},
+      </if>
+      <if test="stemAffix != null" >
+        stem_affix = #{stemAffix,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -280,7 +323,11 @@
       pronunciation_en_Mumbler = #{pronunciationEnMumbler,jdbcType=VARCHAR},
       phonetic_symbol_us_Mumbler = #{phoneticSymbolUsMumbler,jdbcType=VARCHAR},
       pronunciation_us_Mumbler = #{pronunciationUsMumbler,jdbcType=VARCHAR},
-      meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR}
+      meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
+      phrase = #{phrase,jdbcType=VARCHAR},
+      synonym = #{synonym,jdbcType=VARCHAR},
+      word_of_similar_form = #{wordOfSimilarForm,jdbcType=VARCHAR},
+      stem_affix = #{stemAffix,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

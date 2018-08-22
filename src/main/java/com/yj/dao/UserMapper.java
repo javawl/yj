@@ -16,7 +16,9 @@ public interface UserMapper {
 
     int updateByPrimaryKey(User record);
 
-//    下面的是自己创建的
+    //    下面的是自己创建的
+
+    int checkUser(String phone);
 
     int checkUsername(String username);
 

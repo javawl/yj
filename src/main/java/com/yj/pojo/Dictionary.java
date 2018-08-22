@@ -43,7 +43,15 @@ public class Dictionary {
 
     private String meaningMumbler;
 
-    public Dictionary(Integer id, String word, String meaning, String phoneticSymbolEn, String pronunciationEn, String sentence, String pic, String tv, Integer type, String phoneticSymbolUs, String pronunciationUs, String phoneticSymbol, String pronunciation, String sentenceCn, String sentenceAudio, String realMeaning, String phoneticSymbolEnMumbler, String pronunciationEnMumbler, String phoneticSymbolUsMumbler, String pronunciationUsMumbler, String meaningMumbler) {
+    private String phrase;
+
+    private String synonym;
+
+    private String wordOfSimilarForm;
+
+    private String stemAffix;
+
+    public Dictionary(Integer id, String word, String meaning, String phoneticSymbolEn, String pronunciationEn, String sentence, String pic, String tv, Integer type, String phoneticSymbolUs, String pronunciationUs, String phoneticSymbol, String pronunciation, String sentenceCn, String sentenceAudio, String realMeaning, String phoneticSymbolEnMumbler, String pronunciationEnMumbler, String phoneticSymbolUsMumbler, String pronunciationUsMumbler, String meaningMumbler, String phrase, String synonym, String wordOfSimilarForm, String stemAffix) {
         this.id = id;
         this.word = word;
         this.meaning = meaning;
@@ -65,6 +73,10 @@ public class Dictionary {
         this.phoneticSymbolUsMumbler = phoneticSymbolUsMumbler;
         this.pronunciationUsMumbler = pronunciationUsMumbler;
         this.meaningMumbler = meaningMumbler;
+        this.phrase = phrase;
+        this.synonym = synonym;
+        this.wordOfSimilarForm = wordOfSimilarForm;
+        this.stemAffix = stemAffix;
     }
 
     public Dictionary() {
@@ -237,5 +249,37 @@ public class Dictionary {
 
     public void setMeaningMumbler(String meaningMumbler) {
         this.meaningMumbler = meaningMumbler == null ? null : meaningMumbler.trim();
+    }
+
+    public String getPhrase() {
+        return phrase;
+    }
+
+    public void setPhrase(String phrase) {
+        this.phrase = phrase == null ? null : phrase.trim();
+    }
+
+    public String getSynonym() {
+        return synonym;
+    }
+
+    public void setSynonym(String synonym) {
+        this.synonym = synonym == null ? null : synonym.trim();
+    }
+
+    public String getWordOfSimilarForm() {
+        return wordOfSimilarForm;
+    }
+
+    public void setWordOfSimilarForm(String wordOfSimilarForm) {
+        this.wordOfSimilarForm = wordOfSimilarForm == null ? null : wordOfSimilarForm.trim();
+    }
+
+    public String getStemAffix() {
+        return stemAffix;
+    }
+
+    public void setStemAffix(String stemAffix) {
+        this.stemAffix = stemAffix == null ? null : stemAffix.trim();
     }
 }
