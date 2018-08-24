@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -277,5 +278,21 @@ public class UserServiceImpl implements IUserService {
                 return ServerResponse.createByErrorMessage("未经过手机验证码验证！");
             }
         }
+    }
+
+    @Override
+    public ServerResponse<List<Map>> get_plan_types(){
+        //获取计划的所有种类
+        List<Map> type = userMapper.selectPlanTypes();
+
+        return ServerResponse.createBySuccess("查询成功!", type);
+    }
+
+    @Override
+    public ServerResponse<List<Map>> get_plans(String type){
+        //获取该种类下的所有计划
+        List<Map> plan = userMapper.selectPlanByType(type);
+
+        return ServerResponse.createBySuccess("查询成功!", plan);
     }
 }

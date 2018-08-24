@@ -32,4 +32,10 @@ public interface UserMapper {
     int getIdByPhone(@Param("phone") String phone);
 
     int updatePassword(@Param("password") String password, @Param("phone") String phone);
+
+    //查计划的类别
+    List<Map> selectPlanTypes();
+
+    //查类别下的计划
+    List<Map> selectPlanByType(@Param("type") String type);
 }

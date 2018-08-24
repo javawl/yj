@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.Cookie;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 63254 on 2018/8/15.
@@ -28,4 +30,8 @@ public interface IUserService {
     ServerResponse<String> forget_password_b(String forget_password_token, String phone_code, HttpServletRequest Request, HttpServletResponse Response);
 
     ServerResponse<String> forget_password_c(String forget_password_token, String password, HttpServletRequest Request);
+
+    ServerResponse<List<Map>> get_plan_types();
+
+    ServerResponse<List<Map>> get_plans(String type);
 }

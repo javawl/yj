@@ -176,4 +176,19 @@
     set password = #{password}
     WHERE phone = #{phone}
   </update>
+
+  <select id="selectPlanTypes" resultType="map" >
+    SELECT
+      type
+    FROM plan_types
+  </select>
+  
+  <select id="selectPlanByType" resultType="map" parameterType="string">
+    SELECT plan
+    FROM plans
+    WHERE (SELECT id
+			FROM plan_types
+            WHERE type = #{type})
+            = type_id
+  </select>
 </mapper>

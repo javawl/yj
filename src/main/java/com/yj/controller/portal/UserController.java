@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -178,6 +179,31 @@ public class UserController extends BaseController {
     public ServerResponse<String> register_c(String register_token, String password, HttpServletRequest request){
         //调用service层
         return iUserService.register_c(register_token, password, request);
+    }
+
+
+    /**
+     * 获取学习计划所有种类接口
+     * @return
+     */
+    @RequestMapping(value = "get_plan_types.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> get_plan_types(){
+        //调用service层
+        return iUserService.get_plan_types();
+    }
+
+
+    /**
+     * 通过分类获取分类下的计划
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "get_plans.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map>> get_plans(String type){
+        //调用service层
+        return iUserService.get_plans(type);
     }
 
 
