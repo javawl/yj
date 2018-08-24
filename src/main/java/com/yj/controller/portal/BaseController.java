@@ -13,7 +13,7 @@ public class BaseController {
 
 
     //Validate
-    protected String PhoneValidate(String phone){
+    public static String PhoneValidate(String phone){
         //手机号码判断是否11位
         Pattern p = Pattern.compile("^[1-9][0-9]{10}$");
 

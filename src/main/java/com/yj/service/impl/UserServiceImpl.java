@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.controller.portal.BaseController;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IUserService;
@@ -35,6 +36,12 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse<User> login(HttpServletRequest request) throws Exception {
         String username = AES.Decrypt(request.getHeader("username"),AES.KEY);
         String password = AES.Decrypt(request.getHeader("password"),AES.KEY);
+
+        //验证手机号是否11位数字
+        String ValidateResult = BaseController.PhoneValidate(username);
+        if (ValidateResult != null) {
+            return ServerResponse.createByErrorMessage(ValidateResult);
+        }
 
         //检查用户是否存在
         int resultCount = userMapper.checkUser(username);
