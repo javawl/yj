@@ -155,7 +155,25 @@
     SELECT
     <include refid="Base_Column_List" />
     FROM user
-    WHERE username = #{username}
+    WHERE phone = #{username}
     AND password = #{password}
   </select>
+  <!--<select id="getIdByPhone" resultType="map" parameterType="string">-->
+    <!--SELECT-->
+     <!--id-->
+    <!--FROM user-->
+    <!--WHERE phone = #{phone}-->
+  <!--</select>-->
+  <select id="getIdByPhone" resultType="int" parameterType="string">
+    SELECT
+     IFNULL(MIN(id),0)
+    FROM user
+    WHERE phone = #{phone}
+  </select>
+
+  <update id="updatePassword" parameterType="string" >
+    UPDATE user
+    set password = #{password}
+    WHERE phone = #{phone}
+  </update>
 </mapper>

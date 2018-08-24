@@ -50,7 +50,7 @@ public class CommonFunc {
 
 
     //按照指定的盐生成指定的token
-    public String generateToken(String salt){
+    public static String generateToken(String salt){
         //生成token（唯一标示）
         CommonFunc func = new CommonFunc();
         //生成32位随机字符串
@@ -166,6 +166,14 @@ public class CommonFunc {
 
         return code;
     }
+
+
+    public static void setCookie(HttpServletResponse httpServletResponse, String key, String value, int time){
+        Cookie cookie = new Cookie(key,value);
+        cookie.setMaxAge(time);
+        httpServletResponse.addCookie(cookie);
+    }
+
 
     //获取cookie中某个键值的值，没有的话返回null
     public String getCookieValueBykey(HttpServletRequest request,String key){

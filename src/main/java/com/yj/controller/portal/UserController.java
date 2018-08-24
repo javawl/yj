@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IUserService;
 import com.yj.util.MD5Util;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -33,25 +36,90 @@ public class UserController extends BaseController {
     @Autowired
     private IUserService iUserService;
 
+    @Autowired
+    private UserMapper userMapper;
+
 
     /**
      * 用户登录
-     * @param username
-     * @param password
-     * @param session
      * @return
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> login(String username, String password, HttpSession session){
+    public ServerResponse<String> login(HttpServletRequest request,HttpServletResponse httpServletResponse){
         //service-->mybatis->dao
-        ServerResponse<User> response = iUserService.login(username,password);
-        if (response.isSuccess()){
-            session.setAttribute(Const.CURRENT_USER,response.getData());
+        ServerResponse<User> response;
+        try {
+            response = iUserService.login(request);
+        }catch (Exception e){
+            return ServerResponse.createByErrorMessage(e.getMessage());
         }
 
-        return response;
+        String token;
+        if (response.isSuccess()){
+            //将user拿出来
+            User user = response.getData();
+            //取id
+            String id = String.valueOf(user.getId());
+            //生成token
+            token = CommonFunc.generateToken(Const.TOKEN_LOGIN_SALT);
+            //加进cookie
+            CommonFunc.setCookie(httpServletResponse, token, id, Const.TOKEN_EXIST_TIME);
+        }else {
+            //取出错误信息
+            return ServerResponse.createByErrorMessage(response.getMsg());
+        }
+
+        return ServerResponse.createBySuccess("登录成功",token);
     }
+
+    /**
+     * 找回密码A
+     * @param phone
+     * @return
+     */
+    @RequestMapping(value = "forget_password_a.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> forget_password_a(String token, String phone, HttpServletResponse response){
+        if (token == null || phone == null) return ServerResponse.createByErrorMessage("请补全参数");
+        if (!token.equals("forgetPassword")){
+            return ServerResponse.createByErrorMessage("接口身份认证错误");
+        }
+        //验证手机号是否11位数字
+        String ValidateResult = PhoneValidate(phone);
+        if (ValidateResult != null) {
+            return ServerResponse.createByErrorMessage(ValidateResult);
+        }
+        //调用service层
+        return iUserService.forget_password_a(phone, response);
+    }
+
+    /**
+     * 找回密码B
+     * @param forget_password_token,phone_code
+     * @return
+     */
+    @RequestMapping(value = "forget_password_b.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forget_password_b(String forget_password_token, String phone_code, HttpServletRequest request, HttpServletResponse Response){
+        //调用service层
+        return iUserService.forget_password_b(forget_password_token, phone_code, request ,Response);
+    }
+
+    /**
+     * 找回密码C
+     * @param forget_password_token
+     * @param password
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "forget_password_c.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> forget_password_c(String forget_password_token, String password, HttpServletRequest request){
+        //调用service层
+        return iUserService.forget_password_c(forget_password_token, password, request);
+    }
+
 
     /**
      * 登出接口
@@ -117,10 +185,10 @@ public class UserController extends BaseController {
      * 测试
      * @return
      */
-    @RequestMapping(value = "test.do", method = RequestMethod.GET)
+    @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse test(HttpServletRequest request){
-        System.out.println(MD5Util.MD5EncodeUtf8("lala"));
+    public ServerResponse test(String phone,HttpServletRequest request){
+        System.out.println(JSON.toJSONString(userMapper.getIdByPhone("15875658189")));
         return ServerResponse.createByErrorMessage("成功");
     }
 

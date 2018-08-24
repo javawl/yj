@@ -15,11 +15,17 @@ import javax.servlet.http.Cookie;
 //这是一个接口
 public interface IUserService {
 
-    ServerResponse<User> login(String username, String password);
+    ServerResponse<User> login(HttpServletRequest request) throws Exception;
 
-    ServerResponse<JSONObject> register_a(String user, HttpServletResponse httpServletResponse);
+    ServerResponse<JSONObject> register_a(String phone, HttpServletResponse httpServletResponse);
 
     ServerResponse<String> register_b(String register_token, String phone_code, HttpServletRequest Request, HttpServletResponse Response);
 
     ServerResponse<String> register_c(String register_token, String password, HttpServletRequest Request);
+
+    ServerResponse<JSONObject> forget_password_a(String phone, HttpServletResponse httpServletResponse);
+
+    ServerResponse<String> forget_password_b(String forget_password_token, String phone_code, HttpServletRequest Request, HttpServletResponse Response);
+
+    ServerResponse<String> forget_password_c(String forget_password_token, String password, HttpServletRequest Request);
 }

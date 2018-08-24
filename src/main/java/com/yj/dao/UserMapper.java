@@ -3,6 +3,9 @@ package com.yj.dao;
 import com.yj.pojo.User;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 public interface UserMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -23,4 +26,10 @@ public interface UserMapper {
     int checkUsername(String username);
 
     User selectLogin(@Param("username") String username, @Param("password") String password);
+
+//    List<Map> getIdByPhone(@Param("phone") String phone);
+
+    int getIdByPhone(@Param("phone") String phone);
+
+    int updatePassword(@Param("password") String password, @Param("phone") String phone);
 }

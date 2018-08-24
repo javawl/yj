@@ -7,6 +7,7 @@ public enum  ResponseCode {
 
     SUCCESS(200, "SUCCESS"),
     ERROR(400, "ERROR"),
+    INNER_ERROR(500, "INNER_ERROR"),
     NEED_LOGIN(501, "NEED_LOGIN"),
     ILLEGAL_ARGUMENT(403, "NEED_LOGIN");
 
