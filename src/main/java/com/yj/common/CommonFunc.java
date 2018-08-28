@@ -1,5 +1,7 @@
 package com.yj.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.github.qcloudsms.httpclient.HTTPException;
@@ -20,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -174,6 +177,13 @@ public class CommonFunc {
         httpServletResponse.addCookie(cookie);
     }
 
+    public static void setGlobalCookie(HttpServletResponse httpServletResponse, String key, String value, int time){
+        Cookie cookie = new Cookie(key,value);
+        cookie.setMaxAge(time);
+        cookie.setPath("/");
+        httpServletResponse.addCookie(cookie);
+    }
+
 
     //获取cookie中某个键值的值，没有的话返回null
     public String getCookieValueBykey(HttpServletRequest request,String key){
@@ -189,6 +199,64 @@ public class CommonFunc {
                     // 取出cookie的值
                     value = cookie.getValue();
                     return value;
+                }
+            }
+            //没找到返回null
+            return null;
+        }
+    }
+
+    //获取图片或视频完整路径
+    public static String getResourcePath(String fileName){
+        return Const.DOMAIN_NAME + fileName;
+    }
+
+    //获取cookie中某个键值的值，没有的话返回null
+    public static String CheckToken(HttpServletRequest request,String token){
+        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+        if(null==cookies) {
+            //没有cookie
+            return null;
+        }else{
+            String value = "";
+            for(Cookie cookie : cookies){
+                //找到
+                if (cookie.getName().equals(token)) {
+                    // 取出cookie的值
+                    value = cookie.getValue();
+                    return value;
+                }
+            }
+            //没找到返回null
+            return null;
+        }
+    }
+
+    //检查用户传入参数是否为空
+    public static String CheckNull(List<Object> parameter){
+        //返回null说明检查成功！
+        for (int i = 0; i < parameter.size(); i++){
+            if (parameter.get(i) == null || parameter.get(i).equals("")) return "请补全参数！";
+        }
+        return null;
+    }
+
+    //通过token获取用户id
+    public static String getIdByToken(HttpServletRequest request, String token){
+        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+        if(null==cookies) {
+            //没有cookie
+            return null;
+        }else{
+            String value = "";
+            for(Cookie cookie : cookies){
+                //找到
+                if (cookie.getName().equals(token)) {
+                    // 取出cookie的值
+                    value = cookie.getValue();
+                    JSONObject json = JSON.parseObject(value);
+                    String id = json.getString("id");
+                    return id;
                 }
             }
             //没找到返回null

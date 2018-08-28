@@ -65,7 +65,8 @@ public class UserController extends BaseController {
             //生成token
             token = CommonFunc.generateToken(Const.TOKEN_LOGIN_SALT);
             //加进cookie
-            CommonFunc.setCookie(httpServletResponse, token, id, Const.TOKEN_EXIST_TIME);
+            CommonFunc.setGlobalCookie(httpServletResponse, token, id, Const.TOKEN_EXIST_TIME);
+
         }else {
             //取出错误信息
             return ServerResponse.createByErrorMessage(response.getMsg());
@@ -208,14 +209,90 @@ public class UserController extends BaseController {
 
 
     /**
+     * 获取选择的学习计划的天数种类和单词数
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "get_plan_day.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request){
+        //调用service层
+        return iUserService.get_plan_day(request);
+    }
+
+
+    /**
+     * 看看该用户都有多少计划
+     * @param token(header中)
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "get_my_plan.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> get_my_plan(HttpServletRequest request){
+        //调用service层
+        return iUserService.get_my_plan(request);
+    }
+
+
+    /**
+     * 用户决定自己背单词天数和每日背单词的数量
+     * @param token(header中)
+     * @param days
+     * @param daily_word_number
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "decide_plan_days.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> decide_plan_days(String daily_word_number, String days, HttpServletRequest request){
+        //调用service层
+        return iUserService.decide_plan_days(daily_word_number, days, request);
+    }
+
+    /**
+     * 用户选择计划
+     * @param token
+     * @param plan
+     * @return
+     */
+    @RequestMapping(value = "decide_plan.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> decide_plan(String plan, HttpServletRequest request){
+        //调用service层
+        return iUserService.decide_plan(plan,  request);
+    }
+
+    /**
+     * 用户修改选中的学习计划
+     * @param token
+     * @param plan
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "decide_selected_plan.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request){
+        //调用service层
+        return iUserService.decide_selected_plan(plan,  request);
+    }
+
+
+    /**
      * 测试
      * @return
      */
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse test(String phone,HttpServletRequest request){
-        System.out.println(JSON.toJSONString(userMapper.getIdByPhone("15875658189")));
-        return ServerResponse.createByErrorMessage("成功");
+        try {
+            if (true){
+                throw new Exception("更新出错");
+            }
+            return ServerResponse.createByErrorMessage("成功");
+        } catch (Exception e) {
+            return ServerResponse.createByErrorMessage(e.getMessage());
+        }
     }
 
     /**

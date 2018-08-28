@@ -11,17 +11,19 @@ import com.yj.pojo.User;
 import com.yj.service.IUserService;
 import com.yj.util.AES;
 import com.yj.util.MD5Util;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by 63254 on 2018/8/15.
@@ -32,6 +34,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ApplicationContext ctx;
 
     @Override
     public ServerResponse<User> login(HttpServletRequest request) throws Exception {
@@ -290,9 +295,216 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<List<Map>> get_plans(String type){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(type);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //获取该种类下的所有计划
         List<Map> plan = userMapper.selectPlanByType(type);
 
         return ServerResponse.createBySuccess("查询成功!", plan);
+    }
+
+    @Override
+    public ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //找到计划的词汇数，然后进行计算
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String check_token = func.getCookieValueBykey(request,token);
+        String id;
+        if (check_token == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            id = check_token;
+            //找到该id计划的总单词数
+            int number = userMapper.getMyPlanWordsNumber(id);
+            if (number == 0){
+                return ServerResponse.createByErrorMessage("该用户未选择学习计划！");
+            }
+            //到时候装多个map
+            List<Map<String,Integer>> L1 = new ArrayList<Map<String, Integer>>();
+            for (Double i = 2.0; i <= 12; i++){
+                //创建map来装几条信息
+                Map<String,Integer> m1 = new HashMap<String,Integer>();
+                Double daily_word_number = i * Const.WORD_SPACE;
+                Double days = Math.ceil(number / daily_word_number);
+                m1.put("daily_word_number", daily_word_number.intValue());
+                m1.put("days", days.intValue());
+                L1.add(m1);
+            }
+            return ServerResponse.createBySuccess("成功！",L1);
+        }
+    }
+
+    @Override
+    public ServerResponse<Map<Object,Object>> get_my_plan(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        //创建map来装几条信息
+        Map<Object,Object> m1 = new HashMap<Object,Object>();
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //这是用户选择的那个词库
+            String SelectPlan = userMapper.getUserSelectPlan(id);
+            //这是用户除了选择的词库外拥有的词库
+            List<Map> have_plan = userMapper.getUserPlan(id);
+            m1.put("selected_plan",SelectPlan);
+            m1.put("have_plan",have_plan);
+            return ServerResponse.createBySuccess("成功！",m1);
+        }
+    }
+
+    @Override
+    public ServerResponse<String> decide_plan_days(String daily_word_number, String days, HttpServletRequest Request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(Request.getHeader("token"));
+            add(daily_word_number);
+            add(days);
+        }};
+        String token = Request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(Request,token);
+        //创建map来装几条信息
+        Map<Object,Object> m1 = new HashMap<Object,Object>();
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            if (StringUtils.isNumeric(daily_word_number) && StringUtils.isNumeric(days)){
+                //判断每日单词数是否合法
+                if (Integer.valueOf(daily_word_number) % Const.WORD_SPACE.intValue() != 0) return ServerResponse.createByErrorMessage("输入每日单词数不合系统间隔！");
+                //插入
+                int resultCount = userMapper.decide_plan_days(id,days, daily_word_number);
+                if (resultCount > 0){
+                    return ServerResponse.createBySuccessMessage("成功");
+                }else {
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                return ServerResponse.createByErrorMessage("传入参数并非数字！");
+            }
+        }
+    }
+
+    @Override
+    public ServerResponse<String> decide_plan(String plan, HttpServletRequest Request){
+        //选择计划
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(Request.getHeader("token"));
+            add(plan);
+        }};
+        String token = Request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(Request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //检查一下计划是否存在并查出词数
+            int CheckExist = userMapper.check_plan(plan);
+            if (CheckExist == 0){
+                return ServerResponse.createByErrorMessage("没有此学习计划！");
+            }
+            //查一下用户是否已经添加这个计划了
+            String CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
+            if (CheckUserPlanExist != null){
+                return ServerResponse.createByErrorMessage("已添加过该计划了！");
+            }
+            //计算初始化天数
+            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
+            //添加学习计划
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                if (userMapper.getUserSelectPlan(id) == null){
+                    //用户表
+                    int userResult = userMapper.decide_plan_user(id, plan, String.valueOf(days.intValue()), String.valueOf(Const.WORD_INIT));
+                    if (userResult == 0){
+                        throw new Exception();
+                    }
+                }
+                //take_plans表插入数据
+                int plansResult = userMapper.decide_plan_all(id, plan);
+                if (plansResult == 0){
+                    throw new Exception();
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+    @Override
+    public ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request){
+        //修改选中的计划
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(plan);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //检查一下计划是否存在
+            int CheckExist = userMapper.check_plan(plan);
+            if (CheckExist == 0){
+                return ServerResponse.createByErrorMessage("没有此学习计划！");
+            }
+
+            //检查一下这个学习计划是否在自己的学习计划中
+            String CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
+            if (CheckUserPlanExist == null){
+                return ServerResponse.createByErrorMessage("此计划不在我的计划中！");
+            }
+            //剩余单词数为总单词数减去已学单词数
+
+            //计算初始化天数
+            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
+            //用户表
+            int userResult = userMapper.decide_plan_user(id, plan, String.valueOf(days.intValue()), String.valueOf(Const.WORD_INIT));
+            if (userResult == 0){
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
     }
 }

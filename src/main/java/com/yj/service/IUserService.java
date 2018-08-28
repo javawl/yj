@@ -34,4 +34,14 @@ public interface IUserService {
     ServerResponse<List<Map>> get_plan_types();
 
     ServerResponse<List<Map>> get_plans(String type);
+
+    ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request);
+
+    ServerResponse<Map<Object,Object>> get_my_plan(HttpServletRequest request);
+
+    ServerResponse<String> decide_plan_days(String daily_word_number, String days, HttpServletRequest Request);
+
+    ServerResponse<String> decide_plan(String plan, HttpServletRequest Request);
+
+    ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request);
 }

@@ -38,4 +38,26 @@ public interface UserMapper {
 
     //查类别下的计划
     List<Map> selectPlanByType(@Param("type") String type);
+
+    //获取用户所选词表下的单词数
+    int getMyPlanWordsNumber(@Param("id") String id);
+
+    String getUserSelectPlan(@Param("id") String id);
+
+    List<Map> getUserPlan(@Param("id") String id);
+
+    int decide_plan_days(@Param("id") String id, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
+
+    int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
+
+    //计划表添加计划
+    int decide_plan_all(@Param("id") String id, @Param("plan") String plan);
+
+    //查一下用户是否已经添加这个计划了
+    String selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);
+
+    int check_plan(@Param("plan") String plan);
+
+    List<Map> getUserPlanDaysNumber(@Param("id") String id);
+
 }

@@ -184,11 +184,76 @@
   </select>
   
   <select id="selectPlanByType" resultType="map" parameterType="string">
-    SELECT plan
+    SELECT plan,word_number
     FROM plans
     WHERE (SELECT id
 			FROM plan_types
             WHERE type = #{type})
             = type_id
+  </select>
+
+
+  <select id="getMyPlanWordsNumber" resultType="int" parameterType="string">
+    SELECT CASE WHEN (SELECT my_plan
+			 FROM user
+       WHERE id = #{id})
+    IS NULL THEN 0
+    ELSE (SELECT word_number
+    FROM plans
+    WHERE (SELECT my_plan
+                 FROM user
+           WHERE id = #{id})= plan)
+    END
+  </select>
+
+  <select id="getUserSelectPlan" resultType="string" parameterType="string">
+    SELECT my_plan
+       FROM user
+    WHERE id = #{id}
+  </select>
+
+  <select id="getUserPlan" resultType="map" parameterType="string">
+    SELECT plan
+    FROM plans
+    WHERE id IN (SELECT plan_id
+        FROM take_plans
+    WHERE user_id = #{id})
+  </select>
+  <select id="getUserPlanDaysNumber" resultType="map" parameterType="string">
+    SELECT my_plan,plan_days,plan_words_number,insist_day
+    FROM user
+    WHERE id = #{id}
+  </select>
+  <update id="decide_plan_days" parameterType="string">
+    UPDATE user
+    set plan_days = #{days},
+    plan_words_number = #{daily_word_number}
+    WHERE id = #{id}
+  </update>
+
+  <update id="decide_plan_user" parameterType="string">
+    UPDATE user
+    set my_plan = #{plan},
+    plan_days = #{days},
+    plan_words_number = #{daily_word_number}
+    WHERE id = #{id}
+  </update>
+
+  <insert id="decide_plan_all" parameterType="string">
+    INSERT INTO take_plans (plan, user_id, plan_id)
+    values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}))
+  </insert>
+
+  <select id="check_plan" resultType="int" parameterType="string" >
+    SELECT IFNULL(word_number,0)
+    FROM plans
+    WHERE plan = #{plan}
+  </select>
+
+  <select id="selectUserPlanExist" resultType="string" parameterType="string" >
+    SELECT IFNULL(learned_word_number,-1)
+    FROM take_plans
+    WHERE plan = #{plan}
+    AND user_id = #{id}
   </select>
 </mapper>
