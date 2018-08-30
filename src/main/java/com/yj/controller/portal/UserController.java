@@ -325,7 +325,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test2.do", method = RequestMethod.GET)
     @ResponseBody
-    public String test2(@CookieValue("id") String testCookie,HttpServletRequest Request){
+    public String test2(HttpServletRequest Request){
         CommonFunc func = new CommonFunc();
         String check = func.getCookieValueBykey(Request,"1");
         return check;
