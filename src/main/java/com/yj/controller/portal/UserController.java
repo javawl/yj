@@ -284,9 +284,8 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
-    public void test(String phone,HttpServletRequest request){
-        System.out.println(phone);
-        System.out.println(request.getHeader("token"));
+    public String test(String register_token,HttpServletRequest request){
+        return register_token;
     }
 
     /**
