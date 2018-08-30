@@ -1,5 +1,7 @@
 package com.yj.service.impl;
 
+import com.alibaba.fastjson.serializer.IntegerCodec;
+import com.github.pagehelper.StringUtil;
 import com.yj.dao.DictionaryMapper;
 import com.yj.service.IHomeService;
 import com.alibaba.fastjson.JSON;
@@ -87,6 +89,7 @@ public class HomeServiceImpl implements IHomeService {
                     }else {
                         m3.put("cover_page",m2.get("video"));
                     }
+                    m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
                     m3.put("likes",m2.get("likes"));
                     m3.put("comments",m2.get("comments"));
@@ -103,6 +106,287 @@ public class HomeServiceImpl implements IHomeService {
                 return ServerResponse.createBySuccess("成功!",json);
             }catch (Exception e){
                 return ServerResponse.createByErrorMessage("查找信息有误！");
+            }
+        }
+    }
+
+    //评论feeds
+    public ServerResponse<String> comment_feeds(String id, String comment, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+            add(comment);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments += 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //feeds表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表插入数据
+                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+
+    }
+
+    //点赞feeds
+    public ServerResponse<String> like_feeds(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+
+            //检查有没有这条feeds流并且获取点赞数
+            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取点赞数
+            int likes = Integer.valueOf(CheckFeeds.get("likes").toString());
+            //查一下是否已经点赞
+            Map CheckIsLike = dictionaryMapper.findIsLike(uid,id);
+            if (CheckIsLike == null){
+                //没有点赞就点赞
+                likes += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeFeedsLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表插入数据
+                    int feedsLikeResult = dictionaryMapper.insertFeedsLike(uid,id,String.valueOf(new Date().getTime()));
+                    if (feedsLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经点赞了就取消点赞
+                likes -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeFeedsLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int feedsLikeResult = dictionaryMapper.deleteFeedsLike(uid,id);
+                    if (feedsLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }
+        }
+    }
+
+    //返回已背单词
+    public ServerResponse<List<Map>> reciting_words(String page, String size, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(page);
+            add(size);
+        }};
+        int page_new,size_new;
+        try {
+            page_new = Integer.parseInt(page);
+            size_new = Integer.parseInt(size);
+        }catch (Exception e){
+            return ServerResponse.createByErrorMessage("页数和大小必须为数字！");
+        }
+        //判断非法页数和大小的情况
+        if ((page_new * size_new == 0 && page_new + size_new != 0) || page_new < 0 || size_new < 0){
+            return ServerResponse.createByErrorMessage("页数和大小必须同时为零或者同时大于零！");
+        }
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            if (page_new == 0 && size_new == 0){
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectRecitingWordsAll(plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
+                }
+
+                return ServerResponse.createBySuccess("成功!",result);
+            }else{
+                //将页数和大小转化为limit
+                int start = (page_new - 1) * size_new;
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectRecitingWords(start,size_new,plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无已背单词",new ArrayList<Map>());
+                }
+
+                return ServerResponse.createBySuccess("成功!",result);
+            }
+        }
+    }
+
+    //返回已掌握单词
+    public ServerResponse<List<Map>> mastered_words(String page, String size, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(page);
+            add(size);
+        }};
+        int page_new,size_new;
+        try {
+            page_new = Integer.parseInt(page);
+            size_new = Integer.parseInt(size);
+        }catch (Exception e){
+            return ServerResponse.createByErrorMessage("页数和大小必须为数字！");
+        }
+        //判断非法页数和大小的情况
+        if ((page_new * size_new == 0 && page_new + size_new != 0) || page_new < 0 || size_new < 0){
+            return ServerResponse.createByErrorMessage("页数和大小必须同时为零或者同时大于零！");
+        }
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            if (page_new == 0 && size_new == 0){
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectMasteredWordsAll(plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
+                }
+                return ServerResponse.createBySuccess("成功!",result);
+            }else{
+                //将页数和大小转化为limit
+                int start = (page_new - 1) * size_new;
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectMasteredWords(start,size_new,plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无已掌握单词",new ArrayList<Map>());
+                }
+                return ServerResponse.createBySuccess("成功!",result);
+            }
+        }
+    }
+
+    //返回未背单词
+    public ServerResponse<List<Map>> not_memorizing_words(String page, String size, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(page);
+            add(size);
+        }};
+        int page_new,size_new;
+        try {
+            page_new = Integer.parseInt(page);
+            size_new = Integer.parseInt(size);
+        }catch (Exception e){
+            return ServerResponse.createByErrorMessage("页数和大小必须为数字！");
+        }
+        //判断非法页数和大小的情况
+        if ((page_new * size_new == 0 && page_new + size_new != 0) || page_new < 0 || size_new < 0){
+            return ServerResponse.createByErrorMessage("页数和大小必须同时为零或者同时大于零！");
+        }
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            if (page_new == 0 && size_new == 0){
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectNotMemorizingWordsAll(plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
+                }
+
+                return ServerResponse.createBySuccess("成功!",result);
+            }else {
+                //将页数和大小转化为limit
+                int start = (page_new - 1) * size_new;
+                //获取该用户的计划
+                String plan = userMapper.getUserSelectPlan(uid);
+                List<Map> result = dictionaryMapper.selectNotMemorizingWords(start,size_new,plan);
+                if (result == null){
+                    return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
+                }
+
+                return ServerResponse.createBySuccess("成功!",result);
             }
         }
     }

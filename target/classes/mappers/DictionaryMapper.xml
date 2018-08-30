@@ -332,6 +332,8 @@
   </update>
 
 
+
+  <!--下面是自己写的-->
   <select id="getLearnedWordNumber" resultType="int" parameterType="string">
     SELECT learned_word_number
     FROM take_plans
@@ -339,16 +341,114 @@
   </select>
 
   <select id="homePageFirstGet" resultType="map">
-    (SELECT title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT id,title,pic,video,likes,comments,cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY 2*comments+likes DESC
     LIMIT 0,3)
     UNION
-    (SELECT title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT id,title,pic,video,likes,comments,cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY set_time DESC
     LIMIT 0,3)
+  </select>
+
+  <select id="getFeedsCommentLike" resultType="map">
+    SELECT likes,comments
+    FROM feeds
+    WHERE id = #{id}
+  </select>
+
+  <select id="findIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_like
+    WHERE user_id = #{user_id}
+    AND feeds_id = #{feeds_id}
+  </select>
+
+  <update id="changeFeedsComments" parameterType="string">
+    UPDATE feeds
+    set comments = #{comments}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeFeedsLikes" parameterType="string">
+    UPDATE feeds
+    set likes = #{likes}
+    WHERE id = #{id}
+  </update>
+
+  <insert id="insertFeedsComment" parameterType="string">
+    INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
+    values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
+  </insert>
+
+  <insert id="insertFeedsLike" parameterType="string">
+    INSERT INTO feeds_like (user_id, feeds_id, set_time)
+    values (#{user_id}, #{feeds_id}, #{set_time})
+  </insert>
+
+
+  <delete id="deleteFeedsLike" parameterType="string" >
+    delete from feeds_like
+    WHERE user_id = #{user_id}
+    AND feeds_id = #{feeds_id}
+  </delete>
+
+  <select id="selectRecitingWords" resultType="map">
+    SELECT id,word,meaning
+    FROM reciting_words
+    WHERE plan = #{plan}
+    ORDER BY word
+    LIMIT #{param1},#{param2}
+  </select>
+
+  <select id="selectMasteredWords" resultType="map">
+    SELECT id,word,meaning
+    FROM mastered_words
+    WHERE plan = #{plan}
+    ORDER BY word
+    LIMIT #{param1},#{param2}
+  </select>
+
+  <select id="selectNotMemorizingWords" resultType="map">
+    SELECT id,word,real_meaning
+    FROM dictionary
+    WHERE id NOT IN
+    (SELECT word_id
+    FROM reciting_words
+    WHERE plan = #{plan})
+    AND type =
+    (SELECT dictionary_type
+    FROM plans
+    WHERE plan = #{plan})
+    ORDER BY word
+    LIMIT #{param1},#{param2}
+  </select>
+
+  <select id="selectRecitingWordsAll" resultType="map" parameterType="string">
+    SELECT id,word,meaning
+    FROM reciting_words
+    WHERE plan = #{plan}
+    ORDER BY word
+  </select>
+
+  <select id="selectMasteredWordsAll" resultType="map" parameterType="string">
+    SELECT id,word,meaning
+    FROM mastered_words
+    WHERE plan = #{plan}
+    ORDER BY word
+  </select>
+
+  <select id="selectNotMemorizingWordsAll" resultType="map" parameterType="string">
+    SELECT id,word,real_meaning
+    FROM dictionary
+    WHERE id NOT IN
+    (SELECT word_id
+    FROM reciting_words
+    WHERE plan = #{plan})
+    AND plan = #{plan}
+    ORDER BY word
   </select>
 </mapper>

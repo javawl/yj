@@ -25,4 +25,44 @@ public interface DictionaryMapper {
     int getLearnedWordNumber(@Param("plan") String plan);
 
     List<Map> homePageFirstGet();
+
+    //取出feeds流的
+    Map getFeedsCommentLike(@Param("id") String id);
+
+    //feeds表修改评论数
+    int changeFeedsComments(@Param("comments") String comments,@Param("id") String id);
+
+    //feeds表修改点赞数
+    int changeFeedsLikes(@Param("likes") String likes,@Param("id") String id);
+
+    //comment表插入数据
+    int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
+
+    //FeedsLike表插入数据
+    int insertFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
+
+    //检查是否点赞
+    Map findIsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //取消点赞
+    int deleteFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //已背单词
+    List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+
+    //已掌握单词
+    List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+
+    //未背单词
+    List<Map> selectNotMemorizingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+
+
+    //已背单词(all)
+    List<Map> selectRecitingWordsAll(@Param("plan") String plan);
+
+    //已掌握单词(all)
+    List<Map> selectMasteredWordsAll(@Param("plan") String plan);
+
+    //未背单词(all)
+    List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan);
 }

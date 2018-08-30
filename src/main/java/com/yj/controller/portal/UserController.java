@@ -284,15 +284,9 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse test(String phone,HttpServletRequest request){
-        try {
-            if (true){
-                throw new Exception("更新出错");
-            }
-            return ServerResponse.createByErrorMessage("成功");
-        } catch (Exception e) {
-            return ServerResponse.createByErrorMessage(e.getMessage());
-        }
+    public void test(String phone,HttpServletRequest request){
+        System.out.println(phone);
+        System.out.println(request.getHeader("token"));
     }
 
     /**

@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by 63254 on 2018/8/15.
  */
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
 //保证序列化json的时候，如果是null的对象，key也会消失
 public class ServerResponse<T> implements Serializable {
 
