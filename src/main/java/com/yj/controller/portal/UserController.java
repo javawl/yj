@@ -284,8 +284,22 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
-    public String test(String register_token,HttpServletRequest request){
-        return register_token;
+    public ServerResponse<JSONObject> test(HttpServletRequest request,HttpServletResponse httpServletResponse){
+        String token = CommonFunc.generateToken(Const.PHONE_REGISTER_SALT);
+
+        //将phone和code存入缓存
+        Cookie cookie = new Cookie("1",token);
+        cookie.setMaxAge(Const.REGISTER_STATE_EXISIT_TIME);
+        httpServletResponse.addCookie(cookie);
+        //创建map来放返回信息
+        Map<String,String> m2 = new HashMap<String,String>();
+        m2.put("register_token",token);
+        //转JSON串
+        String JSONString2 = JSON.toJSONString(m2);
+        //转json对象
+        JSONObject JSON2 = JSONObject.parseObject(JSONString2);
+
+        return ServerResponse.createBySuccess("发送成功!",JSON2);
     }
 
     /**
@@ -311,8 +325,10 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test2.do", method = RequestMethod.GET)
     @ResponseBody
-    public String test2(@CookieValue("id") String testCookie){
-        return testCookie;
+    public String test2(@CookieValue("id") String testCookie,HttpServletRequest Request){
+        CommonFunc func = new CommonFunc();
+        String check = func.getCookieValueBykey(Request,"1");
+        return check;
     }
 
     /**
