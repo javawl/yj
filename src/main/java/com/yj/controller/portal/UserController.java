@@ -290,6 +290,7 @@ public class UserController extends BaseController {
         //将phone和code存入缓存
         Cookie cookie = new Cookie("1",token);
         cookie.setMaxAge(Const.REGISTER_STATE_EXISIT_TIME);
+        cookie.setPath("/");
         httpServletResponse.addCookie(cookie);
         //创建map来放返回信息
         Map<String,String> m2 = new HashMap<String,String>();
@@ -308,15 +309,10 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test1.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse test1(HttpServletResponse httpServletResponse){
-//        Cookie cookie = new Cookie("id","5");
-//        cookie.setMaxAge(3600);
-//        httpServletResponse.addCookie(cookie);
-//        return "success";
-        String s = "1111111111";
-        String ValidateResult = PhoneValidate(s);
-        System.out.println(ValidateResult);
-        return ServerResponse.createByErrorMessage(ValidateResult);
+    public Cookie[] test1(HttpServletResponse httpServletResponse,HttpServletRequest request){
+       Cookie[] cookies = request.getCookies();
+
+        return cookies;
     }
 
     /**
