@@ -116,7 +116,7 @@ public class UserServiceImpl implements IUserService {
         String check = func.getCookieValueBykey(Request,register_token);
         if (check == null){
             //未找到
-            return ServerResponse.createByErrorMessage("token错误！");
+            return ServerResponse.createByErrorMessage("token错误:"+register_token);
         }else {
             //判断验证码是否正确
             JSONObject json = JSON.parseObject(check);

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IUserService;
@@ -38,7 +39,7 @@ public class UserController extends BaseController {
     private IUserService iUserService;
 
     @Autowired
-    private UserMapper userMapper;
+    private DictionaryMapper dictionaryMapper;
 
 
     /**
@@ -290,7 +291,7 @@ public class UserController extends BaseController {
         //将phone和code存入缓存
         Cookie cookie = new Cookie("1",token);
         cookie.setMaxAge(Const.REGISTER_STATE_EXISIT_TIME);
-        cookie.setPath("/");
+//        cookie.setPath("/");
         httpServletResponse.addCookie(cookie);
         //创建map来放返回信息
         Map<String,String> m2 = new HashMap<String,String>();
@@ -299,6 +300,7 @@ public class UserController extends BaseController {
         String JSONString2 = JSON.toJSONString(m2);
         //转json对象
         JSONObject JSON2 = JSONObject.parseObject(JSONString2);
+
 
         return ServerResponse.createBySuccess("发送成功!",JSON2);
     }
