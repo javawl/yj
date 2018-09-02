@@ -360,14 +360,26 @@ public class UserServiceImpl implements IUserService {
         String id = func.getCookieValueBykey(request,token);
         //创建map来装几条信息
         Map<Object,Object> m1 = new HashMap<Object,Object>();
+        Map<Object,Object> m2 = new HashMap<Object,Object>();
         if (id == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
             //这是用户选择的那个词库
             String SelectPlan = userMapper.getUserSelectPlan(id);
+            int SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan);
+            m2.put("plan",SelectPlan);
+            m2.put("word_number",SelectPlanNumber);
             //这是用户除了选择的词库外拥有的词库
             List<Map> have_plan = userMapper.getUserPlan(id);
+            for (int i = 0; i < have_plan.size(); i++){
+                Map<Object,Object> m3 = new HashMap<Object,Object>();
+                String plan = have_plan.get(i).get("plan").toString();
+                int PlanNumber = userMapper.getPlanWordsNumberByPlan(plan);
+                m3.put("plan",plan);
+                m3.put("word_number",PlanNumber);
+                have_plan.set(i, m3);
+            }
             m1.put("selected_plan",SelectPlan);
             m1.put("have_plan",have_plan);
             return ServerResponse.createBySuccess("成功！",m1);
@@ -410,7 +422,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ServerResponse<String> decide_plan(String plan, HttpServletRequest Request){
+    public ServerResponse<String> decide_plan(String daily_word_number, String days,String plan, HttpServletRequest Request){
         //选择计划
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -432,12 +444,12 @@ public class UserServiceImpl implements IUserService {
                 return ServerResponse.createByErrorMessage("没有此学习计划！");
             }
             //查一下用户是否已经添加这个计划了
-            String CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
+            Map CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
             if (CheckUserPlanExist != null){
                 return ServerResponse.createByErrorMessage("已添加过该计划了！");
             }
-            //计算初始化天数
-            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
+//            计算初始化天数
+//            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
             //添加学习计划
             //事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
@@ -446,15 +458,13 @@ public class UserServiceImpl implements IUserService {
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             TransactionStatus status = transactionManager.getTransaction(def);
             try {
-                if (userMapper.getUserSelectPlan(id) == null){
-                    //用户表
-                    int userResult = userMapper.decide_plan_user(id, plan, String.valueOf(days.intValue()), String.valueOf(Const.WORD_INIT));
-                    if (userResult == 0){
-                        throw new Exception();
-                    }
+                //用户表更新新计划为学习中计划
+                int userResult = userMapper.decide_plan_user(id, plan, days, daily_word_number);
+                if (userResult == 0){
+                    throw new Exception();
                 }
                 //take_plans表插入数据
-                int plansResult = userMapper.decide_plan_all(id, plan);
+                int plansResult = userMapper.decide_plan_all(id, plan,days,daily_word_number);
                 if (plansResult == 0){
                     throw new Exception();
                 }
@@ -491,20 +501,50 @@ public class UserServiceImpl implements IUserService {
             }
 
             //检查一下这个学习计划是否在自己的学习计划中
-            String CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
+            Map CheckUserPlanExist = userMapper.selectUserPlanExist(id,plan);
             if (CheckUserPlanExist == null){
                 return ServerResponse.createByErrorMessage("此计划不在我的计划中！");
             }
             //剩余单词数为总单词数减去已学单词数
 
-            //计算初始化天数
-            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
+//            //计算初始化天数
+//            Double days = Math.ceil(CheckExist / Const.WORD_INIT);
             //用户表
-            int userResult = userMapper.decide_plan_user(id, plan, String.valueOf(days.intValue()), String.valueOf(Const.WORD_INIT));
+            int userResult = userMapper.decide_plan_user(id, plan, CheckUserPlanExist.get("days").toString(), CheckUserPlanExist.get("daily_word_number").toString());
             if (userResult == 0){
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
             return ServerResponse.createBySuccessMessage("成功");
         }
+    }
+
+    @Override
+    public ServerResponse<String> my_favorite( HttpServletRequest request){
+        //我喜欢的
+        return null;
+    }
+
+    @Override
+    public ServerResponse<String> its_dynamic(String id,HttpServletRequest request){
+        //他的动态
+        return null;
+    }
+
+    @Override
+    public ServerResponse<String> its_favorite(String id,HttpServletRequest request){
+        //她喜欢的
+        return null;
+    }
+
+    @Override
+    public ServerResponse<String> its_plan(String id,HttpServletRequest request){
+        //他的计划
+        return null;
+    }
+
+    @Override
+    public ServerResponse<String> my_info( HttpServletRequest request){
+        //我的资料
+        return null;
     }
 }

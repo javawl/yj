@@ -259,9 +259,9 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "decide_plan.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> decide_plan(String plan, HttpServletRequest request){
+    public ServerResponse<String> decide_plan(String daily_word_number, String days,String plan, HttpServletRequest request){
         //调用service层
-        return iUserService.decide_plan(plan,  request);
+        return iUserService.decide_plan(daily_word_number, days , plan,  request);
     }
 
     /**
@@ -276,6 +276,70 @@ public class UserController extends BaseController {
     public ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request){
         //调用service层
         return iUserService.decide_selected_plan(plan,  request);
+    }
+
+    /**
+     * 我喜欢的
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "my_favorite.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> my_favorite( HttpServletRequest request){
+        //调用service层
+        return iUserService.my_favorite(request);
+    }
+
+    /**
+     * 他的动态
+     * @param id 他的id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "its_dynamic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> its_dynamic(String id,HttpServletRequest request){
+        //调用service层
+        return iUserService.its_dynamic(id, request);
+    }
+
+    /**
+     * 她喜欢的
+     * @param id 他的id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "its_favorite.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> its_favorite(String id,HttpServletRequest request){
+        //调用service层
+        return iUserService.its_favorite(id, request);
+    }
+
+
+    /**
+     * 她的计划
+     * @param id 他的id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "its_plan.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> its_plan(String id,HttpServletRequest request){
+        //调用service层
+        return iUserService.its_plan(id, request);
+    }
+
+    /**
+     * 我的资料
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "my_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> my_info( HttpServletRequest request){
+        //调用service层
+        return iUserService.my_info(request);
     }
 
 

@@ -51,13 +51,15 @@ public interface UserMapper {
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
     //计划表添加计划
-    int decide_plan_all(@Param("id") String id, @Param("plan") String plan);
+    int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
     //查一下用户是否已经添加这个计划了
-    String selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);
+    Map selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);
 
     int check_plan(@Param("plan") String plan);
 
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
 
+    //根据计划名获取总数
+    int getPlanWordsNumberByPlan(@Param("plan") String plan);
 }

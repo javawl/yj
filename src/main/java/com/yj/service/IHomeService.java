@@ -31,4 +31,13 @@ public interface IHomeService {
 
     //返回未背单词
     ServerResponse<List<Map>> not_memorizing_words(String page, String size, HttpServletRequest request);
+
+    //文章详情页
+    ServerResponse<Map<String,Object>> article_detail(String id, HttpServletRequest request);
+
+    //删除评论
+    ServerResponse<String> delete_comment(String id, HttpServletRequest request);
+
+    //背单词
+    ServerResponse<String> recite_word(HttpServletRequest request);
 }

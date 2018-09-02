@@ -391,4 +391,18 @@ public class HomeServiceImpl implements IHomeService {
         }
     }
 
+    //文章详情页
+    public ServerResponse<Map<String,Object>> article_detail(String id, HttpServletRequest request){
+        return null;
+    }
+
+    //删除评论
+    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+        return null;
+    }
+
+    //背单词
+    public ServerResponse<String> recite_word(HttpServletRequest request){
+        return null;
+    }
 }

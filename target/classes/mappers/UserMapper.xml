@@ -206,6 +206,13 @@
     END
   </select>
 
+
+  <select id="getPlanWordsNumberByPlan" resultType="int" parameterType="string">
+    SELECT  word_number
+    FROM plans
+    WHERE plan = #{plan}
+  </select>
+
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
     SELECT my_plan
        FROM user
@@ -240,8 +247,8 @@
   </update>
 
   <insert id="decide_plan_all" parameterType="string">
-    INSERT INTO take_plans (plan, user_id, plan_id)
-    values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}))
+    INSERT INTO take_plans (plan, user_id, plan_id, days, daily_word_number)
+    values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}), #{days}, #{daily_word_number})
   </insert>
 
   <select id="check_plan" resultType="int" parameterType="string" >
@@ -250,8 +257,8 @@
     WHERE plan = #{plan}
   </select>
 
-  <select id="selectUserPlanExist" resultType="string" parameterType="string" >
-    SELECT IFNULL(learned_word_number,-1)
+  <select id="selectUserPlanExist" resultType="map" parameterType="string" >
+    SELECT id,days,daily_word_number
     FROM take_plans
     WHERE plan = #{plan}
     AND user_id = #{id}

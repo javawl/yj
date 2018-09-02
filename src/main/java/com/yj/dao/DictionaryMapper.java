@@ -56,7 +56,6 @@ public interface DictionaryMapper {
     //未背单词
     List<Map> selectNotMemorizingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
 
-
     //已背单词(all)
     List<Map> selectRecitingWordsAll(@Param("plan") String plan);
 

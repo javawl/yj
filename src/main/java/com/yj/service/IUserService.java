@@ -41,7 +41,17 @@ public interface IUserService {
 
     ServerResponse<String> decide_plan_days(String daily_word_number, String days, HttpServletRequest Request);
 
-    ServerResponse<String> decide_plan(String plan, HttpServletRequest Request);
+    ServerResponse<String> decide_plan(String daily_word_number, String days,String plan, HttpServletRequest Request);
 
     ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request);
+
+    ServerResponse<String> my_favorite( HttpServletRequest request);
+
+    ServerResponse<String> its_dynamic(String id,HttpServletRequest request);
+
+    ServerResponse<String> its_favorite(String id,HttpServletRequest request);
+
+    ServerResponse<String> its_plan(String id,HttpServletRequest request);
+
+    ServerResponse<String> my_info( HttpServletRequest request);
 }
