@@ -17,7 +17,7 @@
         //        var para = arrUrl[1];
         //        return para;
         //    }
-        var url = 'http://127.0.0.1:8080';
+        var url = 'http://123.207.85.37:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         //    var url1 = document.URL;
         //    if (url1 == url+'/admin/get_word.do'){
