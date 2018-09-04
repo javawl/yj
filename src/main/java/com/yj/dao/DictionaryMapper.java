@@ -50,6 +50,21 @@ public interface DictionaryMapper {
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
 
+    //后台
+    List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
+
+    //后台
+    List<Map> selectAdminVideo(@Param("id") String id);
+
+    //后台
+    List<Map> selectAdminSubtitles(@Param("id") String id);
+
+    //后台
+    Map getInfoByWordId(@Param("id") String id);
+
+    //后台
+    List<Map> selectAdminPlanType();
+
     //已掌握单词
     List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
 

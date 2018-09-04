@@ -44,6 +44,4 @@ public class PropertiesUtil {
         return value.trim();
     }
 
-
-
 }

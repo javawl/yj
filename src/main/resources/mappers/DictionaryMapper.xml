@@ -397,11 +397,42 @@
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
-    SELECT id,word,meaning
-    FROM reciting_words
-    WHERE plan = #{plan}
+  SELECT id,word,meaning
+  FROM reciting_words
+  WHERE plan = #{plan}
+  ORDER BY word
+  LIMIT #{param1},#{param2}
+</select>
+
+  <select id="selectAdminWords" resultType="map">
+    SELECT *
+    FROM dictionary
+    WHERE type = #{type}
     ORDER BY word
     LIMIT #{param1},#{param2}
+  </select>
+
+  <select id="selectAdminVideo" resultType="map" parameterType="string">
+    SELECT *
+    FROM word_video_information
+    WHERE word_id = #{id}
+  </select>
+
+  <select id="selectAdminSubtitles" resultType="map" parameterType="string">
+    SELECT *
+    FROM subtitles
+    WHERE video_id = #{id}
+  </select>
+
+  <select id="getInfoByWordId" resultType="map" parameterType="string">
+    SELECT *
+    FROM dictionary
+    WHERE id = #{id}
+  </select>
+
+  <select id="selectAdminPlanType" resultType="map">
+    SELECT plan,dictionary_type
+    FROM plans
   </select>
 
   <select id="selectMasteredWords" resultType="map">
