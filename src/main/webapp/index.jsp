@@ -9,15 +9,8 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-        //    function GetUrlPara()
-        //    {
-        //        var url = document.location.toString();
-        //        var arrUrl = url.split("?");
-        //
-        //        var para = arrUrl[1];
-        //        return para;
-        //    }
-        var url = 'http://123.207.85.37:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://123.207.85.37:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         //    var url1 = document.URL;
         //    if (url1 == url+'/admin/get_word.do'){
@@ -37,6 +30,7 @@
                         var string4;
                         var string5;
                         var string6;
+                        var string7;
                         if (data[i]['pronunciation_en']==''){
                             string1 = '此资源为空（未爬到）'
                         }else {
@@ -65,7 +59,13 @@
                         if (data[i]['sentence_audio']==''){
                             string6 = '此资源为空（未爬到）'
                         }else {
-                            string6 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['sentence_audio']+'">查看</a></button>';
+//                            string6 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['sentence_audio']+'">查看</a></button>';
+                            string6 = '<audio src="'+root_url+data[i]['sentence_audio']+'" controls="controls"></audio>';
+                        }
+                        if (data[i]['pic']==''){
+                            string7 = '此资源为空（未爬到）'
+                        }else {
+                            string7 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pic']+'">查看</a></button>';
                         }
                         $("#special").append('<tr>'+
                                 '<td style="width: 4%;">'+data[i]['word']+'</td>'+
@@ -84,8 +84,9 @@
                                 +'<td style="width: 4%;">'+string5+'</td>'
                                 +'<td style="width: 20%;">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
                                 +'<td style="width: 4%;">'+string6+'</td>'
-                                +'<td style="width: 4%;"><button type="button"><a style="color: black" href="">查看</a></button></td>'+
-                                '<td style="width: 9%;"><button onclick="edit()">修改</button><button style="margin-left: 5px;" onclick="del()">删除</button></td>'+
+                                +'<td style="width: 4%;">'+string7+'</td>'
+                                +'<td style="width: 4%;"><button type="button"><a style="color: black" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+
+                                '<td style="width: 6%;"><button onclick="edit()">修改</button><br><button style="margin-left: 5px;" onclick="del()">删除</button></td>'+
                                 '</tr>');
                     }
 //                if (result.status == 200){
@@ -121,8 +122,9 @@
             <td  style="width: 4%;">单词音频百词斩</td>
             <td  style="width: 20%;">例句百词斩</td>
             <td  style="width: 4%;">例句音频百词斩</td>
+            <td  style="width: 4%;">图片百词斩</td>
             <td  style="width: 4%;">视频</td>
-            <td  style="width: 9%;">操作</td>
+            <td  style="width: 6%;">操作</td>
         </tr>
     </table>
     <table>
