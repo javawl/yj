@@ -379,6 +379,22 @@
     WHERE id = #{id}
   </update>
 
+  <update id="updateWordInfo" parameterType="string">
+    UPDATE `dictionary` SET
+    `word`= #{word},
+    `meaning`= #{meaning},
+    `phonetic_symbol_en`=#{phonetic_symbol_en},
+    `sentence`=#{sentence},
+    `phonetic_symbol_us`=#{phonetic_symbol_us},
+    `phonetic_symbol`=#{phonetic_symbol},
+    `sentence_cn`=#{sentence_cn},
+    `real_meaning`=#{real_meaning},
+    `phonetic_symbol_en_Mumbler`=#{phonetic_symbol_en_Mumbler},
+    `phonetic_symbol_us_Mumbler`=#{phonetic_symbol_us_Mumbler},
+    `meaning_Mumbler`=#{meaning_Mumbler}
+    WHERE id = #{id}
+  </update>
+
   <insert id="insertFeedsComment" parameterType="string">
     INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
@@ -477,15 +493,36 @@
     WHERE plan = #{plan}
     ORDER BY word
   </select>
+
+  <select id="selectAllWord" resultType="map" parameterType="string">
+    SELECT id
+    FROM dictionary
+    WHERE word = #{word}
+  </select>
   
   <delete id="deleteWordInfo" parameterType="string">
     DELETE FROM dictionary
-    WHERE id = #{id}
+    WHERE word = #{word}
   </delete>
 
-  <delete id="deleteWordVideoSub" parameterType="string">
+  <delete id="deleteWordSub" parameterType="string">
     DELETE FROM subtitles
-    WHERE id = #{id}
+    WHERE video_id IN (SELECT id
+    FROM word_video_information
+    WHERE word_id IN (SELECT id
+    FROM dictionary WHERE word = #{word}))
+  </delete>
+
+  <delete id="deleteWordVideo" parameterType="string">
+    DELETE FROM word_video_information
+    WHERE word_id IN (SELECT id
+    FROM dictionary WHERE word = #{word})
+  </delete>
+
+  <delete id="existWordVideo" parameterType="string">
+    SELECT COUNT(id) FROM word_video_information
+    WHERE word_id IN (SELECT id
+    FROM dictionary WHERE word = #{word})
   </delete>
 
   <select id="selectMasteredWordsAll" resultType="map" parameterType="string">

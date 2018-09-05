@@ -72,10 +72,24 @@ public interface DictionaryMapper {
     List<Map> selectAdminPlanType();
 
     //后台
-    int deleteWordInfo(@Param("id") String id);
+    int deleteWordInfo(@Param("word") String word);
 
     //后台
-    int deleteWordVideoSub(@Param("id") String id);
+    List<Map> selectAllWord(@Param("word") String word);
+
+    //后台
+    int updateWordInfo(@Param("id") String id,@Param("word") String word,@Param("meaning") String meaning,@Param("real_meaning") String real_meaning,@Param("meaning_Mumbler") String meaning_Mumbler,
+                       @Param("phonetic_symbol_en") String phonetic_symbol_en,@Param("phonetic_symbol_us") String phonetic_symbol_us,@Param("phonetic_symbol_en_Mumbler") String phonetic_symbol_en_Mumbler,
+                       @Param("phonetic_symbol_us_Mumbler") String phonetic_symbol_us_Mumbler,@Param("phonetic_symbol") String phonetic_symbol,@Param("sentence") String sentence,@Param("sentence_cn") String sentence_cn);
+
+    //后台
+    int deleteWordSub(@Param("word") String word);
+
+    //后台
+    int deleteWordVideo(@Param("word") String word);
+
+    //后台
+    int existWordVideo(@Param("word") String word);
 
     //已掌握单词
     List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);

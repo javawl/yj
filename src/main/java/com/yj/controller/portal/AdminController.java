@@ -13,7 +13,12 @@ import com.yj.service.IFileService;
 import com.yj.service.IUserService;
 import com.yj.util.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +44,9 @@ public class AdminController {
 
     @Autowired
     private IFileService iFileService;
+
+    @Autowired
+    private ApplicationContext ctx;
 
     /**
      * 获取单词接口
@@ -101,17 +109,73 @@ public class AdminController {
 
 
     /**
-     * 删除某个单词所有信息
-     * @param id
+     * 更新基本信息
+     * @param word
      * @param response
      * @return
      */
-    @RequestMapping(value = "delete_word.do", method = RequestMethod.GET)
+    @RequestMapping(value = "update_main.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<JSONObject> delete_word(String id, HttpServletResponse response){
-        Map result = dictionaryMapper.getInfoByWordId(id);
-        String result_json = JSON.toJSONString(result);
-        return ServerResponse.createBySuccess("成功",JSON.parseObject(result_json));
+    public ServerResponse update_main(String id,String word,String meaning,String real_meaning,String meaning_Mumbler,
+                                                  String phonetic_symbol_en,String phonetic_symbol_us,String phonetic_symbol_en_Mumbler,
+                                                  String phonetic_symbol_us_Mumbler,String phonetic_symbol,String sentence,String sentence_cn, HttpServletResponse response){
+        //查出所有的词
+        List<Map> all_word = dictionaryMapper.selectAllWord(word);
+        for (int i = 0; i < all_word.size(); i++){
+            String new_id = all_word.get(i).get("id").toString();
+            int result = dictionaryMapper.updateWordInfo(new_id, word, meaning, real_meaning, meaning_Mumbler,
+                    phonetic_symbol_en, phonetic_symbol_us, phonetic_symbol_en_Mumbler,
+                    phonetic_symbol_us_Mumbler, phonetic_symbol, sentence, sentence_cn);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新出错");
+            }
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 删除某个单词所有信息
+     * @param word
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "delete_word.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse delete_word(String word, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除单词
+            int resultDictionary = dictionaryMapper.deleteWordInfo(word);
+            if (resultDictionary == 0){
+                throw new Exception();
+            }
+            System.out.println(dictionaryMapper.existWordVideo(word));
+            if (dictionaryMapper.existWordVideo(word)!=-1){
+                System.out.println("test");
+                //删除影片
+                int resultVideo = dictionaryMapper.deleteWordVideo(word);
+                if (resultVideo == 0){
+                    throw new Exception();
+                }
+                //删除台词
+                int resultSub = dictionaryMapper.deleteWordSub(word);
+                if (resultSub == 0){
+                    throw new Exception();
+                }
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            System.out.println(e.getMessage());
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
     }
 
 

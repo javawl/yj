@@ -9,9 +9,9 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
+        var url = 'http://localhost:8088';
         var count = 0;
-        var url = 'http://47.107.62.22:8080';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var url1 = document.URL;
         if (url1 == url || url1 == url+'/'){
@@ -132,7 +132,7 @@
                                 +'<td style="width: 4%;">'+string6+'</td>'
                                 +'<td style="width: 4%;">'+string7+'</td>'
                                 +'<td style="width: 4%;"><button type="button"><a style="color: black" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+
-                                '<td style="width: 6%;"><button onclick="edit()">修改</button><br><button style="margin-left: 5px;" onclick="del()">删除</button></td>'+
+                                '<td style="width: 6%;"><button onclick="edit('+"'"+data[i]['id']+"'"+')">修改</button><br><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['word']+"'"+')">删除</button></td>'+
                                 '</tr>');
                     }
 //                if (result.status == 200){
@@ -225,10 +225,33 @@
 </body>
 <script>
     function edit(id) {
-        window.location.href='http://localhost/homework/edit.php?id='+id;
+        window.location.href=url+'/update_page.jsp?id='+id;
     }
-    function del(id) {
-        window.location.href='http://localhost/homework/handler.php?method=3&id='+id;
+    function del(word) {
+        if (confirm("你确定要删除此单词？删除之后不可恢复！")){
+            $.ajax({
+                url:url+"/admin/delete_word.do",
+                type:'POST',
+                data:{
+                    word:word
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
     }
 </script>
 </html>
