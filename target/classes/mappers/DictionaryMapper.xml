@@ -412,10 +412,23 @@
     LIMIT #{param1},#{param2}
   </select>
 
+  <select id="countWord" resultType="string">
+    SELECT count(id)
+    FROM dictionary
+    WHERE type = #{type}
+  </select>
+
   <select id="selectAdminVideo" resultType="map" parameterType="string">
     SELECT *
     FROM word_video_information
     WHERE word_id = #{id}
+  </select>
+
+  <select id="BetterSelectAdminVideo" resultType="map" parameterType="string">
+    SELECT *
+    FROM word_video_information,subtitles
+    WHERE word_id = #{id}
+    AND video_id = word_video_information.id
   </select>
 
   <select id="selectAdminSubtitles" resultType="map" parameterType="string">
@@ -464,6 +477,16 @@
     WHERE plan = #{plan}
     ORDER BY word
   </select>
+  
+  <delete id="deleteWordInfo" parameterType="string">
+    DELETE FROM dictionary
+    WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteWordVideoSub" parameterType="string">
+    DELETE FROM subtitles
+    WHERE id = #{id}
+  </delete>
 
   <select id="selectMasteredWordsAll" resultType="map" parameterType="string">
     SELECT id,word,meaning

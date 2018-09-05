@@ -5,8 +5,8 @@
     <title>后台管理系统</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
-        var url = 'http://123.207.85.37:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://123.207.85.37:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         function GetQueryString(name)
         {
@@ -22,6 +22,7 @@
                 dataType:'json',
                 success:function (result) {
                     var data = result["data"];
+                    $("#all").append('<h3>视频个数：'+data.length+'</h3>')
                     for(var i = 0; i < data.length; i++) {
                         $("#all").append(
                                 '<h3>出自：' + data[i]['video_name'] + '</h3>' +

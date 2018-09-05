@@ -9,20 +9,65 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
-        var url = 'http://123.207.85.37:8080';
+        var url = 'http://localhost:8088';
+        var count = 0;
+//        var url = 'http://123.207.85.37:8080';
         var root_url = 'http://47.107.62.22/l_e/';
-        //    var url1 = document.URL;
-        //    if (url1 == url+'/admin/get_word.do'){
-        //        window.location.href=url+"/admin/get_word.do?page=1&size=1&type=1"
-        //    }
+        var url1 = document.URL;
+        if (url1 == url || url1 == url+'/'){
+            window.location.href=url+"/index.jsp?page=1&size=15&type=1"
+        }
+        function GetQueryString(name)
+        {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+        var page = parseInt(GetQueryString("page"));
+        var type = parseInt(GetQueryString("type"));
+        var size = 15;
+        var all_url = url+"/admin/get_word.do?page="+page+"&size="+size+"&type="+type;
         $(document).ready(function(){
             $.ajax({
-                url:url+"/admin/get_word.do?page=1&size=1&type=1",
+                url:all_url,
                 type:'GET',
                 dataType:'json',
                 success:function (result) {
                     var data = result["data"];
+                    count += parseInt(result["msg"]);
+                    //计算页数
+                    var page_no = Math.ceil(count / size);
+                    if (page == 1){
+                        $("#page").append('<td><p>第一页</p></td>');
+                    }else{
+                        $("#page").append('<td><a href="'+url+'?page=1&size='+size+'&type='+type+'">第一页</a></td>');
+                    }
+                    var ff = 0;
+                    var f = 0;
+                    if (page > 4){
+                        f += page - 4;
+                    }
+                    if (f != 0){
+                        $("#page").append('<td><p>....</p></td>');
+                    }
+                    for(var z = f; z < page_no; z++){
+                        var no = z + 1;
+                        if (no == page){
+                            $("#page").append('<td><p>'+no+'</p></td>');
+                        }else {
+                            $("#page").append('<td><a href="'+url+'?page='+no+'&size='+size+'&type='+type+'">'+no+'</a></td>');
+                        }
+                        if (ff == 8)break;
+                        ff++;
+                    }
+                    if (ff != 8){
+                        $("#page").append('<td><p>....</p></td>');
+                    }
+                    if (page == page_no){
+                        $("#page").append('<td><p>最后一页</p></td>');
+                    }else{
+                        $("#page").append('<td><a href="'+url+'?page='+page_no+'&size='+size+'&type='+type+'">最后一页</a></td>');
+                    }
                     for(var i = 0; i < data.length; i++){
                         var string1;
                         var string2;
@@ -31,6 +76,7 @@
                         var string5;
                         var string6;
                         var string7;
+
                         if (data[i]['pronunciation_en']==''){
                             string1 = '此资源为空（未爬到）'
                         }else {
@@ -98,13 +144,39 @@
                     alert("服务器出错！");
                 }
             });
+            $.ajax({
+                url:url+"/admin/get_word_type.do",
+                type:'GET',
+                dataType:'json',
+                success:function (result) {
+                    var data1 = result["data"];
+                    for(var i = 0; i < data1.length; i++){
+                        if (i == 0){
+                            $("#select").append('<option value ="'+data1[i]["dictionary_type"]+'" selected>'+data1[i]["plan"]+'</option>');
+                        }else {
+                            $("#select").append('<option value ="'+data1[i]["dictionary_type"]+'">'+data1[i]["plan"]+'</option>');
+                        }
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
         });
+        function change_type(){
+            window.location.href=url+"?page="+page+"&size="+size+"&type="+$("#select").val();
+        }
     </script>
 </head>
 <body>
 <center>
     <h1>单词详情页</h1>
     <table cellpadding="8" width="100%" border="1" cellspacing="0" id="special">
+        <tr>
+            <select style="float: right" id="select" onchange="change_type()">
+            </select>
+        </tr>
         <tr>
             <td style="width: 4%;">单词</td>
             <td style="width: 4%;">单词的扇贝意思</td>
@@ -127,7 +199,7 @@
             <td  style="width: 6%;">操作</td>
         </tr>
     </table>
-    <table>
+    <table id="page">
         <!--<?php-->
         <!--if ($page == 1){-->
         <!--echo "<td><p>第一页</p></td>";-->

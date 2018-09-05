@@ -66,6 +66,13 @@ public class AdminController {
         return iAdminService.get_word_video(id, response);
     }
 
+
+    @RequestMapping(value = "get_video.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List> get_video(String id, HttpServletResponse response){
+        return ServerResponse.createBySuccess("成功！",dictionaryMapper.BetterSelectAdminVideo(id));
+    }
+
     /**
      * 获取单词的种类和对应数字
      * @param response
@@ -87,6 +94,21 @@ public class AdminController {
     @RequestMapping(value = "get_single_word_info.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<JSONObject> get_single_word_info(String id, HttpServletResponse response){
+        Map result = dictionaryMapper.getInfoByWordId(id);
+        String result_json = JSON.toJSONString(result);
+        return ServerResponse.createBySuccess("成功",JSON.parseObject(result_json));
+    }
+
+
+    /**
+     * 删除某个单词所有信息
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "delete_word.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<JSONObject> delete_word(String id, HttpServletResponse response){
         Map result = dictionaryMapper.getInfoByWordId(id);
         String result_json = JSON.toJSONString(result);
         return ServerResponse.createBySuccess("成功",JSON.parseObject(result_json));

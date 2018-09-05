@@ -54,7 +54,13 @@ public interface DictionaryMapper {
     List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
 
     //后台
+    String countWord(@Param("type") String type);
+
+    //后台
     List<Map> selectAdminVideo(@Param("id") String id);
+
+    //后台
+    List<Map> BetterSelectAdminVideo(@Param("id") String id);
 
     //后台
     List<Map> selectAdminSubtitles(@Param("id") String id);
@@ -64,6 +70,12 @@ public interface DictionaryMapper {
 
     //后台
     List<Map> selectAdminPlanType();
+
+    //后台
+    int deleteWordInfo(@Param("id") String id);
+
+    //后台
+    int deleteWordVideoSub(@Param("id") String id);
 
     //已掌握单词
     List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
