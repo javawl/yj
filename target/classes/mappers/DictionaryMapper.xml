@@ -424,7 +424,6 @@
     SELECT *
     FROM dictionary
     WHERE type = #{type}
-    ORDER BY word
     LIMIT #{param1},#{param2}
   </select>
 
