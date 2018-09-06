@@ -18,6 +18,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/admin/")
+@Transactional(readOnly = true)
 public class AdminController {
 
     //将Service注入进来
@@ -186,12 +188,18 @@ public class AdminController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "test_upload.do", method = RequestMethod.POST)
+    @RequestMapping(value = "upload_pic.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> test_upload(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletResponse response, HttpServletRequest request){
+    public ServerResponse<String> upload_pic(@RequestParam(value = "upload_file",required = false) MultipartFile file, String word, HttpServletResponse response, HttpServletRequest request){
         String path = request.getSession().getServletContext().getRealPath("upload");
-        String name = iFileService.upload(file,path);
-        String url = PropertiesUtil.getProperty("ftp.server.http.prefix")+name;
+        String name = iFileService.upload(file,path,"l_e/update_word/word_pic");
+//        String url = PropertiesUtil.getProperty("ftp.server.http.prefix")+name;
+        String url = "update_word/word_pic/"+name;
+        //存到数据库
+        int result = dictionaryMapper.updateWordPic(word,url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
         return ServerResponse.createBySuccess("成功",url);
     }
 

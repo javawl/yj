@@ -9,9 +9,10 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
-        var url = 'http://47.107.62.22:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
+        var word;
         function GetQueryString(name)
         {
             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -27,6 +28,7 @@
                 success:function (result) {
                     var data1 = result["data"];
                     $("#word").val(data1['word']);
+                    word = data1['word'];
                     $("#shanbei").val(data1['meaning']);
                     $("#bcz_meaning").val(data1['real_meaning']);
                     $("#md_meaning").val(data1['meaning_Mumbler']);
@@ -79,6 +81,32 @@
                     }
                 });
             }
+        }
+        function pic(){
+            var formData = new FormData();
+            formData.append('upload_file', $('#pic')[0].files[0]);
+            formData.append('word', word);
+            $.ajax({
+                url:url+"/admin/upload_pic.do",
+                type:'POST',
+                data:formData,
+                dataType:'json',
+                processData: false,
+                contentType: false,
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
         }
     </script>
 </head>
@@ -184,7 +212,15 @@
             <h2>静态资源更新</h2>
             <table>
                 <tr>
-                    暂待
+                    <td align="left">
+                        单词图片
+                    </td>
+                    <td align="left">
+                        <input type="file" id="pic" value="上传"/>
+                    </td>
+                    <td align="left">
+                        <button onclick="pic()">提交</button>
+                    </td>
                 </tr>
             </table>
         </center>

@@ -8,6 +8,7 @@ import com.yj.service.IVariousService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by 63254 on 2018/9/1.
  */
 @Service("iVariousService")
+@Transactional(readOnly = true)
 public class VariousServiceImpl implements IVariousService {
     @Autowired
     private UserMapper userMapper;

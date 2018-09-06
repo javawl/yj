@@ -21,6 +21,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.Cookie;
@@ -31,6 +32,7 @@ import java.util.*;
  * Created by 63254 on 2018/8/26.
  */
 @Service("iHomeService")
+@Transactional(readOnly = true)
 public class HomeServiceImpl implements IHomeService {
 
     @Autowired

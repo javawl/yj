@@ -395,6 +395,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="updateWordPic" parameterType="string">
+    UPDATE `dictionary` SET
+    `pic`= #{pic}
+    WHERE word = #{word}
+  </update>
+
   <insert id="insertFeedsComment" parameterType="string">
     INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
@@ -424,6 +430,7 @@
     SELECT *
     FROM dictionary
     WHERE type = #{type}
+    ORDER BY id
     LIMIT #{param1},#{param2}
   </select>
 

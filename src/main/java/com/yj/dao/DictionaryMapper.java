@@ -72,6 +72,9 @@ public interface DictionaryMapper {
     List<Map> selectAdminPlanType();
 
     //后台
+    int updateWordPic(@Param("word") String word,@Param("pic") String pic);
+
+    //后台
     int deleteWordInfo(@Param("word") String word);
 
     //后台

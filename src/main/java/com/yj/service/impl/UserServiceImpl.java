@@ -18,6 +18,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.Cookie;
@@ -30,6 +31,7 @@ import java.util.*;
  * impl -> implement(接口的实现)
  */
 @Service("iUserService")
+@Transactional(readOnly = true)
 public class UserServiceImpl implements IUserService {
 
     @Autowired

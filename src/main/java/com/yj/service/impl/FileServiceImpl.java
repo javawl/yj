@@ -20,7 +20,7 @@ public class FileServiceImpl implements IFileService {
 
     private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
-    public String upload(MultipartFile file, String path){
+    public String upload(MultipartFile file, String path, String removePath){
         String fileName = file.getOriginalFilename();
         //扩展名
         String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -38,7 +38,7 @@ public class FileServiceImpl implements IFileService {
             //上传文件
             file.transferTo(targetFile);
             //todo 将文件传到ftp服务器上
-            FTPUtill.uploadFile(Lists.newArrayList(targetFile),"");
+            FTPUtill.uploadFile(Lists.newArrayList(targetFile),removePath);
 
             //todo 上传完之后，删除upload下面的文件
             targetFile.delete();
