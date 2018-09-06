@@ -9,9 +9,9 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
+        var url = 'http://localhost:8088';
         var count = 0;
-        var url = 'http://47.107.62.22:8080';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var url1 = document.URL;
         if (url1 == url || url1 == url+'/'){
@@ -80,27 +80,27 @@
                         if (data[i]['pronunciation_en']==''){
                             string1 = '此资源为空（未爬到）'
                         }else {
-                            string1 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pronunciation_en']+'">查看</a></button>';
+                            string1 = '<button type="button"><a target="_blank"  style="color: black" href="'+root_url+data[i]['pronunciation_en']+'">查看</a></button>';
                         }
                         if (data[i]['pronunciation_us']==''){
                             string2 = '此资源为空（未爬到）'
                         }else {
-                            string2 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pronunciation_us']+'">查看</a></button>';
+                            string2 = '<button type="button"><a target="_blank"  style="color: black" href="'+root_url+data[i]['pronunciation_us']+'">查看</a></button>';
                         }
                         if (data[i]['pronunciation_en_Mumbler']==''){
                             string3 = '此资源为空（未爬到）'
                         }else {
-                            string3 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pronunciation_en_Mumbler']+'">查看</a></button>';
+                            string3 = '<button type="button"><a target="_blank"  style="color: black" href="'+root_url+data[i]['pronunciation_en_Mumbler']+'">查看</a></button>';
                         }
                         if (data[i]['pronunciation_us_Mumbler']==''){
                             string4 = '此资源为空（未爬到）'
                         }else {
-                            string4 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pronunciation_us_Mumbler']+'">查看</a></button>';
+                            string4 = '<button type="button"><a target="_blank"  style="color: black" href="'+root_url+data[i]['pronunciation_us_Mumbler']+'">查看</a></button>';
                         }
                         if (data[i]['pronunciation']==''){
                             string5 = '此资源为空（未爬到）'
                         }else {
-                            string5 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pronunciation']+'">查看</a></button>';
+                            string5 = '<button type="button"><a target="_blank"  style="color: black" href="'+root_url+data[i]['pronunciation']+'">查看</a></button>';
                         }
                         if (data[i]['sentence_audio']==''){
                             string6 = '此资源为空（未爬到）'
@@ -111,7 +111,8 @@
                         if (data[i]['pic']==''){
                             string7 = '此资源为空（未爬到）'
                         }else {
-                            string7 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pic']+'">查看</a></button>';
+//                            string7 = '<button type="button"><a style="color: black" href="'+root_url+data[i]['pic']+'">查看</a></button>';
+                            string7 = '<img src="'+root_url+data[i]['pic']+'">';
                         }
                         $("#special").append('<tr>'+
                                 '<td style="width: 4%;">'+data[i]['word']+'</td>'+
@@ -131,7 +132,7 @@
                                 +'<td style="width: 20%;">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
                                 +'<td style="width: 4%;">'+string6+'</td>'
                                 +'<td style="width: 4%;">'+string7+'</td>'
-                                +'<td style="width: 4%;"><button type="button"><a style="color: black" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+
+                                +'<td style="width: 4%;"><button type="button"><a style="color: black" target="_blank" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+
                                 '<td style="width: 6%;"><button onclick="edit('+"'"+data[i]['id']+"'"+')">修改</button><br><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['word']+"'"+')">删除</button></td>'+
                                 '</tr>');
                     }
@@ -151,7 +152,7 @@
                 success:function (result) {
                     var data1 = result["data"];
                     for(var i = 0; i < data1.length; i++){
-                        if (i == 0){
+                        if (parseInt(data1[i]["dictionary_type"]) == type){
                             $("#select").append('<option value ="'+data1[i]["dictionary_type"]+'" selected>'+data1[i]["plan"]+'</option>');
                         }else {
                             $("#select").append('<option value ="'+data1[i]["dictionary_type"]+'">'+data1[i]["plan"]+'</option>');
