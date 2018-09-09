@@ -10,8 +10,8 @@
     </style>
     <script type="text/javascript">
         var count = 0;
-        var url = 'http://localhost:8088';
-//        var url = 'http://47.107.62.22:8080';
+//        var url = 'http://localhost:8088';
+        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var url1 = document.URL;
         //用来上传图片
