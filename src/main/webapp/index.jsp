@@ -115,20 +115,21 @@
                             string7 = '<img src="'+root_url+data[i]['pic']+'">';
                         }
                         $("#special").append('<tr>'+
+                                '<td style="width: 4%;">'+data[i]['id']+'</td>'+
                                 '<td style="width: 4%;">'+data[i]['word']+'</td>'+
                                 '<td style="width: 4%;">'+data[i]['meaning']+'</td>'+
                                 '<td style="width: 4%;">'+data[i]['real_meaning']+'</td>'+
-                                '<td style="width: 4%;">'+data[i]['meaning_Mumbler']+'</td>'+
-                                '<td style="width: 4%;">'+data[i]['phonetic_symbol_en']+'</td>'+
-                                '<td style="width: 4%;">'+string1+'</td>'
-                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_us']+'</td>'
-                                +'<td style="width: 4%;">'+string2+'</td>'
-                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_en_Mumbler']+'</td>'
-                                +'<td style="width: 4%;">'+string3+'</td>'
-                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_us_Mumbler']+'</td>'
-                                +'<td style="width: 4%;">'+string4+'</td>'
-                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol']+'</td>'
-                                +'<td style="width: 4%;">'+string5+'</td>'
+                                '<td style="width: 4%;">'+data[i]['meaning_Mumbler']+'</td>'
+//                              +  '<td style="width: 4%;">'+data[i]['phonetic_symbol_en']+'</td>'+
+//                                '<td style="width: 4%;">'+string1+'</td>'
+//                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_us']+'</td>'
+//                                +'<td style="width: 4%;">'+string2+'</td>'
+//                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_en_Mumbler']+'</td>'
+//                                +'<td style="width: 4%;">'+string3+'</td>'
+//                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol_us_Mumbler']+'</td>'
+//                                +'<td style="width: 4%;">'+string4+'</td>'
+//                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol']+'</td>'
+//                                +'<td style="width: 4%;">'+string5+'</td>'
                                 +'<td style="width: 20%;">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
                                 +'<td style="width: 4%;">'+string6+'</td>'
                                 +'<td style="width: 4%;">'+string7+'</td>'
@@ -179,20 +180,21 @@
             </select>
         </tr>
         <tr>
+            <td style="width: 4%;">单词id</td>
             <td style="width: 4%;">单词</td>
             <td style="width: 4%;">单词的扇贝意思</td>
             <td style="width: 4%;">单词百词斩意思</td>
             <td style="width: 4%;">单词美刀意思</td>
-            <td style="width: 4%;">单词英式音标（金山词霸）</td>
-            <td style="width: 4%;">单词英式发音（金山词霸）</td>
-            <td style="width: 4%;">单词美式音标（金山词霸）</td>
-            <td style="width: 4%;">单词美式发音（金山词霸）</td>
-            <td style="width: 4%;">单词英式音标（美刀）</td>
-            <td  style="width: 4%;">单词英式发音（美刀）</td>
-            <td  style="width: 4%;">单词美式音标（美刀）</td>
-            <td  style="width: 4%;">单词美式发音（美刀）</td>
-            <td  style="width: 4%;">音标百词斩</td>
-            <td  style="width: 4%;">单词音频百词斩</td>
+            <%--<td style="width: 4%;">单词英式音标（金山词霸）</td>--%>
+            <%--<td style="width: 4%;">单词英式发音（金山词霸）</td>--%>
+            <%--<td style="width: 4%;">单词美式音标（金山词霸）</td>--%>
+            <%--<td style="width: 4%;">单词美式发音（金山词霸）</td>--%>
+            <%--<td style="width: 4%;">单词英式音标（美刀）</td>--%>
+            <%--<td  style="width: 4%;">单词英式发音（美刀）</td>--%>
+            <%--<td  style="width: 4%;">单词美式音标（美刀）</td>--%>
+            <%--<td  style="width: 4%;">单词美式发音（美刀）</td>--%>
+            <%--<td  style="width: 4%;">音标百词斩</td>--%>
+            <%--<td  style="width: 4%;">单词音频百词斩</td>--%>
             <td  style="width: 20%;">例句百词斩</td>
             <td  style="width: 4%;">例句音频百词斩</td>
             <td  style="width: 4%;">图片百词斩</td>
