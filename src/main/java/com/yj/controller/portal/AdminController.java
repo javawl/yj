@@ -137,6 +137,30 @@ public class AdminController {
 
 
     /**
+     * 更新句子
+     * @param word
+     * @param sentence
+     * @param sentence_cn
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_sent.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_sent(String word,String sentence,String sentence_cn, HttpServletResponse response){
+        //查出所有的词
+        List<Map> all_word = dictionaryMapper.selectAllWord(word);
+        for (int i = 0; i < all_word.size(); i++){
+            String new_id = all_word.get(i).get("id").toString();
+            int result = dictionaryMapper.updateWordSent(new_id,  sentence, sentence_cn);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新出错");
+            }
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
      * 删除某个单词所有信息
      * @param word
      * @param response

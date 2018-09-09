@@ -9,8 +9,8 @@
         h1{ margin-top: 3rem;}
     </style>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
-        var url = 'http://47.107.62.22:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var word;
         function GetQueryString(name)

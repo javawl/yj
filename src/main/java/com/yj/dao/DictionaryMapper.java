@@ -86,6 +86,9 @@ public interface DictionaryMapper {
                        @Param("phonetic_symbol_us_Mumbler") String phonetic_symbol_us_Mumbler,@Param("phonetic_symbol") String phonetic_symbol,@Param("sentence") String sentence,@Param("sentence_cn") String sentence_cn);
 
     //后台
+    int updateWordSent(@Param("id") String id,@Param("sentence") String sentence,@Param("sentence_cn") String sentence_cn);
+
+    //后台
     int deleteWordSub(@Param("word") String word);
 
     //后台

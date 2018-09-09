@@ -10,10 +10,16 @@
     </style>
     <script type="text/javascript">
         var count = 0;
-//        var url = 'http://localhost:8088';
-        var url = 'http://47.107.62.22:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var url1 = document.URL;
+        //用来上传图片
+        var pic_id;
+        //判断是否有输入框
+        var exist = 0;
+        var flag_id;
+        var save;
         if (url1 == url || url1 == url+'/'){
             window.location.href=url+"/index.jsp?page=1&size=15&type=1"
         }
@@ -22,6 +28,73 @@
             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
             var r = window.location.search.substr(1).match(reg);
             if(r!=null)return  unescape(r[2]); return null;
+        }
+        function upload_pic() {
+            var formData = new FormData();
+            formData.append('upload_file', $('#pic')[0].files[0]);
+            formData.append('word', pic_id);
+            $.ajax({
+                url:url+"/admin/upload_pic.do",
+                type:'POST',
+                data:formData,
+                dataType:'json',
+                processData: false,
+                contentType: false,
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
+        function upload_sent(id,w) {
+            $.ajax({
+                url:url+"/admin/update_sent.do",
+                type:'POST',
+                data:{
+                    word:w,
+                    sentence:$("#sentence_en").val(),
+                    sentence_cn:$("#sentence_cn").val()
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+            exist = 0;
+            history.go(0);
+            $("html, body").scrollTop(0).animate({scrollTop: $("#s"+id).offset().top});
+        }
+        function upload_pic_click(id) {
+            pic_id = id;
+            document.getElementById("pic").click();
+        }
+        function change_sent(id,w,string){
+            if (exist === 0){
+                exist = 1;
+                flag_id = id;
+                save = string;
+                $("#s"+id).empty();
+                $("#s"+id).append('英文：<input id="sentence_en" type="text"><br>中文：<input id="sentence_cn" type="text"><br><button onclick="upload_sent('+"'"+id+"','"+w+"'"+')">提交</button>');
+            }
         }
         var page = parseInt(GetQueryString("page"));
         var type = parseInt(GetQueryString("type"));
@@ -130,9 +203,9 @@
 //                                +'<td style="width: 4%;">'+string4+'</td>'
 //                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol']+'</td>'
 //                                +'<td style="width: 4%;">'+string5+'</td>'
-                                +'<td style="width: 20%;">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
+                                +'<td style="width: 20%;" id="s'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+","+"'"+data[i]['word']+"',"+"'"+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+"'"+')">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
                                 +'<td style="width: 4%;">'+string6+'</td>'
-                                +'<td style="width: 4%;">'+string7+'</td>'
+                                +'<td style="width: 4%;" onclick="upload_pic_click('+"'"+data[i]['word']+"'"+')">'+string7+'</td>'
                                 +'<td style="width: 4%;"><button type="button"><a style="color: black" target="_blank" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+
                                 '<td style="width: 6%;"><button onclick="edit('+"'"+data[i]['id']+"'"+')">修改</button><br><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['word']+"'"+')">删除</button></td>'+
                                 '</tr>');
@@ -174,6 +247,7 @@
 <body>
 <center>
     <h1>单词详情页</h1>
+    <input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />
     <table cellpadding="8" width="100%" border="1" cellspacing="0" id="special">
         <tr>
             <select style="float: right" id="select" onchange="change_type()">

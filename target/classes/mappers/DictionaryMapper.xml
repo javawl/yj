@@ -395,6 +395,13 @@
     WHERE id = #{id}
   </update>
 
+  <update id="updateWordSent" parameterType="string">
+    UPDATE `dictionary` SET
+    `sentence`=#{sentence},
+    `sentence_cn`=#{sentence_cn}
+    WHERE id = #{id}
+  </update>
+
   <update id="updateWordPic" parameterType="string">
     UPDATE `dictionary` SET
     `pic`= #{pic}
