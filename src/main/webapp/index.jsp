@@ -10,8 +10,8 @@
     </style>
     <script type="text/javascript">
         var count = 0;
-//        var url = 'http://localhost:8088';
-        var url = 'http://47.107.62.22:8080';
+        var url = 'http://localhost:8088';
+//        var url = 'http://47.107.62.22:8080';
         var root_url = 'http://47.107.62.22/l_e/';
         var url1 = document.URL;
         //用来上传图片
@@ -65,6 +65,7 @@
                     sentence_cn:$("#sentence_cn").val()
                 },
                 dataType:'json',
+                async: false,
                 success:function (result) {
                     var code = result['code'];
                     var msg = result['msg'];
@@ -203,7 +204,7 @@
 //                                +'<td style="width: 4%;">'+string4+'</td>'
 //                                +'<td style="width: 4%;">'+data[i]['phonetic_symbol']+'</td>'
 //                                +'<td style="width: 4%;">'+string5+'</td>'
-                                +'<td style="width: 20%;" id="s'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+","+"'"+data[i]['word']+"',"+"'"+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+"'"+')">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
+                                +'<td style="width: 20%;" id="s'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+","+"'"+data[i]['word']+"',"+"'"+escape(data[i]['sentence'])+'<br>'+escape(data[i]['sentence_cn'])+"'"+')">'+data[i]['sentence']+'<br>'+data[i]['sentence_cn']+'</td>'
                                 +'<td style="width: 4%;">'+string6+'</td>'
                                 +'<td style="width: 4%;" onclick="upload_pic_click('+"'"+data[i]['word']+"'"+')">'+string7+'</td>'
                                 +'<td style="width: 4%;"><button type="button"><a style="color: black" target="_blank" href="'+url+'/show_video.jsp?id='+data[i]['id']+'">查看</a></button></td>'+

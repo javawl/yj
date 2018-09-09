@@ -66,6 +66,7 @@
                         sentence_cn:$("#sentence_cn").val()
                     },
                     dataType:'json',
+                    async: false,
                     success:function (result) {
                         var code = result['code'];
                         var msg = result['msg'];
