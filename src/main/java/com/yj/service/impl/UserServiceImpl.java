@@ -30,7 +30,7 @@ import java.util.*;
  * Created by 63254 on 2018/8/15.
  * impl -> implement(接口的实现)
  */
-@Service("iUserService")
+//@Service("iUserService")
 @Transactional(readOnly = true)
 public class UserServiceImpl implements IUserService {
 
@@ -369,7 +369,7 @@ public class UserServiceImpl implements IUserService {
         }else {
             //这是用户选择的那个词库
             String SelectPlan = userMapper.getUserSelectPlan(id);
-            int SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan);
+            String SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan);
             m2.put("plan",SelectPlan);
             m2.put("word_number",SelectPlanNumber);
             //这是用户除了选择的词库外拥有的词库
@@ -377,7 +377,7 @@ public class UserServiceImpl implements IUserService {
             for (int i = 0; i < have_plan.size(); i++){
                 Map<Object,Object> m3 = new HashMap<Object,Object>();
                 String plan = have_plan.get(i).get("plan").toString();
-                int PlanNumber = userMapper.getPlanWordsNumberByPlan(plan);
+                String PlanNumber = have_plan.get(i).get("word_number").toString();
                 m3.put("plan",plan);
                 m3.put("word_number",PlanNumber);
                 have_plan.set(i, m3);

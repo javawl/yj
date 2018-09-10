@@ -207,7 +207,7 @@
   </select>
 
 
-  <select id="getPlanWordsNumberByPlan" resultType="int" parameterType="string">
+  <select id="getPlanWordsNumberByPlan" resultType="string" parameterType="string">
     SELECT  word_number
     FROM plans
     WHERE plan = #{plan}
@@ -220,7 +220,7 @@
   </select>
 
   <select id="getUserPlan" resultType="map" parameterType="string">
-    SELECT plan
+    SELECT plan,word_number
     FROM plans
     WHERE id IN (SELECT plan_id
         FROM take_plans

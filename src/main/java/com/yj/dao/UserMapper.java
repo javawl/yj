@@ -61,5 +61,5 @@ public interface UserMapper {
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
 
     //根据计划名获取总数
-    int getPlanWordsNumberByPlan(@Param("plan") String plan);
+    String getPlanWordsNumberByPlan(@Param("plan") String plan);
 }
