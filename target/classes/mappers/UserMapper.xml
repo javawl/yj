@@ -219,9 +219,9 @@
     WHERE id = #{id}
   </select>
 
-  <delete id="deleteTakePlans" parameterType="java.lang.Integer" >
+  <delete id="deleteTakePlans" parameterType="string" >
     delete from take_plans
-    WHERE user_id = #{user_id}
+    WHERE user_id = #{id}
     AND plan = #{plan}
   </delete>
 

@@ -31,7 +31,7 @@ import java.util.*;
  * impl -> implement(接口的实现)
  */
 //@Service("iUserService")
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class UserServiceImpl implements IUserService {
 
     @Autowired

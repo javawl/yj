@@ -31,7 +31,7 @@ import java.util.*;
 /**
  * Created by 63254 on 2018/8/26.
  */
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class HomeServiceImpl implements IHomeService {
 
     @Autowired
@@ -104,6 +104,7 @@ public class HomeServiceImpl implements IHomeService {
                         m3.put("pic",m2.get("pic"));
                     }else {
                         m3.put("type",1);
+                        m3.put("pic",m2.get("pic"));
                         m3.put("video",m2.get("video"));
                     }
                     m3.put("id",m2.get("id"));

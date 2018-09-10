@@ -46,7 +46,7 @@ public interface UserMapper {
     String getUserSelectPlan(@Param("id") String id);
 
     //删除选择计划表
-    int deleteTakePlans(@Param("user_id") String user_id, @Param("plan") String plan);
+    int deleteTakePlans(@Param("id") String id, @Param("plan") String plan);
 
     //获取我添加的所有计划和其单词数
     List<Map> getUserPlan(@Param("id") String id);

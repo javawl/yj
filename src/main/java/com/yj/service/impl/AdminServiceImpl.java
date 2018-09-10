@@ -8,6 +8,7 @@ import com.yj.service.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Map;
 /**
  * Created by 63254 on 2018/9/4.
  */
+@Transactional(readOnly = false)
 public class AdminServiceImpl implements IAdminService {
 
     @Autowired

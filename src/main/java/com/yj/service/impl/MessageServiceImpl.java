@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by 63254 on 2018/9/1.
  */
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class MessageServiceImpl implements IMessageService {
     @Autowired
     private UserMapper userMapper;

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by 63254 on 2018/9/1.
  */
 //@Service("iVariousService")
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class VariousServiceImpl implements IVariousService {
     @Autowired
     private UserMapper userMapper;
