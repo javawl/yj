@@ -14,6 +14,12 @@
     </context:component-scan>
 
     <bean id="iUserService" class="com.yj.service.impl.UserServiceImpl"></bean>
+    <bean id="iHomeService" class="com.yj.service.impl.HomeServiceImpl"></bean>
+    <bean id="iAdminService" class="com.yj.service.impl.AdminServiceImpl"></bean>
+    <bean id="iEnvironmentService" class="com.yj.service.impl.EnvironmentServiceImpl"></bean>
+    <bean id="iFileService" class="com.yj.service.impl.FileServiceImpl"></bean>
+    <bean id="iMessageService" class="com.yj.service.impl.MessageServiceImpl"></bean>
+    <bean id="iVariousService" class="com.yj.service.impl.VariousServiceImpl"></bean>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>

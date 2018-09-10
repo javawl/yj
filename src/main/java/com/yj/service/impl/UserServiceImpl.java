@@ -527,6 +527,57 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public ServerResponse<String> delete_plan(String plan, HttpServletRequest request){
+        //删除计划
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(plan);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //todo 判断该计划是否在学习中，在的话不可删除
+            String my_plan = userMapper.getUserSelectPlan(id);
+            if (my_plan.equals(plan)){
+                return ServerResponse.createByErrorMessage("不可删除学习中的计划！");
+            }
+
+            //todo 删除选择计划表
+            int resultDelete = userMapper.deleteTakePlans(id,plan);
+            if (resultDelete == 0){
+                return ServerResponse.createByErrorMessage("删除失败！");
+            }
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+//    //事务
+//    DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+//    DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+//    //隔离级别
+//    def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+//    TransactionStatus status = transactionManager.getTransaction(def);
+//    try {
+//        //用户表更新新计划为学习中计划
+//        int userResult = userMapper.decide_plan_user(id, plan, days, daily_word_number);
+//        if (userResult == 0){
+//            throw new Exception();
+//        }
+//        transactionManager.commit(status);
+//        return ServerResponse.createBySuccessMessage("成功");
+//    } catch (Exception e) {
+//        transactionManager.rollback(status);
+//        return ServerResponse.createByErrorMessage("更新出错！");
+//    }
+
+    @Override
     public ServerResponse<String> its_dynamic(String id,HttpServletRequest request){
         //他的动态
         return null;

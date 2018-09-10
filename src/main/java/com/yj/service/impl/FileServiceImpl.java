@@ -15,7 +15,6 @@ import java.util.UUID;
 /**
  * Created by 63254 on 2018/8/28.
  */
-@Service("iFileService")
 public class FileServiceImpl implements IFileService {
 
     private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);

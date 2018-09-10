@@ -219,6 +219,12 @@
     WHERE id = #{id}
   </select>
 
+  <delete id="deleteTakePlans" parameterType="java.lang.Integer" >
+    delete from take_plans
+    WHERE user_id = #{user_id}
+    AND plan = #{plan}
+  </delete>
+
   <select id="getUserPlan" resultType="map" parameterType="string">
     SELECT plan,word_number
     FROM plans

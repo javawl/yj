@@ -278,6 +278,20 @@ public class UserController extends BaseController {
         return iUserService.decide_selected_plan(plan,  request);
     }
 
+
+    /**
+     * 删除计划
+     * @param plan
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "delete_plan.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> delete_plan(String plan, HttpServletRequest request){
+        //调用service层
+        return iUserService.delete_plan(plan,  request);
+    }
+
     /**
      * 我喜欢的
      * @param request

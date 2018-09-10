@@ -42,12 +42,19 @@ public interface UserMapper {
     //获取用户所选词表下的单词数
     int getMyPlanWordsNumber(@Param("id") String id);
 
+    //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //删除选择计划表
+    int deleteTakePlans(@Param("user_id") String user_id, @Param("plan") String plan);
+
+    //获取我添加的所有计划和其单词数
     List<Map> getUserPlan(@Param("id") String id);
 
+    //决定天数和单词数
     int decide_plan_days(@Param("id") String id, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
     //计划表添加计划
@@ -58,6 +65,7 @@ public interface UserMapper {
 
     int check_plan(@Param("plan") String plan);
 
+    //获取我的计划、天数、每日学习单词数、坚持天数
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
 
     //根据计划名获取总数

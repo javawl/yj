@@ -22,7 +22,7 @@ public interface DictionaryMapper {
 
     //下面是自己加的
     //获取用户已背单词数
-    int getLearnedWordNumber(@Param("plan") String plan);
+    int getLearnedWordNumber(@Param("plan") String plan,@Param("user_id") String user_id);
 
     List<Map> homePageFirstGet();
 

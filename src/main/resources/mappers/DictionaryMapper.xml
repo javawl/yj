@@ -338,16 +338,17 @@
     SELECT learned_word_number
     FROM take_plans
     WHERE plan = #{plan}
+    AND user_id = #{user_id}
   </select>
 
   <select id="homePageFirstGet" resultType="map">
-    (SELECT id,title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY 2*comments+likes DESC
     LIMIT 0,3)
     UNION
-    (SELECT id,title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY set_time DESC

@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * Created by 63254 on 2018/9/4.
  */
-@Service("iAdminService")
 public class AdminServiceImpl implements IAdminService {
 
     @Autowired

@@ -31,7 +31,6 @@ import java.util.*;
 /**
  * Created by 63254 on 2018/8/26.
  */
-@Service("iHomeService")
 @Transactional(readOnly = true)
 public class HomeServiceImpl implements IHomeService {
 
@@ -63,18 +62,31 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            try {
+//            try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
-                //取我的计划的单词数
-                int word_number = userMapper.getMyPlanWordsNumber(id);
-                if (word_number == 0){
-                    return ServerResponse.createByErrorMessage("该用户未选择学习计划！");
-                }
                 //取剩余天数和坚持天数
                 Object insist_days = SelectPlan.get(0).get("insist_day");
                 Object rest_days = SelectPlan.get(0).get("plan_days");
-                String plan = SelectPlan.get(0).get("my_plan").toString();
-                int learned_word = dictionaryMapper.getLearnedWordNumber(plan);
+                Object plan = SelectPlan.get(0).get("my_plan");
+                //立个flag返回用户是否有计划，0代表没有
+                int flag = 0;
+                //取我的计划的单词数
+                int word_number;
+                //已学单词
+                int learned_word;
+                //如果没有计划
+                if (plan == null){
+                    //没有计划的话就置零，到时候前端不会获取
+                    rest_days = 0;
+                    insist_days = 0;
+                    word_number  = 0;
+                    learned_word = 0;
+                }else {
+                    word_number = Integer.parseInt(userMapper.getPlanWordsNumberByPlan(plan.toString()));
+                    learned_word = dictionaryMapper.getLearnedWordNumber(plan.toString(),id);
+                    flag = 1;
+                }
+                m1.put("flag",flag);
                 m1.put("insist_days",insist_days);
                 m1.put("rest_days",rest_days);
                 m1.put("learned_word",learned_word);
@@ -86,10 +98,13 @@ public class HomeServiceImpl implements IHomeService {
                 for(int i = 0; i < feeds.size(); i++){
                     Map m2 = feeds.get(i);
                     Map<String,Object> m3 = new HashMap<String,Object>();
+                    //当type为0是图片，为1是视频
                     if (m2.get("cover_select").toString().equals("1")){
-                        m3.put("cover_page",m2.get("pic"));
+                        m3.put("type",0);
+                        m3.put("pic",m2.get("pic"));
                     }else {
-                        m3.put("cover_page",m2.get("video"));
+                        m3.put("type",1);
+                        m3.put("video",m2.get("video"));
                     }
                     m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
@@ -106,9 +121,9 @@ public class HomeServiceImpl implements IHomeService {
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1));
 
                 return ServerResponse.createBySuccess("成功!",json);
-            }catch (Exception e){
-                return ServerResponse.createByErrorMessage("查找信息有误！");
-            }
+//            }catch (Exception e){
+//                return ServerResponse.createByErrorMessage("查找信息有误！");
+//            }
         }
     }
 
@@ -395,6 +410,7 @@ public class HomeServiceImpl implements IHomeService {
 
     //文章详情页
     public ServerResponse<Map<String,Object>> article_detail(String id, HttpServletRequest request){
+
         return null;
     }
 
