@@ -33,7 +33,7 @@ public interface IHomeService {
     ServerResponse<List<Map>> not_memorizing_words(String page, String size, HttpServletRequest request);
 
     //文章详情页
-    ServerResponse<Map<String,Object>> article_detail(String id, HttpServletRequest request);
+    ServerResponse<Map<String,Object>> article_detail(String feeds_id, HttpServletRequest request);
 
     //删除评论
     ServerResponse<String> delete_comment(String id, HttpServletRequest request);

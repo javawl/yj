@@ -342,17 +342,48 @@
   </select>
 
   <select id="homePageFirstGet" resultType="map">
-    (SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
-    ORDER BY 2*comments+likes DESC
+    ORDER BY 2*feeds.comments+feeds.likes DESC
     LIMIT 0,3)
     UNION
-    (SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
+    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait
     FROM feeds,`user`
     WHERE auther_id = `user`.id
-    ORDER BY set_time DESC
+    ORDER BY feeds.set_time DESC
     LIMIT 0,3)
+  </select>
+
+  <select id="hotRecommendations" resultType="map">
+    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.kind
+    FROM feeds,`user`
+    WHERE auther_id = `user`.id
+    AND feeds.set_time > #{time}
+    ORDER BY 2*feeds.comments+feeds.likes DESC
+    LIMIT 0,5)
+  </select>
+
+  <select id="hotComments" resultType="map">
+    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait
+    FROM feeds_comment,`user`
+    WHERE user_id = `user`.id
+    AND 2*feeds_comment.comments+feeds_comment.likes > 50
+    ORDER BY 2*feeds_comment.comments+feeds_comment.likes DESC
+    LIMIT 0,3
+  </select>
+
+  <select id="getCommentByCommentId" resultType="map" parameterType="string">
+    SELECT feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
+    FROM feeds_reply_comments,`user`
+    WHERE user_id = `user`.id
+    AND feeds_reply_comments.id = #{id}
+  </select>
+
+  <select id="getHotCommentsSum" resultType="int">
+    SELECT COUNT(1)
+    FROM feeds_comment
+    WHERE 2*comments+likes > 50
   </select>
 
   <select id="getFeedsCommentLike" resultType="map">
@@ -366,6 +397,20 @@
     FROM feeds_like
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="findFeedsInner" resultType="map" parameterType="string">
+    SELECT paragraph,type,pic,order
+    FROM feeds_inner
+    WHERE feeds_id = #{feeds_id}
+    ORDER BY order ASC
+  </select>
+
+  <select id="singleFeeds" resultType="map" parameterType="string">
+    SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
+    FROM feeds,`user`
+    WHERE feeds.id = #{id}
+    AND auther_id = `user`.id
   </select>
 
   <update id="changeFeedsComments" parameterType="string">

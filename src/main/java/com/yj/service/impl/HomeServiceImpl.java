@@ -15,6 +15,7 @@ import com.yj.pojo.User;
 import com.yj.util.AES;
 import com.yj.util.MD5Util;
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.core.Is;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -62,7 +63,7 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-//            try {
+            try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
                 Object insist_days = SelectPlan.get(0).get("insist_day");
@@ -101,18 +102,31 @@ public class HomeServiceImpl implements IHomeService {
                     //当type为0是图片，为1是视频
                     if (m2.get("cover_select").toString().equals("1")){
                         m3.put("type",0);
-                        m3.put("pic",m2.get("pic"));
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
                     }else {
                         m3.put("type",1);
-                        m3.put("pic",m2.get("pic"));
-                        m3.put("video",m2.get("video"));
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                        m3.put("video",Const.FTP_PREFIX+m2.get("video"));
+                    }
+                    //todo 是否点赞
+                    Map is_like = dictionaryMapper.findIsLike(id,m2.get("id").toString());
+                    if (is_like == null){
+                        m3.put("is_like",0);
+                    }else {
+                        m3.put("is_like",1);
                     }
                     m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
                     m3.put("likes",m2.get("likes"));
+
                     m3.put("comments",m2.get("comments"));
                     m3.put("author_username",m2.get("username"));
-                    m3.put("author_portrait",m2.get("portrait"));
+                    if (m2.get("portrait")==null){
+                        m3.put("author_portrait",null);
+                    }else {
+                        m3.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                    }
+
                     feeds_result.add(m3);
                 }
                 //将feeds流六条信息加进去
@@ -122,9 +136,9 @@ public class HomeServiceImpl implements IHomeService {
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1));
 
                 return ServerResponse.createBySuccess("成功!",json);
-//            }catch (Exception e){
-//                return ServerResponse.createByErrorMessage("查找信息有误！");
-//            }
+            }catch (Exception e){
+                return ServerResponse.createByErrorMessage("查找信息有误！");
+            }
         }
     }
 
@@ -410,9 +424,112 @@ public class HomeServiceImpl implements IHomeService {
     }
 
     //文章详情页
-    public ServerResponse<Map<String,Object>> article_detail(String id, HttpServletRequest request){
+    public ServerResponse<Map<String,Object>> article_detail(String feeds_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(feeds_id);
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
 
-        return null;
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        //创建map来装几条信息
+        Map<Object,Object> m1 = new HashMap<Object,Object>();
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //获取feeds流基本信息
+            Map m2 = dictionaryMapper.singleFeeds(feeds_id);
+            if (m2 == null){
+                return ServerResponse.createByErrorMessage("未找到该文章！");
+            }
+            Map<String,Object> m3 = new HashMap<String,Object>();
+            //当type为0是图片，为1是视频
+            if (m2.get("cover_select").toString().equals("1")){
+                m3.put("pic",m2.get("pic"));
+                m3.put("type",0);
+            }else {
+                m3.put("type",1);
+                m3.put("pic",m2.get("pic"));
+                m3.put("video",m2.get("video"));
+            }
+            m3.put("id",m2.get("id"));
+            m3.put("title",m2.get("title"));
+            m3.put("likes",m2.get("likes"));
+            m3.put("author_username",m2.get("username"));
+            m3.put("author_portrait",m2.get("portrait"));
+            //todo 是否点赞
+            Map IsLike = dictionaryMapper.findIsLike(id, feeds_id);
+            if (IsLike == null){
+                //未点赞
+                m3.put("is_like",0);
+            }else {
+                m3.put("is_like",1);
+            }
+            //todo 把文章内容部分加进来
+            //用一个list装结果
+            List<Map> order = dictionaryMapper.findFeedsInner(feeds_id);
+            m3.put("order",order);
+            //todo 热门推荐
+            List<Map> recommendations = dictionaryMapper.hotRecommendations(String.valueOf(new Date().getTime()-Const.HOT_RECOMMENDATIONS));
+            List<Map> recommendations_result = new ArrayList<Map>();
+            for(int i = 0; i < recommendations.size(); i++){
+                Map m4 = recommendations.get(i);
+                Map<String,Object> m5 = new HashMap<String,Object>();
+                //当type为0是图片，为1是视频
+                if (m4.get("cover_select").toString().equals("1")){
+                    m5.put("pic",Const.FTP_PREFIX+m4.get("pic"));
+                    m5.put("type",0);
+                }else {
+                    m5.put("type",1);
+                    m5.put("pic",Const.FTP_PREFIX+m4.get("pic"));
+                    m5.put("video",Const.FTP_PREFIX+m4.get("video"));
+                }
+                m5.put("id",m4.get("id"));
+                m5.put("title",m4.get("title"));
+                m5.put("likes",m4.get("likes"));
+                m5.put("comments",m4.get("comments"));
+                //文章所属类别
+                m5.put("kind",m4.get("kind"));
+                m5.put("author_username",m4.get("username"));
+                if (m4.get("portrait")==null){
+                    m5.put("author_portrait",null);
+                }else {
+                    m5.put("author_portrait",Const.FTP_PREFIX+m4.get("portrait"));
+                }
+                recommendations_result.add(m5);
+            }
+            m3.put("recommendations",recommendations_result);
+            //todo 热门评论(点赞数和是否点赞)
+            //先获取热门评论
+            List<Map<Object,Object>> hotComments = dictionaryMapper.hotComments();
+            //获取其数量
+            int hotCommentsNumber = dictionaryMapper.getHotCommentsSum();
+            m3.put("hot_comment_number",hotCommentsNumber);
+            //对每个热门评论获取其评论
+            for (int k = 0; k < hotComments.size(); k++){
+                String commentId = hotComments.get(k).get("id").toString();
+                //去评论评论表中查
+                List<Map> comment_comment = dictionaryMapper.getCommentByCommentId(commentId);
+                hotComments.get(k).put("inner_comment",comment_comment);
+            }
+            m3.put("hot_comment",hotComments);
+            //todo 最新评论
+//
+//            feeds_result.add(m3);
+//            //将feeds流六条信息加进去
+//            m1.put("feeds",feeds_result);
+
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(m3));
+
+            return ServerResponse.createBySuccess("成功!",json);
+        }
     }
 
     //删除评论

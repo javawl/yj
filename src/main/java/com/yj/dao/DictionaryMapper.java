@@ -24,7 +24,20 @@ public interface DictionaryMapper {
     //获取用户已背单词数
     int getLearnedWordNumber(@Param("plan") String plan,@Param("user_id") String user_id);
 
+    //获取首页的feeds流的信息
     List<Map> homePageFirstGet();
+
+    //获取热门推荐文章信息
+    List<Map> hotRecommendations(@Param("time") String time);
+
+    //热门评论
+    List<Map<Object,Object>> hotComments();
+
+    //根据评论id获得其评论
+    List<Map> getCommentByCommentId(@Param("id") String id);
+
+    //获取热门评论数量
+    int getHotCommentsSum();
 
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
@@ -44,11 +57,17 @@ public interface DictionaryMapper {
     //检查是否点赞
     Map findIsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
 
+    //获得feeds流的基本信息
+    Map singleFeeds(@Param("id") String id);
+
     //取消点赞
     int deleteFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
 
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+
+    //获取feeds流具体内容
+    List<Map> findFeedsInner(@Param("feeds_id") String feeds_id);
 
     //后台
     List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
