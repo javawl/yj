@@ -341,6 +341,12 @@
     AND user_id = #{user_id}
   </select>
 
+  <select id="homePagePortraitMaxId" resultType="int">
+    SELECT get_home_page_portrait_max
+    FROM common_config
+    WHERE id = 1
+  </select>
+
   <select id="homePageFirstGet" resultType="map">
     (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait
     FROM feeds,`user`
@@ -355,13 +361,13 @@
     LIMIT 0,3)
   </select>
 
-  <select id="hotRecommendations" resultType="map">
-    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.kind
+  <select id="hotRecommendations" resultType="map" parameterType="string">
+    SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.kind
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     AND feeds.set_time > #{time}
     ORDER BY 2*feeds.comments+feeds.likes DESC
-    LIMIT 0,5)
+    LIMIT 0,5
   </select>
 
   <select id="hotComments" resultType="map">
@@ -373,17 +379,32 @@
     LIMIT 0,3
   </select>
 
-  <select id="getCommentByCommentId" resultType="map" parameterType="string">
+  <select id="newComments" resultType="map" parameterType="string">
+    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait
+    FROM feeds_comment,`user`
+    WHERE user_id = `user`.id
+    AND feeds_comment.set_time > #{time}
+    ORDER BY feeds_comment.set_time DESC
+    LIMIT 0,15
+  </select>
+
+  <select id="getCommentByCommentId" resultType="map" parameterType="string" flushCache="true">
     SELECT feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
     FROM feeds_reply_comments,`user`
     WHERE user_id = `user`.id
-    AND feeds_reply_comments.id = #{id}
+    AND feeds_reply_comments.feeds_comment_id = #{id}
   </select>
 
   <select id="getHotCommentsSum" resultType="int">
     SELECT COUNT(1)
     FROM feeds_comment
     WHERE 2*comments+likes > 50
+  </select>
+
+  <select id="getNewCommentsSum" resultType="int" parameterType="string">
+    SELECT COUNT(1)
+    FROM feeds_comment
+    WHERE feeds_comment.set_time > #{time}
   </select>
 
   <select id="getFeedsCommentLike" resultType="map">
@@ -399,15 +420,29 @@
     AND feeds_id = #{feeds_id}
   </select>
 
+  <select id="findIsFavour" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_favour
+    WHERE user_id = #{user_id}
+    AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="commentFindIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_comment_id = #{id}
+  </select>
+
   <select id="findFeedsInner" resultType="map" parameterType="string">
-    SELECT paragraph,type,pic,order
+    SELECT paragraph,type,pic,`order`
     FROM feeds_inner
     WHERE feeds_id = #{feeds_id}
-    ORDER BY order ASC
+    ORDER BY `order` ASC
   </select>
 
   <select id="singleFeeds" resultType="map" parameterType="string">
-    SELECT feeds.id,title,pic,video,likes,comments,cover_select,username,portrait
+    SELECT feeds.id,title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.favours
     FROM feeds,`user`
     WHERE feeds.id = #{id}
     AND auther_id = `user`.id

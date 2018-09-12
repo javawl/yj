@@ -14,7 +14,12 @@ public class Const {
     public static final String FTP_PREFIX = "http://47.107.62.22/l_e/";   //文件服务器域名前缀
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间
-    public static final long HOT_RECOMMENDATIONS = 2678400; //因为热门推荐是一个月内热度前五的这是一个月的秒数
+    public static final int INIT_STUDY_PEOPLE = 20000; //开始背单词的人数
+    public static final Long INIT_STUDY_TIME = 1536771352000L; //开始背单词的人数的计算时间戳
+    public static final Long HOT_RECOMMENDATIONS = 2678400000L; //因为热门推荐是一个月内热度前五的这是一个月的秒数(JAVA里面时间戳大三位)
+    public static final Long ONE_HOUR_DATE = 3600000L; //一个小时的秒数(JAVA里面时间戳大三位)
+    public static final Long ONE_DAY_DATE = 86400000L; //一天的秒数(JAVA里面时间戳大三位)
+    public static final Long THREE_DAY_DATE = 259200000L; //一天的秒数(JAVA里面时间戳大三位)
     public static final Double WORD_SPACE = 5.0; //用户计划单词每一项之间的间隔
     public static final int WORD_INIT = 20; //初始化每日背单词数
 }

@@ -219,6 +219,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getUserPortrait" resultType="string" parameterType="string">
+    SELECT portrait
+       FROM user
+    WHERE id = #{id}
+  </select>
+
   <delete id="deleteTakePlans" parameterType="string" >
     delete from take_plans
     WHERE user_id = #{id}

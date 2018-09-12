@@ -1,6 +1,7 @@
 package com.yj.service.impl;
 
 import com.alibaba.fastjson.serializer.IntegerCodec;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.StringUtil;
 import com.yj.dao.DictionaryMapper;
 import com.yj.service.IHomeService;
@@ -28,6 +29,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 /**
  * Created by 63254 on 2018/8/26.
@@ -63,12 +65,13 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            try {
+//            try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
                 Object insist_days = SelectPlan.get(0).get("insist_day");
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
+                Long during_time = (new Date().getTime() - Const.INIT_STUDY_TIME)/1000;
                 //立个flag返回用户是否有计划，0代表没有
                 int flag = 0;
                 //取我的计划的单词数
@@ -108,12 +111,12 @@ public class HomeServiceImpl implements IHomeService {
                         m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
                         m3.put("video",Const.FTP_PREFIX+m2.get("video"));
                     }
-                    //todo 是否点赞
-                    Map is_like = dictionaryMapper.findIsLike(id,m2.get("id").toString());
-                    if (is_like == null){
-                        m3.put("is_like",0);
+                    //todo 是否喜欢
+                    Map is_favour = dictionaryMapper.findIsFavour(id,m2.get("id").toString());
+                    if (is_favour == null){
+                        m3.put("is_favour",0);
                     }else {
-                        m3.put("is_like",1);
+                        m3.put("is_favour",1);
                     }
                     m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
@@ -126,19 +129,37 @@ public class HomeServiceImpl implements IHomeService {
                     }else {
                         m3.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
                     }
-
                     feeds_result.add(m3);
                 }
                 //将feeds流六条信息加进去
                 m1.put("feeds",feeds_result);
 
+                //计算有多少人背单词
+                int all_people = Const.INIT_STUDY_PEOPLE;
+                int ii = 0;
+                while (ii < during_time){
+                    all_people += 3;
+                    ii+=10;
+                }
+                m1.put("study_people",all_people);
+                //随机抽取用户头像
+                //获取随机数最大值
+                int Max_id = dictionaryMapper.homePagePortraitMaxId();
+                List<Object> head_user_portrait = new ArrayList<>();
+                Random random = new Random();
+                for (int i=0;i<7;i++) {
+                    int user_id = (int)(Math.random()*(Max_id-7+1)+7);
+                    System.out.println(user_id);
+                    head_user_portrait.add(Const.FTP_PREFIX + userMapper.getUserPortrait(String.valueOf(user_id)));
+                }
+                m1.put("head_user_portrait",head_user_portrait);
                 //转json
-                JSONObject json = JSON.parseObject(JSON.toJSONString(m1));
+                JSONObject json = JSON.parseObject(JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue));
 
                 return ServerResponse.createBySuccess("成功!",json);
-            }catch (Exception e){
-                return ServerResponse.createByErrorMessage("查找信息有误！");
-            }
+//            }catch (Exception e){
+//                return ServerResponse.createByErrorMessage("查找信息有误！");
+//            }
         }
     }
 
@@ -451,18 +472,19 @@ public class HomeServiceImpl implements IHomeService {
             Map<String,Object> m3 = new HashMap<String,Object>();
             //当type为0是图片，为1是视频
             if (m2.get("cover_select").toString().equals("1")){
-                m3.put("pic",m2.get("pic"));
+                m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
                 m3.put("type",0);
             }else {
                 m3.put("type",1);
-                m3.put("pic",m2.get("pic"));
-                m3.put("video",m2.get("video"));
+                m3.put("video",Const.FTP_PREFIX+m2.get("video"));
+                m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
             }
             m3.put("id",m2.get("id"));
             m3.put("title",m2.get("title"));
             m3.put("likes",m2.get("likes"));
+            m3.put("favours",m2.get("favours"));
             m3.put("author_username",m2.get("username"));
-            m3.put("author_portrait",m2.get("portrait"));
+            m3.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
             //todo 是否点赞
             Map IsLike = dictionaryMapper.findIsLike(id, feeds_id);
             if (IsLike == null){
@@ -471,9 +493,24 @@ public class HomeServiceImpl implements IHomeService {
             }else {
                 m3.put("is_like",1);
             }
+
+            //todo 是否喜欢
+            Map IsFavour = dictionaryMapper.findIsFavour(id, feeds_id);
+            if (IsFavour == null){
+                //未喜欢
+                m3.put("is_favour",0);
+            }else {
+                m3.put("is_favour",1);
+            }
             //todo 把文章内容部分加进来
             //用一个list装结果
-            List<Map> order = dictionaryMapper.findFeedsInner(feeds_id);
+            List<Map<Object,Object>> order = dictionaryMapper.findFeedsInner(feeds_id);
+            //给图片上域名
+            for (int ii = 0; ii < order.size(); ii++){
+                if (order.get(ii).get("pic") != null){
+                    order.get(ii).put("pic",Const.FTP_PREFIX+order.get(ii).get("pic"));
+                }
+            }
             m3.put("order",order);
             //todo 热门推荐
             List<Map> recommendations = dictionaryMapper.hotRecommendations(String.valueOf(new Date().getTime()-Const.HOT_RECOMMENDATIONS));
@@ -514,19 +551,65 @@ public class HomeServiceImpl implements IHomeService {
             //对每个热门评论获取其评论
             for (int k = 0; k < hotComments.size(); k++){
                 String commentId = hotComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.commentFindIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    hotComments.get(k).put("is_like",0);
+                }else {
+                    hotComments.get(k).put("is_like",1);
+                }
                 //去评论评论表中查
-                List<Map> comment_comment = dictionaryMapper.getCommentByCommentId(commentId);
+                List<Map<Object,Object>> comment_comment = dictionaryMapper.getCommentByCommentId(commentId);
+                for (int h_i = 0; h_i < comment_comment.size(); h_i++){
+                    //时间转换和图片格式处理
+                    String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(h_i).get("portrait");
+                    comment_comment.get(h_i).put("portrait", change_reply_pic_url);
+                    comment_comment.get(h_i).put("set_time", CommonFunc.commentTime(comment_comment.get(h_i).get("set_time").toString()));
+                }
                 hotComments.get(k).put("inner_comment",comment_comment);
+                //时间转换和图片格式处理
+                String change_pic_url = Const.FTP_PREFIX + hotComments.get(k).get("portrait");
+                hotComments.get(k).put("portrait", change_pic_url);
+                hotComments.get(k).put("set_time", CommonFunc.commentTime(hotComments.get(k).get("set_time").toString()));
             }
             m3.put("hot_comment",hotComments);
             //todo 最新评论
-//
-//            feeds_result.add(m3);
-//            //将feeds流六条信息加进去
-//            m1.put("feeds",feeds_result);
-
+            //先获取最新评论
+            //获取当天0点时间戳
+            String zero = CommonFunc.getZeroDate();
+            List<Map<Object,Object>> newComments = dictionaryMapper.newComments(zero);
+            //获取其数量
+            int newCommentsNumber = dictionaryMapper.getNewCommentsSum(zero);
+            m3.put("new_comments_number",newCommentsNumber);
+            //对每个最新评论获取其评论
+            for (int k = 0; k < newComments.size(); k++){
+                String commentId = newComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.commentFindIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    newComments.get(k).put("is_like",0);
+                }else {
+                    newComments.get(k).put("is_like",1);
+                }
+                //去评论评论表中查
+                List<Map<Object,Object>> comment_comment = dictionaryMapper.getCommentByCommentId(commentId);
+                for (int n_i = 0; n_i < comment_comment.size(); n_i++){
+                    //时间转换和图片格式处理
+                    String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(n_i).get("portrait");
+                    comment_comment.get(n_i).put("portrait", change_reply_pic_url);
+                    comment_comment.get(n_i).put("set_time", CommonFunc.commentTime(comment_comment.get(n_i).get("set_time").toString()));
+                }
+                newComments.get(k).put("inner_comment",comment_comment);
+                //时间转换和图片格式处理
+                newComments.get(k).put("set_time", CommonFunc.commentTime(newComments.get(k).get("set_time").toString()));
+                String change_pic_url = Const.FTP_PREFIX + newComments.get(k).get("portrait");
+                newComments.get(k).put("portrait", change_pic_url);
+            }
+            m3.put("new_comment",newComments);
             //转json
-            JSONObject json = JSON.parseObject(JSON.toJSONString(m3));
+            JSONObject json = JSON.parseObject(JSON.toJSONString(m3, SerializerFeature.WriteMapNullValue));
 
             return ServerResponse.createBySuccess("成功!",json);
         }

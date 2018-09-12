@@ -45,6 +45,9 @@ public interface UserMapper {
     //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //获取用户头像
+    String getUserPortrait(@Param("id") String id);
+
     //删除选择计划表
     int deleteTakePlans(@Param("id") String id, @Param("plan") String plan);
 

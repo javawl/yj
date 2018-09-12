@@ -26,10 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by 63254 on 2018/8/20.
@@ -244,6 +242,49 @@ public class CommonFunc {
             if (parameter.get(i) == null || parameter.get(i).equals("")) return "请补全参数！";
         }
         return null;
+    }
+
+    //获取当天零点时间戳
+    public static String getZeroDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long date =calendar.getTime().getTime();
+        return String.valueOf(date);
+    }
+
+    //评论时间从时间戳转换为标准时间
+    //评论时间显示规则：显示评论的时间时，在1小时内显示“X分钟前”，超过1小时，在一天内显示“今天 XX：XX”。超过1天，在3天内，显示“一天前”，之后显示“XXXX/XX/XX”
+    public static String commentTime(String time){
+        Long input_time = Long.valueOf(time);
+        Long now_time = new Date().getTime();
+        Long last_one_hour = now_time - Const.ONE_HOUR_DATE;
+        Long last_one_day = now_time - Const.ONE_DAY_DATE;
+        Long last_three_day = now_time - Const.THREE_DAY_DATE;
+        //判断是否是一个小时内
+        if (input_time > last_one_hour){
+            //一个小时内
+            //计算出和现在相差几分钟
+            Long during_time = (input_time - last_one_hour)/1000;
+            int minute = (int) Math.floor(Double.valueOf(during_time)/60.0);
+            return String.valueOf(minute)+"分钟前";
+        }else {
+            if (input_time > last_one_day){
+                //一天内
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                return "今天 "+sdf.format(new Date(input_time));
+            }else {
+                if (input_time > last_three_day){
+                    //三天内
+                    return "一天前";
+                }else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm");
+                    return sdf.format(new Date(input_time));
+                }
+            }
+        }
     }
 
     //通过token获取用户id

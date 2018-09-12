@@ -2,6 +2,7 @@ package com.yj.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
@@ -91,7 +92,7 @@ public class UserServiceImpl implements IUserService {
         m1.put("state","0");
 
         //转Json串
-        String JSONString = JSON.toJSONString(m1);
+        String JSONString = JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue);
 
 
         //将phone和code存入缓存
@@ -103,7 +104,7 @@ public class UserServiceImpl implements IUserService {
         Map<String,String> m2 = new HashMap<String,String>();
         m2.put("register_token",token);
         //转JSON串
-        String JSONString2 = JSON.toJSONString(m2);
+        String JSONString2 = JSON.toJSONString(m2, SerializerFeature.WriteMapNullValue);
         //转json对象
         JSONObject JSON2 = JSONObject.parseObject(JSONString2);
 
@@ -131,7 +132,7 @@ public class UserServiceImpl implements IUserService {
                 //0表示没有短信验证过，1表示验证过
                 m1.put("state","1");
                 //转Json
-                String JSONString = JSON.toJSONString(m1);
+                String JSONString = JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue);
                 JSONObject JSON1 = JSON.parseObject(JSONString);
                 //修改cookie
                 func.changeCookieValueBykey(Request,Response,register_token,JSON1.toString());
@@ -207,7 +208,7 @@ public class UserServiceImpl implements IUserService {
         m1.put("state","0");
 
         //转Json串
-        String JSONString = JSON.toJSONString(m1);
+        String JSONString = JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue);
 
 
         //将phone和code存入缓存
@@ -219,7 +220,7 @@ public class UserServiceImpl implements IUserService {
         Map<String,String> m2 = new HashMap<String,String>();
         m2.put("forget_password_token",token);
         //转JSON串
-        String JSONString2 = JSON.toJSONString(m2);
+        String JSONString2 = JSON.toJSONString(m2, SerializerFeature.WriteMapNullValue);
         //转json对象
         JSONObject JSON2 = JSONObject.parseObject(JSONString2);
 
@@ -247,7 +248,7 @@ public class UserServiceImpl implements IUserService {
                 //0表示没有短信验证过，1表示验证过
                 m1.put("state","1");
                 //转Json
-                String JSONString = JSON.toJSONString(m1);
+                String JSONString = JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue);
                 JSONObject JSON1 = JSON.parseObject(JSONString);
                 //修改cookie
                 func.changeCookieValueBykey(Request,Response,forget_password_token,JSON1.toString());
