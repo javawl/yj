@@ -371,7 +371,7 @@
   </select>
 
   <select id="hotComments" resultType="map">
-    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait
+    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait,`user`.id as user_id
     FROM feeds_comment,`user`
     WHERE user_id = `user`.id
     AND 2*feeds_comment.comments+feeds_comment.likes > 50
@@ -380,7 +380,7 @@
   </select>
 
   <select id="newComments" resultType="map" parameterType="string">
-    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait
+    SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait,`user`.id as user_id
     FROM feeds_comment,`user`
     WHERE user_id = `user`.id
     AND feeds_comment.set_time > #{time}
@@ -389,7 +389,7 @@
   </select>
 
   <select id="getCommentByCommentId" resultType="map" parameterType="string" flushCache="true">
-    SELECT feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
+    SELECT `user`.id as user_id,feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
     FROM feeds_reply_comments,`user`
     WHERE user_id = `user`.id
     AND feeds_reply_comments.feeds_comment_id = #{id}
@@ -442,7 +442,7 @@
   </select>
 
   <select id="singleFeeds" resultType="map" parameterType="string">
-    SELECT feeds.id,title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.favours
+    SELECT feeds.id,title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait,feeds.favours,`user`.id as user_id
     FROM feeds,`user`
     WHERE feeds.id = #{id}
     AND auther_id = `user`.id

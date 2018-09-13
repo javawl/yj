@@ -480,6 +480,7 @@ public class HomeServiceImpl implements IHomeService {
                 m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
             }
             m3.put("id",m2.get("id"));
+            m3.put("user_id",m2.get("user_id"));
             m3.put("title",m2.get("title"));
             m3.put("likes",m2.get("likes"));
             m3.put("favours",m2.get("favours"));
