@@ -341,7 +341,7 @@ public class UserServiceImpl implements IUserService {
                 Double days = Math.ceil(number / daily_word_number);
                 m1.put("daily_word_number", daily_word_number.intValue());
                 m1.put("days", days.intValue());
-                Long during_time = Long.valueOf(String.valueOf(days.intValue()*24*60*60*1000));
+                Long during_time = days.longValue()*24L*60L*60L*1000L;
                 Long need_date = (new Date().getTime()) + during_time;
                 //转换为日期
                 m1.put("date", CommonFunc.getFormatTime(need_date, "yyyy年MM月dd日"));
