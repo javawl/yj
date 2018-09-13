@@ -287,6 +287,15 @@ public class CommonFunc {
         }
     }
 
+    //获取时间戳
+    public static String getFormatTime(Long time,String format){
+        if (format == null){
+            format= "yyyy-MM-dd HH:mm:ss";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return sdf.format(new Date(time));
+    }
+
     //通过token获取用户id
     public static String getIdByToken(HttpServletRequest request, String token){
         Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组

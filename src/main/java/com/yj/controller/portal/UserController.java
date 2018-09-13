@@ -216,9 +216,9 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "get_plan_day.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request){
+    public ServerResponse<List<Map<String,Object>>> get_plan_day(String plan,HttpServletRequest request){
         //调用service层
-        return iUserService.get_plan_day(request);
+        return iUserService.get_plan_day(plan,request);
     }
 
 

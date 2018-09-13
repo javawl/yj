@@ -35,7 +35,7 @@ public interface IUserService {
 
     ServerResponse<List<Map>> get_plans(String type);
 
-    ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request);
+    ServerResponse<List<Map<String,Object>>> get_plan_day(String plan, HttpServletRequest request);
 
     ServerResponse<Map<Object,Object>> get_my_plan(HttpServletRequest request);
 

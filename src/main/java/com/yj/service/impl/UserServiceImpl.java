@@ -311,7 +311,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ServerResponse<List<Map<String,Integer>>> get_plan_day(HttpServletRequest request){
+    public ServerResponse<List<Map<String,Object>>> get_plan_day(String plan, HttpServletRequest request){
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(request.getHeader("token"));
@@ -323,26 +323,28 @@ public class UserServiceImpl implements IUserService {
         //验证token
         CommonFunc func = new CommonFunc();
         String check_token = func.getCookieValueBykey(request,token);
-        String id;
         if (check_token == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
-            id = check_token;
             //找到该id计划的总单词数
-            int number = userMapper.getMyPlanWordsNumber(id);
+            int number = Integer.valueOf(userMapper.getPlanWordsNumberByPlan(plan));
             if (number == 0){
-                return ServerResponse.createByErrorMessage("该用户未选择学习计划！");
+                return ServerResponse.createByErrorMessage("未找到该计划！");
             }
             //到时候装多个map
-            List<Map<String,Integer>> L1 = new ArrayList<Map<String, Integer>>();
+            List<Map<String,Object>> L1 = new ArrayList<Map<String, Object>>();
             for (Double i = 2.0; i <= 12; i++){
                 //创建map来装几条信息
-                Map<String,Integer> m1 = new HashMap<String,Integer>();
+                Map<String,Object> m1 = new HashMap<String,Object>();
                 Double daily_word_number = i * Const.WORD_SPACE;
                 Double days = Math.ceil(number / daily_word_number);
                 m1.put("daily_word_number", daily_word_number.intValue());
                 m1.put("days", days.intValue());
+                Long during_time = Long.valueOf(String.valueOf(days.intValue()*24*60*60*1000));
+                Long need_date = (new Date().getTime()) + during_time;
+                //转换为日期
+                m1.put("date", CommonFunc.getFormatTime(need_date, "yyyy年MM月dd日"));
                 L1.add(m1);
             }
             return ServerResponse.createBySuccess("成功！",L1);
