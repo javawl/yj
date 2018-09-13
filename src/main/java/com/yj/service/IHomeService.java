@@ -38,6 +38,9 @@ public interface IHomeService {
     //删除评论
     ServerResponse<String> delete_comment(String id, HttpServletRequest request);
 
+    //喜欢和取消喜欢
+    ServerResponse<String> favour_feeds(String id, HttpServletRequest request);
+
     //背单词
     ServerResponse<String> recite_word(HttpServletRequest request);
 }

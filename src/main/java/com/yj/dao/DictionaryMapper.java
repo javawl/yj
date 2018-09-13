@@ -57,11 +57,17 @@ public interface DictionaryMapper {
     //feeds表修改点赞数
     int changeFeedsLikes(@Param("likes") String likes,@Param("id") String id);
 
+    //feeds表修改喜欢数
+    int changeFeedsFavour(@Param("favours") String favours,@Param("id") String id);
+
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
     //FeedsLike表插入数据
     int insertFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
+
+    //FeedsFavour表插入数据
+    int insertFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
     //检查是否点赞
     Map findIsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
@@ -77,6 +83,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //取消点赞
+    int deleteFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
 
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);

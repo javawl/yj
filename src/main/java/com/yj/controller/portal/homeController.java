@@ -48,6 +48,18 @@ public class homeController {
         return iHomeService.home_page_info(request);
     }
 
+    /**
+     * 喜欢和取消喜欢
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "favour_feeds.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> favour_feeds(String id, HttpServletRequest request){
+        return iHomeService.favour_feeds(id, request);
+    }
+
 
     /**
      * 评论feeds

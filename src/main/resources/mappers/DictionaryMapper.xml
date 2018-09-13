@@ -408,7 +408,7 @@
   </select>
 
   <select id="getFeedsCommentLike" resultType="map">
-    SELECT likes,comments
+    SELECT likes,comments,favours
     FROM feeds
     WHERE id = #{id}
   </select>
@@ -460,6 +460,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="changeFeedsFavour" parameterType="string">
+    UPDATE feeds
+    set favours = #{favours}
+    WHERE id = #{id}
+  </update>
+
   <update id="updateWordInfo" parameterType="string">
     UPDATE `dictionary` SET
     `word`= #{word},
@@ -499,9 +505,19 @@
     values (#{user_id}, #{feeds_id}, #{set_time})
   </insert>
 
+  <insert id="insertFeedsFavour" parameterType="string">
+    INSERT INTO feeds_favour (user_id, feeds_id, set_time)
+    values (#{user_id}, #{feeds_id}, #{set_time})
+  </insert>
 
   <delete id="deleteFeedsLike" parameterType="string" >
     delete from feeds_like
+    WHERE user_id = #{user_id}
+    AND feeds_id = #{feeds_id}
+  </delete>
+
+  <delete id="deleteFeedsFavour" parameterType="string" >
+    delete from feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
   </delete>
