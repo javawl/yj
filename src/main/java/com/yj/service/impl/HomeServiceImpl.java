@@ -87,7 +87,12 @@ public class HomeServiceImpl implements IHomeService {
                     learned_word = 0;
                 }else {
                     word_number = Integer.parseInt(userMapper.getPlanWordsNumberByPlan(plan.toString()));
-                    learned_word = dictionaryMapper.getLearnedWordNumber(plan.toString(),id);
+                    String learned_word_result = dictionaryMapper.getLearnedWordNumber(plan.toString(),id);
+                    if (learned_word_result == null){
+                        learned_word = 0;
+                    }else {
+                        learned_word = Integer.valueOf(learned_word_result);
+                    }
                     flag = 1;
                 }
                 m1.put("flag",flag);

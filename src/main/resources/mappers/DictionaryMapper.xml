@@ -334,7 +334,7 @@
 
 
   <!--下面是自己写的-->
-  <select id="getLearnedWordNumber" resultType="int" parameterType="string">
+  <select id="getLearnedWordNumber" resultType="string" parameterType="string">
     SELECT learned_word_number
     FROM take_plans
     WHERE plan = #{plan}
