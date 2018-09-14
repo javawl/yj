@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.github.qcloudsms.httpclient.HTTPException;
+import com.yj.dao.DictionaryMapper;
 import com.yj.util.MD5Util;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -15,6 +16,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -35,6 +37,9 @@ import java.util.*;
 public class CommonFunc {
 
     private static String Url = "http://106.ihuyi.com/webservice/sms.php?method=Submit";
+
+    @Autowired
+    private DictionaryMapper dictionaryMapper;
 
     public String getRandChars(int length){
         //不能把位数写死了，根据length来确定多少位数随机字符串
@@ -337,6 +342,7 @@ public class CommonFunc {
             }
         }
     }
+
 
     //验证传入数据是否为空
     public String first_Validate(Map<String,String> m1){

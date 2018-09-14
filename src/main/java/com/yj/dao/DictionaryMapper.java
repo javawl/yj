@@ -154,4 +154,13 @@ public interface DictionaryMapper {
 
     //未背单词(all)
     List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan);
+
+    //背单词接口给出新单词
+    List<Map> getNewWord(@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
+
+    //背单词给出旧单词
+    List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id);
+
+    //获得视频和字幕
+    List<Map<Object,Object>> getVideoInfoByWordId(@Param("id") String id);
 }

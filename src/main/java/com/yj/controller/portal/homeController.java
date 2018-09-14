@@ -165,11 +165,11 @@ public class homeController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "recite_word.do", method = RequestMethod.POST)
+    @RequestMapping(value = "recite_word_list.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> recite_word(HttpServletRequest request){
+    public ServerResponse<JSONObject> recite_word_list(HttpServletRequest request){
         //调用service层
-        return iHomeService.recite_word(request);
+        return iHomeService.recite_word_list(request);
     }
 
 

@@ -42,5 +42,5 @@ public interface IHomeService {
     ServerResponse<String> favour_feeds(String id, HttpServletRequest request);
 
     //背单词
-    ServerResponse<String> recite_word(HttpServletRequest request);
+    ServerResponse<JSONObject> recite_word_list(HttpServletRequest request);
 }

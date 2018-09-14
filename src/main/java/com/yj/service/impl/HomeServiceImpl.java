@@ -699,8 +699,302 @@ public class HomeServiceImpl implements IHomeService {
         return null;
     }
 
-    //背单词
-    public ServerResponse<String> recite_word(HttpServletRequest request){
-        return null;
+    //获取背单词列表
+    public ServerResponse<JSONObject> recite_word_list(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        //创建map来装几条信息
+        Map<Object,Object> m1 = new HashMap<Object,Object>();
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //获取用户选择的计划
+            String plan = userMapper.getUserSelectPlan(id);
+            //首先先获取自己背的单词里面的每日背单词数
+            //找到该用户所选择的计划的总单词数
+            Map numberResult = userMapper.getUserPlanNumber(id);
+            if (numberResult == null){
+                return ServerResponse.createByErrorMessage("未找到该计划！");
+            }
+            int number = Integer.valueOf(numberResult.get("plan_words_number").toString());
+            //获取新单词(获取上面number条
+            List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id);
+
+            //格式化
+            List<Map> word = new_list_word;
+            List<Map> new_list = new ArrayList<>();
+
+            for (int iiii = 0; iiii < word.size(); iiii++){
+                //新建一个map
+                Map<Object,Object> mm = new HashMap<Object,Object>();
+                mm.put("word",word.get(iiii).get("word"));
+                //判断是否有意思，没有的话换一个意思
+                if (word.get(iiii).get("real_meaning") != null){
+                    mm.put("meaning",word.get(iiii).get("real_meaning"));
+                }else {
+                    if(word.get(iiii).get("meaning_Mumbler") != null) {
+                        mm.put("meaning",word.get(iiii).get("meaning_Mumbler"));
+                    }else {
+                        mm.put("meaning",word.get(iiii).get("meaning"));
+                    }
+                }
+                //音标音频
+                if (word.get(iiii).get("phonetic_symbol_en_Mumbler") != null){
+                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en_Mumbler"));
+                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en_Mumbler"));
+                }else {
+                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en"));
+                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en"));
+                }
+                if (word.get(iiii).get("phonetic_symbol_us_Mumbler") != null){
+                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us_Mumbler"));
+                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us_Mumbler"));
+                }else {
+                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us"));
+                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us"));
+                }
+                mm.put("sentence",word.get(iiii).get("sentence"));
+                mm.put("sentence_cn",word.get(iiii).get("sentence_cn"));
+                mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
+                mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
+                mm.put("phrase",word.get(iiii).get("phrase"));
+                mm.put("synonym",word.get(iiii).get("synonym"));
+                mm.put("word_of_similar_form",word.get(iiii).get("word_of_similar_form"));
+                mm.put("stem_affix",word.get(iiii).get("stem_affix"));
+                //获取五条视频和字幕
+                List<Map<Object,Object>> video_info = dictionaryMapper.getVideoInfoByWordId(word.get(iiii).get("id").toString());
+                int flag = -1;
+                List<Map<Object,Object>> video_info_list = new ArrayList<>();
+                for (int iiiii = 0; iiiii < video_info.size(); iiiii++){
+                    //看看是否有了这个id
+                    if (video_info_list.size() == 0){
+                        //没有就加(新建一个map)
+                        Map<Object,Object> word_single_video = new HashMap<Object,Object>();
+                        word_single_video.put("id",video_info.get(iiiii).get("id"));
+                        word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
+                        word_single_video.put("rank",video_info.get(iiiii).get("rank"));
+                        word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
+                        word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
+                        word_single_video.put("translation",video_info.get(iiiii).get("translation"));
+                        word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
+                        word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
+                        word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
+                        //插入字幕(这就是不存在之前的那种的)
+                        //新建一个list
+                        List<Map> subtitles_list = new ArrayList<>();
+                        Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                        subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                        subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                        subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                        subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                        subtitles_list.add(subtitles_map);
+                        word_single_video.put("subtitles",subtitles_list);
+                        video_info_list.add(word_single_video);
+                        flag++;
+                    }else {
+                        if (!video_info_list.get(flag).get("id").equals(video_info.get(iiiii).get("id"))){
+                            //没有就加(新建一个map)
+                            Map<Object,Object> word_single_video = new HashMap<Object,Object>();
+                            word_single_video.put("id",video_info.get(iiiii).get("id"));
+                            word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
+                            word_single_video.put("rank",video_info.get(iiiii).get("rank"));
+                            word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
+                            word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
+                            word_single_video.put("translation",video_info.get(iiiii).get("translation"));
+                            word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
+                            word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
+                            word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
+//                            //插入字幕
+                            //新建一个list
+                            List<Map> subtitles_list = new ArrayList<>();
+                            Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                            subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                            subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                            subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                            subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                            subtitles_list.add(subtitles_map);
+                            word_single_video.put("subtitles",subtitles_list);
+                            video_info_list.add(word_single_video);
+                            flag++;
+                        }else {
+                            //没有的话直接插入字幕
+                            //插入字幕
+                            boolean exist_subtitles = video_info_list.get(flag).containsKey("subtitles");
+                            if (!exist_subtitles){
+                                //新建一个list
+                                List<Map> subtitles_list = new ArrayList<>();
+                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                                subtitles_list.add(subtitles_map);
+                                video_info_list.get(flag).put("subtitles",subtitles_list);
+                            }else {
+                                List<Map> subtitles = (ArrayList<Map>)video_info_list.get(flag).get("subtitles");
+                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                                subtitles.add(subtitles_map);
+                                video_info_list.get(flag).put("subtitles",subtitles);
+                            }
+                        }
+                    }
+                }
+                mm.put("video_info",video_info_list);
+                new_list.add(mm);
+            }
+
+
+            //获取要复习的旧单词
+            List<Map> old_list_word = dictionaryMapper.getOldWord(plan,id);
+            word = old_list_word;
+
+            List<Map> old_list = new ArrayList<>();
+            for (int iiii = 0; iiii < word.size(); iiii++){
+                //新建一个map
+                Map<Object,Object> mm = new HashMap<Object,Object>();
+                mm.put("word",word.get(iiii).get("word"));
+                //判断是否有意思，没有的话换一个意思
+                if (word.get(iiii).get("real_meaning") != null){
+                    mm.put("meaning",word.get(iiii).get("real_meaning"));
+                }else {
+                    if(word.get(iiii).get("meaning_Mumbler") != null) {
+                        mm.put("meaning",word.get(iiii).get("meaning_Mumbler"));
+                    }else {
+                        mm.put("meaning",word.get(iiii).get("meaning"));
+                    }
+                }
+                //音标音频
+                if (word.get(iiii).get("phonetic_symbol_en_Mumbler") != null){
+                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en_Mumbler"));
+                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en_Mumbler"));
+                }else {
+                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en"));
+                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en"));
+                }
+                if (word.get(iiii).get("phonetic_symbol_us_Mumbler") != null){
+                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us_Mumbler"));
+                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us_Mumbler"));
+                }else {
+                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us"));
+                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us"));
+                }
+                mm.put("level",word.get(iiii).get("level"));
+                mm.put("sentence",word.get(iiii).get("sentence"));
+                mm.put("sentence_cn",word.get(iiii).get("sentence_cn"));
+                mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
+                mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
+                mm.put("phrase",word.get(iiii).get("phrase"));
+                mm.put("synonym",word.get(iiii).get("synonym"));
+                mm.put("word_of_similar_form",word.get(iiii).get("word_of_similar_form"));
+                mm.put("stem_affix",word.get(iiii).get("stem_affix"));
+                //获取五条视频和字幕
+                List<Map<Object,Object>> video_info = dictionaryMapper.getVideoInfoByWordId(word.get(iiii).get("id").toString());
+                int flag = -1;
+                List<Map<Object,Object>> video_info_list = new ArrayList<>();
+                for (int iiiii = 0; iiiii < video_info.size(); iiiii++){
+                    //看看是否有了这个id
+                    if (video_info_list.size() == 0){
+                        //没有就加(新建一个map)
+                        Map<Object,Object> word_single_video = new HashMap<Object,Object>();
+                        word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
+                        word_single_video.put("id",video_info.get(iiiii).get("id"));
+                        word_single_video.put("rank",video_info.get(iiiii).get("rank"));
+                        word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
+                        word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
+                        word_single_video.put("translation",video_info.get(iiiii).get("translation"));
+                        word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
+                        word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
+                        word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
+                        //插入字幕(这就是不存在之前的那种的)
+                        //新建一个list
+                        List<Map> subtitles_list = new ArrayList<>();
+                        Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                        subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                        subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                        subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                        subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                        subtitles_list.add(subtitles_map);
+                        word_single_video.put("subtitles",subtitles_list);
+                        video_info_list.add(word_single_video);
+                        flag++;
+                    }else {
+                        if (!video_info_list.get(flag).get("id").equals(video_info.get(iiiii).get("id"))){
+                            //没有就加(新建一个map)
+                            Map<Object,Object> word_single_video = new HashMap<Object,Object>();
+                            word_single_video.put("id",video_info.get(iiiii).get("id"));
+                            word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
+                            word_single_video.put("rank",video_info.get(iiiii).get("rank"));
+                            word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
+                            word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
+                            word_single_video.put("translation",video_info.get(iiiii).get("translation"));
+                            word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
+                            word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
+                            word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
+//                            //插入字幕
+                            //新建一个list
+                            List<Map> subtitles_list = new ArrayList<>();
+                            Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                            subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                            subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                            subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                            subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                            subtitles_list.add(subtitles_map);
+                            word_single_video.put("subtitles",subtitles_list);
+                            video_info_list.add(word_single_video);
+                            flag++;
+                        }else {
+                            //没有的话直接插入字幕
+                            //插入字幕
+                            boolean exist_subtitles = video_info_list.get(flag).containsKey("subtitles");
+                            if (!exist_subtitles){
+                                //新建一个list
+                                List<Map> subtitles_list = new ArrayList<>();
+                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                                subtitles_list.add(subtitles_map);
+                                video_info_list.get(flag).put("subtitles",subtitles_list);
+                            }else {
+                                List<Map> subtitles = (ArrayList<Map>)video_info_list.get(flag).get("subtitles");
+                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
+                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
+                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
+                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
+                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
+                                subtitles.add(subtitles_map);
+                                video_info_list.get(flag).put("subtitles",subtitles);
+                            }
+                        }
+                    }
+                }
+                mm.put("video_info",video_info_list);
+                old_list.add(mm);
+            }
+
+            //用一个Map装这个结果
+            Map<Object,Object> result_list = new HashMap<>();
+            result_list.put("new_list", new_list);
+            result_list.put("old_list", old_list);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(result_list, SerializerFeature.WriteMapNullValue));
+
+            return ServerResponse.createBySuccess("成功!",json);
+        }
     }
 }

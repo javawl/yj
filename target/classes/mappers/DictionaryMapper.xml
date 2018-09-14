@@ -582,6 +582,29 @@
     LIMIT #{param1},#{param2}
   </select>
 
+  <select id="getNewWord" resultType="map">
+    SELECT * FROM dictionary
+    WHERE id NOT IN
+    (SELECT word_id FROM
+    (SELECT word_id FROM reciting_words WHERE plan = #{plan} AND user_id = #{id}
+    UNION
+    SELECT word_id FROM mastered_words WHERE plan = #{plan} AND user_id = #{id}) tb)
+    LIMIT 0,#{size}
+  </select>
+
+  <select id="getOldWord" resultType="map">
+    SELECT dictionary.*,reciting_words.`level` FROM dictionary,reciting_words
+    WHERE user_id = #{id}
+    AND plan = #{plan}
+    AND dictionary.id = word_id
+  </select>
+
+  <select id="getVideoInfoByWordId" resultType="map" parameterType="string">
+    SELECT tb.*,st,et,en,cn FROM subtitles,(SELECT * FROM word_video_information
+    WHERE word_video_information.word_id = #{id}
+    LIMIT 0,3) tb WHERE tb.id = subtitles.video_id
+  </select>
+
   <select id="selectNotMemorizingWords" resultType="map">
     SELECT id,word,real_meaning
     FROM dictionary

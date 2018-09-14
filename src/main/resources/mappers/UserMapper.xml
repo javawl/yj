@@ -243,6 +243,11 @@
     FROM user
     WHERE id = #{id}
   </select>
+  <select id="getUserPlanNumber" resultType="map" parameterType="string">
+    SELECT my_plan,plan_days,plan_words_number,insist_day
+    FROM user
+    WHERE id = #{id}
+  </select>
   <update id="decide_plan_days" parameterType="string">
     UPDATE user
     set plan_days = #{days},
