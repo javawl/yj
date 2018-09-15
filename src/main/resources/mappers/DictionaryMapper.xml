@@ -594,6 +594,11 @@
     LIMIT 0,#{size}
   </select>
 
+  <select id="getSingleWordInfo" resultType="map" parameterType="string">
+    SELECT * FROM dictionary
+    WHERE id = #{id}
+  </select>
+
   <select id="getOldWord" resultType="map">
     SELECT dictionary.*,reciting_words.`level` FROM dictionary,reciting_words
     WHERE user_id = #{id}

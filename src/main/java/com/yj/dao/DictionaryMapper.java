@@ -158,6 +158,9 @@ public interface DictionaryMapper {
     //背单词接口给出新单词
     List<Map> getNewWord(@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
 
+    //单词卡片一个单词
+    Map getSingleWordInfo(@Param("id") String id);
+
     //背单词给出旧单词
     List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id,@Param("two_day") String two_day,@Param("two_week") String two_week,@Param("last_month") String last_month);
 

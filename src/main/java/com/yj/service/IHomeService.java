@@ -46,4 +46,7 @@ public interface IHomeService {
 
     //背单词清算
     ServerResponse<String> liquidation_word(String word_list,HttpServletRequest request);
+
+    //单词卡片
+    ServerResponse<JSONObject> word_card(String word_id,HttpServletRequest request);
 }

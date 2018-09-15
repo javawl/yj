@@ -186,4 +186,16 @@ public class homeController {
     }
 
 
+    /**
+     * 获取单词卡片
+     * @param word_id  //单词id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "word_card.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> word_card(String word_id,HttpServletRequest request){
+        //调用service层
+        return iHomeService.word_card(word_id,request);
+    }
 }
