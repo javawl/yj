@@ -192,6 +192,12 @@
             = type_id
   </select>
 
+  <select id="getTypeByPlan" resultType="string" parameterType="string">
+    SELECT type_id
+    FROM plans
+    WHERE plan = #{plan}
+  </select>
+
 
   <select id="getMyPlanWordsNumber" resultType="int" parameterType="string">
     SELECT CASE WHEN (SELECT my_plan

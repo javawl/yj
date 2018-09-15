@@ -17,6 +17,8 @@ public class Const {
     public static final int INIT_STUDY_PEOPLE = 20000; //开始背单词的人数
     public static final Long INIT_STUDY_TIME = 1536771352000L; //开始背单词的人数的计算时间戳
     public static final Long HOT_RECOMMENDATIONS = 2678400000L; //因为热门推荐是一个月内热度前五的这是一个月的秒数(JAVA里面时间戳大三位)
+    public static final Long TWO_DAY = 172800L; //两天
+    public static final Long TWO_WEEK = 1209600L; //两周
     public static final Long ONE_HOUR_DATE = 3600000L; //一个小时的秒数(JAVA里面时间戳大三位)
     public static final Long ONE_DAY_DATE = 86400000L; //一天的秒数(JAVA里面时间戳大三位)
     public static final Long THREE_DAY_DATE = 259200000L; //一天的秒数(JAVA里面时间戳大三位)

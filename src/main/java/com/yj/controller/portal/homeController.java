@@ -172,5 +172,18 @@ public class homeController {
         return iHomeService.recite_word_list(request);
     }
 
+    /**
+     * 背单词清算
+     * @param word_list
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "liquidation_word.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> liquidation_word(String word_list,HttpServletRequest request){
+        //调用service层
+        return iHomeService.liquidation_word(word_list,request);
+    }
+
 
 }

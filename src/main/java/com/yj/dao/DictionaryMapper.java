@@ -88,7 +88,7 @@ public interface DictionaryMapper {
     int deleteFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
 
     //已背单词
-    List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+    List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
 
     //获取feeds流具体内容
     List<Map<Object,Object>> findFeedsInner(@Param("feeds_id") String feeds_id);
@@ -141,25 +141,31 @@ public interface DictionaryMapper {
     int existWordVideo(@Param("word") String word);
 
     //已掌握单词
-    List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+    List<Map> selectMasteredWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan, @Param("id") String id);
 
     //未背单词
-    List<Map> selectNotMemorizingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan);
+    List<Map> selectNotMemorizingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan, @Param("id") String id, @Param("type") String type);
 
     //已背单词(all)
-    List<Map> selectRecitingWordsAll(@Param("plan") String plan);
+    List<Map> selectRecitingWordsAll(@Param("plan") String plan, @Param("id") String id);
 
     //已掌握单词(all)
-    List<Map> selectMasteredWordsAll(@Param("plan") String plan);
+    List<Map> selectMasteredWordsAll(@Param("plan") String plan, @Param("id") String id);
 
     //未背单词(all)
-    List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan);
+    List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan, @Param("id") String id, @Param("type") String type);
 
     //背单词接口给出新单词
     List<Map> getNewWord(@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
 
     //背单词给出旧单词
-    List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id);
+    List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id,@Param("two_day") String two_day,@Param("two_week") String two_week,@Param("last_month") String last_month);
+
+    //新增已掌握单词
+    int insertMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word);
+
+    //更新已背单词
+    int insertRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
 
     //获得视频和字幕
     List<Map<Object,Object>> getVideoInfoByWordId(@Param("id") String id);

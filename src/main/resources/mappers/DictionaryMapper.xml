@@ -526,6 +526,7 @@
   SELECT id,word,meaning
   FROM reciting_words
   WHERE plan = #{plan}
+  AND user_id = #{id}
   ORDER BY word
   LIMIT #{param1},#{param2}
 </select>
@@ -578,6 +579,7 @@
     SELECT id,word,meaning
     FROM mastered_words
     WHERE plan = #{plan}
+    AND user_id = #{id}
     ORDER BY word
     LIMIT #{param1},#{param2}
   </select>
@@ -597,7 +599,46 @@
     WHERE user_id = #{id}
     AND plan = #{plan}
     AND dictionary.id = word_id
+    AND `level` = 2
+    AND set_time &lt; #{two_day}
+    UNION
+    SELECT dictionary.*,reciting_words.`level` FROM dictionary,reciting_words
+    WHERE user_id = #{id}
+    AND plan = #{plan}
+    AND dictionary.id = word_id
+    AND `level` = 3
+    AND set_time &lt; #{two_week}
+    UNION
+    SELECT dictionary.*,reciting_words.`level` FROM dictionary,reciting_words
+    WHERE user_id = #{id}
+    AND plan = #{plan}
+    AND dictionary.id = word_id
+    AND `level` = 4
+    AND set_time &lt; #{last_month}
   </select>
+
+  <insert id="insertMasteredWord" parameterType="string">
+    if NOT EXISTS (SELECT 1 FROM mastered_words WHERE word_id=#{word_id} AND set_time = #{right_time} AND user_id = #{user_id} AND plan = #{plan})
+    BEGIN
+     INSERT INTO mastered_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
+    END
+  </insert>
+
+  <insert id="insertRecitingWord" parameterType="string">
+    if NOT EXISTS (SELECT 1 FROM reciting_words WHERE word_id=#{word_id} AND user_id = #{user_id} AND plan = #{plan})
+    BEGIN
+      INSERT INTO reciting_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
+    END
+    ELSE
+    BEGIN
+      UPDATE `reciting_words` SET
+      `set_time`= #{right_time},
+      `level`= #{level}
+      WHERE word_id = #{word_id}
+      AND user_id = #{user_id}
+      AND plan = #{plan}
+    END
+  </insert>
 
   <select id="getVideoInfoByWordId" resultType="map" parameterType="string">
     SELECT tb.*,st,et,en,cn FROM subtitles,(SELECT * FROM word_video_information
@@ -609,13 +650,16 @@
     SELECT id,word,real_meaning
     FROM dictionary
     WHERE id NOT IN
+    AND type = #{type}
     (SELECT word_id
     FROM reciting_words
-    WHERE plan = #{plan})
-    AND type =
-    (SELECT dictionary_type
-    FROM plans
-    WHERE plan = #{plan})
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+    UNION
+    SELECT word_id
+    FROM mastered_words
+    WHERE plan = #{plan}
+    AND user_id = #{id})
     ORDER BY word
     LIMIT #{param1},#{param2}
   </select>
@@ -624,6 +668,7 @@
     SELECT id,word,meaning
     FROM reciting_words
     WHERE plan = #{plan}
+    AND user_id = #{id}
     ORDER BY word
   </select>
 
@@ -662,6 +707,7 @@
     SELECT id,word,meaning
     FROM mastered_words
     WHERE plan = #{plan}
+    AND user_id = #{id}
     ORDER BY word
   </select>
 
@@ -669,10 +715,16 @@
     SELECT id,word,real_meaning
     FROM dictionary
     WHERE id NOT IN
+    AND type = #{type}
     (SELECT word_id
     FROM reciting_words
-    WHERE plan = #{plan})
-    AND plan = #{plan}
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+    UNION
+    SELECT word_id
+    FROM mastered_words
+    WHERE plan = #{plan}
+    AND user_id = #{id})
     ORDER BY word
   </select>
 </mapper>

@@ -43,4 +43,7 @@ public interface IHomeService {
 
     //背单词
     ServerResponse<JSONObject> recite_word_list(HttpServletRequest request);
+
+    //背单词清算
+    ServerResponse<String> liquidation_word(String word_list,HttpServletRequest request);
 }
