@@ -1032,9 +1032,9 @@ public class HomeServiceImpl implements IHomeService {
             net.sf.json.JSONArray word_list_json = net.sf.json.JSONArray.fromObject(word_list);
             //开启事务
             //开启事务
-            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
-            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
-            try {
+//            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+//            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+//            try {
                 if(word_list_json.size()>0){
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
@@ -1046,25 +1046,41 @@ public class HomeServiceImpl implements IHomeService {
                         String plan = userMapper.getUserSelectPlan(id);
                         //判断是否掌握
                         if (Integer.valueOf(level) == 5){
-                            int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word);
-                            if (resultMaster == 0){
-                                throw new Exception();
+                            String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
+                            if (selectMaster == null){
+                                //删除已背单词
+                                int deleteMaster = dictionaryMapper.deleteRecitingWord(word_id,id,plan,word);
+//                                if (deleteMaster == 0){
+//                                    throw new Exception();
+//                                }
+                                int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word);
+//                                if (resultMaster == 0){
+//                                    throw new Exception();
+//                                }
                             }
                         }else {
-                            int resultReciting = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word);
-                            if (resultReciting == 0){
-                                throw new Exception();
+                            String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
+                            if (selectReciting == null){
+                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level);
+//                                if (resultReciting == 0){
+//                                    throw new Exception();
+//                                }
+                            }else {
+                                int resultReciting = dictionaryMapper.updateRecitingWord(word_id,id,right_time,plan,word,level);
+//                                if (resultReciting == 0){
+//                                    throw new Exception();
+//                                }
                             }
                         }
                     }
                 }
-                transactionManager.commit(status);
+//                transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
-            } catch (Exception e) {
-                System.out.println(e);
-                transactionManager.rollback(status);
-                return ServerResponse.createByErrorMessage("更新出错！");
-            }
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//                transactionManager.rollback(status);
+//                return ServerResponse.createByErrorMessage("更新出错！");
+//            }
 
         }
     }

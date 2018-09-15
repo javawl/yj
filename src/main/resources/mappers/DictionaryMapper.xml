@@ -618,27 +618,38 @@
   </select>
 
   <insert id="insertMasteredWord" parameterType="string">
-    if NOT EXISTS (SELECT 1 FROM mastered_words WHERE word_id=#{word_id} AND set_time = #{right_time} AND user_id = #{user_id} AND plan = #{plan})
-    BEGIN
-     INSERT INTO mastered_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
-    END
+    INSERT INTO mastered_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
   </insert>
 
+  <select id="selectMasteredWord" parameterType="string" resultType="string">
+    SELECT id FROM mastered_words WHERE word_id=#{word_id} AND set_time = #{right_time} AND user_id = #{user_id} AND plan = #{plan}
+    LIMIT 1
+  </select>
+
+  <delete id="deleteRecitingWord" parameterType="string">
+    DELETE FROM reciting_words
+    WHERE word_id=#{word_id}
+    AND user_id = #{user_id}
+    AND plan = #{plan}
+  </delete>
+
   <insert id="insertRecitingWord" parameterType="string">
-    if NOT EXISTS (SELECT 1 FROM reciting_words WHERE word_id=#{word_id} AND user_id = #{user_id} AND plan = #{plan})
-    BEGIN
-      INSERT INTO reciting_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
-    END
-    ELSE
-    BEGIN
-      UPDATE `reciting_words` SET
-      `set_time`= #{right_time},
-      `level`= #{level}
-      WHERE word_id = #{word_id}
-      AND user_id = #{user_id}
-      AND plan = #{plan}
-    END
+    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
   </insert>
+
+  <update id="updateRecitingWord" parameterType="string">
+    UPDATE `reciting_words` SET
+    `set_time`= #{right_time},
+    `level`= #{level}
+    WHERE word_id = #{word_id}
+    AND user_id = #{user_id}
+    AND plan = #{plan}
+  </update>
+
+  <select id="selectRecitingWord" parameterType="string" resultType="string">
+    SELECT id FROM reciting_words WHERE word_id=#{word_id} AND user_id = #{user_id} AND plan = #{plan}
+    LIMIT 1
+  </select>
 
   <select id="getVideoInfoByWordId" resultType="map" parameterType="string">
     SELECT tb.*,st,et,en,cn FROM subtitles,(SELECT * FROM word_video_information

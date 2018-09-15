@@ -161,11 +161,23 @@ public interface DictionaryMapper {
     //背单词给出旧单词
     List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id,@Param("two_day") String two_day,@Param("two_week") String two_week,@Param("last_month") String last_month);
 
+    //查一下已掌握单词
+    String selectMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word);
+
     //新增已掌握单词
     int insertMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word);
 
+    //删除已背
+    int deleteRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("plan") String plan,@Param("word") String word);
+
+    //查一下已背单词
+    String selectRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
+
     //更新已背单词
     int insertRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
+
+    //更新已背单词
+    int updateRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
 
     //获得视频和字幕
     List<Map<Object,Object>> getVideoInfoByWordId(@Param("id") String id);
