@@ -55,5 +55,5 @@ public interface IUserService {
 
     ServerResponse<JSONObject> its_plan(String id,HttpServletRequest request);
 
-    ServerResponse<String> my_info( HttpServletRequest request);
+    ServerResponse<JSONObject> my_info( HttpServletRequest request);
 }

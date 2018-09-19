@@ -648,17 +648,17 @@ public class UserServiceImpl implements IUserService {
     //返回我的页面
     private Map<Object,Object> my_page_basic_information(String user_id){
         //获取基本信息
-        Map basic_information = new HashMap<>();
+        Map<Object,Object> result_basic_information = new HashMap<Object,Object>();
         //除了背了多少单词的信息外所有加进来
-        basic_information = userMapper.getAuthorInfo(user_id);
-        basic_information.put("author_id",user_id);
-        basic_information.put("author_portrait",basic_information.get("portrait"));
-        basic_information.put("author_gender",basic_information.get("gender"));
-        basic_information.put("author_username",basic_information.get("username"));
-        basic_information.put("author_personality_signature",basic_information.get("personality_signature"));
+        Map basic_information = userMapper.getAuthorInfo(user_id);
+        result_basic_information.put("author_id",user_id);
+        result_basic_information.put("author_portrait", Const.FTP_PREFIX + basic_information.get("portrait"));
+        result_basic_information.put("author_gender",basic_information.get("gender"));
+        result_basic_information.put("author_username",basic_information.get("username"));
+        result_basic_information.put("author_personality_signature",basic_information.get("personality_signature"));
         int learned_word = Integer.valueOf(userMapper.calculateAllWords(user_id));
-        basic_information.put("learned_word",learned_word);
-        return basic_information;
+        result_basic_information.put("learned_word",learned_word);
+        return result_basic_information;
     }
 
 
@@ -689,7 +689,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ServerResponse<String> my_info( HttpServletRequest request){
+    public ServerResponse<JSONObject> my_info( HttpServletRequest request){
         //我的资料
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -704,8 +704,17 @@ public class UserServiceImpl implements IUserService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
-
+            //获取用户信息
+            Map<Object,Object> user_info_result = new HashMap<Object,Object>();
+            Map user_information = userMapper.getAuthorInfo(id);
+            user_info_result.put("user_id",id);
+            user_info_result.put("portrait", Const.FTP_PREFIX + user_information.get("portrait"));
+            user_info_result.put("gender",user_information.get("gender"));
+            user_info_result.put("username",user_information.get("username"));
+            user_info_result.put("personality_signature",user_information.get("personality_signature"));
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(user_info_result, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功",json);
         }
-        return null;
     }
 }

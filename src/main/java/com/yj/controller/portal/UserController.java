@@ -347,7 +347,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "my_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> my_info( HttpServletRequest request){
+    public ServerResponse<JSONObject> my_info( HttpServletRequest request){
         //调用service层
         return iUserService.my_info(request);
     }
