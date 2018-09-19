@@ -7,6 +7,7 @@ import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
 import com.yj.controller.portal.BaseController;
+import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IUserService;
@@ -37,6 +38,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private DictionaryMapper dictionaryMapper;
 
     @Autowired
     private ApplicationContext ctx;
@@ -659,7 +663,7 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public ServerResponse<String> its_plan(String user_id,HttpServletRequest request){
+    public ServerResponse<JSONObject> its_plan(String user_id,HttpServletRequest request){
         //他的计划
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -676,9 +680,12 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
             Map<Object,Object> final_result = my_page_basic_information(user_id);
-
+            List<Map> plans =  dictionaryMapper.getOnesPlans(user_id);
+            final_result.put("its_plan",plans);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(final_result, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功",json);
         }
-        return null;
     }
 
     @Override

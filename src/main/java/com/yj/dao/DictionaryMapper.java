@@ -170,6 +170,9 @@ public interface DictionaryMapper {
     //获取一个视频的字幕
     List<Map> getSingleSubtitleInfo(@Param("video_id") String video_id);
 
+    //他的计划
+    List<Map> getOnesPlans(@Param("id") String id);
+
     //背单词给出旧单词
     List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id,@Param("two_day") String two_day,@Param("two_week") String two_week,@Param("last_month") String last_month);
 

@@ -611,6 +611,13 @@
     LIMIT 0,#{size}
   </select>
 
+  <select id="getOnesPlans" resultType="map" parameterType="string">
+    SELECT take_plans.plan,take_plans.learned_word_number,plans.word_number
+    FROM take_plans,plans
+    WHERE take_plans.user_id = #{id}
+    AND take_plans.plan_id = plans.id
+  </select>
+
   <select id="getSingleWordInfo" resultType="map" parameterType="string">
     SELECT * FROM dictionary
     WHERE id = #{id}

@@ -53,7 +53,7 @@ public interface IUserService {
 
     ServerResponse<String> its_favorite(String id,HttpServletRequest request);
 
-    ServerResponse<String> its_plan(String id,HttpServletRequest request);
+    ServerResponse<JSONObject> its_plan(String id,HttpServletRequest request);
 
     ServerResponse<String> my_info( HttpServletRequest request);
 }

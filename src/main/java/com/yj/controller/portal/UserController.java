@@ -224,7 +224,6 @@ public class UserController extends BaseController {
 
     /**
      * 看看该用户都有多少计划
-     * @param token(header中)
      * @param request
      * @return
      */
@@ -238,7 +237,6 @@ public class UserController extends BaseController {
 
     /**
      * 用户决定自己背单词天数和每日背单词的数量
-     * @param token(header中)
      * @param days
      * @param daily_word_number
      * @param request
@@ -253,7 +251,6 @@ public class UserController extends BaseController {
 
     /**
      * 用户选择计划
-     * @param token
      * @param plan
      * @return
      */
@@ -266,7 +263,6 @@ public class UserController extends BaseController {
 
     /**
      * 用户修改选中的学习计划
-     * @param token
      * @param plan
      * @param request
      * @return
@@ -333,15 +329,15 @@ public class UserController extends BaseController {
 
     /**
      * 她的计划
-     * @param id 他的id
+     * @param user_id 他的id
      * @param request
      * @return
      */
     @RequestMapping(value = "its_plan.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> its_plan(String id,HttpServletRequest request){
+    public ServerResponse<JSONObject> its_plan(String user_id,HttpServletRequest request){
         //调用service层
-        return iUserService.its_plan(id, request);
+        return iUserService.its_plan(user_id, request);
     }
 
     /**
