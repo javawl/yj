@@ -134,6 +134,22 @@ public class homeController {
         return iHomeService.not_memorizing_words(page, size ,request);
     }
 
+
+    /**
+     * 作者页
+     * @param page
+     * @param size
+     * @param author_id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "author_page.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> author_page(String page, String size, String author_id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.author_page(page, size , author_id, request);
+    }
+
     /**
      * 文章详情页
      * @param id 文章id
@@ -183,6 +199,20 @@ public class homeController {
     public ServerResponse<String> liquidation_word(String word_list,HttpServletRequest request){
         //调用service层
         return iHomeService.liquidation_word(word_list,request);
+    }
+
+
+    /**
+     * 获取视频字幕
+     * @param video_id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "get_subtitles.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map>> get_subtitles(String video_id,HttpServletRequest request){
+        //调用service层
+        return iHomeService.get_subtitles(video_id,request);
     }
 
 

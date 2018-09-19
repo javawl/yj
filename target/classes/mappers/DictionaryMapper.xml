@@ -348,17 +348,27 @@
   </select>
 
   <select id="homePageFirstGet" resultType="map">
-    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait
+    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY 2*feeds.comments+feeds.likes DESC
     LIMIT 0,3)
     UNION
-    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,username,portrait
+    (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY feeds.set_time DESC
     LIMIT 0,3)
+  </select>
+
+
+  <select id="authorFeeds" resultType="map">
+    SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
+    FROM feeds,`user`
+    WHERE auther_id = #{id}
+    AND auther_id = `user`.id
+    ORDER BY feeds.set_time DESC
+    LIMIT #{start},#{size}
   </select>
 
   <select id="hotRecommendations" resultType="map" parameterType="string">
@@ -495,6 +505,13 @@
     WHERE word = #{word}
   </update>
 
+  <update id="updateLearnedWord">
+    UPDATE `take_plans` SET
+    `learned_word_number`= learned_word_number + #{learned_word_number}
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+  </update>
+
   <insert id="insertFeedsComment" parameterType="string">
     INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
@@ -599,6 +616,11 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getSingleSubtitleInfo" resultType="map" parameterType="string">
+    SELECT st,et,en,cn FROM subtitles
+    WHERE video_id = #{video_id}
+  </select>
+
   <select id="getOldWord" resultType="map">
     SELECT dictionary.*,reciting_words.`level` FROM dictionary,reciting_words
     WHERE user_id = #{id}
@@ -660,6 +682,13 @@
     SELECT tb.*,st,et,en,cn FROM subtitles,(SELECT * FROM word_video_information
     WHERE word_video_information.word_id = #{id}
     LIMIT 0,3) tb WHERE tb.id = subtitles.video_id
+  </select>
+
+<!--获取三条视频信息不含字幕-->
+  <select id="getVideoInfoByWordIdWithOutSubtitles" resultType="map" parameterType="string">
+    SELECT * FROM word_video_information
+    WHERE word_video_information.word_id = #{id}
+    LIMIT 3
   </select>
 
   <select id="selectNotMemorizingWords" resultType="map">

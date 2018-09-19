@@ -66,7 +66,7 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-//            try {
+            try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
                 Object insist_days = SelectPlan.get(0).get("insist_day");
@@ -126,10 +126,10 @@ public class HomeServiceImpl implements IHomeService {
                     }
                     m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
-                    m3.put("likes",m2.get("likes"));
-
+                    m3.put("likes",m2.get("favours"));
                     m3.put("comments",m2.get("comments"));
                     m3.put("author_username",m2.get("username"));
+                    m3.put("author_id",m2.get("user_id"));
                     if (m2.get("portrait")==null){
                         m3.put("author_portrait",null);
                     }else {
@@ -163,11 +163,90 @@ public class HomeServiceImpl implements IHomeService {
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue));
 
                 return ServerResponse.createBySuccess("成功!",json);
-//            }catch (Exception e){
-//                return ServerResponse.createByErrorMessage("查找信息有误！");
-//            }
+            }catch (Exception e){
+                return ServerResponse.createByErrorMessage("查找信息有误！");
+            }
         }
     }
+
+
+    @Override
+    public ServerResponse<JSONObject> author_page(String page, String size, String author_id, HttpServletRequest request){
+        //作者页
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(page);
+            add(size);
+            add(author_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //装结果的map
+            Map<Object,Object> final_result = new HashMap<Object,Object>();
+            //查出用户的
+            Map user_info = userMapper.getAuthorInfo(author_id);
+            final_result.put("author_id",author_id);
+            final_result.put("author_portrait",user_info.get("portrait"));
+            final_result.put("author_gender",user_info.get("gender"));
+            final_result.put("author_username",user_info.get("username"));
+            final_result.put("author_personality_signature",user_info.get("personality_signature"));
+            //将页数和大小转化为limit
+            int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+            //查出feeds信息并捡出有用的
+            List<Map> feeds = dictionaryMapper.authorFeeds(start,Integer.valueOf(size),author_id);
+            List<Map> feeds_result = new ArrayList<Map>();
+            if (feeds != null){
+                for(int i = 0; i < feeds.size(); i++){
+                    Map m2 = feeds.get(i);
+                    Map<String,Object> m3 = new HashMap<String,Object>();
+                    //当type为0是图片，为1是视频
+                    if (m2.get("cover_select").toString().equals("1")){
+                        m3.put("type",0);
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    }else {
+                        m3.put("type",1);
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                        m3.put("video",Const.FTP_PREFIX+m2.get("video"));
+                    }
+                    //todo 是否喜欢
+                    Map is_favour = dictionaryMapper.findIsFavour(id,m2.get("id").toString());
+                    if (is_favour == null){
+                        m3.put("is_favour",0);
+                    }else {
+                        m3.put("is_favour",1);
+                    }
+                    m3.put("id",m2.get("id"));
+                    m3.put("title",m2.get("title"));
+                    m3.put("likes",m2.get("favours"));
+                    m3.put("comments",m2.get("comments"));
+                    m3.put("author_username",m2.get("username"));
+                    m3.put("author_id",m2.get("user_id"));
+                    if (m2.get("portrait")==null){
+                        m3.put("author_portrait",null);
+                    }else {
+                        m3.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                    }
+                    feeds_result.add(m3);
+                }
+            }
+            //将feeds流六条信息加进去
+            final_result.put("feeds",feeds_result);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(final_result, SerializerFeature.WriteMapNullValue));
+
+            return ServerResponse.createBySuccess("成功!",json);
+        }
+    }
+
+
 
     //评论feeds
     public ServerResponse<String> comment_feeds(String id, String comment, HttpServletRequest request){
@@ -775,6 +854,7 @@ public class HomeServiceImpl implements IHomeService {
                 mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
                 mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
                 mm.put("phrase",word.get(iiii).get("phrase"));
+                mm.put("paraphrase",word.get(iiii).get("paraphrase"));
                 mm.put("synonym",word.get(iiii).get("synonym"));
 //                mm.put("word_of_similar_form",word.get(iiii).get("word_of_similar_form"));
 //                mm.put("stem_affix",word.get(iiii).get("stem_affix"));
@@ -910,6 +990,7 @@ public class HomeServiceImpl implements IHomeService {
                 mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
                 mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
                 mm.put("phrase",word.get(iiii).get("phrase"));
+                mm.put("paraphrase",word.get(iiii).get("paraphrase"));
                 mm.put("synonym",word.get(iiii).get("synonym"));
 //                mm.put("word_of_similar_form",word.get(iiii).get("word_of_similar_form"));
 //                mm.put("stem_affix",word.get(iiii).get("stem_affix"));
@@ -1017,6 +1098,7 @@ public class HomeServiceImpl implements IHomeService {
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(word_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -1024,8 +1106,6 @@ public class HomeServiceImpl implements IHomeService {
         //验证token
         CommonFunc func = new CommonFunc();
         String id = func.getCookieValueBykey(request,token);
-        //创建map来装几条信息
-        Map<Object,Object> m1 = new HashMap<Object,Object>();
         if (id == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -1066,95 +1146,54 @@ public class HomeServiceImpl implements IHomeService {
             mm.put("sentence_audio",Const.FTP_PREFIX + Single_word_info.get("sentence_audio"));
             mm.put("pic",Const.FTP_PREFIX + Single_word_info.get("pic"));
             mm.put("phrase",Single_word_info.get("phrase"));
+            mm.put("paraphrase",Single_word_info.get("paraphrase"));
             mm.put("synonym",Single_word_info.get("synonym"));
             mm.put("word_of_similar_form",Single_word_info.get("word_of_similar_form"));
             mm.put("stem_affix",Single_word_info.get("stem_affix"));
-            //获取五条视频和字幕
-                List<Map<Object,Object>> video_info = dictionaryMapper.getVideoInfoByWordId(Single_word_info.get("id").toString());
-                int flag = -1;
-                List<Map<Object,Object>> video_info_list = new ArrayList<>();
-                for (int iiiii = 0; iiiii < video_info.size(); iiiii++){
-                    //看看是否有了这个id
-                    if (video_info_list.size() == 0){
-                        //没有就加(新建一个map)
-                        Map<Object,Object> word_single_video = new HashMap<Object,Object>();
-                        word_single_video.put("id",video_info.get(iiiii).get("id"));
-                        word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
-                        word_single_video.put("rank",video_info.get(iiiii).get("rank"));
-                        word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
-                        word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
-                        word_single_video.put("translation",video_info.get(iiiii).get("translation"));
-                        word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
-                        word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
-                        word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
-                        //插入字幕(这就是不存在之前的那种的)
-                        //新建一个list
-                        List<Map> subtitles_list = new ArrayList<>();
-                        Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
-                        subtitles_map.put("st",video_info.get(iiiii).get("st"));
-                        subtitles_map.put("et",video_info.get(iiiii).get("et"));
-                        subtitles_map.put("en",video_info.get(iiiii).get("en"));
-                        subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
-                        subtitles_list.add(subtitles_map);
-                        word_single_video.put("subtitles",subtitles_list);
-                        video_info_list.add(word_single_video);
-                        flag++;
-                    }else {
-                        if (!video_info_list.get(flag).get("id").equals(video_info.get(iiiii).get("id"))){
-                            //没有就加(新建一个map)
-                            Map<Object,Object> word_single_video = new HashMap<Object,Object>();
-                            word_single_video.put("id",video_info.get(iiiii).get("id"));
-                            word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
-                            word_single_video.put("rank",video_info.get(iiiii).get("rank"));
-                            word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
-                            word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
-                            word_single_video.put("translation",video_info.get(iiiii).get("translation"));
-                            word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
-                            word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
-                            word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
-//                            //插入字幕
-                            //新建一个list
-                            List<Map> subtitles_list = new ArrayList<>();
-                            Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
-                            subtitles_map.put("st",video_info.get(iiiii).get("st"));
-                            subtitles_map.put("et",video_info.get(iiiii).get("et"));
-                            subtitles_map.put("en",video_info.get(iiiii).get("en"));
-                            subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
-                            subtitles_list.add(subtitles_map);
-                            word_single_video.put("subtitles",subtitles_list);
-                            video_info_list.add(word_single_video);
-                            flag++;
-                        }else {
-                            //没有的话直接插入字幕
-                            //插入字幕
-                            boolean exist_subtitles = video_info_list.get(flag).containsKey("subtitles");
-                            if (!exist_subtitles){
-                                //新建一个list
-                                List<Map> subtitles_list = new ArrayList<>();
-                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
-                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
-                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
-                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
-                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
-                                subtitles_list.add(subtitles_map);
-                                video_info_list.get(flag).put("subtitles",subtitles_list);
-                            }else {
-                                List<Map> subtitles = (ArrayList<Map>)video_info_list.get(flag).get("subtitles");
-                                Map<Object,Object> subtitles_map = new HashMap<Object,Object>();
-                                subtitles_map.put("st",video_info.get(iiiii).get("st"));
-                                subtitles_map.put("et",video_info.get(iiiii).get("et"));
-                                subtitles_map.put("en",video_info.get(iiiii).get("en"));
-                                subtitles_map.put("cn",video_info.get(iiiii).get("cn"));
-                                subtitles.add(subtitles_map);
-                                video_info_list.get(flag).put("subtitles",subtitles);
-                            }
-                        }
-                    }
-                }
+            //获取三条视频
+            List<Map<Object,Object>> video_info = dictionaryMapper.getVideoInfoByWordIdWithOutSubtitles(Single_word_info.get("id").toString());
+            List<Map<Object,Object>> video_info_list = new ArrayList<>();
+            for (int iiiii = 0; iiiii < video_info.size(); iiiii++){
+                Map<Object,Object> word_single_video = new HashMap<Object,Object>();
+                word_single_video.put("id",video_info.get(iiiii).get("id"));
+                word_single_video.put("word_usage",video_info.get(iiiii).get("word_usage"));
+                word_single_video.put("rank",video_info.get(iiiii).get("rank"));
+                word_single_video.put("sentence",video_info.get(iiiii).get("sentence"));
+                word_single_video.put("sentence_audio",Const.FTP_PREFIX + video_info.get(iiiii).get("sentence_audio"));
+                word_single_video.put("translation",video_info.get(iiiii).get("translation"));
+                word_single_video.put("video_name",video_info.get(iiiii).get("video_name"));
+                word_single_video.put("img",Const.FTP_PREFIX + video_info.get(iiiii).get("img"));
+                word_single_video.put("video",Const.FTP_PREFIX + video_info.get(iiiii).get("video"));
+                video_info_list.add(word_single_video);
+            }
             mm.put("video_info",video_info_list);
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(mm, SerializerFeature.WriteMapNullValue));
             return ServerResponse.createBySuccess("成功",json);
+        }
+    }
+
+
+    //根据视频id获取字幕
+    public ServerResponse<List<Map>> get_subtitles(String video_id,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(video_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //找出单个词的信息
+            List<Map> Single_video_info = dictionaryMapper.getSingleSubtitleInfo(video_id);
+            return ServerResponse.createBySuccess("成功",Single_video_info);
         }
     }
 
@@ -1185,14 +1224,15 @@ public class HomeServiceImpl implements IHomeService {
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
             try {
                 if(word_list_json.size()>0){
+                    int learned_word = 0;
+                    //获取用户的计划
+                    String plan = userMapper.getUserSelectPlan(id);
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
                         String word_id = job.get("id").toString();
                         String right_time = job.get("right_time").toString();
                         String level = job.get("level").toString();
                         String word = job.get("word").toString();
-                        //获取用户的计划
-                        String plan = userMapper.getUserSelectPlan(id);
                         //判断是否掌握
                         if (Integer.valueOf(level) == 5){
                             String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
@@ -1200,7 +1240,8 @@ public class HomeServiceImpl implements IHomeService {
                                 //删除已背单词
                                 int deleteMaster = dictionaryMapper.deleteRecitingWord(word_id,id,plan,word);
                                 if (deleteMaster == 0){
-                                    throw new Exception();
+                                    //删不了说明没有，是点pass进来的背单词数加一
+                                    learned_word+=1;
                                 }
                                 int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word);
                                 if (resultMaster == 0){
@@ -1210,6 +1251,7 @@ public class HomeServiceImpl implements IHomeService {
                         }else {
                             String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
                             if (selectReciting == null){
+                                learned_word+=1;
                                 int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level);
                                 if (resultReciting == 0){
                                     throw new Exception();
@@ -1221,6 +1263,11 @@ public class HomeServiceImpl implements IHomeService {
                                 }
                             }
                         }
+                        int resultUpdate = dictionaryMapper.updateLearnedWord(learned_word,id,plan);
+                        if (resultUpdate == 0){
+                            throw new Exception();
+                        }
+
                     }
                 }
                 transactionManager.commit(status);

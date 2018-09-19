@@ -526,8 +526,24 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> my_favorite( HttpServletRequest request){
         //我喜欢的
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+
+        }
         return null;
     }
+
 
     @Override
     public ServerResponse<String> delete_plan(String plan, HttpServletRequest request){
@@ -581,26 +597,108 @@ public class UserServiceImpl implements IUserService {
 //    }
 
     @Override
-    public ServerResponse<String> its_dynamic(String id,HttpServletRequest request){
+    public ServerResponse<String> its_dynamic(String user_id,HttpServletRequest request){
         //他的动态
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(user_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+
+        }
         return null;
     }
 
     @Override
-    public ServerResponse<String> its_favorite(String id,HttpServletRequest request){
+    public ServerResponse<String> its_favorite(String user_id,HttpServletRequest request){
         //她喜欢的
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(user_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+
+        }
         return null;
     }
 
+
+    //返回我的页面
+    private Map<Object,Object> my_page_basic_information(String user_id){
+        //获取基本信息
+        Map basic_information = new HashMap<>();
+        //除了背了多少单词的信息外所有加进来
+        basic_information = userMapper.getAuthorInfo(user_id);
+        basic_information.put("author_id",user_id);
+        basic_information.put("author_portrait",basic_information.get("portrait"));
+        basic_information.put("author_gender",basic_information.get("gender"));
+        basic_information.put("author_username",basic_information.get("username"));
+        basic_information.put("author_personality_signature",basic_information.get("personality_signature"));
+        int learned_word = Integer.valueOf(userMapper.calculateAllWords(user_id));
+        basic_information.put("learned_word",learned_word);
+        return basic_information;
+    }
+
+
     @Override
-    public ServerResponse<String> its_plan(String id,HttpServletRequest request){
+    public ServerResponse<String> its_plan(String user_id,HttpServletRequest request){
         //他的计划
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(user_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            Map<Object,Object> final_result = my_page_basic_information(user_id);
+
+        }
         return null;
     }
 
     @Override
     public ServerResponse<String> my_info( HttpServletRequest request){
         //我的资料
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+
+        }
         return null;
     }
 }

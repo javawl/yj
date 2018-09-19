@@ -30,6 +30,9 @@ public interface DictionaryMapper {
     //获取首页的feeds流的信息
     List<Map> homePageFirstGet();
 
+    //获取作者页的feeds流的信息
+    List<Map> authorFeeds(@Param("start") int start,@Param("size") int page,@Param("id") String id);
+
     //获取热门推荐文章信息
     List<Map> hotRecommendations(@Param("time") String time);
 
@@ -117,6 +120,9 @@ public interface DictionaryMapper {
     //后台
     int updateWordPic(@Param("word") String word,@Param("pic") String pic);
 
+    //更新已背单词数
+    int updateLearnedWord(@Param("learned_word_number") int learned_word_number,@Param("id") String id,@Param("plan") String plan);
+
     //后台
     int deleteWordInfo(@Param("word") String word);
 
@@ -161,6 +167,9 @@ public interface DictionaryMapper {
     //单词卡片一个单词
     Map getSingleWordInfo(@Param("id") String id);
 
+    //获取一个视频的字幕
+    List<Map> getSingleSubtitleInfo(@Param("video_id") String video_id);
+
     //背单词给出旧单词
     List<Map> getOldWord(@Param("plan") String plan,@Param("id") String id,@Param("two_day") String two_day,@Param("two_week") String two_week,@Param("last_month") String last_month);
 
@@ -184,4 +193,7 @@ public interface DictionaryMapper {
 
     //获得视频和字幕
     List<Map<Object,Object>> getVideoInfoByWordId(@Param("id") String id);
+
+    //获取视频除了字幕
+    List<Map<Object,Object>> getVideoInfoByWordIdWithOutSubtitles(@Param("id") String id);
 }

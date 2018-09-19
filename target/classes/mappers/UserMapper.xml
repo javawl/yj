@@ -219,10 +219,22 @@
     WHERE plan = #{plan}
   </select>
 
+  <select id="getAuthorInfo" resultType="map" parameterType="string">
+    SELECT  portrait,gender,username,personality_signature,insist_day
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
     SELECT my_plan
        FROM user
     WHERE id = #{id}
+  </select>
+
+  <select id="calculateAllWords" resultType="string" parameterType="string">
+    SELECT sum(learned_word_number)
+       FROM take_plans
+    WHERE user_id = #{id}
   </select>
 
   <select id="getUserPortrait" resultType="string" parameterType="string">

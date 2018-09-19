@@ -45,6 +45,9 @@ public interface UserMapper {
     //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //获取我的背单词总数
+    String calculateAllWords(@Param("id") String id);
+
     //获取计划的类别
     String getTypeByPlan(@Param("plan") String plan);
 
@@ -78,4 +81,7 @@ public interface UserMapper {
 
     //根据计划名获取总数
     String getPlanWordsNumberByPlan(@Param("plan") String plan);
+
+    //作者页用户信息
+    Map getAuthorInfo(@Param("id") String id);
 }

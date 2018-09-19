@@ -49,4 +49,10 @@ public interface IHomeService {
 
     //单词卡片
     ServerResponse<JSONObject> word_card(String word_id,HttpServletRequest request);
+
+    //作者页
+    ServerResponse<JSONObject> author_page(String page, String size, String author_id, HttpServletRequest request);
+
+    //获取视频字幕
+    ServerResponse<List<Map>> get_subtitles(String video_id,HttpServletRequest request);
 }
