@@ -15,10 +15,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -350,6 +348,39 @@ public class UserController extends BaseController {
     public ServerResponse<JSONObject> my_info( HttpServletRequest request){
         //调用service层
         return iUserService.my_info(request);
+    }
+
+
+    /**
+     * 修改我的信息
+     * @param username  用户名
+     * @param gender    性别
+     * @param personality_signature  个性签名
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "edit_my_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> edit_my_info(String username, String gender, String personality_signature, HttpServletRequest request){
+        //调用service层
+        return iUserService.edit_my_info(username, gender, personality_signature, request);
+    }
+
+
+    /**
+     * 更换头像
+     * @param file
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "edit_portrait.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> edit_portrait(@RequestParam(value = "portrait",required = false) MultipartFile file, HttpServletRequest request){
+        if (file == null){
+            return ServerResponse.createByErrorMessage("请上传图片！");
+        }
+        //调用service层
+        return iUserService.edit_portrait(file, request);
     }
 
 

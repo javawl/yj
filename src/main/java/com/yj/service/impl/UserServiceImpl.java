@@ -10,6 +10,7 @@ import com.yj.controller.portal.BaseController;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
+import com.yj.service.IFileService;
 import com.yj.service.IUserService;
 import com.yj.util.AES;
 import com.yj.util.MD5Util;
@@ -22,6 +23,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +44,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private IFileService iFileService;
 
     @Autowired
     private ApplicationContext ctx;
@@ -527,27 +533,6 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-    @Override
-    public ServerResponse<String> my_favorite( HttpServletRequest request){
-        //我喜欢的
-        //验证参数是否为空
-        List<Object> l1 = new ArrayList<Object>(){{
-            add(request.getHeader("token"));
-        }};
-        String token = request.getHeader("token");
-        String CheckNull = CommonFunc.CheckNull(l1);
-        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-        //验证token
-        String id = CommonFunc.CheckToken(request,token);
-        if (id == null){
-            //未找到
-            return ServerResponse.createByErrorMessage("身份认证错误！");
-        }else {
-
-        }
-        return null;
-    }
-
 
     @Override
     public ServerResponse<String> delete_plan(String plan, HttpServletRequest request){
@@ -599,6 +584,27 @@ public class UserServiceImpl implements IUserService {
 //        transactionManager.rollback(status);
 //        return ServerResponse.createByErrorMessage("更新出错！");
 //    }
+
+    @Override
+    public ServerResponse<String> my_favorite( HttpServletRequest request){
+        //我喜欢的
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+
+        }
+        return null;
+    }
 
     @Override
     public ServerResponse<String> its_dynamic(String user_id,HttpServletRequest request){
@@ -715,6 +721,65 @@ public class UserServiceImpl implements IUserService {
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(user_info_result, SerializerFeature.WriteMapNullValue));
             return ServerResponse.createBySuccess("成功",json);
+        }
+    }
+
+    @Override
+    public ServerResponse<JSONObject> edit_my_info(String username, String gender, String personality_signature, HttpServletRequest request){
+        //编辑我的信息
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (!CommonFunc.isInteger(gender)){
+            return ServerResponse.createByErrorMessage("传入性别类型错误（数字的字符串）！");
+        }
+        if (Integer.valueOf(gender) != 1 && Integer.valueOf(gender) != 0){
+            return ServerResponse.createByErrorMessage("传入性别格式错误！");
+        }
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //修改个人信息
+            int result_update = userMapper.update_my_info(id,gender,personality_signature,username);
+            if (result_update == 0){
+                return ServerResponse.createByErrorMessage("更新失败！");
+            }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+    @Override
+    public ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String name = iFileService.upload(file,path,"l_e/user/portrait");
+            String url = "user/portrait/"+name;
+            //存到数据库
+            int result = userMapper.update_my_portrait(id,url);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            return ServerResponse.createBySuccess("成功",Const.FTP_PREFIX + url);
         }
     }
 }

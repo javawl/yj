@@ -3,6 +3,8 @@ package com.yj.service;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.ServerResponse;
 import com.yj.pojo.User;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,4 +58,8 @@ public interface IUserService {
     ServerResponse<JSONObject> its_plan(String id,HttpServletRequest request);
 
     ServerResponse<JSONObject> my_info( HttpServletRequest request);
+
+    ServerResponse<JSONObject> edit_my_info(String username, String gender, String personality_signature, HttpServletRequest request);
+
+    ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request);
 }

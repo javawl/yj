@@ -273,6 +273,20 @@
     WHERE id = #{id}
   </update>
 
+  <update id="update_my_info" parameterType="string">
+    UPDATE `user`
+    set gender = #{gender},
+    personality_signature = #{personality_signature},
+    username = #{username}
+    WHERE id = #{id}
+  </update>
+
+  <update id="update_my_portrait" parameterType="string">
+    UPDATE `user`
+    set portrait = #{portrait}
+    WHERE id = #{id}
+  </update>
+
   <update id="decide_plan_user" parameterType="string">
     UPDATE user
     set my_plan = #{plan},

@@ -63,6 +63,12 @@ public interface UserMapper {
     //决定天数和单词数
     int decide_plan_days(@Param("id") String id, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //修改个人信息
+    int update_my_info(@Param("id") String id, @Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("username") String username);
+
+    //修改个人信息
+    int update_my_portrait(@Param("id") String id, @Param("portrait") String portrait);
+
     //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
