@@ -36,8 +36,6 @@ public class VariousController {
 
     /**
      * 发现页
-     * @param request
-     * @return
      */
     @RequestMapping(value = "found_page.do", method = RequestMethod.POST)
     @ResponseBody

@@ -193,7 +193,7 @@
   </select>
 
   <select id="getTypeByPlan" resultType="string" parameterType="string">
-    SELECT type_id
+    SELECT dictionary_type
     FROM plans
     WHERE plan = #{plan}
   </select>
@@ -220,9 +220,16 @@
   </select>
 
   <select id="getAuthorInfo" resultType="map" parameterType="string">
-    SELECT  portrait,gender,username,personality_signature,insist_day
+    SELECT  portrait,gender,username,personality_signature,insist_day,my_plan
     FROM `user`
     WHERE id = #{id}
+  </select>
+
+  <select id="getDailyPic" resultType="map" parameterType="string">
+    SELECT  id,daily_pic
+    FROM `daily_pic`
+    ORDER set_time desc
+    LIMIT 1
   </select>
 
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
@@ -235,6 +242,14 @@
     SELECT sum(learned_word_number)
        FROM take_plans
     WHERE user_id = #{id}
+  </select>
+
+  <select id="calculateRestWord" resultType="string" parameterType="string">
+    SELECT (plans.word_nummber-take_plans.learned_word_number) AS result
+    FROM `user`,plans
+    WHERE take_plans.user_id = #{id}
+    AND plan = #{plan}
+    AND plans.id = take_plans.plan_id
   </select>
 
   <select id="getUserPortrait" resultType="string" parameterType="string">

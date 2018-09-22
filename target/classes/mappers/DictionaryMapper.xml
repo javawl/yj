@@ -702,7 +702,6 @@
     SELECT id,word,real_meaning
     FROM dictionary
     WHERE id NOT IN
-    AND type = #{type}
     (SELECT word_id
     FROM reciting_words
     WHERE plan = #{plan}
@@ -712,6 +711,7 @@
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id})
+    AND type = #{type}
     ORDER BY word
     LIMIT #{param1},#{param2}
   </select>
@@ -722,6 +722,43 @@
     WHERE plan = #{plan}
     AND user_id = #{id}
     ORDER BY word
+  </select>
+
+  <select id="welfareServiceOnlineNumber" resultType="int" parameterType="string">
+    SELECT COUNT(id)
+    FROM welfare_service
+    WHERE st &lt; #{time}
+    AND et &gt; #{time}
+  </select>
+
+  <select id="welfareServiceOnlineLack" resultType="map">
+    SELECT *
+    FROM welfare_service
+    WHERE st &lt; #{time}
+    AND et &gt; #{time}
+    ORDER BY st DESC
+    UNION
+    SELECT *
+    FROM welfare_service
+    WHERE st &gt;= #{time}
+    AND et &lt;= #{time}
+    ORDER BY st DESC
+    LIMIT #{number}
+  </select>
+
+  <select id="welfareServiceOnlineAll" resultType="map" parameterType="string">
+    SELECT *
+    FROM welfare_service
+    WHERE st &lt; #{time}
+    AND et &gt; #{time}
+    ORDER BY st DESC
+  </select>
+
+  <select id="isWelfareFavour" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM daily_pic_favour
+    WHERE user_id = #{id}
+    AND daily_pic_id = #{daily_pic_id}
   </select>
 
   <select id="selectAllWord" resultType="map" parameterType="string">

@@ -155,6 +155,18 @@ public interface DictionaryMapper {
     //已背单词(all)
     List<Map> selectRecitingWordsAll(@Param("plan") String plan, @Param("id") String id);
 
+    //正在进行的福利社
+    int welfareServiceOnlineNumber(@Param("time") String time);
+
+    //福利社(少于5个正在进行）
+    List<Map> welfareServiceOnlineLack(@Param("time") String time,@Param("number") int number);
+
+    //福利社(大于等于5个正在进行）
+    List<Map> welfareServiceOnlineAll(@Param("time") String time);
+
+    //判断用户是否喜欢过这个每日一句
+    Map isWelfareFavour(@Param("id") String id,@Param("daily_pic_id") String daily_pic_id);
+
     //已掌握单词(all)
     List<Map> selectMasteredWordsAll(@Param("plan") String plan, @Param("id") String id);
 
