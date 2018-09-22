@@ -804,7 +804,6 @@
     SELECT id,word,real_meaning
     FROM dictionary
     WHERE id NOT IN
-    AND type = #{type}
     (SELECT word_id
     FROM reciting_words
     WHERE plan = #{plan}
@@ -814,6 +813,7 @@
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id})
+    AND type = #{type}
     ORDER BY word
   </select>
 </mapper>
