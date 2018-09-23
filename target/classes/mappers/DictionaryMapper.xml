@@ -736,12 +736,11 @@
     FROM welfare_service
     WHERE st &lt; #{time}
     AND et &gt; #{time}
-    ORDER BY st DESC
     UNION
     SELECT *
     FROM welfare_service
     WHERE st &gt;= #{time}
-    AND et &lt;= #{time}
+    OR et &lt;= #{time}
     ORDER BY st DESC
     LIMIT #{number}
   </select>
@@ -804,7 +803,6 @@
     SELECT id,word,real_meaning
     FROM dictionary
     WHERE id NOT IN
-    AND type = #{type}
     (SELECT word_id
     FROM reciting_words
     WHERE plan = #{plan}
@@ -814,6 +812,7 @@
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id})
+    AND type = #{type}
     ORDER BY word
   </select>
 </mapper>

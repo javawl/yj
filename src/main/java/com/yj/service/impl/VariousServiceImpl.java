@@ -1,6 +1,8 @@
 package com.yj.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
@@ -48,7 +50,7 @@ public class VariousServiceImpl implements IVariousService {
             Map<Object,Object> result = new HashMap<Object, Object>();
             //先拿每日一图
             Map DailyPic = userMapper.getDailyPic();
-            result.put("daily_pic", Const.FTP_PREFIX + DailyPic.get("url").toString());
+            result.put("daily_pic", Const.FTP_PREFIX + DailyPic.get("daily_pic").toString());
             String daily_pic_id = DailyPic.get("id").toString();
             //判断用户是否喜欢每日一图
             Map is_favour = dictionaryMapper.isWelfareFavour(id,daily_pic_id);
@@ -68,22 +70,54 @@ public class VariousServiceImpl implements IVariousService {
             }else {
                 welfare_service = dictionaryMapper.welfareServiceOnlineAll(now_time);
             }
+            for (int i = 0; i < welfare_service.size(); i++){
+                welfare_service.get(i).put("pic",Const.FTP_PREFIX + welfare_service.get(i).get("pic"));
+            }
             result.put("welfare_service", welfare_service);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(result, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功",json);
         }
-
-        return null;
     }
 
     @Override
     public ServerResponse<String> daily_pic(){
         //每日一句
         Map DailyPic = userMapper.getDailyPic();
-        return ServerResponse.createBySuccess("成功！",Const.FTP_PREFIX + DailyPic.get("url").toString());
+        return ServerResponse.createBySuccess("成功！",Const.FTP_PREFIX + DailyPic.get("daily_pic").toString());
     }
 
     @Override
-    public ServerResponse<String> advice(HttpServletRequest request){
+    public ServerResponse<String> advice(String advice,String level,HttpServletRequest request){
         //意见反馈
-        return null;
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(advice);
+            add(level);
+        }};
+        if (!CommonFunc.isInteger(level)){
+            return ServerResponse.createByErrorMessage("传入level字符串并非为数字！");
+        }
+        if (Integer.valueOf(level)!=1 && Integer.valueOf(level)!=2 && Integer.valueOf(level)!=3 && Integer.valueOf(level)!=4){
+            return ServerResponse.createByErrorMessage("level取值只能是1~4");
+        }
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //插入
+            int result = userMapper.advice(advice,level,String.valueOf(new Date().getTime()));
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("提交失败！");
+            }
+
+            return ServerResponse.createBySuccessMessage("成功");
+        }
     }
 }

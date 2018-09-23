@@ -736,12 +736,11 @@
     FROM welfare_service
     WHERE st &lt; #{time}
     AND et &gt; #{time}
-    ORDER BY st DESC
     UNION
     SELECT *
     FROM welfare_service
     WHERE st &gt;= #{time}
-    AND et &lt;= #{time}
+    OR et &lt;= #{time}
     ORDER BY st DESC
     LIMIT #{number}
   </select>

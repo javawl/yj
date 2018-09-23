@@ -228,7 +228,7 @@
   <select id="getDailyPic" resultType="map" parameterType="string">
     SELECT  id,daily_pic
     FROM `daily_pic`
-    ORDER set_time desc
+    ORDER BY set_time desc
     LIMIT 1
   </select>
 
@@ -243,6 +243,8 @@
        FROM take_plans
     WHERE user_id = #{id}
   </select>
+
+
 
   <select id="calculateRestWord" resultType="string" parameterType="string">
     SELECT (plans.word_nummber-take_plans.learned_word_number) AS result
@@ -288,6 +290,7 @@
     WHERE id = #{id}
   </update>
 
+
   <update id="update_my_info" parameterType="string">
     UPDATE `user`
     set gender = #{gender},
@@ -313,6 +316,12 @@
   <insert id="decide_plan_all" parameterType="string">
     INSERT INTO take_plans (plan, user_id, plan_id, days, daily_word_number)
     values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}), #{days}, #{daily_word_number})
+  </insert>
+
+
+  <insert id="advice" parameterType="string">
+    INSERT INTO advice (advice, `level`, set_time)
+    values (#{advice}, #{level}, #{time})
   </insert>
 
   <select id="check_plan" resultType="int" parameterType="string" >

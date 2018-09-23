@@ -59,8 +59,8 @@ public class VariousController {
 
     @RequestMapping(value = "advice.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> advice(HttpServletRequest request){
+    public ServerResponse<String> advice(String advice,String level,HttpServletRequest request){
         //调用service层
-        return iVariousService.advice(request);
+        return iVariousService.advice(advice,level,request);
     }
 }

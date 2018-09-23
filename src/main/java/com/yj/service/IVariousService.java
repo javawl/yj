@@ -16,5 +16,5 @@ public interface IVariousService {
     ServerResponse<String> daily_pic();
 
     //意见反馈
-    ServerResponse<String> advice(HttpServletRequest request);
+    ServerResponse<String> advice(String advice,String level,HttpServletRequest request);
 }

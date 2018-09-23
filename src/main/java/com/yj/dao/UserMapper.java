@@ -78,6 +78,9 @@ public interface UserMapper {
     //计划表添加计划
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //意见反馈
+    int advice(@Param("advice") String advice, @Param("level") String level, @Param("time") String time);
+
     //查一下用户是否已经添加这个计划了
     Map selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);
 
