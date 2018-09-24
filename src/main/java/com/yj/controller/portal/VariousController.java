@@ -49,11 +49,11 @@ public class VariousController {
      * 每日一句
      * @return
      */
-    @RequestMapping(value = "daily_pic.do", method = RequestMethod.GET)
+    @RequestMapping(value = "daily_pic.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> daily_pic(){
+    public ServerResponse<List<Map<Object,Object>>> daily_pic(String page,String size,HttpServletRequest request){
         //调用service层
-        return iVariousService.daily_pic();
+        return iVariousService.daily_pic( page, size,request);
     }
 
 

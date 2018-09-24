@@ -225,11 +225,15 @@
     WHERE id = #{id}
   </select>
 
-  <select id="getDailyPic" resultType="map" parameterType="string">
-    SELECT  id,daily_pic
+  <select id="getDailyPic" resultType="map">
+    SELECT tb.daily_pic,tb.id,tb.set_time as pic_time,daily_pic_favour.set_time as favour_time
+    FROM (SELECT  id,daily_pic,set_time
     FROM `daily_pic`
     ORDER BY set_time desc
-    LIMIT 1
+    LIMIT #{start},#{size}) tb
+    LEFT JOIN daily_pic_favour
+    ON tb.id = daily_pic_favour.daily_pic_id
+    AND daily_pic_favour.user_id = #{id}
   </select>
 
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
@@ -247,10 +251,10 @@
 
 
   <select id="calculateRestWord" resultType="string" parameterType="string">
-    SELECT (plans.word_nummber-take_plans.learned_word_number) AS result
-    FROM `user`,plans
+    SELECT (plans.word_number-take_plans.learned_word_number) AS result
+    FROM take_plans,plans
     WHERE take_plans.user_id = #{id}
-    AND plan = #{plan}
+    AND take_plans.plan = #{plan}
     AND plans.id = take_plans.plan_id
   </select>
 

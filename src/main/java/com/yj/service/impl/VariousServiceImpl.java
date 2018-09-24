@@ -49,17 +49,23 @@ public class VariousServiceImpl implements IVariousService {
         }else{
             Map<Object,Object> result = new HashMap<Object, Object>();
             //先拿每日一图
-            Map DailyPic = userMapper.getDailyPic();
-            result.put("daily_pic", Const.FTP_PREFIX + DailyPic.get("daily_pic").toString());
-            String daily_pic_id = DailyPic.get("id").toString();
-            //判断用户是否喜欢每日一图
-            Map is_favour = dictionaryMapper.isWelfareFavour(id,daily_pic_id);
-            if (is_favour == null){
-                //没有喜欢
-                result.put("is_favour", 0);
-            }else {
-                result.put("is_favour", 1);
+            List<Map> DailyPic = userMapper.getDailyPic(0,6,id);
+            //遍历加上前缀并且判断是否喜欢
+            List<Map<Object,Object>> DailyPicResult = new ArrayList<>();
+            for(int i = 0; i < DailyPic.size(); i++){
+                Map<Object,Object> singlePic = new HashMap<>();
+                singlePic.put("daily_pic",Const.FTP_PREFIX + DailyPic.get(i).get("daily_pic").toString());
+                singlePic.put("id",DailyPic.get(i).get("id").toString());
+                //判断用户是否喜欢每日一图
+                if (DailyPic.get(i).get("favour_time") == null){
+                    //没有喜欢
+                    singlePic.put("is_favour", 0);
+                }else {
+                    singlePic.put("is_favour", 1);
+                }
+                DailyPicResult.add(singlePic);
             }
+            result.put("daily_pic",DailyPicResult);
             //查看正在进行的福利社的个数
             String now_time = String.valueOf(new Date().getTime());
             int welfare_number = dictionaryMapper.welfareServiceOnlineNumber(now_time);
@@ -81,10 +87,43 @@ public class VariousServiceImpl implements IVariousService {
     }
 
     @Override
-    public ServerResponse<String> daily_pic(){
-        //每日一句
-        Map DailyPic = userMapper.getDailyPic();
-        return ServerResponse.createBySuccess("成功！",Const.FTP_PREFIX + DailyPic.get("daily_pic").toString());
+    public ServerResponse<List<Map<Object,Object>>> daily_pic(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(page);
+            add(size);
+        }};
+        String token = request.getHeader("token");
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            String CheckNull = CommonFunc.CheckNull(l1);
+            if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+            //将页数和大小转化为limit
+            int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+            //每日一句
+            List<Map> DailyPic = userMapper.getDailyPic(start,Integer.valueOf(size),id);
+            //遍历加上前缀并且判断是否喜欢
+            List<Map<Object,Object>> DailyPicResult = new ArrayList<>();
+            for(int i = 0; i < DailyPic.size(); i++){
+                Map<Object,Object> singlePic = new HashMap<>();
+                singlePic.put("daily_pic",Const.FTP_PREFIX + DailyPic.get(i).get("daily_pic").toString());
+                singlePic.put("id",DailyPic.get(i).get("id").toString());
+                //判断用户是否喜欢每日一图
+                if (DailyPic.get(i).get("favour_time") == null){
+                    //没有喜欢
+                    singlePic.put("is_favour", 0);
+                }else {
+                    singlePic.put("is_favour", 1);
+                }
+                DailyPicResult.add(singlePic);
+            }
+            return ServerResponse.createBySuccess("成功！",DailyPicResult);
+        }
     }
 
     @Override

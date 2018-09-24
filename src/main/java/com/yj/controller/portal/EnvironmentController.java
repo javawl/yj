@@ -39,11 +39,25 @@ public class EnvironmentController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "home_page_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "yu_video.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<JSONObject> home_page_info(HttpServletRequest request){
+    public ServerResponse<JSONObject> yu_video(HttpServletRequest request){
         //调用service层
 //        System.out.println(request.getSession().getServletContext().getRealPath("upload"));
-        return iEnvironmentService.home_page_info(request);
+        return iEnvironmentService.yu_video(request);
+    }
+
+
+    /**
+     * 获取四条后更多的单词视频
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "more_yu_video.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> more_yu_video(String page,String size,HttpServletRequest request){
+        return iEnvironmentService.more_yu_video(page,size,request);
     }
 }

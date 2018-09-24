@@ -476,6 +476,28 @@
     WHERE id = #{id}
   </update>
 
+  <select id="randSelectVideo" resultType="map" parameterType="int">
+    select * from word_video_information
+    order by rand() limit #{size};
+  </select>
+
+  <select id="yjFourWord" resultType="map">
+    SELECT dictionary.phonetic_symbol,tb1.*
+    FROM (SELECT tb.*,word_video_information.img,word_video_information.views,word_video_information.comments,word_video_information.favours,
+    word_video_information.video,word_video_information.id as video_id
+    FROM
+    (select word,word_id
+    from reciting_words
+    WHERE user_id = #{id}
+    order by `level` DESC
+    LIMIT #{start},#{size}) tb
+    JOIN word_video_information
+    ON tb.word_id = word_video_information.word_id) tb1
+    JOIN dictionary
+    ON tb1.word_id = dictionary.id
+  </select>
+
+
   <update id="updateWordInfo" parameterType="string">
     UPDATE `dictionary` SET
     `word`= #{word},

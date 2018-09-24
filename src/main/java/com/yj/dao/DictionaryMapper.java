@@ -96,6 +96,12 @@ public interface DictionaryMapper {
     //获取feeds流具体内容
     List<Map<Object,Object>> findFeedsInner(@Param("feeds_id") String feeds_id);
 
+    //语境那里随机出5条视频
+    List<Map<Object,Object>> randSelectVideo(@Param("size") int size);
+
+    //语境那里已背单词视频
+    List<Map<Object,Object>> yjFourWord(@Param("id") String id,@Param("start") int start,@Param("size") int size);
+
     //后台
     List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
 

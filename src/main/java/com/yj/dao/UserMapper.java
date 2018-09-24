@@ -98,5 +98,5 @@ public interface UserMapper {
     Map getAuthorInfo(@Param("id") String id);
 
     //每日一句
-    Map getDailyPic();
+    List<Map> getDailyPic(@Param("start") int start,@Param("size") int size,@Param("id") String id);
 }
