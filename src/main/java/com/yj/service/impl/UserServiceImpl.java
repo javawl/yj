@@ -713,18 +713,24 @@ public class UserServiceImpl implements IUserService {
             //获取用户信息
             Map<Object,Object> user_info_result = new HashMap<Object,Object>();
             Map user_information = userMapper.getAuthorInfo(id);
-            String plan = user_information.get("my_plan").toString();
+            if (user_information.get("my_plan") != null){
+                String plan = user_information.get("my_plan").toString();
+                user_info_result.put("insist_day",user_information.get("insist_day"));
+                //todo 加一下那个基本信息 打卡天数 已背单词 剩余词数
+                int learned_word = Integer.valueOf(userMapper.calculateAllWords(id));
+                user_info_result.put("learned_word",learned_word);
+                int remaining_words = Integer.valueOf(userMapper.calculateRestWord(id,plan));
+                user_info_result.put("remaining_words",remaining_words);
+            }else {
+                user_info_result.put("insist_day",0);
+                user_info_result.put("learned_word",0);
+                user_info_result.put("remaining_words",0);
+            }
             user_info_result.put("user_id",id);
             user_info_result.put("portrait", Const.FTP_PREFIX + user_information.get("portrait"));
             user_info_result.put("gender",user_information.get("gender"));
             user_info_result.put("username",user_information.get("username"));
             user_info_result.put("personality_signature",user_information.get("personality_signature"));
-            user_info_result.put("insist_day",user_information.get("insist_day"));
-            //todo 加一下那个基本信息 打卡天数 已背单词 剩余词数
-            int learned_word = Integer.valueOf(userMapper.calculateAllWords(id));
-            user_info_result.put("learned_word",learned_word);
-            int remaining_words = Integer.valueOf(userMapper.calculateRestWord(id,plan));
-            user_info_result.put("remaining_words",remaining_words);
 
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(user_info_result, SerializerFeature.WriteMapNullValue));
