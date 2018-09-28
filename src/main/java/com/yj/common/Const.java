@@ -12,6 +12,7 @@ public class Const {
     public static final String TOKEN_LOGIN_SALT = "token_login_salt";   //用户token的加密盐
     public static final String DOMAIN_NAME = "http://localhost:8088";   //域名
     public static final String FTP_PREFIX = "http://47.107.62.22/l_e/";   //文件服务器域名前缀
+    public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间
     public static final int INIT_STUDY_PEOPLE = 20000; //开始背单词的人数

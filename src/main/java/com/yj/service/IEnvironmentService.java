@@ -15,4 +15,6 @@ public interface IEnvironmentService {
     ServerResponse<JSONObject> yu_video(HttpServletRequest request);
 
     ServerResponse<List<Map<Object,Object>>> more_yu_video(String page, String size, HttpServletRequest request);
+
+    ServerResponse<JSONObject> single_yu_video(String video_id,HttpServletRequest request);
 }

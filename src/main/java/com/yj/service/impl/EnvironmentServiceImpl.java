@@ -62,6 +62,8 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                 if (top_video.get(i).get("video") != null){
                     map_result.put("video", Const.FTP_PREFIX + top_video.get(i).get("video"));
                 }
+                map_result.put("word_id",top_video.get(i).get("word_id"));
+                map_result.put("word",top_video.get(i).get("word"));
                 map_result.put("video_id",top_video.get(i).get("id"));
                 top_video_result.add(map_result);
             }
@@ -207,6 +209,92 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
             }
 
             return ServerResponse.createBySuccess("成功",final_result);
+        }
+    }
+
+
+    @Override
+    public ServerResponse<JSONObject> single_yu_video(String video_id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(video_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (!CommonFunc.isInteger(video_id)){
+            return ServerResponse.createByErrorMessage("video_id需为数字！");
+        }
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> final_result = new HashMap<Object,Object>();
+            //获取视频信息
+            Map video_info = dictionaryMapper.selectAdminVideoByVideoId(video_id);
+            if (video_info == null){
+                return ServerResponse.createByErrorMessage("未找到该视频！");
+            }
+            List<Map> subtitles_info = dictionaryMapper.getSingleSubtitleInfo(video_id);
+            Map<Object,Object> video = new HashMap<Object,Object>();
+            video.put("subtitles",subtitles_info);
+            if (video_info.get("video").toString().length() == 0){
+                video.put("video", null);
+            }else {
+                video.put("video", Const.FTP_PREFIX + video_info.get("video"));
+            }
+            if (video_info.get("img").toString().length() == 0){
+                video.put("img", null);
+            }else {
+                video.put("img", Const.FTP_PREFIX + video_info.get("img"));
+            }
+            final_result.put("top_video",video);
+            //获取中间的5条信息
+            List<Map<Object,Object>> top_video = dictionaryMapper.randSelectVideo(5);
+            List<Map<Object,Object>> top_video_result = new ArrayList<>();
+            for (int i = 0; i < top_video.size(); i++){
+                Map<Object,Object> map_result = new HashMap<Object,Object>();
+                map_result.put("views",top_video.get(i).get("views"));
+                if (top_video.get(i).get("img") != null){
+                    map_result.put("img", Const.FTP_PREFIX + top_video.get(i).get("img"));
+                }
+                if (top_video.get(i).get("video") != null){
+                    map_result.put("video", Const.FTP_PREFIX + top_video.get(i).get("video"));
+                }
+                map_result.put("video_id",top_video.get(i).get("id"));
+                map_result.put("word_id",top_video.get(i).get("word_id"));
+                map_result.put("word",top_video.get(i).get("word"));
+                top_video_result.add(map_result);
+            }
+            final_result.put("recommend_video",top_video_result);
+
+            //todo 热门评论(点赞数和是否点赞)
+            //先获取热门评论
+            List<Map<Object,Object>> hotComments = dictionaryMapper.hotCommentsYJ(0,15,video_id);
+            //对每个热门评论获取其评论
+            for (int k = 0; k < hotComments.size(); k++){
+                String commentId = hotComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.VideoCommentIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    hotComments.get(k).put("is_like",0);
+                }else {
+                    hotComments.get(k).put("is_like",1);
+                }
+                //时间转换和图片格式处理
+                String change_pic_url = Const.FTP_PREFIX + hotComments.get(k).get("portrait");
+                hotComments.get(k).put("portrait", change_pic_url);
+                hotComments.get(k).put("set_time", CommonFunc.commentTime(hotComments.get(k).get("set_time").toString()));
+            }
+            final_result.put("hot_comment",hotComments);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(final_result, SerializerFeature.WriteMapNullValue));
+
+            return ServerResponse.createBySuccess("成功",json);
         }
     }
 }

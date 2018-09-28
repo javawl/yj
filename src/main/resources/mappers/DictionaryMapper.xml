@@ -380,13 +380,24 @@
     LIMIT 0,5
   </select>
 
-  <select id="hotComments" resultType="map">
+  <select id="hotComments" resultType="map" parameterType="string">
     SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait,`user`.id as user_id
     FROM feeds_comment,`user`
     WHERE user_id = `user`.id
     AND 2*feeds_comment.comments+feeds_comment.likes > 50
+    AND feeds_id = #{feed_id}
     ORDER BY 2*feeds_comment.comments+feeds_comment.likes DESC
     LIMIT 0,3
+  </select>
+
+  <select id="hotCommentsYJ" resultType="map">
+    SELECT video_comment.id,video_comment.comment,video_comment.set_time,username,portrait,`user`.id as user_id
+    FROM video_comment,`user`
+    WHERE user_id = `user`.id
+    AND 3*video_comment.likes > 50
+    AND video_id = #{video_id}
+    ORDER BY 3*video_comment.likes DESC
+    LIMIT #{start},#{size}
   </select>
 
   <select id="newComments" resultType="map" parameterType="string">
@@ -394,6 +405,7 @@
     FROM feeds_comment,`user`
     WHERE user_id = `user`.id
     AND feeds_comment.set_time > #{time}
+    AND feeds_id = #{feed_id}
     ORDER BY feeds_comment.set_time DESC
     LIMIT 0,15
   </select>
@@ -409,12 +421,14 @@
     SELECT COUNT(1)
     FROM feeds_comment
     WHERE 2*comments+likes > 50
+    AND feeds_id = #{feed_id}
   </select>
 
   <select id="getNewCommentsSum" resultType="int" parameterType="string">
     SELECT COUNT(1)
     FROM feeds_comment
     WHERE feeds_comment.set_time > #{time}
+    AND feeds_id = #{feed_id}
   </select>
 
   <select id="getFeedsCommentLike" resultType="map">
@@ -442,6 +456,14 @@
     FROM feeds_comment_like
     WHERE user_id = #{user_id}
     AND feeds_comment_id = #{id}
+  </select>
+
+
+  <select id="VideoCommentIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM video_comment_like
+    WHERE user_id = #{user_id}
+    AND video_comment_id = #{video_comment_id}
   </select>
 
   <select id="findFeedsInner" resultType="map" parameterType="string">
@@ -477,8 +499,12 @@
   </update>
 
   <select id="randSelectVideo" resultType="map" parameterType="int">
-    select * from word_video_information
-    order by rand() limit #{size};
+    SELECT dictionary.word,tb.*
+    FROM
+    (select * from word_video_information
+    order by rand() limit #{size}) tb
+    JOIN dictionary
+    ON dictionary.id = tb.word_id
   </select>
 
   <select id="yjFourWord" resultType="map">
@@ -511,6 +537,12 @@
     `phonetic_symbol_en_Mumbler`=#{phonetic_symbol_en_Mumbler},
     `phonetic_symbol_us_Mumbler`=#{phonetic_symbol_us_Mumbler},
     `meaning_Mumbler`=#{meaning_Mumbler}
+    WHERE id = #{id}
+  </update>
+
+  <update id="addViews" parameterType="string">
+    UPDATE word_video_information
+    SET views = views + 1
     WHERE id = #{id}
   </update>
 
@@ -590,6 +622,12 @@
     WHERE word_id = #{id}
   </select>
 
+  <select id="selectAdminVideoByVideoId" resultType="map" parameterType="string">
+    SELECT *
+    FROM word_video_information
+    WHERE id = #{id}
+  </select>
+
   <select id="BetterSelectAdminVideo" resultType="map" parameterType="string">
     SELECT *
     FROM word_video_information,subtitles
@@ -648,6 +686,7 @@
   <select id="getSingleSubtitleInfo" resultType="map" parameterType="string">
     SELECT st,et,en,cn FROM subtitles
     WHERE video_id = #{video_id}
+    ORDER BY id ASC
   </select>
 
   <select id="getOldWord" resultType="map">

@@ -227,6 +227,19 @@ public class AdminController {
         return ServerResponse.createBySuccess("成功",url);
     }
 
+    /**
+     * 合成音频
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "change_mp3.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> change_mp3(String sentence,HttpServletResponse response, HttpServletRequest request){
+        return iAdminService.change_mp3(sentence,response,request);
+    }
+
+
+
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
     public String test(HttpServletResponse response, HttpServletRequest request){

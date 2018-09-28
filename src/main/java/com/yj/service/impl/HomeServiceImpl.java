@@ -708,9 +708,9 @@ public class HomeServiceImpl implements IHomeService {
             m3.put("recommendations",recommendations_result);
             //todo 热门评论(点赞数和是否点赞)
             //先获取热门评论
-            List<Map<Object,Object>> hotComments = dictionaryMapper.hotComments();
+            List<Map<Object,Object>> hotComments = dictionaryMapper.hotComments(feeds_id);
             //获取其数量
-            int hotCommentsNumber = dictionaryMapper.getHotCommentsSum();
+            int hotCommentsNumber = dictionaryMapper.getHotCommentsSum(feeds_id);
             m3.put("hot_comment_number",hotCommentsNumber);
             //对每个热门评论获取其评论
             for (int k = 0; k < hotComments.size(); k++){
@@ -742,9 +742,9 @@ public class HomeServiceImpl implements IHomeService {
             //先获取最新评论
             //获取当天0点时间戳
             String zero = CommonFunc.getZeroDate();
-            List<Map<Object,Object>> newComments = dictionaryMapper.newComments(zero);
+            List<Map<Object,Object>> newComments = dictionaryMapper.newComments(zero,feeds_id);
             //获取其数量
-            int newCommentsNumber = dictionaryMapper.getNewCommentsSum(zero);
+            int newCommentsNumber = dictionaryMapper.getNewCommentsSum(zero,feeds_id);
             m3.put("new_comments_number",newCommentsNumber);
             //对每个最新评论获取其评论
             for (int k = 0; k < newComments.size(); k++){
@@ -1193,6 +1193,11 @@ public class HomeServiceImpl implements IHomeService {
         }else{
             //找出单个词的信息
             List<Map> Single_video_info = dictionaryMapper.getSingleSubtitleInfo(video_id);
+            //浏览量+1
+            int updateResult = dictionaryMapper.addViews(video_id);
+            if (updateResult == 0){
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
             return ServerResponse.createBySuccess("成功",Single_video_info);
         }
     }
@@ -1230,7 +1235,7 @@ public class HomeServiceImpl implements IHomeService {
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
                         String word_id = job.get("id").toString();
-                        String right_time = job.get("right_time").toString();
+                        String right_time = String.valueOf(new Date().getTime());
                         String level = job.get("level").toString();
                         String word = job.get("word").toString();
                         //判断是否掌握

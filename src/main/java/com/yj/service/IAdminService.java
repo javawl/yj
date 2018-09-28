@@ -18,4 +18,6 @@ public interface IAdminService {
     ServerResponse<List> get_word(String page, String size, String type, HttpServletResponse response);
 
     ServerResponse<List> get_word_video(String id, HttpServletResponse response);
+
+    ServerResponse<String> change_mp3(String sentence, HttpServletResponse response, HttpServletRequest request);
 }

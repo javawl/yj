@@ -37,19 +37,22 @@ public interface DictionaryMapper {
     List<Map> hotRecommendations(@Param("time") String time);
 
     //热门评论
-    List<Map<Object,Object>> hotComments();
+    List<Map<Object,Object>> hotComments(@Param("feed_id") String feed_id);
+
+    //热门评论(语境)
+    List<Map<Object,Object>> hotCommentsYJ(@Param("start") int start,@Param("size") int page,@Param("video_id") String video_id);
 
     //最新评论
-    List<Map<Object,Object>> newComments(@Param("time") String time);
+    List<Map<Object,Object>> newComments(@Param("time") String time,@Param("feed_id") String feed_id);
 
     //根据评论id获得其评论
     List<Map<Object,Object>> getCommentByCommentId(@Param("id") String id);
 
     //获取热门评论数量
-    int getHotCommentsSum();
+    int getHotCommentsSum(@Param("feed_id") String feed_id);
 
     //获取最新评论数量
-    int getNewCommentsSum(@Param("time") String time);
+    int getNewCommentsSum(@Param("time") String time,@Param("feed_id") String feed_id);
 
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
@@ -81,6 +84,9 @@ public interface DictionaryMapper {
     //feeds_comment检查是否点赞
     Map commentFindIsLike(@Param("user_id") String user_id,@Param("id") String id);
 
+    //video检查是否点赞
+    Map VideoCommentIsLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id);
+
     //获得feeds流的基本信息
     Map singleFeeds(@Param("id") String id);
 
@@ -92,6 +98,9 @@ public interface DictionaryMapper {
 
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
+
+    //根据视频id获取视频
+    Map selectAdminVideoByVideoId(@Param("id") String id);
 
     //获取feeds流具体内容
     List<Map<Object,Object>> findFeedsInner(@Param("feeds_id") String feeds_id);
@@ -175,6 +184,9 @@ public interface DictionaryMapper {
 
     //已掌握单词(all)
     List<Map> selectMasteredWordsAll(@Param("plan") String plan, @Param("id") String id);
+
+    //视频浏览量+1
+    int addViews(@Param("id") String id);
 
     //未背单词(all)
     List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan, @Param("id") String id, @Param("type") String type);

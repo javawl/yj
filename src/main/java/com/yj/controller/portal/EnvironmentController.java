@@ -60,4 +60,17 @@ public class EnvironmentController {
     public ServerResponse<List<Map<Object,Object>>> more_yu_video(String page,String size,HttpServletRequest request){
         return iEnvironmentService.more_yu_video(page,size,request);
     }
+
+
+    /**
+     * 语境详情页
+     * @param video_id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "single_yu_video.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> single_yu_video(String video_id,HttpServletRequest request){
+        return iEnvironmentService.single_yu_video(video_id,request);
+    }
 }
