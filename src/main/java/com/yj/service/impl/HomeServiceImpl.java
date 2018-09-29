@@ -295,7 +295,6 @@ public class HomeServiceImpl implements IHomeService {
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
         }
-
     }
 
     //点赞feeds
@@ -812,8 +811,9 @@ public class HomeServiceImpl implements IHomeService {
                 return ServerResponse.createByErrorMessage("未找到该计划！");
             }
             int number = Integer.valueOf(numberResult.get("plan_words_number").toString());
+            String dictionary_type = dictionaryMapper.selectPlanType(plan);
             //获取新单词(获取上面number条
-            List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id);
+            List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id,dictionary_type);
 
             //格式化
             List<Map> word = new_list_word;
@@ -1268,11 +1268,10 @@ public class HomeServiceImpl implements IHomeService {
                                 }
                             }
                         }
-                        int resultUpdate = dictionaryMapper.updateLearnedWord(learned_word,id,plan);
-                        if (resultUpdate == 0){
-                            throw new Exception();
-                        }
-
+                    }
+                    int resultUpdate = dictionaryMapper.updateLearnedWord(learned_word,id,plan);
+                    if (resultUpdate == 0){
+                        throw new Exception();
                     }
                 }
                 transactionManager.commit(status);

@@ -11,14 +11,13 @@ import com.yj.dao.UserMapper;
 import com.yj.service.IEnvironmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by 63254 on 2018/9/1.
@@ -297,4 +296,180 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
             return ServerResponse.createBySuccess("成功",json);
         }
     }
+
+
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> single_yu_comment(String video_id,String page,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (!CommonFunc.isInteger(page)){
+            return ServerResponse.createByErrorMessage("page需为数字！");
+        }
+//        if (Integer.valueOf(page) <= 0){
+//            return ServerResponse.createByErrorMessage("page最低为1！");
+//        }
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //todo 热门评论(点赞数和是否点赞)
+            //先获取热门评论
+            //这里的page加了1因为第一页已经放在详情页了，从第二页开始
+            int start = (Integer.valueOf(page)) * 15;
+            List<Map<Object,Object>> hotComments = dictionaryMapper.hotCommentsYJ(start,15,video_id);
+            //对每个热门评论获取其评论
+            for (int k = 0; k < hotComments.size(); k++){
+                String commentId = hotComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.VideoCommentIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    hotComments.get(k).put("is_like",0);
+                }else {
+                    hotComments.get(k).put("is_like",1);
+                }
+                //时间转换和图片格式处理
+                String change_pic_url = Const.FTP_PREFIX + hotComments.get(k).get("portrait");
+                hotComments.get(k).put("portrait", change_pic_url);
+                hotComments.get(k).put("set_time", CommonFunc.commentTime(hotComments.get(k).get("set_time").toString()));
+            }
+
+            return ServerResponse.createBySuccess("成功",hotComments);
+        }
+    }
+
+    //喜欢语境取消喜欢
+    public ServerResponse<String> favour_yj(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流并且获取喜欢数
+            Map CheckYJ = dictionaryMapper.getYJCommentLike(id);
+            if (CheckYJ == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取喜欢数
+            int favours = Integer.valueOf(CheckYJ.get("favours").toString());
+            //查一下是否已经喜欢
+            Map CheckIsFavour = dictionaryMapper.findYJIsFavour(uid,id);
+            if (CheckIsFavour == null){
+                //没有喜欢就喜欢
+                favours += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //视频表修改数据
+                    int videoResult = dictionaryMapper.changeYJFavour(String.valueOf(favours),id);
+                    if (videoResult == 0){
+                        throw new Exception();
+                    }
+                    //喜欢表插入数据
+                    int videoLikeResult = dictionaryMapper.insertVideoFavour(uid,id,String.valueOf(new Date().getTime()));
+                    if (videoLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经喜欢了就取消喜欢
+                favours -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //video表修改数据
+                    int videoResult = dictionaryMapper.changeYJFavour(String.valueOf(favours),id);
+                    if (videoResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int videoLikeResult = dictionaryMapper.deleteVideoFavour(uid,id);
+                    if (videoLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }
+        }
+    }
+
+
+    //评论语境视频
+    public ServerResponse<String> comment_video(String id, String comment, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+            add(comment);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条视频并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getYJCommentLike(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments += 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //feeds表修改数据
+                int feedsResult = dictionaryMapper.changeVideoComments(String.valueOf(comments),id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表插入数据
+                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
 }

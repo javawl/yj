@@ -17,4 +17,8 @@ public interface IEnvironmentService {
     ServerResponse<List<Map<Object,Object>>> more_yu_video(String page, String size, HttpServletRequest request);
 
     ServerResponse<JSONObject> single_yu_video(String video_id,HttpServletRequest request);
+
+    ServerResponse<List<Map<Object,Object>>> single_yu_comment(String video_id,String page,HttpServletRequest request);
+
+    ServerResponse<String> favour_yj(String id, HttpServletRequest request);
 }

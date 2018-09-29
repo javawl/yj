@@ -73,4 +73,30 @@ public class EnvironmentController {
     public ServerResponse<JSONObject> single_yu_video(String video_id,HttpServletRequest request){
         return iEnvironmentService.single_yu_video(video_id,request);
     }
+
+
+    /**
+     * 语境详情页加载更多评论
+     * @param page
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "single_yu_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> single_yu_comment(String video_id,String page,HttpServletRequest request){
+        return iEnvironmentService.single_yu_comment(video_id,page,request);
+    }
+
+
+    /**
+     * 语境视频的喜欢和取消喜欢
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "favour_yj.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> favour_yj(String id, HttpServletRequest request){
+        return iEnvironmentService.favour_yj(id,request);
+    }
 }

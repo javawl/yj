@@ -57,14 +57,23 @@ public interface DictionaryMapper {
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
 
+    //取出语境视频的评论数和喜欢数
+    Map getYJCommentLike(@Param("id") String id);
+
     //feeds表修改评论数
     int changeFeedsComments(@Param("comments") String comments,@Param("id") String id);
+
+    //video修改评论数
+    int changeVideoComments(@Param("comments") String comments,@Param("id") String id);
 
     //feeds表修改点赞数
     int changeFeedsLikes(@Param("likes") String likes,@Param("id") String id);
 
     //feeds表修改喜欢数
     int changeFeedsFavour(@Param("favours") String favours,@Param("id") String id);
+
+    //视频表修改喜欢数
+    int changeYJFavour(@Param("favours") String favours,@Param("id") String id);
 
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
@@ -75,11 +84,17 @@ public interface DictionaryMapper {
     //FeedsFavour表插入数据
     int insertFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
+    //VideoFavour表插入数据
+    int insertVideoFavour(@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
+
     //检查是否点赞
     Map findIsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
 
     //feeds检查是否喜欢
     Map findIsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //语境检查是否喜欢
+    Map findYJIsFavour(@Param("user_id") String user_id,@Param("yj_id") String yj_id);
 
     //feeds_comment检查是否点赞
     Map commentFindIsLike(@Param("user_id") String user_id,@Param("id") String id);
@@ -95,6 +110,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //视频取消点赞
+    int deleteVideoFavour(@Param("user_id") String user_id,@Param("video_id") String video_id);
 
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
@@ -131,6 +149,9 @@ public interface DictionaryMapper {
 
     //后台
     List<Map> selectAdminPlanType();
+
+    //根据计划获取计划类型
+    String selectPlanType(@Param("plan") String plan);
 
     //后台
     int updateWordPic(@Param("word") String word,@Param("pic") String pic);
@@ -192,7 +213,7 @@ public interface DictionaryMapper {
     List<Map> selectNotMemorizingWordsAll(@Param("plan") String plan, @Param("id") String id, @Param("type") String type);
 
     //背单词接口给出新单词
-    List<Map> getNewWord(@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
+    List<Map> getNewWord(@Param("size") int size,@Param("plan") String plan,@Param("id") String id,@Param("plan_id") String plan_id);
 
     //单词卡片一个单词
     Map getSingleWordInfo(@Param("id") String id);

@@ -437,6 +437,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getYJCommentLike" resultType="map">
+    SELECT comments,favours
+    FROM word_video_information
+    WHERE id = #{id}
+  </select>
+
   <select id="findIsLike" resultType="map" parameterType="string">
     SELECT id,set_time
     FROM feeds_like
@@ -449,6 +455,13 @@
     FROM feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="findYJIsFavour" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM video_favour
+    WHERE user_id = #{user_id}
+    AND video_id = #{yj_id}
   </select>
 
   <select id="commentFindIsLike" resultType="map" parameterType="string">
@@ -486,6 +499,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="changeVideoComments" parameterType="string">
+    UPDATE word_video_information
+    set comments = #{comments}
+    WHERE id = #{id}
+  </update>
+
   <update id="changeFeedsLikes" parameterType="string">
     UPDATE feeds
     set likes = #{likes}
@@ -494,6 +513,12 @@
 
   <update id="changeFeedsFavour" parameterType="string">
     UPDATE feeds
+    set favours = #{favours}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeYJFavour" parameterType="string">
+    UPDATE word_video_information
     set favours = #{favours}
     WHERE id = #{id}
   </update>
@@ -581,6 +606,11 @@
     values (#{user_id}, #{feeds_id}, #{set_time})
   </insert>
 
+  <insert id="insertVideoFavour" parameterType="string">
+    INSERT INTO video_favour (user_id, video_id, set_time)
+    values (#{user_id}, #{video_id}, #{set_time})
+  </insert>
+
   <delete id="deleteFeedsLike" parameterType="string" >
     delete from feeds_like
     WHERE user_id = #{user_id}
@@ -591,6 +621,12 @@
     delete from feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </delete>
+
+  <delete id="deleteVideoFavour" parameterType="string" >
+    delete from video_favour
+    WHERE user_id = #{user_id}
+    AND video_id = #{video_id}
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
@@ -652,6 +688,12 @@
     FROM plans
   </select>
 
+  <select id="selectPlanType" resultType="string">
+    SELECT dictionary_type
+    FROM plans
+    WHERE plan = #{plan}
+  </select>
+
   <select id="selectMasteredWords" resultType="map">
     SELECT id,word,meaning
     FROM mastered_words
@@ -668,6 +710,7 @@
     (SELECT word_id FROM reciting_words WHERE plan = #{plan} AND user_id = #{id}
     UNION
     SELECT word_id FROM mastered_words WHERE plan = #{plan} AND user_id = #{id}) tb)
+    AND `type` = #{plan_id}
     LIMIT 0,#{size}
   </select>
 
