@@ -458,8 +458,8 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                     throw new Exception();
                 }
                 //评论表插入数据
-                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
-                if (feedsCommentResult == 0){
+                int videoCommentResult = dictionaryMapper.insertVideoComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                if (videoCommentResult == 0){
                     throw new Exception();
                 }
                 transactionManager.commit(status);
@@ -468,6 +468,84 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                 System.out.println(e);
                 transactionManager.rollback(status);
                 return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
+    //点赞video评论
+    public ServerResponse<String> like_video_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+
+            //检查有没有这条feeds流并且获取点赞数
+            Map CheckVideo = dictionaryMapper.getVideoLikeOfComment(id);
+            if (CheckVideo == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取点赞数
+            int likes = Integer.valueOf(CheckVideo.get("likes").toString());
+            //查一下是否已经点赞
+            Map CheckIsLike = dictionaryMapper.findYJCommentIsLike(uid,id);
+            if (CheckIsLike == null){
+                //没有点赞就点赞
+                likes += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeVideoLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表插入数据
+                    int videoLikeResult = dictionaryMapper.insertVideoLike(uid,id,String.valueOf(new Date().getTime()));
+                    if (videoLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经点赞了就取消点赞
+                likes -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeVideoLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int videoLikeResult = dictionaryMapper.deleteVideoCommentLike(uid,id);
+                    if (videoLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
             }
         }
     }

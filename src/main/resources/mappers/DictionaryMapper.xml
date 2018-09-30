@@ -437,6 +437,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getVideoLikeOfComment" resultType="map">
+    SELECT likes
+    FROM video_comment
+    WHERE id = #{id}
+  </select>
+
   <select id="getYJCommentLike" resultType="map">
     SELECT comments,favours
     FROM word_video_information
@@ -448,6 +454,13 @@
     FROM feeds_like
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="findYJCommentIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM video_comment_like
+    WHERE user_id = #{user_id}
+    AND video_comment_id = #{video_comment_id}
   </select>
 
   <select id="findIsFavour" resultType="map" parameterType="string">
@@ -507,6 +520,12 @@
 
   <update id="changeFeedsLikes" parameterType="string">
     UPDATE feeds
+    set likes = #{likes}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeVideoLikes" parameterType="string">
+    UPDATE video_comment
     set likes = #{likes}
     WHERE id = #{id}
   </update>
@@ -596,9 +615,20 @@
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
   </insert>
 
+
+  <insert id="insertVideoComment" parameterType="string">
+    INSERT INTO video_comment (user_id, comment, video_id, set_time)
+    values (#{user_id}, #{comment}, #{video_id}, #{set_time})
+  </insert>
+
   <insert id="insertFeedsLike" parameterType="string">
     INSERT INTO feeds_like (user_id, feeds_id, set_time)
     values (#{user_id}, #{feeds_id}, #{set_time})
+  </insert>
+
+  <insert id="insertVideoLike" parameterType="string">
+    INSERT INTO video_comment_like (user_id, video_comment_id, set_time)
+    values (#{user_id}, #{video_comment_id}, #{set_time})
   </insert>
 
   <insert id="insertFeedsFavour" parameterType="string">
@@ -615,6 +645,12 @@
     delete from feeds_like
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </delete>
+
+  <delete id="deleteVideoCommentLike" parameterType="string" >
+    delete from video_comment_like
+    WHERE user_id = #{user_id}
+    AND video_comment_id = #{video_comment_id}
   </delete>
 
   <delete id="deleteFeedsFavour" parameterType="string" >

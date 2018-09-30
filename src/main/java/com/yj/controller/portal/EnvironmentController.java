@@ -99,4 +99,32 @@ public class EnvironmentController {
     public ServerResponse<String> favour_yj(String id, HttpServletRequest request){
         return iEnvironmentService.favour_yj(id,request);
     }
+
+
+    /**
+     * 语境视频评论
+     * @param id
+     * @param comment
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "comment_video.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> comment_video(String id, String comment, HttpServletRequest request){
+        return iEnvironmentService.comment_video(id,comment,request);
+    }
+
+
+    /**
+     * 语境视频的评论的点赞
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "like_video_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> like_video_comment(String id, HttpServletRequest request){
+        return iEnvironmentService.like_video_comment(id,request);
+    }
+
 }

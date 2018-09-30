@@ -21,4 +21,8 @@ public interface IEnvironmentService {
     ServerResponse<List<Map<Object,Object>>> single_yu_comment(String video_id,String page,HttpServletRequest request);
 
     ServerResponse<String> favour_yj(String id, HttpServletRequest request);
+
+    ServerResponse<String> comment_video(String id, String comment, HttpServletRequest request);
+
+    ServerResponse<String> like_video_comment(String id, HttpServletRequest request);
 }
