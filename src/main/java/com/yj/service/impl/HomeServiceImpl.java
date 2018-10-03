@@ -778,9 +778,108 @@ public class HomeServiceImpl implements IHomeService {
         }
     }
 
-    //删除评论
-    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
-        return null;
+
+    //评论feeds
+    public ServerResponse<String> comment_feeds_comment(String id, String comment, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+            add(comment);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments += 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //feeds表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表插入数据
+                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+    //删除feeds评论的评论
+    public ServerResponse<String> delete_comment_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+
+
+
+
+
+
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments += 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //feeds表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表插入数据
+                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
     }
 
     //获取背单词列表
@@ -1280,6 +1379,83 @@ public class HomeServiceImpl implements IHomeService {
                 System.out.println(e.getMessage());
                 transactionManager.rollback(status);
                 return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
+    //给feeds评论点赞
+    public ServerResponse<String> like_feeds_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流评论并且获取点赞数
+            Map CheckFeedsComment = dictionaryMapper.getLikeOfFeedsComment(id);
+            if (CheckFeedsComment == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取点赞数
+            int likes = Integer.valueOf(CheckFeedsComment.get("likes").toString());
+            //查一下是否已经点赞
+            Map CheckIsLike = dictionaryMapper.findIsLike(uid,id);
+            if (CheckIsLike == null){
+                //没有点赞就点赞
+                likes += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeFeedsCommentLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表插入数据
+                    int feedsLikeResult = dictionaryMapper.insertFeedsCommentLike(uid,id,String.valueOf(new Date().getTime()));
+                    if (feedsLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经点赞了就取消点赞
+                likes -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsResult = dictionaryMapper.changeFeedsCommentLikes(String.valueOf(likes),id);
+                    if (feedsResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int feedsLikeResult = dictionaryMapper.deleteFeedsCommentLike(uid,id);
+                    if (feedsLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
             }
         }
     }
