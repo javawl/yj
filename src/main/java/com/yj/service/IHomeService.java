@@ -36,7 +36,7 @@ public interface IHomeService {
     ServerResponse<Map<String,Object>> article_detail(String feeds_id, HttpServletRequest request);
 
     //删除评论
-    ServerResponse<String> delete_comment(String id, HttpServletRequest request);
+//    ServerResponse<String> delete_comment(String id, HttpServletRequest request);
 
     //喜欢和取消喜欢
     ServerResponse<String> favour_feeds(String id, HttpServletRequest request);
@@ -55,4 +55,10 @@ public interface IHomeService {
 
     //获取视频字幕
     ServerResponse<List<Map>> get_subtitles(String video_id,HttpServletRequest request);
+
+    //删除评论的评论
+    ServerResponse<String> delete_comment_comment(String id, HttpServletRequest request);
+
+    //副评论
+    ServerResponse<String> comment_feeds_comment(String id, String comment, HttpServletRequest request);
 }

@@ -796,8 +796,8 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            //检查有没有这条feeds流并且获取评论数
-            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            //检查有没有这条feeds评论并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getCommentOfFeedsComment(id);
             if (CheckFeeds == null){
                 return ServerResponse.createByErrorMessage("没有此文章！");
             }
@@ -808,13 +808,13 @@ public class HomeServiceImpl implements IHomeService {
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
             try {
-                //feeds表修改数据
-                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),id);
+                //feeds_comment表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsCommentComments(String.valueOf(comments),id);
                 if (feedsResult == 0){
                     throw new Exception();
                 }
                 //评论表插入数据
-                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                int feedsCommentResult = dictionaryMapper.insertFeedsCommentComment(comment,uid,id,String.valueOf(new Date().getTime()));
                 if (feedsCommentResult == 0){
                     throw new Exception();
                 }
@@ -837,11 +837,6 @@ public class HomeServiceImpl implements IHomeService {
             add(id);
         }};
 
-
-
-
-
-
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
@@ -851,24 +846,24 @@ public class HomeServiceImpl implements IHomeService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             //检查有没有这条feeds流并且获取评论数
-            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(id);
+            Map CheckFeeds = dictionaryMapper.getCommentOfFeedsComment(id);
             if (CheckFeeds == null){
-                return ServerResponse.createByErrorMessage("没有此文章！");
+                return ServerResponse.createByErrorMessage("没有此评论！");
             }
             //获取评论数
             int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
-            comments += 1;
+            comments -= 1;
             //开启事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
             try {
-                //feeds表修改数据
-                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),id);
+                //feedsComment表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsCommentComments(String.valueOf(comments),id);
                 if (feedsResult == 0){
                     throw new Exception();
                 }
-                //评论表插入数据
-                int feedsCommentResult = dictionaryMapper.insertFeedsComment(comment,uid,id,String.valueOf(new Date().getTime()));
+                //评论表删除数据
+                int feedsCommentResult = dictionaryMapper.deleteFeedsCommentComment(uid,id);
                 if (feedsCommentResult == 0){
                     throw new Exception();
                 }

@@ -163,18 +163,18 @@ public class homeController {
         return iHomeService.article_detail(id ,request);
     }
 
-    /**
-     * 删除评论
-     * @param id 评论id
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "delete_comment.do", method = RequestMethod.POST)
-    @ResponseBody
-    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
-        //调用service层
-        return iHomeService.delete_comment(id ,request);
-    }
+//    /**
+//     * 删除评论
+//     * @param id 评论id
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping(value = "delete_comment.do", method = RequestMethod.POST)
+//    @ResponseBody
+//    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+//        //调用service层
+//        return iHomeService.delete_comment(id ,request);
+//    }
 
     /**
      * 背单词
@@ -227,5 +227,34 @@ public class homeController {
     public ServerResponse<JSONObject> word_card(String word_id,HttpServletRequest request){
         //调用service层
         return iHomeService.word_card(word_id,request);
+    }
+
+
+    /**
+     * 副评论
+     * @param id
+     * @param comment
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "comment_feeds_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> comment_feeds_comment(String id, String comment, HttpServletRequest request){
+        //调用service层
+        return iHomeService.comment_feeds_comment(id, comment,request);
+    }
+
+
+    /**
+     * 删除副评论
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "delete_comment_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> delete_comment_comment(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.delete_comment_comment(id,request);
     }
 }

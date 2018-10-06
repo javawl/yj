@@ -57,6 +57,9 @@ public interface DictionaryMapper {
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
 
+    //取出feeds流的评论的
+    Map getCommentOfFeedsComment(@Param("id") String id);
+
     //取出feeds流的
     Map getLikeOfFeedsComment(@Param("id") String id);
 
@@ -78,6 +81,9 @@ public interface DictionaryMapper {
     //feeds_comment表修改点赞数
     int changeFeedsCommentLikes(@Param("likes") String likes,@Param("id") String id);
 
+    //feeds_comment表修改点赞数
+    int changeFeedsCommentComments(@Param("comments") String comments,@Param("id") String id);
+
     //video表修改点赞数
     int changeVideoLikes(@Param("likes") String likes,@Param("id") String id);
 
@@ -98,6 +104,9 @@ public interface DictionaryMapper {
 
     //FeedsLike表插入数据
     int insertFeedsCommentLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id,@Param("set_time") String set_time);
+
+    //FeedsComment表插入数据
+    int insertFeedsCommentComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id,@Param("set_time") String set_time);
 
     //video comment Like表插入数据
     int insertVideoLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id,@Param("set_time") String set_time);
@@ -137,6 +146,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsCommentLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
+
+    //删除评论的评论
+    int deleteFeedsCommentComment(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
 
     //取消点赞
     int deleteVideoCommentLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id);
