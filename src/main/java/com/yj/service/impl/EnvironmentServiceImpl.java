@@ -81,6 +81,13 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                     video_info.put("views",user_word.get(j).get("views"));
                     video_info.put("comments",user_word.get(j).get("comments"));
                     video_info.put("favours",user_word.get(j).get("favours"));
+                    //判断是否喜欢
+                    Map yjIsFavour = dictionaryMapper.findYJIsFavour(id,user_word.get(j).get("video_id").toString());
+                    if (yjIsFavour == null){
+                        video_info.put("is_favour",0);
+                    }else {
+                        video_info.put("is_favour",1);
+                    }
                     video_info.put("video_id",user_word.get(j).get("video_id"));
                     if (user_word.get(j).get("img").toString().length() != 0){
                         video_info.put("img",Const.FTP_PREFIX + user_word.get(j).get("img"));
@@ -103,6 +110,13 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                     video_info.put("comments",user_word.get(j).get("comments"));
                     video_info.put("favours",user_word.get(j).get("favours"));
                     video_info.put("video_id",user_word.get(j).get("video_id"));
+                    //判断是否喜欢
+                    Map yjIsFavour = dictionaryMapper.findYJIsFavour(id,user_word.get(j).get("video_id").toString());
+                    if (yjIsFavour == null){
+                        video_info.put("is_favour",0);
+                    }else {
+                        video_info.put("is_favour",1);
+                    }
                     if (user_word.get(j).get("img").toString().length() != 0){
                         video_info.put("img",Const.FTP_PREFIX + user_word.get(j).get("img"));
                     }else {
@@ -167,6 +181,14 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                     video_info.put("comments",user_word.get(j).get("comments"));
                     video_info.put("favours",user_word.get(j).get("favours"));
                     video_info.put("video_id",user_word.get(j).get("video_id"));
+                    //判断是否喜欢
+                    Map yjIsFavour = dictionaryMapper.findYJIsFavour(id,user_word.get(j).get("video_id").toString());
+                    if (yjIsFavour == null){
+                        video_info.put("is_favour",0);
+                    }else {
+                        video_info.put("is_favour",1);
+                    }
+
                     if (user_word.get(j).get("img").toString().length() != 0){
                         video_info.put("img",Const.FTP_PREFIX + user_word.get(j).get("img"));
                     }else {
@@ -187,6 +209,14 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                     video_info.put("views",user_word.get(j).get("views"));
                     video_info.put("comments",user_word.get(j).get("comments"));
                     video_info.put("favours",user_word.get(j).get("favours"));
+
+                    //判断是否喜欢
+                    Map yjIsFavour = dictionaryMapper.findYJIsFavour(id,user_word.get(j).get("video_id").toString());
+                    if (yjIsFavour == null){
+                        video_info.put("is_favour",0);
+                    }else {
+                        video_info.put("is_favour",1);
+                    }
                     video_info.put("video_id",user_word.get(j).get("video_id"));
                     if (user_word.get(j).get("img").toString().length() != 0){
                         video_info.put("img",Const.FTP_PREFIX + user_word.get(j).get("img"));

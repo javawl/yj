@@ -60,6 +60,9 @@ public interface DictionaryMapper {
     //取出feeds流的评论的
     Map getCommentOfFeedsComment(@Param("id") String id);
 
+    //取出副评论
+    Map getFeedsReplayComment(@Param("id") String id);
+
     //取出feeds流的
     Map getLikeOfFeedsComment(@Param("id") String id);
 
@@ -148,7 +151,7 @@ public interface DictionaryMapper {
     int deleteFeedsCommentLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
 
     //删除评论的评论
-    int deleteFeedsCommentComment(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
+    int deleteFeedsCommentComment(@Param("user_id") String user_id,@Param("id") String id);
 
     //取消点赞
     int deleteVideoCommentLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id);

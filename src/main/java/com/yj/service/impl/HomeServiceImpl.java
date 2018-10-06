@@ -845,10 +845,25 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
+
+            //取出副评论
+            Map CheckReplayComment = dictionaryMapper.getFeedsReplayComment(id);
+            if (CheckReplayComment == null){
+                return ServerResponse.createByErrorMessage("没有此副评论！");
+            }
+
+            //获取主评论id
+            String feeds_comment_id = CheckReplayComment.get("feeds_comment_id").toString();
+            //查看这个评论是否是这个用户发布的
+            int user_id = Integer.valueOf(CheckReplayComment.get("user_id").toString());
+            if (user_id != Integer.valueOf(uid)){
+                return ServerResponse.createByErrorMessage("评论并非此用户发布！");
+            }
+
             //检查有没有这条feeds流并且获取评论数
-            Map CheckFeeds = dictionaryMapper.getCommentOfFeedsComment(id);
+            Map CheckFeeds = dictionaryMapper.getCommentOfFeedsComment(feeds_comment_id);
             if (CheckFeeds == null){
-                return ServerResponse.createByErrorMessage("没有此评论！");
+                return ServerResponse.createByErrorMessage("没有主评论！");
             }
             //获取评论数
             int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
@@ -858,7 +873,7 @@ public class HomeServiceImpl implements IHomeService {
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
             try {
                 //feedsComment表修改数据
-                int feedsResult = dictionaryMapper.changeFeedsCommentComments(String.valueOf(comments),id);
+                int feedsResult = dictionaryMapper.changeFeedsCommentComments(String.valueOf(comments),feeds_comment_id);
                 if (feedsResult == 0){
                     throw new Exception();
                 }

@@ -451,6 +451,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getFeedsReplayComment" resultType="map">
+    SELECT *
+    FROM feeds_reply_comments
+    WHERE id = #{id}
+  </select>
+
   <select id="getVideoLikeOfComment" resultType="map">
     SELECT likes
     FROM video_comment
@@ -703,7 +709,7 @@
   <delete id="deleteFeedsCommentComment" parameterType="string" >
     delete from feeds_reply_comments
     WHERE user_id = #{user_id}
-    AND feeds_comment_id = #{feeds_comment_id}
+    AND id = #{id}
   </delete>
 
   <delete id="deleteVideoCommentLike" parameterType="string" >

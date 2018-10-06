@@ -437,6 +437,26 @@
     WHERE id = #{id}
   </select>
 
+
+
+  <select id="getLikeOfFeedsComment" resultType="map">
+    SELECT likes
+    FROM feeds_comment
+    WHERE id = #{id}
+  </select>
+
+  <select id="getCommentOfFeedsComment" resultType="map">
+    SELECT comments
+    FROM feeds_comment
+    WHERE id = #{id}
+  </select>
+
+  <select id="getFeedsReplayComment" resultType="map">
+    SELECT *
+    FROM feeds_reply_comments
+    WHERE id = #{id}
+  </select>
+
   <select id="getVideoLikeOfComment" resultType="map">
     SELECT likes
     FROM video_comment
@@ -454,6 +474,14 @@
     FROM feeds_like
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+
+  <select id="findFeedsCommentIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_comment_id = #{feeds_comment_id}
   </select>
 
   <select id="findYJCommentIsLike" resultType="map" parameterType="string">
@@ -521,6 +549,20 @@
   <update id="changeFeedsLikes" parameterType="string">
     UPDATE feeds
     set likes = #{likes}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="changeFeedsCommentLikes" parameterType="string">
+    UPDATE feeds_comment
+    set likes = #{likes}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="changeFeedsCommentComments" parameterType="string">
+    UPDATE feeds_comment
+    set comments = #{comments}
     WHERE id = #{id}
   </update>
 
@@ -621,6 +663,17 @@
     values (#{user_id}, #{comment}, #{video_id}, #{set_time})
   </insert>
 
+  <insert id="insertFeedsCommentLike" parameterType="string">
+    INSERT INTO feeds_comment_like (user_id, feeds_comment_id, set_time)
+    values (#{user_id}, #{feeds_comment_id}, #{set_time})
+  </insert>
+
+
+  <insert id="insertFeedsCommentComment" parameterType="string">
+    INSERT INTO feeds_reply_comments (user_id, feeds_comment_id, set_time,comment)
+    values (#{user_id}, #{feeds_comment_id}, #{set_time}, #{comment})
+  </insert>
+
   <insert id="insertFeedsLike" parameterType="string">
     INSERT INTO feeds_like (user_id, feeds_id, set_time)
     values (#{user_id}, #{feeds_id}, #{set_time})
@@ -645,6 +698,18 @@
     delete from feeds_like
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </delete>
+
+  <delete id="deleteFeedsCommentLike" parameterType="string" >
+    delete from feeds_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_comment_id = #{feeds_comment_id}
+  </delete>
+
+  <delete id="deleteFeedsCommentComment" parameterType="string" >
+    delete from feeds_reply_comments
+    WHERE user_id = #{user_id}
+    AND id = #{id}
   </delete>
 
   <delete id="deleteVideoCommentLike" parameterType="string" >
