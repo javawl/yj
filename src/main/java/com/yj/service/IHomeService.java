@@ -61,4 +61,10 @@ public interface IHomeService {
 
     //副评论
     ServerResponse<String> comment_feeds_comment(String id, String comment, HttpServletRequest request);
+
+    //删除评论
+    ServerResponse<String> delete_comment(String id, HttpServletRequest request);
+
+    //feeds评论点赞
+    ServerResponse<String> like_feeds_comment(String id, HttpServletRequest request);
 }

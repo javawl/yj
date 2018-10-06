@@ -257,4 +257,32 @@ public class homeController {
         //调用service层
         return iHomeService.delete_comment_comment(id,request);
     }
+
+
+    /**
+     * 删除主评论
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "delete_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.delete_comment(id,request);
+    }
+
+
+    /**
+     * 给feeds评论点赞和取消
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "like_feeds_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> like_feeds_comment(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.like_feeds_comment(id,request);
+    }
 }

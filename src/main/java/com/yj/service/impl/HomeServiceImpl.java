@@ -892,6 +892,74 @@ public class HomeServiceImpl implements IHomeService {
         }
     }
 
+    //删除feeds评论
+    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+
+            //取出评论
+            Map CheckReplayComment = dictionaryMapper.getCommentOfFeedsComment(id);
+            if (CheckReplayComment == null){
+                return ServerResponse.createByErrorMessage("没有此副评论！");
+            }
+
+            //获取主评论id
+            String feeds_id = CheckReplayComment.get("feeds_id").toString();
+            //查看这个评论是否是这个用户发布的
+            int user_id = Integer.valueOf(CheckReplayComment.get("user_id").toString());
+            if (user_id != Integer.valueOf(uid)){
+                return ServerResponse.createByErrorMessage("评论并非此用户发布！");
+            }
+
+            //检查有没有这条feeds流并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getFeedsCommentLike(feeds_id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有主评论！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments -= 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //feeds表修改数据
+                int feedsResult = dictionaryMapper.changeFeedsComments(String.valueOf(comments),feeds_id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表删除数据
+                int feedsCommentResult = dictionaryMapper.deleteFeedsComment(uid,id);
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                //删除评论的评论
+                dictionaryMapper.deleteFeedsCommentAllComment(id);
+                //删除评论的点赞
+                dictionaryMapper.deleteFeedsCommentAllLike(id);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
     //获取背单词列表
     public ServerResponse<JSONObject> recite_word_list(HttpServletRequest request){
         String token = request.getHeader("token");
@@ -1418,7 +1486,7 @@ public class HomeServiceImpl implements IHomeService {
             //获取点赞数
             int likes = Integer.valueOf(CheckFeedsComment.get("likes").toString());
             //查一下是否已经点赞
-            Map CheckIsLike = dictionaryMapper.findIsLike(uid,id);
+            Map CheckIsLike = dictionaryMapper.findFeedsCommentIsLike(uid,id);
             if (CheckIsLike == null){
                 //没有点赞就点赞
                 likes += 1;

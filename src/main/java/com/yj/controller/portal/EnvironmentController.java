@@ -127,4 +127,17 @@ public class EnvironmentController {
         return iEnvironmentService.like_video_comment(id,request);
     }
 
+
+    /**
+     * 删除语境评论
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "delete_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+        return iEnvironmentService.delete_comment(id,request);
+    }
+
 }

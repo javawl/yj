@@ -580,4 +580,69 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
         }
     }
 
+
+    //删除语境的评论
+    public ServerResponse<String> delete_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //取出副评论
+            Map CheckComment = dictionaryMapper.getYJComment(id);
+            if (CheckComment == null){
+                return ServerResponse.createByErrorMessage("没有此副评论！");
+            }
+
+            //获取主评论id
+            String video_id = CheckComment.get("video_id").toString();
+            //查看这个评论是否是这个用户发布的
+            int user_id = Integer.valueOf(CheckComment.get("user_id").toString());
+            if (user_id != Integer.valueOf(uid)){
+                return ServerResponse.createByErrorMessage("评论并非此用户发布！");
+            }
+
+            //检查有没有这条语境并且获取评论数
+            Map CheckFeeds = dictionaryMapper.getYJCommentLike(video_id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有主评论！");
+            }
+            //获取评论数
+            int comments = Integer.valueOf(CheckFeeds.get("comments").toString());
+            comments -= 1;
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //视频表修改数据
+                int feedsResult = dictionaryMapper.changeYJComments(String.valueOf(comments),video_id);
+                if (feedsResult == 0){
+                    throw new Exception();
+                }
+                //评论表删除数据
+                int feedsCommentResult = dictionaryMapper.deleteYJComment(uid,id);
+                if (feedsCommentResult == 0){
+                    throw new Exception();
+                }
+                //删除评论的点赞
+                dictionaryMapper.deleteYJCommentLike(id);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e);
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
 }

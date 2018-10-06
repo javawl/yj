@@ -25,4 +25,6 @@ public interface IEnvironmentService {
     ServerResponse<String> comment_video(String id, String comment, HttpServletRequest request);
 
     ServerResponse<String> like_video_comment(String id, HttpServletRequest request);
+
+    ServerResponse<String> delete_comment(String id, HttpServletRequest request);
 }

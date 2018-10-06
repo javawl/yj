@@ -446,7 +446,7 @@
   </select>
 
   <select id="getCommentOfFeedsComment" resultType="map">
-    SELECT comments
+    SELECT *
     FROM feeds_comment
     WHERE id = #{id}
   </select>
@@ -454,6 +454,12 @@
   <select id="getFeedsReplayComment" resultType="map">
     SELECT *
     FROM feeds_reply_comments
+    WHERE id = #{id}
+  </select>
+
+  <select id="getYJComment" resultType="map">
+    SELECT *
+    FROM video_comment
     WHERE id = #{id}
   </select>
 
@@ -562,6 +568,12 @@
 
   <update id="changeFeedsCommentComments" parameterType="string">
     UPDATE feeds_comment
+    set comments = #{comments}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeYJComments" parameterType="string">
+    UPDATE word_video_information
     set comments = #{comments}
     WHERE id = #{id}
   </update>
@@ -700,6 +712,11 @@
     AND feeds_id = #{feeds_id}
   </delete>
 
+  <delete id="deleteFeedsCommentAllLike" parameterType="string" >
+    delete from feeds_comment_like
+    WHERE feeds_comment_id = #{feeds_comment_id}
+  </delete>
+
   <delete id="deleteFeedsCommentLike" parameterType="string" >
     delete from feeds_comment_like
     WHERE user_id = #{user_id}
@@ -710,6 +727,29 @@
     delete from feeds_reply_comments
     WHERE user_id = #{user_id}
     AND id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsCommentAllComment" parameterType="string" >
+    delete from feeds_reply_comments
+    WHERE feeds_comment_id = #{comment_id}
+  </delete>
+
+  <delete id="deleteFeedsComment" parameterType="string" >
+    delete from feeds_comment
+    WHERE user_id = #{user_id}
+    AND id = #{id}
+  </delete>
+
+
+  <delete id="deleteYJComment" parameterType="string" >
+    delete from video_comment
+    WHERE user_id = #{user_id}
+    AND id = #{id}
+  </delete>
+
+  <delete id="deleteYJCommentLike" parameterType="string" >
+    delete from feeds_comment_like
+    WHERE feeds_comment_id = #{id}
   </delete>
 
   <delete id="deleteVideoCommentLike" parameterType="string" >
