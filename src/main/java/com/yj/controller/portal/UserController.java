@@ -385,6 +385,19 @@ public class UserController extends BaseController {
 
 
     /**
+     * 我的评论
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "my_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> my_comment( HttpServletRequest request){
+        //调用service层
+        return iUserService.my_comment(request);
+    }
+
+
+    /**
      * 测试
      * @return
      */

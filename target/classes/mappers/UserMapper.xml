@@ -249,6 +249,31 @@
   </select>
 
 
+  <select id="getAllUserFeedsComment" resultType="map" parameterType="string">
+    SELECT tb.*,username,portrait,`user`.id as user_id
+    FROM `user`,
+    (SELECT feeds.id,title,pic,video,cover_select,feeds.auther_id,tb2.`comment`,tb2.set_time
+    FROM feeds,(SELECT feeds_id,feeds_comment.`comment`,set_time
+    FROM feeds_comment
+    WHERE user_id = #{id}) tb2
+    WHERE feeds.id = tb2.feeds_id
+    ORDER BY tb2.set_time DESC) tb
+    WHERE `user`.id = auther_id
+  </select>
+
+  <select id="getAllUserVideoComment" resultType="map" parameterType="string">
+    SELECT tb.*,phonetic_symbol,word
+    FROM `dictionary`,
+    (SELECT word_video_information.id as video_id,word_video_information.comments,views,favours,img,video,word_id,tb2.set_time
+    FROM word_video_information,(SELECT video_id,video_comment.`comment`,set_time
+    FROM video_comment
+    WHERE user_id = #{id}) tb2
+    WHERE word_video_information.id = tb2.video_id
+    ORDER BY tb2.set_time DESC) tb
+    WHERE `dictionary`.id = tb.word_id
+  </select>
+
+
 
   <select id="calculateRestWord" resultType="string" parameterType="string">
     SELECT (plans.word_number-take_plans.learned_word_number) AS result

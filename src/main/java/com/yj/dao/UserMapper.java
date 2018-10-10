@@ -48,6 +48,12 @@ public interface UserMapper {
     //获取我的背单词总数
     String calculateAllWords(@Param("id") String id);
 
+    //获取我评论的所有feeds
+    List<Map<Object,Object>> getAllUserFeedsComment(@Param("id") String id);
+
+    //获取我评论的所有feeds
+    List<Map<Object,Object>> getAllUserVideoComment(@Param("id") String id);
+
     //获取我的剩余单词数
     String calculateRestWord(@Param("id") String id,@Param("plan") String plan);
 

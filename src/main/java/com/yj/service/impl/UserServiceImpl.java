@@ -606,6 +606,90 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
 
+
+
+    @Override
+    public ServerResponse<JSONObject> my_comment( HttpServletRequest request){
+        //我评论的
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //先弄个Map
+            Map<Object,Object> resultMap = new HashMap<Object,Object>();
+            //获取我评论的feeds
+            List<Map<Object,Object>> my_comment_feeds = userMapper.getAllUserFeedsComment(id);
+            //新建一个list
+            List<Map<Object,Object>> comment_feeds_list = new ArrayList<>();
+            for (int i = 0; i < my_comment_feeds.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_feeds = new HashMap<Object,Object>();
+                Map m2 = my_comment_feeds.get(i);
+                //当type为0是图片，为1是视频
+                if (m2.get("cover_select").toString().equals("1")){
+                    single_feeds.put("type",0);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                }else {
+                    single_feeds.put("type",1);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    single_feeds.put("video",Const.FTP_PREFIX+m2.get("video"));
+                }
+                single_feeds.put("id",m2.get("id"));
+                single_feeds.put("title",m2.get("title"));
+                single_feeds.put("comment",m2.get("comment"));
+                single_feeds.put("author_username",m2.get("username"));
+                single_feeds.put("set_time",CommonFunc.commentTime(my_comment_feeds.get(i).get("set_time").toString()));
+                single_feeds.put("author_id",m2.get("user_id"));
+                if (m2.get("portrait")==null){
+                    single_feeds.put("author_portrait",null);
+                }else {
+                    single_feeds.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                }
+                comment_feeds_list.add(single_feeds);
+            }
+            //将list加入map
+            resultMap.put("feeds_comment",comment_feeds_list);
+
+            //获取我评论的视频
+            List<Map<Object,Object>> my_comment_video = userMapper.getAllUserVideoComment(id);
+            //新建一个list
+            List<Map<Object,Object>> comment_video_list = new ArrayList<>();
+            for (int i = 0; i < my_comment_video.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_video = new HashMap<Object,Object>();
+                Map m2 = my_comment_video.get(i);
+                //当type为0是图片，为1是视频
+                if (my_comment_video.get(i).get("img").toString().length() != 0){
+                    single_video.put("img",Const.FTP_PREFIX + my_comment_video.get(i).get("img"));
+                }else {
+                    single_video.put("img",null);
+                }
+                single_video.put("views",m2.get("views"));
+                single_video.put("comment",m2.get("comment"));
+                single_video.put("word_id",my_comment_video.get(i).get("word_id"));
+                single_video.put("video_id",my_comment_video.get(i).get("video_id"));
+                single_video.put("phonetic_symbol",my_comment_video.get(i).get("phonetic_symbol"));
+                single_video.put("word",my_comment_video.get(i).get("word"));
+                single_video.put("set_time",CommonFunc.commentTime(my_comment_video.get(i).get("set_time").toString()));
+                comment_video_list.add(single_video);
+            }
+            //将list加入map
+            resultMap.put("video_comment",comment_video_list);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(resultMap, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功",json);
+        }
+    }
+
     @Override
     public ServerResponse<String> its_dynamic(String user_id,HttpServletRequest request){
         //他的动态
