@@ -586,7 +586,7 @@ public class UserServiceImpl implements IUserService {
 //    }
 
     @Override
-    public ServerResponse<String> my_favorite( HttpServletRequest request){
+    public ServerResponse<List<Map<Object,Object>>> my_favorite( HttpServletRequest request){
         //我喜欢的
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -601,9 +601,339 @@ public class UserServiceImpl implements IUserService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            //create a new list
+            List<Map<Object,Object>> all_favour_list = new ArrayList<>();
+            //todo feeds favour
+            //获取我评论的feeds
+            List<Map<Object,Object>> my_favour_feeds = userMapper.getAllUserFeedsFavour(id);
+            for (int i = 0; i < my_favour_feeds.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_feeds = new HashMap<Object,Object>();
+                Map m2 = my_favour_feeds.get(i);
+                //当type为0是图片，为1是视频
+                if (m2.get("cover_select").toString().equals("1")){
+                    single_feeds.put("type",0);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                }else {
+                    single_feeds.put("type",1);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    single_feeds.put("video",Const.FTP_PREFIX+m2.get("video"));
+                }
+                single_feeds.put("id",m2.get("id"));
+                single_feeds.put("title",m2.get("title"));
+                single_feeds.put("author_username",m2.get("username"));
+                single_feeds.put("set_time",CommonFunc.commentTime(my_favour_feeds.get(i).get("set_time").toString()));
+                single_feeds.put("sort_time",my_favour_feeds.get(i).get("set_time").toString());
+                single_feeds.put("author_id",m2.get("user_id"));
+                //set type
+                single_feeds.put("type","feeds");
+                if (m2.get("portrait")==null){
+                    single_feeds.put("author_portrait",null);
+                }else {
+                    single_feeds.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                }
+                all_favour_list.add(single_feeds);
+            }
 
+            //todo dictionary favour
+            //get all my favour word
+            List<Map<Object,Object>> my_favour_word = userMapper.getAllUserDictionaryFavour(id);
+            for (int i = 0; i < my_favour_word.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_word = new HashMap<Object,Object>();
+                Map m2 = my_favour_word.get(i);
+                single_word.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                single_word.put("id",m2.get("id"));
+                single_word.put("word",m2.get("word"));
+                if (m2.get("pronunciation").toString().length() != 0){
+                    single_word.put("pronunciation",Const.FTP_PREFIX+m2.get("pronunciation"));
+                }else {
+                    single_word.put("pronunciation",null);
+                }
+                single_word.put("set_time",CommonFunc.commentTime(my_favour_word.get(i).get("set_time").toString()));
+                single_word.put("sort_time",my_favour_word.get(i).get("set_time").toString());
+                single_word.put("phonetic_symbol",m2.get("phonetic_symbol"));
+                //set type
+                single_word.put("type","word");
+                all_favour_list.add(single_word);
+            }
+
+            //todo daily pic favour
+            //get all my favour daily pic
+            List<Map<Object,Object>> my_favour_daily_pic = userMapper.getAllUserDailyPicFavour(id);
+            for (int i = 0; i < my_favour_daily_pic.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_daily_pic = new HashMap<Object,Object>();
+                Map m2 = my_favour_daily_pic.get(i);
+                single_daily_pic.put("daily_pic",Const.FTP_PREFIX+m2.get("daily_pic"));
+                single_daily_pic.put("small_pic",Const.FTP_PREFIX+m2.get("small_pic"));
+                single_daily_pic.put("id",m2.get("id"));
+                single_daily_pic.put("set_time",CommonFunc.commentTime(my_favour_daily_pic.get(i).get("set_time").toString()));
+                single_daily_pic.put("sort_time",my_favour_daily_pic.get(i).get("set_time").toString());
+                //set type
+                single_daily_pic.put("type","daily_pic");
+                all_favour_list.add(single_daily_pic);
+            }
+
+
+            //todo video favour
+            //get all my favour video
+            List<Map<Object,Object>> my_favour_video = userMapper.getAllUserVideoFavour(id);
+            for (int i = 0; i < my_favour_video.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_video = new HashMap<Object,Object>();
+                Map m2 = my_favour_video.get(i);
+                //当type为0是图片，为1是视频
+                if (my_favour_video.get(i).get("img").toString().length() != 0){
+                    single_video.put("img",Const.FTP_PREFIX + my_favour_video.get(i).get("img"));
+                }else {
+                    single_video.put("img",null);
+                }
+                single_video.put("comment",m2.get("comment"));
+                single_video.put("views",m2.get("views"));
+                single_video.put("word_id",my_favour_video.get(i).get("word_id"));
+                single_video.put("video_id",my_favour_video.get(i).get("video_id"));
+                single_video.put("phonetic_symbol",my_favour_video.get(i).get("phonetic_symbol"));
+                single_video.put("word",my_favour_video.get(i).get("word"));
+                single_video.put("set_time",CommonFunc.commentTime(my_favour_video.get(i).get("set_time").toString()));
+                single_video.put("sort_time",my_favour_video.get(i).get("set_time").toString());
+                //set type
+                single_video.put("type","video");
+                all_favour_list.add(single_video);
+            }
+
+            //sort by comment function
+            for (Map<Object, Object> map : all_favour_list) {
+                System.out.println(map.get("sort_time"));
+            }
+            Collections.sort(all_favour_list, new Comparator<Map<Object,Object>>() {
+                public int compare(Map<Object, Object> o1, Map<Object, Object> o2) {
+                    Integer name1 = Integer.valueOf(o1.get("sort_time").toString().substring(0,o1.get("sort_time").toString().length()-3)) ;
+                    Integer name2 = Integer.valueOf(o2.get("sort_time").toString().substring(0,o2.get("sort_time").toString().length()-3)) ;
+                    return name2.compareTo(name1);
+                }
+            });
+            return ServerResponse.createBySuccess("成功",all_favour_list);
         }
-        return null;
+    }
+
+
+
+    @Override
+    public ServerResponse<JSONObject> its_dynamic(String id, HttpServletRequest request){
+        //他的动态
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //获取用户信息
+            Map<Object,Object> user_info_result = new HashMap<Object,Object>();
+            Map user_information = userMapper.getAuthorInfo(id);
+            if (user_information.get("my_plan") != null){
+                user_info_result.put("insist_day",user_information.get("insist_day"));
+                //todo 加一下那个基本信息 打卡天数 已背单词 剩余词数
+                int learned_word = Integer.valueOf(userMapper.calculateAllWords(id));
+                user_info_result.put("learned_word",learned_word);
+            }else {
+                user_info_result.put("insist_day",0);
+                user_info_result.put("learned_word",0);
+            }
+            user_info_result.put("user_id",id);
+            user_info_result.put("portrait", Const.FTP_PREFIX + user_information.get("portrait"));
+            user_info_result.put("gender",user_information.get("gender"));
+            user_info_result.put("username",user_information.get("username"));
+            user_info_result.put("personality_signature",user_information.get("personality_signature"));
+
+
+            //create a new list
+            List<Map<Object,Object>> all_list = new ArrayList<>();
+            //its favours
+            //todo feeds favour
+            //获取他喜欢的feeds
+            List<Map<Object,Object>> its_favour_feeds = userMapper.getAllUserFeedsFavour(id);
+            for (int i = 0; i < its_favour_feeds.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_feeds = new HashMap<Object,Object>();
+                Map m2 = its_favour_feeds.get(i);
+                //当type为0是图片，为1是视频
+                if (m2.get("cover_select").toString().equals("1")){
+                    single_feeds.put("type",0);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                }else {
+                    single_feeds.put("type",1);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    single_feeds.put("video",Const.FTP_PREFIX+m2.get("video"));
+                }
+                single_feeds.put("id",m2.get("id"));
+                single_feeds.put("title",m2.get("title"));
+                single_feeds.put("author_username",m2.get("username"));
+                single_feeds.put("set_time",CommonFunc.commentTime(its_favour_feeds.get(i).get("set_time").toString()));
+                single_feeds.put("sort_time",its_favour_feeds.get(i).get("set_time").toString());
+                single_feeds.put("author_id",m2.get("user_id"));
+                //set type
+                single_feeds.put("type","favour_feeds");
+                if (m2.get("portrait")==null){
+                    single_feeds.put("author_portrait",null);
+                }else {
+                    single_feeds.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                }
+                all_list.add(single_feeds);
+            }
+
+            //todo dictionary favour
+            //get all my favour word
+            List<Map<Object,Object>> its_favour_word = userMapper.getAllUserDictionaryFavour(id);
+            for (int i = 0; i < its_favour_word.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_word = new HashMap<Object,Object>();
+                Map m2 = its_favour_word.get(i);
+                single_word.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                single_word.put("id",m2.get("id"));
+                single_word.put("word",m2.get("word"));
+                if (m2.get("pronunciation").toString().length() != 0){
+                    single_word.put("pronunciation",Const.FTP_PREFIX+m2.get("pronunciation"));
+                }else {
+                    single_word.put("pronunciation",null);
+                }
+                single_word.put("set_time",CommonFunc.commentTime(its_favour_word.get(i).get("set_time").toString()));
+                single_word.put("sort_time",its_favour_word.get(i).get("set_time").toString());
+                single_word.put("phonetic_symbol",m2.get("phonetic_symbol"));
+                //set type
+                single_word.put("type","favour_word");
+                all_list.add(single_word);
+            }
+
+            //todo daily pic favour
+            //get all my favour daily pic
+            List<Map<Object,Object>> its_favour_daily_pic = userMapper.getAllUserDailyPicFavour(id);
+            for (int i = 0; i < its_favour_daily_pic.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_daily_pic = new HashMap<Object,Object>();
+                Map m2 = its_favour_daily_pic.get(i);
+                single_daily_pic.put("daily_pic",Const.FTP_PREFIX+m2.get("daily_pic"));
+                single_daily_pic.put("small_pic",Const.FTP_PREFIX+m2.get("small_pic"));
+                single_daily_pic.put("id",m2.get("id"));
+                single_daily_pic.put("set_time",CommonFunc.commentTime(its_favour_daily_pic.get(i).get("set_time").toString()));
+                single_daily_pic.put("sort_time",its_favour_daily_pic.get(i).get("set_time").toString());
+                //set type
+                single_daily_pic.put("type","favour_daily_pic");
+                all_list.add(single_daily_pic);
+            }
+
+
+            //todo video favour
+            //get all my favour video
+            List<Map<Object,Object>> its_favour_video = userMapper.getAllUserVideoFavour(id);
+            for (int i = 0; i < its_favour_video.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_video = new HashMap<Object,Object>();
+                Map m2 = its_favour_video.get(i);
+                //当type为0是图片，为1是视频
+                if (its_favour_video.get(i).get("img").toString().length() != 0){
+                    single_video.put("img",Const.FTP_PREFIX + its_favour_video.get(i).get("img"));
+                }else {
+                    single_video.put("img",null);
+                }
+                single_video.put("comment",m2.get("comment"));
+                single_video.put("views",m2.get("views"));
+                single_video.put("word_id",its_favour_video.get(i).get("word_id"));
+                single_video.put("video_id",its_favour_video.get(i).get("video_id"));
+                single_video.put("phonetic_symbol",its_favour_video.get(i).get("phonetic_symbol"));
+                single_video.put("word",its_favour_video.get(i).get("word"));
+                single_video.put("set_time",CommonFunc.commentTime(its_favour_video.get(i).get("set_time").toString()));
+                single_video.put("sort_time",its_favour_video.get(i).get("set_time").toString());
+                //set type
+                single_video.put("type","favour_video");
+                all_list.add(single_video);
+            }
+
+
+            //get its comments
+            //获取Ta评论的feeds
+            List<Map<Object,Object>> my_comment_feeds = userMapper.getAllUserFeedsComment(id);
+            for (int i = 0; i < my_comment_feeds.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_feeds = new HashMap<Object,Object>();
+                Map m2 = my_comment_feeds.get(i);
+                //当type为0是图片，为1是视频
+                if (m2.get("cover_select").toString().equals("1")){
+                    single_feeds.put("type",0);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                }else {
+                    single_feeds.put("type",1);
+                    single_feeds.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    single_feeds.put("video",Const.FTP_PREFIX+m2.get("video"));
+                }
+                single_feeds.put("id",m2.get("id"));
+                single_feeds.put("title",m2.get("title"));
+                single_feeds.put("comment",m2.get("comment"));
+                single_feeds.put("author_username",m2.get("username"));
+                //set type
+                single_feeds.put("type","comment_feeds");
+                single_feeds.put("set_time",CommonFunc.commentTime(my_comment_feeds.get(i).get("set_time").toString()));
+                single_feeds.put("sort_time",my_comment_feeds.get(i).get("set_time").toString());
+                single_feeds.put("author_id",m2.get("user_id"));
+                if (m2.get("portrait")==null){
+                    single_feeds.put("author_portrait",null);
+                }else {
+                    single_feeds.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                }
+                all_list.add(single_feeds);
+            }
+
+            //获取我评论的视频
+            List<Map<Object,Object>> my_comment_video = userMapper.getAllUserVideoComment(id);
+            for (int i = 0; i < my_comment_video.size(); i++){
+                //新建一个map
+                Map<Object,Object> single_video = new HashMap<Object,Object>();
+                Map m2 = my_comment_video.get(i);
+                //当type为0是图片，为1是视频
+                if (my_comment_video.get(i).get("img").toString().length() != 0){
+                    single_video.put("img",Const.FTP_PREFIX + my_comment_video.get(i).get("img"));
+                }else {
+                    single_video.put("img",null);
+                }
+                single_video.put("views",m2.get("views"));
+                single_video.put("comment",m2.get("comment"));
+                single_video.put("word_id",my_comment_video.get(i).get("word_id"));
+                single_video.put("video_id",my_comment_video.get(i).get("video_id"));
+                single_video.put("phonetic_symbol",my_comment_video.get(i).get("phonetic_symbol"));
+                single_video.put("sort_time",my_comment_video.get(i).get("set_time").toString());
+                single_video.put("word",my_comment_video.get(i).get("word"));
+                //set type
+                single_video.put("type","comment_video");
+                single_video.put("set_time",CommonFunc.commentTime(my_comment_video.get(i).get("set_time").toString()));
+                all_list.add(single_video);
+            }
+
+            //sort by comment function
+            for (Map<Object, Object> map : all_list) {
+                System.out.println(map.get("sort_time"));
+            }
+            Collections.sort(all_list, new Comparator<Map<Object,Object>>() {
+                public int compare(Map<Object, Object> o1, Map<Object, Object> o2) {
+                    Integer name1 = Integer.valueOf(o1.get("sort_time").toString().substring(0,o1.get("sort_time").toString().length()-3)) ;
+                    Integer name2 = Integer.valueOf(o2.get("sort_time").toString().substring(0,o2.get("sort_time").toString().length()-3)) ;
+                    return name2.compareTo(name1);
+                }
+            });
+            //put the list in Map
+            user_info_result.put("its_dynamic",all_list);
+
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(user_info_result, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功",json);
+        }
     }
 
 
@@ -690,27 +1020,6 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-    @Override
-    public ServerResponse<String> its_dynamic(String user_id,HttpServletRequest request){
-        //他的动态
-        //验证参数是否为空
-        List<Object> l1 = new ArrayList<Object>(){{
-            add(request.getHeader("token"));
-            add(user_id);
-        }};
-        String token = request.getHeader("token");
-        String CheckNull = CommonFunc.CheckNull(l1);
-        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-        //验证token
-        String id = CommonFunc.CheckToken(request,token);
-        if (id == null){
-            //未找到
-            return ServerResponse.createByErrorMessage("身份认证错误！");
-        }else {
-
-        }
-        return null;
-    }
 
     @Override
     public ServerResponse<String> its_favorite(String user_id,HttpServletRequest request){

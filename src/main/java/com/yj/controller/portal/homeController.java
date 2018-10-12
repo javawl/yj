@@ -285,4 +285,18 @@ public class homeController {
         //调用service层
         return iHomeService.like_feeds_comment(id,request);
     }
+
+
+    /**
+     * 单词的喜欢和取消
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "favour_dictionary.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> favour_dictionary(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.favour_dictionary(id,request);
+    }
 }

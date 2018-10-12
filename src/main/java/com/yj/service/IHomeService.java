@@ -67,4 +67,7 @@ public interface IHomeService {
 
     //feeds评论点赞
     ServerResponse<String> like_feeds_comment(String id, HttpServletRequest request);
+
+    //单词的喜欢和取消
+    ServerResponse<String> favour_dictionary(String id, HttpServletRequest request);
 }

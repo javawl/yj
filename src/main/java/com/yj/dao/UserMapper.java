@@ -51,8 +51,20 @@ public interface UserMapper {
     //获取我评论的所有feeds
     List<Map<Object,Object>> getAllUserFeedsComment(@Param("id") String id);
 
-    //获取我评论的所有feeds
+    //获取我喜欢的所有feeds
+    List<Map<Object,Object>> getAllUserFeedsFavour(@Param("id") String id);
+
+    //获取我喜欢的所有dictionary
+    List<Map<Object,Object>> getAllUserDictionaryFavour(@Param("id") String id);
+
+    //获取我喜欢的所有daily_pic
+    List<Map<Object,Object>> getAllUserDailyPicFavour(@Param("id") String id);
+
+    //获取我评论的所有视频
     List<Map<Object,Object>> getAllUserVideoComment(@Param("id") String id);
+
+    //获取我喜欢的所有视频
+    List<Map<Object,Object>> getAllUserVideoFavour(@Param("id") String id);
 
     //获取我的剩余单词数
     String calculateRestWord(@Param("id") String id,@Param("plan") String plan);

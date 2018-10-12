@@ -47,11 +47,11 @@ public interface IUserService {
 
     ServerResponse<String> decide_selected_plan(String plan, HttpServletRequest request);
 
-    ServerResponse<String> my_favorite( HttpServletRequest request);
+    ServerResponse<List<Map<Object,Object>>> my_favorite( HttpServletRequest request);
 
     ServerResponse<String> delete_plan(String plan, HttpServletRequest request);
 
-    ServerResponse<String> its_dynamic(String id,HttpServletRequest request);
+    ServerResponse<JSONObject> its_dynamic(String id,HttpServletRequest request);
 
     ServerResponse<String> its_favorite(String id,HttpServletRequest request);
 

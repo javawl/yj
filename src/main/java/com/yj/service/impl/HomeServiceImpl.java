@@ -452,6 +452,85 @@ public class HomeServiceImpl implements IHomeService {
         }
     }
 
+
+    //喜欢单词取消喜欢
+    public ServerResponse<String> favour_dictionary(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流并且获取喜欢数
+            Map CheckDictionary = dictionaryMapper.getDictionaryFavours(id);
+            if (CheckDictionary == null){
+                return ServerResponse.createByErrorMessage("没有此单词！");
+            }
+            //获取喜欢数
+            int favours = Integer.valueOf(CheckDictionary.get("favours").toString());
+            //查一下是否已经喜欢
+            Map CheckIsFavour = dictionaryMapper.findDictionaryIsFavour(uid,id);
+            if (CheckIsFavour == null){
+                //没有喜欢就喜欢
+                favours += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //dictionary表修改数据
+                    int dictionaryResult = dictionaryMapper.changeDictionaryFavour(String.valueOf(favours),id);
+                    if (dictionaryResult == 0){
+                        throw new Exception();
+                    }
+                    //喜欢表插入数据
+                    int dictionaryLikeResult = dictionaryMapper.insertDictionaryFavour(uid,id,String.valueOf(new Date().getTime()));
+                    if (dictionaryLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经喜欢了就取消喜欢
+                favours -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int dictionaryResult = dictionaryMapper.changeDictionaryFavour(String.valueOf(favours),id);
+                    if (dictionaryResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int dictionaryLikeResult = dictionaryMapper.deleteDictionaryFavour(uid,id);
+                    if (dictionaryLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }
+        }
+    }
+
+
+
     //返回已背单词
     public ServerResponse<List<Map>> reciting_words(String page, String size, HttpServletRequest request){
         String token = request.getHeader("token");

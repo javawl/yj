@@ -261,12 +261,54 @@
     WHERE `user`.id = auther_id
   </select>
 
+  <select id="getAllUserFeedsFavour" resultType="map" parameterType="string">
+    SELECT tb.*,username,portrait,`user`.id as user_id
+    FROM `user`,
+    (SELECT feeds.id,title,pic,video,cover_select,feeds.auther_id,tb2.set_time
+    FROM feeds,(SELECT feeds_id,set_time
+    FROM feeds_favour
+    WHERE user_id = #{id}) tb2
+    WHERE feeds.id = tb2.feeds_id
+    ORDER BY tb2.set_time DESC) tb
+    WHERE `user`.id = auther_id
+  </select>
+
+  <select id="getAllUserDictionaryFavour" resultType="map" parameterType="string">
+    SELECT dictionary.id,dictionary.word,dictionary.phonetic_symbol,dictionary.pronunciation,dictionary.pic,tb2.set_time
+    FROM dictionary,(SELECT word_id,set_time
+    FROM dictionary_favour
+    WHERE user_id = #{id}) tb2
+    WHERE dictionary.id = tb2.word_id
+    ORDER BY tb2.set_time DESC
+  </select>
+
+  <select id="getAllUserDailyPicFavour" resultType="map" parameterType="string">
+    SELECT daily_pic.id,daily_pic.daily_pic,daily_pic.small_pic,tb2.set_time
+    FROM daily_pic,(SELECT daily_pic_id,set_time
+    FROM daily_pic_favour
+    WHERE user_id = #{id}) tb2
+    WHERE daily_pic.id = tb2.daily_pic_id
+    ORDER BY tb2.set_time DESC
+  </select>
+
   <select id="getAllUserVideoComment" resultType="map" parameterType="string">
     SELECT tb.*,phonetic_symbol,word
     FROM `dictionary`,
     (SELECT word_video_information.id as video_id,word_video_information.comments,views,favours,img,video,word_id,tb2.set_time
     FROM word_video_information,(SELECT video_id,video_comment.`comment`,set_time
     FROM video_comment
+    WHERE user_id = #{id}) tb2
+    WHERE word_video_information.id = tb2.video_id
+    ORDER BY tb2.set_time DESC) tb
+    WHERE `dictionary`.id = tb.word_id
+  </select>
+
+  <select id="getAllUserVideoFavour" resultType="map" parameterType="string">
+    SELECT tb.*,phonetic_symbol,word
+    FROM `dictionary`,
+    (SELECT word_video_information.id as video_id,word_video_information.comments,views,favours,img,video,word_id,tb2.set_time
+    FROM word_video_information,(SELECT video_id,set_time
+    FROM video_favour
     WHERE user_id = #{id}) tb2
     WHERE word_video_information.id = tb2.video_id
     ORDER BY tb2.set_time DESC) tb

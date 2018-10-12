@@ -57,6 +57,9 @@ public interface DictionaryMapper {
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
 
+    //取出dictionary流的喜欢
+    Map getDictionaryFavours(@Param("id") String id);
+
     //取出feeds流的评论的
     Map getCommentOfFeedsComment(@Param("id") String id);
 
@@ -100,6 +103,9 @@ public interface DictionaryMapper {
     //feeds表修改喜欢数
     int changeFeedsFavour(@Param("favours") String favours,@Param("id") String id);
 
+    //dictionary表修改喜欢数
+    int changeDictionaryFavour(@Param("favours") String favours,@Param("id") String id);
+
     //视频表修改喜欢数
     int changeYJFavour(@Param("favours") String favours,@Param("id") String id);
 
@@ -124,6 +130,9 @@ public interface DictionaryMapper {
     //FeedsFavour表插入数据
     int insertFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
+    //DictionaryFavour表插入数据
+    int insertDictionaryFavour(@Param("user_id") String user_id,@Param("word_id") String word_id,@Param("set_time") String set_time);
+
     //VideoFavour表插入数据
     int insertVideoFavour(@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
 
@@ -138,6 +147,9 @@ public interface DictionaryMapper {
 
     //feeds检查是否喜欢
     Map findIsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //dictionary_favours检查是否喜欢
+    Map findDictionaryIsFavour(@Param("user_id") String user_id,@Param("word_id") String word_id);
 
     //语境检查是否喜欢
     Map findYJIsFavour(@Param("user_id") String user_id,@Param("yj_id") String yj_id);
@@ -180,6 +192,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //取消点赞
+    int deleteDictionaryFavour(@Param("user_id") String user_id,@Param("word_id") String word_id);
 
     //视频取消点赞
     int deleteVideoFavour(@Param("user_id") String user_id,@Param("video_id") String video_id);

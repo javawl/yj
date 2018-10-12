@@ -439,6 +439,14 @@
 
 
 
+  <select id="getDictionaryFavours" resultType="map">
+    SELECT favours
+    FROM dictionary
+    WHERE id = #{id}
+  </select>
+
+
+
   <select id="getLikeOfFeedsComment" resultType="map">
     SELECT likes
     FROM feeds_comment
@@ -502,6 +510,13 @@
     FROM feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="findDictionaryIsFavour" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM dictionary_favour
+    WHERE user_id = #{user_id}
+    AND word_id = #{word_id}
   </select>
 
   <select id="findYJIsFavour" resultType="map" parameterType="string">
@@ -586,6 +601,12 @@
 
   <update id="changeFeedsFavour" parameterType="string">
     UPDATE feeds
+    set favours = #{favours}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeDictionaryFavour" parameterType="string">
+    UPDATE dictionary
     set favours = #{favours}
     WHERE id = #{id}
   </update>
@@ -701,6 +722,11 @@
     values (#{user_id}, #{feeds_id}, #{set_time})
   </insert>
 
+  <insert id="insertDictionaryFavour" parameterType="string">
+    INSERT INTO dictionary_favour (user_id, word_id, set_time)
+    values (#{user_id}, #{word_id}, #{set_time})
+  </insert>
+
   <insert id="insertVideoFavour" parameterType="string">
     INSERT INTO video_favour (user_id, video_id, set_time)
     values (#{user_id}, #{video_id}, #{set_time})
@@ -762,6 +788,12 @@
     delete from feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </delete>
+
+  <delete id="deleteDictionaryFavour" parameterType="string" >
+    delete from dictionary_favour
+    WHERE user_id = #{user_id}
+    AND word_id = #{word_id}
   </delete>
 
   <delete id="deleteVideoFavour" parameterType="string" >

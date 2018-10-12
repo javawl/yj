@@ -293,7 +293,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "my_favorite.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> my_favorite( HttpServletRequest request){
+    public ServerResponse<List<Map<Object,Object>>> my_favorite( HttpServletRequest request){
         //调用service层
         return iUserService.my_favorite(request);
     }
@@ -306,7 +306,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "its_dynamic.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> its_dynamic(String id,HttpServletRequest request){
+    public ServerResponse<JSONObject> its_dynamic(String id,HttpServletRequest request){
         //调用service层
         return iUserService.its_dynamic(id, request);
     }
