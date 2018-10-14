@@ -858,6 +858,58 @@ public class HomeServiceImpl implements IHomeService {
     }
 
 
+    //评论详情
+    public ServerResponse<JSONObject> comment_detail(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> result = new HashMap<Object,Object>();
+            //todo 是否点赞
+            Map CommentIsLike = dictionaryMapper.commentFindIsLike(uid, id);
+            if (CommentIsLike == null){
+                //未点赞
+                result.put("is_like",0);
+            }else {
+                result.put("is_like",1);
+            }
+
+            Map single = dictionaryMapper.getSingleComment(id);
+            result.put("likes",single.get("likes"));
+            result.put("comments",single.get("comments"));
+            result.put("comment",single.get("comment"));
+            result.put("set_time",CommonFunc.commentTime(single.get("set_time").toString()));
+            result.put("portrait",Const.FTP_PREFIX + single.get("portrait"));
+            result.put("username",single.get("username"));
+            result.put("user_id",single.get("user_id"));
+            result.put("id",single.get("id"));
+
+            //去评论评论表中查
+            List<Map<Object,Object>> comment_comment = dictionaryMapper.getCommentByCommentId(id);
+            for (int n_i = 0; n_i < comment_comment.size(); n_i++){
+                //时间转换和图片格式处理
+                String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(n_i).get("portrait");
+                comment_comment.get(n_i).put("portrait", change_reply_pic_url);
+                comment_comment.get(n_i).put("set_time", CommonFunc.commentTime(comment_comment.get(n_i).get("set_time").toString()));
+            }
+            result.put("inner_comment",comment_comment);
+            //转json
+            JSONObject json = JSON.parseObject(JSON.toJSONString(result, SerializerFeature.WriteMapNullValue));
+            return ServerResponse.createBySuccess("成功!",json);
+        }
+    }
+
+
     //评论feeds
     public ServerResponse<String> comment_feeds_comment(String id, String comment, HttpServletRequest request){
         String token = request.getHeader("token");

@@ -393,6 +393,7 @@ public class UserServiceImpl implements IUserService {
                 String PlanNumber = have_plan.get(i).get("word_number").toString();
                 m3.put("plan",plan);
                 m3.put("word_number",PlanNumber);
+                m3.put("learned_word",have_plan.get(i).get("learned_word_number").toString());
                 have_plan.set(i, m3);
             }
             m1.put("selected_plan",SelectPlan);
@@ -749,6 +750,7 @@ public class UserServiceImpl implements IUserService {
                 user_info_result.put("learned_word",0);
             }
             user_info_result.put("user_id",id);
+            user_info_result.put("is_open",Integer.valueOf(user_information.get("whether_open").toString()));
             user_info_result.put("portrait", Const.FTP_PREFIX + user_information.get("portrait"));
             user_info_result.put("gender",user_information.get("gender"));
             user_info_result.put("username",user_information.get("username"));
@@ -1187,6 +1189,40 @@ public class UserServiceImpl implements IUserService {
                 return ServerResponse.createByErrorMessage("更新失败");
             }
             return ServerResponse.createBySuccess("成功",Const.FTP_PREFIX + url);
+        }
+    }
+
+
+    @Override
+    public ServerResponse<String> change_open_status(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            int number = 1;
+            try {
+                if (Integer.valueOf(userMapper.getUserOpenStatus(id)) == 1){
+                    number = 0;
+                }
+            }catch (Exception ex){
+                return ServerResponse.createByErrorMessage("未找到该用户");
+            }
+
+            int result = userMapper.change_open_status(id,number);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            return ServerResponse.createBySuccessMessage("成功");
         }
     }
 }

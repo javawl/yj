@@ -352,6 +352,19 @@ public class UserController extends BaseController {
 
 
     /**
+     * 修改公开状态
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "change_open_status.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> change_open_status(HttpServletRequest request){
+        //调用service层
+        return iUserService.change_open_status(request);
+    }
+
+
+    /**
      * 修改我的信息
      * @param username  用户名
      * @param gender    性别

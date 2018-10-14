@@ -45,6 +45,9 @@ public interface UserMapper {
     //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //获取用户动态是否公开
+    String getUserOpenStatus(@Param("id") String id);
+
     //获取我的背单词总数
     String calculateAllWords(@Param("id") String id);
 
@@ -83,6 +86,9 @@ public interface UserMapper {
 
     //决定天数和单词数
     int decide_plan_days(@Param("id") String id, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
+
+    //决定天数和单词数
+    int change_open_status(@Param("id") String id, @Param("number") int number);
 
     //修改个人信息
     int update_my_info(@Param("id") String id, @Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("username") String username);

@@ -410,8 +410,18 @@
     LIMIT 0,15
   </select>
 
+  <select id="newCommentsYJ" resultType="map" parameterType="string">
+    SELECT video_comment.id,video_comment.comment,video_comment.set_time,video_comment.likes,username,portrait,`user`.id as user_id
+    FROM video_comment,`user`
+    WHERE user_id = `user`.id
+    AND video_comment.set_time > #{time}
+    AND video_id = #{video_id}
+    ORDER BY video_comment.set_time DESC
+    LIMIT 0,15
+  </select>
+
   <select id="getCommentByCommentId" resultType="map" parameterType="string" flushCache="true">
-    SELECT `user`.id as user_id,feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
+    SELECT `user`.id as user_id,feeds_reply_comments.id,feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
     FROM feeds_reply_comments,`user`
     WHERE user_id = `user`.id
     AND feeds_reply_comments.feeds_comment_id = #{id}
@@ -434,6 +444,20 @@
   <select id="getFeedsCommentLike" resultType="map">
     SELECT likes,comments,favours
     FROM feeds
+    WHERE id = #{id}
+  </select>
+
+
+  <select id="getSingleComment" resultType="map">
+    SELECT feeds_comment.id,likes,comments,comment,set_time,username,`user`.id as user_id,portrait
+    FROM feeds_comment,`user`
+    WHERE feeds_comment.id = #{id}
+    AND `user`.id = user_id
+  </select>
+
+  <select id="getDailyPicFavour" resultType="map">
+    SELECT favours
+    FROM daily_pic
     WHERE id = #{id}
   </select>
 
@@ -510,6 +534,13 @@
     FROM feeds_favour
     WHERE user_id = #{user_id}
     AND feeds_id = #{feeds_id}
+  </select>
+
+  <select id="findDailyPicIsFavour" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM daily_pic_favour
+    WHERE user_id = #{user_id}
+    AND daily_pic_id = #{daily_pic_id}
   </select>
 
   <select id="findDictionaryIsFavour" resultType="map" parameterType="string">
@@ -601,6 +632,12 @@
 
   <update id="changeFeedsFavour" parameterType="string">
     UPDATE feeds
+    set favours = #{favours}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeDailyPicFavour" parameterType="string">
+    UPDATE daily_pic
     set favours = #{favours}
     WHERE id = #{id}
   </update>
@@ -722,6 +759,11 @@
     values (#{user_id}, #{feeds_id}, #{set_time})
   </insert>
 
+  <insert id="insertDailyPicFavour" parameterType="string">
+    INSERT INTO daily_pic_favour (user_id, daily_pic_id, set_time)
+    values (#{user_id}, #{daily_pic_id}, #{set_time})
+  </insert>
+
   <insert id="insertDictionaryFavour" parameterType="string">
     INSERT INTO dictionary_favour (user_id, word_id, set_time)
     values (#{user_id}, #{word_id}, #{set_time})
@@ -790,6 +832,12 @@
     AND feeds_id = #{feeds_id}
   </delete>
 
+  <delete id="deleteDailyPicFavour" parameterType="string" >
+    delete from daily_pic_favour
+    WHERE user_id = #{user_id}
+    AND daily_pic_id = #{daily_pic_id}
+  </delete>
+
   <delete id="deleteDictionaryFavour" parameterType="string" >
     delete from dictionary_favour
     WHERE user_id = #{user_id}
@@ -803,7 +851,7 @@
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
-  SELECT id,word,meaning
+  SELECT word_id as id,word,meaning
   FROM reciting_words
   WHERE plan = #{plan}
   AND user_id = #{id}
@@ -868,7 +916,7 @@
   </select>
 
   <select id="selectMasteredWords" resultType="map">
-    SELECT id,word,meaning
+    SELECT word_id as id,word,meaning
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id}
@@ -994,7 +1042,7 @@
   </select>
 
   <select id="selectRecitingWordsAll" resultType="map" parameterType="string">
-    SELECT id,word,meaning
+    SELECT word_id as id,word,meaning
     FROM reciting_words
     WHERE plan = #{plan}
     AND user_id = #{id}
@@ -1069,7 +1117,7 @@
   </delete>
 
   <select id="selectMasteredWordsAll" resultType="map" parameterType="string">
-    SELECT id,word,meaning
+    SELECT word_id as id,word,meaning
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id}

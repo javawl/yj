@@ -299,4 +299,18 @@ public class homeController {
         //调用service层
         return iHomeService.favour_dictionary(id,request);
     }
+
+
+    /**
+     * 评论详情页
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "comment_detail.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<JSONObject> comment_detail(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.comment_detail(id,request);
+    }
 }

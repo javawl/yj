@@ -45,6 +45,9 @@ public interface DictionaryMapper {
     //最新评论
     List<Map<Object,Object>> newComments(@Param("time") String time,@Param("feed_id") String feed_id);
 
+    //最新评论
+    List<Map<Object,Object>> newCommentsYJ(@Param("time") String time,@Param("video_id") String video_id);
+
     //根据评论id获得其评论
     List<Map<Object,Object>> getCommentByCommentId(@Param("id") String id);
 
@@ -56,6 +59,12 @@ public interface DictionaryMapper {
 
     //取出feeds流的
     Map getFeedsCommentLike(@Param("id") String id);
+
+    //取出单个评论
+    Map getSingleComment(@Param("id") String id);
+
+    //取出每日一图的
+    Map getDailyPicFavour(@Param("id") String id);
 
     //取出dictionary流的喜欢
     Map getDictionaryFavours(@Param("id") String id);
@@ -103,6 +112,9 @@ public interface DictionaryMapper {
     //feeds表修改喜欢数
     int changeFeedsFavour(@Param("favours") String favours,@Param("id") String id);
 
+    //feeds表修改喜欢数
+    int changeDailyPicFavour(@Param("favours") String favours,@Param("id") String id);
+
     //dictionary表修改喜欢数
     int changeDictionaryFavour(@Param("favours") String favours,@Param("id") String id);
 
@@ -130,6 +142,9 @@ public interface DictionaryMapper {
     //FeedsFavour表插入数据
     int insertFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
+    //每日一图Favour表插入数据
+    int insertDailyPicFavour(@Param("user_id") String user_id,@Param("daily_pic_id") String daily_pic_id,@Param("set_time") String set_time);
+
     //DictionaryFavour表插入数据
     int insertDictionaryFavour(@Param("user_id") String user_id,@Param("word_id") String word_id,@Param("set_time") String set_time);
 
@@ -147,6 +162,9 @@ public interface DictionaryMapper {
 
     //feeds检查是否喜欢
     Map findIsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //daily_pic检查是否喜欢
+    Map findDailyPicIsFavour(@Param("user_id") String user_id,@Param("daily_pic_id") String daily_pic_id);
 
     //dictionary_favours检查是否喜欢
     Map findDictionaryIsFavour(@Param("user_id") String user_id,@Param("word_id") String word_id);
@@ -192,6 +210,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsFavour(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id);
+
+    //取消点赞
+    int deleteDailyPicFavour(@Param("user_id") String user_id,@Param("daily_pic_id") String daily_pic_id);
 
     //取消点赞
     int deleteDictionaryFavour(@Param("user_id") String user_id,@Param("word_id") String word_id);

@@ -320,6 +320,38 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
                 hotComments.get(k).put("set_time", CommonFunc.commentTime(hotComments.get(k).get("set_time").toString()));
             }
             final_result.put("hot_comment",hotComments);
+
+            //todo 最新评论
+            //先获取最新评论
+            //获取当天0点时间戳
+            String zero = CommonFunc.getZeroDate();
+            List<Map<Object,Object>> newComments = dictionaryMapper.newCommentsYJ(zero,video_id);
+            //对每个最新评论获取其评论
+            for (int k = 0; k < newComments.size(); k++){
+                String commentId = newComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.commentFindIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    newComments.get(k).put("is_like",0);
+                }else {
+                    newComments.get(k).put("is_like",1);
+                }
+                //时间转换和图片格式处理
+                newComments.get(k).put("set_time", CommonFunc.commentTime(newComments.get(k).get("set_time").toString()));
+                String change_pic_url = Const.FTP_PREFIX + newComments.get(k).get("portrait");
+                newComments.get(k).put("portrait", change_pic_url);
+            }
+            final_result.put("new_comment",newComments);
+
+            //查一下是否已经喜欢
+            Map CheckIsFavour = dictionaryMapper.findYJIsFavour(id,video_id);
+            if (CheckIsFavour == null){
+                final_result.put("is_favour",0);
+            }else {
+                final_result.put("is_favour",1);
+            }
+
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(final_result, SerializerFeature.WriteMapNullValue));
 

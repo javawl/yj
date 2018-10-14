@@ -11,7 +11,9 @@ import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -125,6 +127,84 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createBySuccess("成功！",DailyPicResult);
         }
     }
+
+
+    //喜欢daily_pic取消喜欢
+    public ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条每日一图流并且获取喜欢数
+            Map CheckFeeds = dictionaryMapper.getDailyPicFavour(id);
+            if (CheckFeeds == null){
+                return ServerResponse.createByErrorMessage("没有此文章！");
+            }
+            //获取喜欢数
+            int favours = Integer.valueOf(CheckFeeds.get("favours").toString());
+            //查一下是否已经喜欢
+            Map CheckIsFavour = dictionaryMapper.findDailyPicIsFavour(uid,id);
+            if (CheckIsFavour == null){
+                //没有喜欢就喜欢
+                favours += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //每日一图表修改数据
+                    int dailyPicResult = dictionaryMapper.changeDailyPicFavour(String.valueOf(favours),id);
+                    if (dailyPicResult == 0){
+                        throw new Exception();
+                    }
+                    //喜欢表插入数据
+                    int dailyPicLikeResult = dictionaryMapper.insertDailyPicFavour(uid,id,String.valueOf(new Date().getTime()));
+                    if (dailyPicLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经喜欢了就取消喜欢
+                favours -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //每日一图表修改数据
+                    int dailyPicResult = dictionaryMapper.changeDailyPicFavour(String.valueOf(favours),id);
+                    if (dailyPicResult == 0){
+                        throw new Exception();
+                    }
+                    //喜欢表删除数据
+                    int dailyPicLikeResult = dictionaryMapper.deleteDailyPicFavour(uid,id);
+                    if (dailyPicLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }
+        }
+    }
+
 
     @Override
     public ServerResponse<String> advice(String advice,String level,HttpServletRequest request){

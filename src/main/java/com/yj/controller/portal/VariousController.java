@@ -63,4 +63,18 @@ public class VariousController {
         //调用service层
         return iVariousService.advice(advice,level,request);
     }
+
+
+    /**
+     * 每日一图的喜欢和取消
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "favour_daily_pic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.favour_daily_pic(id,request);
+    }
 }

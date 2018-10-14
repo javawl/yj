@@ -64,4 +64,6 @@ public interface IUserService {
     ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request);
 
     ServerResponse<JSONObject> my_comment( HttpServletRequest request);
+
+    ServerResponse<String> change_open_status(HttpServletRequest request);
 }

@@ -220,7 +220,7 @@
   </select>
 
   <select id="getAuthorInfo" resultType="map" parameterType="string">
-    SELECT  portrait,gender,username,personality_signature,insist_day,my_plan
+    SELECT  portrait,gender,username,personality_signature,insist_day,my_plan,whether_open
     FROM `user`
     WHERE id = #{id}
   </select>
@@ -239,6 +239,12 @@
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
     SELECT my_plan
        FROM user
+    WHERE id = #{id}
+  </select>
+
+  <select id="getUserOpenStatus" resultType="string" parameterType="string">
+    SELECT whether_open
+       FROM `user`
     WHERE id = #{id}
   </select>
 
@@ -338,11 +344,11 @@
   </delete>
 
   <select id="getUserPlan" resultType="map" parameterType="string">
-    SELECT plan,word_number
-    FROM plans
-    WHERE id IN (SELECT plan_id
-        FROM take_plans
-    WHERE user_id = #{id})
+    SELECT plan,word_number,learned_word_number
+    FROM plans,(SELECT plan_id,take_plans.learned_word_number
+            FROM take_plans
+    WHERE user_id = #{id}) tb
+    WHERE plans.id = tb.plan_id
   </select>
   <select id="getUserPlanDaysNumber" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number,insist_day
@@ -358,6 +364,12 @@
     UPDATE user
     set plan_days = #{days},
     plan_words_number = #{daily_word_number}
+    WHERE id = #{id}
+  </update>
+
+  <update id="change_open_status">
+    UPDATE `user`
+    set whether_open = #{number}
     WHERE id = #{id}
   </update>
 

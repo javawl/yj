@@ -70,4 +70,7 @@ public interface IHomeService {
 
     //单词的喜欢和取消
     ServerResponse<String> favour_dictionary(String id, HttpServletRequest request);
+
+    //评论详情页
+    ServerResponse<JSONObject> comment_detail(String id, HttpServletRequest request);
 }
