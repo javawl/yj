@@ -846,7 +846,7 @@ public class UserServiceImpl implements IUserService {
                 }else {
                     single_video.put("img",null);
                 }
-                single_video.put("comment",m2.get("comment"));
+                single_video.put("comments",m2.get("comments"));
                 single_video.put("views",m2.get("views"));
                 single_video.put("word_id",its_favour_video.get(i).get("word_id"));
                 single_video.put("video_id",its_favour_video.get(i).get("video_id"));

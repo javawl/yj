@@ -313,4 +313,18 @@ public class homeController {
         //调用service层
         return iHomeService.comment_detail(id,request);
     }
+
+
+    /**
+     * 回复评论的点赞和取消
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "like_feeds_reply_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> like_feeds_reply_comment(String id, HttpServletRequest request){
+        //调用service层
+        return iHomeService.like_feeds_reply_comment(id,request);
+    }
 }

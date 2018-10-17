@@ -42,6 +42,9 @@ public interface DictionaryMapper {
     //热门评论(语境)
     List<Map<Object,Object>> hotCommentsYJ(@Param("start") int start,@Param("size") int page,@Param("video_id") String video_id);
 
+    //最新评论(语境)
+    List<Map<Object,Object>> newMoreCommentsYJ(@Param("start") int start,@Param("size") int page,@Param("video_id") String video_id,@Param("time") String time);
+
     //最新评论
     List<Map<Object,Object>> newComments(@Param("time") String time,@Param("feed_id") String feed_id);
 
@@ -81,6 +84,12 @@ public interface DictionaryMapper {
     //取出feeds流的
     Map getLikeOfFeedsComment(@Param("id") String id);
 
+    //取出打卡信息
+    Map getInsistDayMessage(@Param("user_id") String user_id,@Param("plan") String plan,@Param("time") String time);
+
+    //取出回复评论的
+    Map getLikeOfFeedsReplyComment(@Param("id") String id);
+
     //取出语境视频的
     Map getVideoLikeOfComment(@Param("id") String id);
 
@@ -98,6 +107,9 @@ public interface DictionaryMapper {
 
     //feeds_comment表修改点赞数
     int changeFeedsCommentLikes(@Param("likes") String likes,@Param("id") String id);
+
+    //feeds_reply_comment表修改点赞数
+    int changeFeedsReplyCommentLikes(@Param("likes") String likes,@Param("id") String id);
 
     //feeds_comment表修改评论数
     int changeFeedsCommentComments(@Param("comments") String comments,@Param("id") String id);
@@ -121,17 +133,29 @@ public interface DictionaryMapper {
     //视频表修改喜欢数
     int changeYJFavour(@Param("favours") String favours,@Param("id") String id);
 
+    //修改打卡表信息
+    int changeInsistDayStatus(@Param("is_correct") int is_correct,@Param("today_word_number") int today_word_number,@Param("plan") String plan,@Param("set_time") String set_time,@Param("user_id") String user_id);
+
+    //修改用户打卡表信息
+    int changeUserInsistDayStatus(@Param("id") String id);
+
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
     //comment表插入数据
     int insertVideoComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
 
+    //打卡表插入数据
+    int insertInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("today_word_number") int today_word_number,@Param("set_time") String set_time,@Param("is_correct") int is_correct);
+
     //FeedsLike表插入数据
     int insertFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
     //FeedsLike表插入数据
     int insertFeedsCommentLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id,@Param("set_time") String set_time);
+
+    //FeedsReplyCommentLike表插入数据
+    int insertFeedsReplyCommentLike(@Param("user_id") String user_id,@Param("feeds_reply_comment_id") String feeds_reply_comment_id,@Param("set_time") String set_time);
 
     //FeedsComment表插入数据
     int insertFeedsCommentComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id,@Param("set_time") String set_time);
@@ -156,6 +180,9 @@ public interface DictionaryMapper {
 
     //检查是否点赞
     Map findFeedsCommentIsLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
+
+    //检查是否点赞
+    Map findFeedsReplyCommentIsLike(@Param("user_id") String user_id,@Param("feeds_reply_comment_id") String feeds_reply_comment_id);
 
     //检查是否点赞
     Map findYJCommentIsLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id);
@@ -189,6 +216,9 @@ public interface DictionaryMapper {
 
     //取消点赞
     int deleteFeedsCommentLike(@Param("user_id") String user_id,@Param("feeds_comment_id") String feeds_comment_id);
+
+    //取消点赞
+    int deleteFeedsReplyCommentLike(@Param("user_id") String user_id,@Param("feeds_reply_comment_id") String feeds_reply_comment_id);
 
     //删除评论的评论
     int deleteFeedsCommentComment(@Param("user_id") String user_id,@Param("id") String id);

@@ -73,4 +73,7 @@ public interface IHomeService {
 
     //评论详情页
     ServerResponse<JSONObject> comment_detail(String id, HttpServletRequest request);
+
+    //回复评论的点赞
+    ServerResponse<String> like_feeds_reply_comment(String id, HttpServletRequest request);
 }

@@ -268,7 +268,18 @@ public class CommonFunc {
         calendar.setTime(new Date());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.SECOND, 1);
+        long date =calendar.getTime().getTime();
+        return String.valueOf(date);
+    }
+
+    //获取当天零点多一秒时间戳
+    public static String getOneDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 1);
         long date =calendar.getTime().getTime();
         return String.valueOf(date);
     }
@@ -285,7 +296,7 @@ public class CommonFunc {
         if (input_time > last_one_hour){
             //一个小时内
             //计算出和现在相差几分钟
-            Long during_time = (input_time - last_one_hour)/1000;
+            Long during_time = (now_time - input_time)/1000;
             int minute = (int) Math.floor(Double.valueOf(during_time)/60.0);
             return String.valueOf(minute)+"分钟前";
         }else {

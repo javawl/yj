@@ -300,7 +300,7 @@
   <select id="getAllUserVideoComment" resultType="map" parameterType="string">
     SELECT tb.*,phonetic_symbol,word
     FROM `dictionary`,
-    (SELECT word_video_information.id as video_id,word_video_information.comments,views,favours,img,video,word_id,tb2.set_time
+    (SELECT word_video_information.id as video_id,word_video_information.comments,views,favours,img,video,word_id,tb2.set_time,tb2.`comment`
     FROM word_video_information,(SELECT video_id,video_comment.`comment`,set_time
     FROM video_comment
     WHERE user_id = #{id}) tb2

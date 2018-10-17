@@ -361,9 +361,61 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
 
 
     @Override
+    public ServerResponse<List<Map<Object,Object>>> single_yu_new_comment(String video_id,String page,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(video_id);
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (!CommonFunc.isInteger(page)){
+            return ServerResponse.createByErrorMessage("page需为数字！");
+        }
+        if (Integer.valueOf(page) < 0){
+            return ServerResponse.createByErrorMessage("page最低为0！");
+        }
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //todo 最新评论(点赞数和是否点赞)
+            //先获取最新评论
+            int start = (Integer.valueOf(page)) * 15;
+            //获取当天0点时间戳
+            String zero = CommonFunc.getZeroDate();
+            List<Map<Object,Object>> newComments = dictionaryMapper.newMoreCommentsYJ(start,15,video_id,zero);
+            //对每个热门评论获取其评论
+            for (int k = 0; k < newComments.size(); k++){
+                String commentId = newComments.get(k).get("id").toString();
+                //todo 是否点赞
+                Map CommentIsLike = dictionaryMapper.VideoCommentIsLike(id, commentId);
+                if (CommentIsLike == null){
+                    //未点赞
+                    newComments.get(k).put("is_like",0);
+                }else {
+                    newComments.get(k).put("is_like",1);
+                }
+                //时间转换和图片格式处理
+                String change_pic_url = Const.FTP_PREFIX + newComments.get(k).get("portrait");
+                newComments.get(k).put("portrait", change_pic_url);
+                newComments.get(k).put("set_time", CommonFunc.commentTime(newComments.get(k).get("set_time").toString()));
+            }
+
+            return ServerResponse.createBySuccess("成功",newComments);
+        }
+    }
+
+
+    @Override
     public ServerResponse<List<Map<Object,Object>>> single_yu_comment(String video_id,String page,HttpServletRequest request){
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
+            add(video_id);
             add(page);
             add(request.getHeader("token"));
         }};
@@ -373,9 +425,9 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
         if (!CommonFunc.isInteger(page)){
             return ServerResponse.createByErrorMessage("page需为数字！");
         }
-//        if (Integer.valueOf(page) <= 0){
-//            return ServerResponse.createByErrorMessage("page最低为1！");
-//        }
+        if (Integer.valueOf(page) <= 0){
+            return ServerResponse.createByErrorMessage("page最低为1！");
+        }
         //验证token
         String id = CommonFunc.CheckToken(request,token);
         if (id == null){

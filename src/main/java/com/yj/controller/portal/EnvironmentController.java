@@ -140,4 +140,18 @@ public class EnvironmentController {
         return iEnvironmentService.delete_comment(id,request);
     }
 
+
+    /**
+     * 加载更多最新评论
+     * @param video_id
+     * @param page
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "single_yu_new_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> single_yu_new_comment(String video_id,String page,HttpServletRequest request){
+        return iEnvironmentService.single_yu_new_comment(video_id, page,request);
+    }
+
 }

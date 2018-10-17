@@ -96,6 +96,18 @@ public class HomeServiceImpl implements IHomeService {
                     }
                     flag = 1;
                 }
+
+                //判断用户是否打卡
+                //获取当天0点多一秒时间戳
+                String one = CommonFunc.getOneDate();
+
+                //查看坚持天数表中有没有数据
+                Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan.toString(),one);
+                if (getInsistDay == null){
+                    m1.put("level",0);
+                }else {
+                    m1.put("level",getInsistDay.get("is_correct"));
+                }
                 m1.put("flag",flag);
                 m1.put("insist_days",insist_days);
                 m1.put("rest_days",rest_days);
@@ -1539,7 +1551,10 @@ public class HomeServiceImpl implements IHomeService {
                 if(word_list_json.size()>0){
                     int learned_word = 0;
                     //获取用户的计划
-                    String plan = userMapper.getUserSelectPlan(id);
+                    Map user_info = userMapper.getUserPlanNumber(id);
+                    String plan = user_info.get("my_plan").toString();
+                    //每日计划单词数
+                    int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
                         String word_id = job.get("id").toString();
@@ -1581,6 +1596,57 @@ public class HomeServiceImpl implements IHomeService {
                     if (resultUpdate == 0){
                         throw new Exception();
                     }
+                    //获取当天0点多一秒时间戳
+                    String one = CommonFunc.getOneDate();
+
+                    //查看坚持天数表中有没有数据
+                    Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
+                    if (getInsistDay == null){
+                        //插入
+                        if (learned_word >= plan_words_number){
+                            //已经完成任务，状态改为1
+                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,1);
+                            if (insertResult == 0){
+                                throw new Exception();
+                            }
+                            //todo 用户表坚持天数增加
+                            int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
+                            if (updateUserResult == 0){
+                                throw new Exception();
+                            }
+                        }else {
+                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,0);
+                            if (insertResult == 0){
+                                throw new Exception();
+                            }
+                        }
+                    }else {
+                        //取出今天已背的
+                        int today_learned_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
+                        //取出状态
+                        int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
+                        //计算总的
+                        if ((today_learned_number + learned_word) >= plan_words_number && is_correct == 0){
+                            //完成任务
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(1,learned_word,plan,one,id);
+                            if (updateResult == 0){
+                                throw new Exception();
+                            }
+                            //todo 用户表坚持天数增加
+                            int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
+                            if (updateUserResult == 0){
+                                throw new Exception();
+                            }
+                        }
+                        //没完成不变
+                        if ((today_learned_number + learned_word) >= (2 * plan_words_number) && is_correct == 2){
+                            //完成双倍任务
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(3,learned_word,plan,one,id);
+                            if (updateResult == 0){
+                                throw new Exception();
+                            }
+                        }
+                    }
                 }
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
@@ -1612,7 +1678,7 @@ public class HomeServiceImpl implements IHomeService {
             //检查有没有这条feeds流评论并且获取点赞数
             Map CheckFeedsComment = dictionaryMapper.getLikeOfFeedsComment(id);
             if (CheckFeedsComment == null){
-                return ServerResponse.createByErrorMessage("没有此文章！");
+                return ServerResponse.createByErrorMessage("没有此评论！");
             }
             //获取点赞数
             int likes = Integer.valueOf(CheckFeedsComment.get("likes").toString());
@@ -1656,6 +1722,83 @@ public class HomeServiceImpl implements IHomeService {
                     //点赞表删除数据
                     int feedsLikeResult = dictionaryMapper.deleteFeedsCommentLike(uid,id);
                     if (feedsLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    System.out.println(e);
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }
+        }
+    }
+
+
+    //给feeds评论的回复评论点赞
+    public ServerResponse<String> like_feeds_reply_comment(String id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //检查有没有这条feeds流回复评论并且获取点赞数
+            Map CheckFeedsComment = dictionaryMapper.getLikeOfFeedsReplyComment(id);
+            if (CheckFeedsComment == null){
+                return ServerResponse.createByErrorMessage("没有此回复评论！");
+            }
+            //获取点赞数
+            int likes = Integer.valueOf(CheckFeedsComment.get("likes").toString());
+            //查一下是否已经点赞
+            Map CheckIsLike = dictionaryMapper.findFeedsReplyCommentIsLike(uid,id);
+            if (CheckIsLike == null){
+                //没有点赞就点赞
+                likes += 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds回复评论表修改数据
+                    int feedsReplyCommentResult = dictionaryMapper.changeFeedsReplyCommentLikes(String.valueOf(likes),id);
+                    if (feedsReplyCommentResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表插入数据
+                    int feedsReplyCommentLikeResult = dictionaryMapper.insertFeedsReplyCommentLike(uid,id,String.valueOf(new Date().getTime()));
+                    if (feedsReplyCommentLikeResult == 0){
+                        throw new Exception();
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
+            }else {
+                //已经点赞了就取消点赞
+                likes -= 1;
+                //开启事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+                try {
+                    //feeds表修改数据
+                    int feedsReplyCommentResult = dictionaryMapper.changeFeedsReplyCommentLikes(String.valueOf(likes),id);
+                    if (feedsReplyCommentResult == 0){
+                        throw new Exception();
+                    }
+                    //点赞表删除数据
+                    int feedsReplyCommentLikeResult = dictionaryMapper.deleteFeedsReplyCommentLike(uid,id);
+                    if (feedsReplyCommentLikeResult == 0){
                         throw new Exception();
                     }
                     transactionManager.commit(status);

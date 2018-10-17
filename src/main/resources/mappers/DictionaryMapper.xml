@@ -400,6 +400,16 @@
     LIMIT #{start},#{size}
   </select>
 
+  <select id="newMoreCommentsYJ" resultType="map">
+    SELECT video_comment.id,video_comment.comment,video_comment.set_time,video_comment.likes,username,portrait,`user`.id as user_id
+    FROM video_comment,`user`
+    WHERE user_id = `user`.id
+    AND video_comment.set_time > #{time}
+    AND video_id = #{video_id}
+    ORDER BY video_comment.set_time DESC
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="newComments" resultType="map" parameterType="string">
     SELECT feeds_comment.id,feeds_comment.comment,feeds_comment.set_time,feeds_comment.likes,feeds_comment.comments,username,portrait,`user`.id as user_id
     FROM feeds_comment,`user`
@@ -421,7 +431,7 @@
   </select>
 
   <select id="getCommentByCommentId" resultType="map" parameterType="string" flushCache="true">
-    SELECT `user`.id as user_id,feeds_reply_comments.id,feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time
+    SELECT `user`.id as user_id,feeds_reply_comments.id,feeds_reply_comments.comment,username,portrait,feeds_reply_comments.set_time,feeds_reply_comments.likes
     FROM feeds_reply_comments,`user`
     WHERE user_id = `user`.id
     AND feeds_reply_comments.feeds_comment_id = #{id}
@@ -477,6 +487,20 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getInsistDayMessage" resultType="map">
+    SELECT *
+    FROM insist_day
+    WHERE user_id = #{user_id}
+    AND plan = #{plan}
+    AND set_time = #{time}
+  </select>
+
+  <select id="getLikeOfFeedsReplyComment" resultType="map">
+    SELECT likes
+    FROM feeds_reply_comments
+    WHERE id = #{id}
+  </select>
+
   <select id="getCommentOfFeedsComment" resultType="map">
     SELECT *
     FROM feeds_comment
@@ -520,6 +544,13 @@
     FROM feeds_comment_like
     WHERE user_id = #{user_id}
     AND feeds_comment_id = #{feeds_comment_id}
+  </select>
+
+  <select id="findFeedsReplyCommentIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_reply_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_reply_comment_id = #{feeds_reply_comment_id}
   </select>
 
   <select id="findYJCommentIsLike" resultType="map" parameterType="string">
@@ -611,6 +642,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="changeFeedsReplyCommentLikes" parameterType="string">
+    UPDATE feeds_reply_comments
+    set likes = #{likes}
+    WHERE id = #{id}
+  </update>
+
 
   <update id="changeFeedsCommentComments" parameterType="string">
     UPDATE feeds_comment
@@ -651,6 +688,21 @@
   <update id="changeYJFavour" parameterType="string">
     UPDATE word_video_information
     set favours = #{favours}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeInsistDayStatus">
+    UPDATE insist_day
+    set is_correct = #{is_correct}
+    set `today_word_number` = today_word_number + #{today_word_number}
+    WHERE plan = #{plan}
+    AND set_time = #{set_time}
+    AND user_id = #{user_id}
+  </update>
+
+  <update id="changeUserInsistDayStatus" parameterType="string">
+    UPDATE `user`
+    set insist_day = insist_day + 1
     WHERE id = #{id}
   </update>
 
@@ -733,9 +785,19 @@
     values (#{user_id}, #{comment}, #{video_id}, #{set_time})
   </insert>
 
+  <insert id="insertInsistDay">
+    INSERT INTO insist_day (user_id, plan, set_time,today_word_number,is_correct)
+    values (#{user_id}, #{plan}, #{set_time},#{today_word_number},#{is_correct})
+  </insert>
+
   <insert id="insertFeedsCommentLike" parameterType="string">
     INSERT INTO feeds_comment_like (user_id, feeds_comment_id, set_time)
     values (#{user_id}, #{feeds_comment_id}, #{set_time})
+  </insert>
+
+  <insert id="insertFeedsReplyCommentLike" parameterType="string">
+    INSERT INTO feeds_reply_comment_like (user_id, feeds_reply_comment_id, set_time)
+    values (#{user_id}, #{feeds_reply_comment_id}, #{set_time})
   </insert>
 
 
@@ -789,6 +851,12 @@
     delete from feeds_comment_like
     WHERE user_id = #{user_id}
     AND feeds_comment_id = #{feeds_comment_id}
+  </delete>
+
+  <delete id="deleteFeedsReplyCommentLike" parameterType="string" >
+    delete from feeds_reply_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_reply_comment_id = #{feeds_reply_comment_id}
   </delete>
 
   <delete id="deleteFeedsCommentComment" parameterType="string" >

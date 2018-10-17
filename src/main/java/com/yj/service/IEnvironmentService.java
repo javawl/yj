@@ -27,4 +27,6 @@ public interface IEnvironmentService {
     ServerResponse<String> like_video_comment(String id, HttpServletRequest request);
 
     ServerResponse<String> delete_comment(String id, HttpServletRequest request);
+
+    ServerResponse<List<Map<Object,Object>>> single_yu_new_comment(String video_id,String page,HttpServletRequest request);
 }
