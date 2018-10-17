@@ -79,4 +79,7 @@ public interface IHomeService {
 
     //打卡接口
     ServerResponse<String> clock_in(HttpServletRequest request);
+
+    //纠错
+    ServerResponse<String> error_correction(String word_id,String type, String text, HttpServletRequest request);
 }

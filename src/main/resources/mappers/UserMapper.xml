@@ -355,6 +355,39 @@
     FROM user
     WHERE id = #{id}
   </select>
+
+  <select id="getUserFeedsCommentLikes" resultType="map" parameterType="string">
+    SELECT `user`.username,`user`.portrait,tb.*
+    FROM `user`,(SELECT feeds_comment_like.user_id,tb2.`comment`,tb2.set_time
+    FROM feeds_comment_like,(SELECT id,`comment`,set_time
+    FROM feeds_comment
+    WHERE user_id = #{id}) tb2
+    WHERE feeds_comment_like.feeds_comment_id = tb2.id) tb
+    WHERE tb.user_id = `user`.id
+    ORDER BY set_time DESC
+  </select>
+
+  <select id="getUserFeedsReplyCommentLikes" resultType="map" parameterType="string">
+    SELECT `user`.username,`user`.portrait,tb.*
+    FROM `user`,(SELECT feeds_reply_comment_like.user_id,tb2.`comment`,tb2.set_time
+    FROM feeds_reply_comment_like,(SELECT id,`comment`,set_time
+    FROM feeds_reply_comments
+    WHERE user_id = #{id}) tb2
+    WHERE feeds_reply_comment_like.feeds_reply_comment_id = tb2.id) tb
+    WHERE tb.user_id = `user`.id
+    ORDER BY set_time DESC
+  </select>
+
+  <select id="getUserVideoCommentLikes" resultType="map" parameterType="string">
+    SELECT `user`.username,`user`.portrait,tb.*
+    FROM `user`,(SELECT video_comment_like.user_id,tb2.`comment`,tb2.set_time
+    FROM video_comment_like,(SELECT id,`comment`,set_time
+    FROM video_comment
+    WHERE user_id = #{id}) tb2
+    WHERE video_comment_like.video_comment_id = tb2.id) tb
+    WHERE tb.user_id = `user`.id
+    ORDER BY set_time DESC
+  </select>
   <select id="getUserPlanNumber" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number,insist_day
     FROM user
@@ -404,6 +437,11 @@
   <insert id="add_tip_off">
     INSERT INTO tip_off (`type`, report_reason)
     values (#{type}, #{report_reason})
+  </insert>
+
+  <insert id="error_correction" parameterType="string">
+    INSERT INTO error_correction (`word_id`, user_id,`paraphrase`, real_meaning,`sentence`, other_sentence,other)
+    values (#{word_id}, #{user_id},#{paraphrase}, #{real_meaning},#{sentence}, #{other_sentence},#{other})
   </insert>
 
 

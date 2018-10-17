@@ -1873,4 +1873,66 @@ public class HomeServiceImpl implements IHomeService {
             }
         }
     }
+
+    //纠错
+    public ServerResponse<String> error_correction(String word_id,String type, String text, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(word_id);
+            add(type);
+            add(text);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            int type_int;
+            try {
+                type_int = Integer.parseInt(type);
+            }catch (Exception e){
+                return ServerResponse.createByErrorMessage("类型必须为数字！");
+            }
+            if (type_int == 0){
+                int result = userMapper.error_correction(word_id,uid,text,null,null,null,null);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("纠错失败！");
+                }
+            }
+
+            if (type_int == 1){
+                int result = userMapper.error_correction(word_id,uid,null,text,null,null,null);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("纠错失败！");
+                }
+            }
+
+            if (type_int == 2){
+                int result = userMapper.error_correction(word_id,uid,null,null,text,null,null);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("纠错失败！");
+                }
+            }
+
+            if (type_int == 3){
+                int result = userMapper.error_correction(word_id,uid,null,null,null,text,null);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("纠错失败！");
+                }
+            }
+
+            if (type_int == 4){
+                int result = userMapper.error_correction(word_id,uid,null,null,null,null,text);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("纠错失败！");
+                }
+            }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
 }

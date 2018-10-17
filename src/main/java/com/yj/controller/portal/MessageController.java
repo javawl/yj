@@ -46,4 +46,17 @@ public class MessageController {
 //        System.out.println(request.getSession().getServletContext().getRealPath("upload"));
         return iMessageService.tip_off(type,report_reason,request);
     }
+
+
+    /**
+     * 收到的赞
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "receive_likes.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> receive_likes(HttpServletRequest request){
+        //调用service层
+        return iMessageService.receive_likes(request);
+    }
 }

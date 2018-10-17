@@ -340,4 +340,20 @@ public class homeController {
         //调用service层
         return iHomeService.clock_in(request);
     }
+
+
+    /**
+     * 纠错
+     * @param word_id
+     * @param type
+     * @param text
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "error_correction.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> error_correction(String word_id,String type, String text, HttpServletRequest request){
+        //调用service层
+        return iHomeService.error_correction(word_id, type, text, request);
+    }
 }

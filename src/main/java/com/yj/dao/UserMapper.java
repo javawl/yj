@@ -105,6 +105,9 @@ public interface UserMapper {
     //举报
     int add_tip_off(@Param("type") int type, @Param("report_reason") String report_reason);
 
+    //纠错
+    int error_correction(@Param("word_id") String word_id, @Param("user_id") String user_id,@Param("paraphrase") String paraphrase, @Param("real_meaning") String real_meaning,@Param("sentence") String sentence, @Param("other_sentence") String other_sentence,@Param("other") String other);
+
     //意见反馈
     int advice(@Param("advice") String advice, @Param("level") String level, @Param("time") String time);
 
@@ -115,6 +118,15 @@ public interface UserMapper {
 
     //获取我的计划、天数、每日学习单词数、坚持天数
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
+
+    //获取feeds_comment的点赞
+    List<Map<Object,Object>> getUserFeedsCommentLikes(@Param("id") String id);
+
+    //获取回复评论的点赞
+    List<Map<Object,Object>> getUserFeedsReplyCommentLikes(@Param("id") String id);
+
+    //获取视频评论的点赞
+    List<Map<Object,Object>> getUserVideoCommentLikes(@Param("id") String id);
 
     Map getUserPlanNumber(@Param("id") String id);
 
