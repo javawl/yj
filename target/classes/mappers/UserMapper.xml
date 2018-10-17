@@ -401,6 +401,11 @@
     values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}), #{days}, #{daily_word_number})
   </insert>
 
+  <insert id="add_tip_off">
+    INSERT INTO tip_off (`type`, report_reason)
+    values (#{type}, #{report_reason})
+  </insert>
+
 
   <insert id="advice" parameterType="string">
     INSERT INTO advice (advice, `level`, set_time)

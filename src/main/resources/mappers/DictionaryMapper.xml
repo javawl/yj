@@ -708,7 +708,7 @@
 
   <update id="changeUserClockDayStatus" parameterType="string">
     UPDATE `user`
-    set clock_in = clock_in + 1
+    set insist_day = insist_day + 1
     WHERE id = #{id}
   </update>
 

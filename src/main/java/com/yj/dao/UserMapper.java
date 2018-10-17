@@ -102,6 +102,9 @@ public interface UserMapper {
     //计划表添加计划
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //举报
+    int add_tip_off(@Param("type") int type, @Param("report_reason") String report_reason);
+
     //意见反馈
     int advice(@Param("advice") String advice, @Param("level") String level, @Param("time") String time);
 

@@ -39,11 +39,11 @@ public class MessageController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "home_page_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "tip_off.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<JSONObject> home_page_info(HttpServletRequest request){
+    public ServerResponse<String> tip_off(String type,String report_reason,HttpServletRequest request){
         //调用service层
 //        System.out.println(request.getSession().getServletContext().getRealPath("upload"));
-        return iMessageService.home_page_info(request);
+        return iMessageService.tip_off(type,report_reason,request);
     }
 }
