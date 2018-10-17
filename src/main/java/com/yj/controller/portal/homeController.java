@@ -327,4 +327,17 @@ public class homeController {
         //调用service层
         return iHomeService.like_feeds_reply_comment(id,request);
     }
+
+
+    /**
+     * 打卡接口
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "clock_in.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> clock_in(HttpServletRequest request){
+        //调用service层
+        return iHomeService.clock_in(request);
+    }
 }

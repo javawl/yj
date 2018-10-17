@@ -139,6 +139,9 @@ public interface DictionaryMapper {
     //修改用户打卡表信息
     int changeUserInsistDayStatus(@Param("id") String id);
 
+    //修改用户打卡表信息
+    int changeUserClockDayStatus(@Param("id") String id);
+
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
@@ -147,6 +150,9 @@ public interface DictionaryMapper {
 
     //打卡表插入数据
     int insertInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("today_word_number") int today_word_number,@Param("set_time") String set_time,@Param("is_correct") int is_correct);
+
+    //打卡表更改数据
+    int updateInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("set_time") String set_time,@Param("is_correct") int is_correct);
 
     //FeedsLike表插入数据
     int insertFeedsLike(@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);

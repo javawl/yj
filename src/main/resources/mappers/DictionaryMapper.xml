@@ -706,6 +706,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="changeUserClockDayStatus" parameterType="string">
+    UPDATE `user`
+    set clock_in = clock_in + 1
+    WHERE id = #{id}
+  </update>
+
   <select id="randSelectVideo" resultType="map" parameterType="int">
     SELECT dictionary.word,tb.*
     FROM
@@ -789,6 +795,14 @@
     INSERT INTO insist_day (user_id, plan, set_time,today_word_number,is_correct)
     values (#{user_id}, #{plan}, #{set_time},#{today_word_number},#{is_correct})
   </insert>
+
+  <update id="updateInsistDay">
+    UPDATE `insist_day` SET
+    `is_correct`= #{is_correct}
+    WHERE plan = #{plan}
+    AND user_id = #{user_id}
+    AND set_time = #{set_time}
+  </update>
 
   <insert id="insertFeedsCommentLike" parameterType="string">
     INSERT INTO feeds_comment_like (user_id, feeds_comment_id, set_time)

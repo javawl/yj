@@ -76,4 +76,7 @@ public interface IHomeService {
 
     //回复评论的点赞
     ServerResponse<String> like_feeds_reply_comment(String id, HttpServletRequest request);
+
+    //打卡接口
+    ServerResponse<String> clock_in(HttpServletRequest request);
 }

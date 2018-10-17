@@ -281,7 +281,9 @@ public class CommonFunc {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 1);
         long date =calendar.getTime().getTime();
-        return String.valueOf(date);
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
     }
 
     //评论时间从时间戳转换为标准时间

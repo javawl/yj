@@ -106,7 +106,7 @@ public class HomeServiceImpl implements IHomeService {
                 if (getInsistDay == null){
                     m1.put("level",0);
                 }else {
-                    m1.put("level",getInsistDay.get("is_correct"));
+                    m1.put("level",Integer.valueOf(getInsistDay.get("is_correct").toString()));
                 }
                 m1.put("flag",flag);
                 m1.put("insist_days",insist_days);
@@ -1648,6 +1648,68 @@ public class HomeServiceImpl implements IHomeService {
                         }
                     }
                 }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                transactionManager.rollback(status);
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
+    //分享完打卡
+    public ServerResponse<String> clock_in(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //获取用户的计划
+            Map user_info = userMapper.getUserPlanNumber(id);
+            String plan = user_info.get("my_plan").toString();
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //查看坚持天数表中有没有数据
+            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
+            if (getInsistDay == null){
+                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+            }
+            //取出状态
+            int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
+            if (is_correct >= 2){
+                return ServerResponse.createByErrorMessage("您已经打过卡了！");
+            }
+            if (is_correct == 0){
+                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+            }
+            //开启事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+            try {
+                //todo 用户表打卡天数增加
+                int updateUserResult = dictionaryMapper.changeUserClockDayStatus(id);
+                if (updateUserResult == 0){
+                    throw new Exception();
+                }
+
+                //todo 打卡表变为打卡状态
+                int updateResult = dictionaryMapper.updateInsistDay(id,plan,one,2);
+                if (updateResult == 0){
+                    throw new Exception();
+                }
+
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             } catch (Exception e) {
