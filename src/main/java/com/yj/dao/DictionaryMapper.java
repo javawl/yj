@@ -208,6 +208,9 @@ public interface DictionaryMapper {
     //feeds_comment检查是否点赞
     Map commentFindIsLike(@Param("user_id") String user_id,@Param("id") String id);
 
+    //reply_feeds_comment检查是否点赞
+    Map commentReplyFindIsLike(@Param("user_id") String user_id,@Param("id") String id);
+
     //video检查是否点赞
     Map VideoCommentIsLike(@Param("user_id") String user_id,@Param("video_comment_id") String video_comment_id);
 

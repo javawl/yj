@@ -596,6 +596,14 @@
   </select>
 
 
+  <select id="commentReplyFindIsLike" resultType="map" parameterType="string">
+    SELECT id,set_time
+    FROM feeds_reply_comment_like
+    WHERE user_id = #{user_id}
+    AND feeds_reply_comment_id = #{id}
+  </select>
+
+
   <select id="VideoCommentIsLike" resultType="map" parameterType="string">
     SELECT id,set_time
     FROM video_comment_like

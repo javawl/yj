@@ -820,6 +820,15 @@ public class HomeServiceImpl implements IHomeService {
                     String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(h_i).get("portrait");
                     comment_comment.get(h_i).put("portrait", change_reply_pic_url);
                     comment_comment.get(h_i).put("set_time", CommonFunc.commentTime(comment_comment.get(h_i).get("set_time").toString()));
+
+                    //todo 是否点赞
+                    Map ReplyCommentIsLike = dictionaryMapper.commentReplyFindIsLike(id, comment_comment.get(h_i).get("id").toString());
+                    if (ReplyCommentIsLike == null){
+                        //未点赞
+                        comment_comment.get(h_i).put("is_like",0);
+                    }else {
+                        comment_comment.get(h_i).put("is_like",1);
+                    }
                 }
                 hotComments.get(k).put("inner_comment",comment_comment);
                 //时间转换和图片格式处理
@@ -854,6 +863,15 @@ public class HomeServiceImpl implements IHomeService {
                     String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(n_i).get("portrait");
                     comment_comment.get(n_i).put("portrait", change_reply_pic_url);
                     comment_comment.get(n_i).put("set_time", CommonFunc.commentTime(comment_comment.get(n_i).get("set_time").toString()));
+
+                    //todo 是否点赞
+                    Map ReplyCommentIsLike = dictionaryMapper.commentReplyFindIsLike(id, comment_comment.get(n_i).get("id").toString());
+                    if (ReplyCommentIsLike == null){
+                        //未点赞
+                        comment_comment.get(n_i).put("is_like",0);
+                    }else {
+                        comment_comment.get(n_i).put("is_like",1);
+                    }
                 }
                 newComments.get(k).put("inner_comment",comment_comment);
                 //时间转换和图片格式处理
