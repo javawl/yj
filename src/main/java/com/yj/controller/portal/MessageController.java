@@ -35,7 +35,9 @@ public class MessageController {
     private IFileService iFileService;
 
     /**
-     * 主页显示基本信息和六条feeds流
+     * 纠错
+     * @param type
+     * @param report_reason
      * @param request
      * @return
      */

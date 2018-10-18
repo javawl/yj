@@ -82,4 +82,7 @@ public interface IHomeService {
 
     //纠错
     ServerResponse<String> error_correction(String word_id,String type, String text, HttpServletRequest request);
+
+    //打卡历史
+    ServerResponse<Map<Object,List<Object>>> clock_history(HttpServletRequest request);
 }

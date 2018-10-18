@@ -318,6 +318,72 @@ public class CommonFunc {
         }
     }
 
+
+    //计算历史打卡
+    public static Map<Object,List<Object>> clock_history(List<Map<Object,Object>> time){
+        Map<Object,List<Object>> Date_time = new HashMap<Object,List<Object>>();
+        //获取当前月
+        Calendar now = Calendar.getInstance();
+        int now_year = now.get(Calendar.YEAR);
+        int now_month = now.get(Calendar.MONTH);
+
+        for (int i = 0; i < time.size(); i++){
+            //获取历史时间
+            Calendar history = Calendar.getInstance();
+            history.setTime(new Date(Long.valueOf(time.get(i).get("set_time").toString())));
+            int history_year = history.get(Calendar.YEAR);
+            int history_month = history.get(Calendar.MONTH);
+            int history_day = history.get(Calendar.DAY_OF_MONTH);
+
+
+
+            if (now_month != history_month){
+                if (now_year != history_year){
+                    //不同年
+                    //差一年的情况
+                    if ((now_year-history_year) == 1){
+                        //因为要返回相反数，所以倒着减
+                        int index = history_month - 12 - now_month;
+                        List<Object> single_list = Date_time.get(index);
+                        if (single_list == null){
+                            single_list = new ArrayList<>();
+                        }
+                        single_list.add(history_day);
+                        Date_time.put(index,single_list);
+                    }
+                    if ((now_year-history_year) > 1){
+                        //因为要返回相反数，所以倒着减
+                        int index = history_month - 12 - now_month - 12;
+                        List<Object> single_list = Date_time.get(index);
+                        if (single_list == null){
+                            single_list = new ArrayList<>();
+                        }
+                        single_list.add(history_day);
+                        Date_time.put(index,single_list);
+                    }
+                }else {
+                    int index = history_month - now_month;
+                    List<Object> single_list = Date_time.get(index);
+                    if (single_list == null){
+                        single_list = new ArrayList<>();
+                    }
+                    single_list.add(history_day);
+                    Date_time.put(index,single_list);
+                }
+            }else {
+                //如果当前月
+                List<Object> single_list = Date_time.get(0);
+                if (single_list == null){
+                    single_list = new ArrayList<>();
+                }
+                single_list.add(history_day);
+                Date_time.put(0,single_list);
+            }
+        }
+
+        return Date_time;
+    }
+
     //获取时间戳
     public static String getFormatTime(Long time,String format){
         if (format == null){

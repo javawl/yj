@@ -128,6 +128,9 @@ public interface UserMapper {
     //获取视频评论的点赞
     List<Map<Object,Object>> getUserVideoCommentLikes(@Param("id") String id);
 
+    //获取打卡历史记录
+    List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);
+
     Map getUserPlanNumber(@Param("id") String id);
 
     //根据计划名获取总数

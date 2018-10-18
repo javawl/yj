@@ -356,4 +356,17 @@ public class homeController {
         //调用service层
         return iHomeService.error_correction(word_id, type, text, request);
     }
+
+
+    /**
+     * 历史打卡
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "clock_history.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,List<Object>>> clock_history(HttpServletRequest request){
+        //调用service层
+        return iHomeService.clock_history(request);
+    }
 }

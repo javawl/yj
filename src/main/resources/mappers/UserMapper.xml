@@ -388,6 +388,14 @@
     WHERE tb.user_id = `user`.id
     ORDER BY set_time DESC
   </select>
+
+  <select id="getUserAllInsistDay" resultType="map" parameterType="string">
+    SELECT *
+    FROM `insist_day`
+    WHERE user_id = #{id}
+    ORDER BY set_time
+  </select>
+
   <select id="getUserPlanNumber" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number,insist_day
     FROM user

@@ -1935,4 +1935,26 @@ public class HomeServiceImpl implements IHomeService {
             return ServerResponse.createBySuccessMessage("成功");
         }
     }
+
+
+    //纠错
+    public ServerResponse<Map<Object,List<Object>>> clock_history(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            List<Map<Object,Object>> insist_day = userMapper.getUserAllInsistDay(uid);
+            Map<Object,List<Object>> result = CommonFunc.clock_history(insist_day);
+            return ServerResponse.createBySuccess("成功",result);
+        }
+    }
 }
