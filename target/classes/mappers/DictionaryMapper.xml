@@ -701,8 +701,8 @@
 
   <update id="changeInsistDayStatus">
     UPDATE insist_day
-    set is_correct = #{is_correct}
-    set `today_word_number` = today_word_number + #{today_word_number}
+    set is_correct = #{is_correct},
+    `today_word_number` = today_word_number + #{today_word_number}
     WHERE plan = #{plan}
     AND set_time = #{set_time}
     AND user_id = #{user_id}
