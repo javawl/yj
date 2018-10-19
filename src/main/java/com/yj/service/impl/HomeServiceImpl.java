@@ -101,12 +101,17 @@ public class HomeServiceImpl implements IHomeService {
                 //获取当天0点多一秒时间戳
                 String one = CommonFunc.getOneDate();
 
-                //查看坚持天数表中有没有数据
-                Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan.toString(),one);
-                if (getInsistDay == null){
+                //todo 记住这个接口调用plan时候一定要判断null
+                if (plan == null){
                     m1.put("level",0);
                 }else {
-                    m1.put("level",Integer.valueOf(getInsistDay.get("is_correct").toString()));
+                    //查看坚持天数表中有没有数据
+                    Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan.toString(),one);
+                    if (getInsistDay == null){
+                        m1.put("level",0);
+                    }else {
+                        m1.put("level",Integer.valueOf(getInsistDay.get("is_correct").toString()));
+                    }
                 }
                 m1.put("flag",flag);
                 m1.put("insist_days",insist_days);
