@@ -235,7 +235,7 @@ public class AdminController {
     @RequestMapping(value = "change_mp3.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> change_mp3(String sentence,HttpServletResponse response, HttpServletRequest request){
-        return iAdminService.change_mp3(sentence,response,request);
+        return iAdminService.change_mp3(response,request);
     }
 
 

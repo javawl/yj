@@ -262,6 +262,9 @@ public interface DictionaryMapper {
     //已背单词
     List<Map> selectRecitingWords(@Param("start") int start,@Param("size") int size,@Param("plan") String plan,@Param("id") String id);
 
+    //返回单词句子
+    List<Map> getWordByType(@Param("start") int start,@Param("size") int size,@Param("type") int type);
+
     //根据视频id获取视频
     Map selectAdminVideoByVideoId(@Param("id") String id);
 
@@ -300,6 +303,9 @@ public interface DictionaryMapper {
 
     //后台
     int updateWordPic(@Param("word") String word,@Param("pic") String pic);
+
+    //后台更新音频
+    int updateWordSentenceAudio(@Param("id") String id,@Param("audio") String audio);
 
     //更新已背单词数
     int updateLearnedWord(@Param("learned_word_number") int learned_word_number,@Param("id") String id,@Param("plan") String plan);
@@ -376,7 +382,7 @@ public interface DictionaryMapper {
     String selectMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word);
 
     //新增已掌握单词
-    int insertMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word);
+    int insertMasteredWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("meaning") String meaning);
 
     //删除已背
     int deleteRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("plan") String plan,@Param("word") String word);
@@ -385,7 +391,7 @@ public interface DictionaryMapper {
     String selectRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
 
     //更新已背单词
-    int insertRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
+    int insertRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level,@Param("meaning") String meaning);
 
     //更新已背单词
     int updateRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);

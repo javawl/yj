@@ -393,7 +393,7 @@
     SELECT *
     FROM `insist_day`
     WHERE user_id = #{id}
-    AND is_correct = 2
+    AND is_correct >= 2
     ORDER BY set_time
   </select>
 

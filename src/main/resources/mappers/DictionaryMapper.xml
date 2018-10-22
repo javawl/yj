@@ -775,10 +775,18 @@
     WHERE id = #{id}
   </update>
 
+
+
   <update id="updateWordPic" parameterType="string">
     UPDATE `dictionary` SET
     `pic`= #{pic}
     WHERE word = #{word}
+  </update>
+
+  <update id="updateWordSentenceAudio" parameterType="string">
+    UPDATE `dictionary` SET
+    `sentence_audio`= #{audio}
+    WHERE id = #{id}
   </update>
 
   <update id="updateLearnedWord">
@@ -941,13 +949,20 @@
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
-  SELECT word_id as id,word,meaning
+  SELECT word_id as id,word,real_meaning
   FROM reciting_words
   WHERE plan = #{plan}
   AND user_id = #{id}
   ORDER BY word
   LIMIT #{param1},#{param2}
 </select>
+
+  <select id="getWordByType" resultType="map" parameterType="int">
+    SELECT id,sentence
+    FROM dictionary
+    WHERE type = #{type}
+    LIMIT #{start},#{size}
+  </select>
 
   <select id="selectAdminWords" resultType="map">
     SELECT *
@@ -1067,7 +1082,7 @@
   </select>
 
   <insert id="insertMasteredWord" parameterType="string">
-    INSERT INTO mastered_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
+    INSERT INTO mastered_words (word_id, user_id, set_time, plan, word, meaning,real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word},#{meaning},#{meaning})
   </insert>
 
   <select id="selectMasteredWord" parameterType="string" resultType="string">
@@ -1083,7 +1098,7 @@
   </delete>
 
   <insert id="insertRecitingWord" parameterType="string">
-    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word})
+    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word, meaning, real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word}, #{meaning}, #{real_meaning})
   </insert>
 
   <update id="updateRecitingWord" parameterType="string">

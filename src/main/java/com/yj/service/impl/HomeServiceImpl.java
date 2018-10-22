@@ -1584,6 +1584,7 @@ public class HomeServiceImpl implements IHomeService {
                         String right_time = String.valueOf(new Date().getTime());
                         String level = job.get("level").toString();
                         String word = job.get("word").toString();
+                        String meaning = job.get("meaning").toString();
                         //判断是否掌握
                         if (Integer.valueOf(level) == 5){
                             String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
@@ -1594,7 +1595,7 @@ public class HomeServiceImpl implements IHomeService {
                                     //删不了说明没有，是点pass进来的背单词数加一
                                     learned_word+=1;
                                 }
-                                int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word);
+                                int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
                                 if (resultMaster == 0){
                                     throw new Exception();
                                 }
@@ -1603,7 +1604,7 @@ public class HomeServiceImpl implements IHomeService {
                             String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
                             if (selectReciting == null){
                                 learned_word+=1;
-                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level);
+                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning);
                                 if (resultReciting == 0){
                                     throw new Exception();
                                 }
