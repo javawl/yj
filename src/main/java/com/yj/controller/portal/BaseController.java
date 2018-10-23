@@ -1,8 +1,5 @@
 package com.yj.controller.portal;
 
-import com.yj.common.ServerResponse;
-import com.yj.pojo.User;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.Error_correctionMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Error_correction" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="word_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="paraphrase" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="real_meaning" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="sentence" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="other_sentence" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="other" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, word_id, user_id, paraphrase, real_meaning, sentence, other_sentence, other
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from error_correction
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from error_correction
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Error_correction" >
+    insert into error_correction (id, word_id, user_id, 
+      paraphrase, real_meaning, sentence, 
+      other_sentence, other)
+    values (#{id,jdbcType=INTEGER}, #{wordId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{paraphrase,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR}, 
+      #{otherSentence,jdbcType=VARCHAR}, #{other,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Error_correction" >
+    insert into error_correction
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="wordId != null" >
+        word_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="paraphrase != null" >
+        paraphrase,
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning,
+      </if>
+      <if test="sentence != null" >
+        sentence,
+      </if>
+      <if test="otherSentence != null" >
+        other_sentence,
+      </if>
+      <if test="other != null" >
+        other,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="wordId != null" >
+        #{wordId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="paraphrase != null" >
+        #{paraphrase,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="sentence != null" >
+        #{sentence,jdbcType=VARCHAR},
+      </if>
+      <if test="otherSentence != null" >
+        #{otherSentence,jdbcType=VARCHAR},
+      </if>
+      <if test="other != null" >
+        #{other,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Error_correction" >
+    update error_correction
+    <set >
+      <if test="wordId != null" >
+        word_id = #{wordId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="paraphrase != null" >
+        paraphrase = #{paraphrase,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="sentence != null" >
+        sentence = #{sentence,jdbcType=VARCHAR},
+      </if>
+      <if test="otherSentence != null" >
+        other_sentence = #{otherSentence,jdbcType=VARCHAR},
+      </if>
+      <if test="other != null" >
+        other = #{other,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Error_correction" >
+    update error_correction
+    set word_id = #{wordId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      paraphrase = #{paraphrase,jdbcType=VARCHAR},
+      real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      sentence = #{sentence,jdbcType=VARCHAR},
+      other_sentence = #{otherSentence,jdbcType=VARCHAR},
+      other = #{other,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -2,16 +2,10 @@ package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yj.common.CommonFunc;
-import com.yj.common.Const;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
-import com.yj.dao.UserMapper;
-import com.yj.pojo.User;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
-import com.yj.service.IUserService;
-import com.yj.util.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -23,10 +17,8 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 /**

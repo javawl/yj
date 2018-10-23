@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.FeedsMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Feeds" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="title" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="content" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="pic" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="video" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="auther_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="comments" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="favours" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="likes" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="cover_select" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="views" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="set_time" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="kind" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, title, content, pic, video, auther_id, comments, favours, likes, cover_select, 
+    views, set_time, kind
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from feeds
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from feeds
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Feeds" >
+    insert into feeds (id, title, content, 
+      pic, video, auther_id, 
+      comments, favours, likes, 
+      cover_select, views, set_time, 
+      kind)
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+      #{pic,jdbcType=VARCHAR}, #{video,jdbcType=VARCHAR}, #{autherId,jdbcType=VARCHAR}, 
+      #{comments,jdbcType=INTEGER}, #{favours,jdbcType=INTEGER}, #{likes,jdbcType=INTEGER}, 
+      #{coverSelect,jdbcType=INTEGER}, #{views,jdbcType=INTEGER}, #{setTime,jdbcType=VARCHAR}, 
+      #{kind,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Feeds" >
+    insert into feeds
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="pic != null" >
+        pic,
+      </if>
+      <if test="video != null" >
+        video,
+      </if>
+      <if test="autherId != null" >
+        auther_id,
+      </if>
+      <if test="comments != null" >
+        comments,
+      </if>
+      <if test="favours != null" >
+        favours,
+      </if>
+      <if test="likes != null" >
+        likes,
+      </if>
+      <if test="coverSelect != null" >
+        cover_select,
+      </if>
+      <if test="views != null" >
+        views,
+      </if>
+      <if test="setTime != null" >
+        set_time,
+      </if>
+      <if test="kind != null" >
+        kind,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="pic != null" >
+        #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="video != null" >
+        #{video,jdbcType=VARCHAR},
+      </if>
+      <if test="autherId != null" >
+        #{autherId,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="favours != null" >
+        #{favours,jdbcType=INTEGER},
+      </if>
+      <if test="likes != null" >
+        #{likes,jdbcType=INTEGER},
+      </if>
+      <if test="coverSelect != null" >
+        #{coverSelect,jdbcType=INTEGER},
+      </if>
+      <if test="views != null" >
+        #{views,jdbcType=INTEGER},
+      </if>
+      <if test="setTime != null" >
+        #{setTime,jdbcType=VARCHAR},
+      </if>
+      <if test="kind != null" >
+        #{kind,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Feeds" >
+    update feeds
+    <set >
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="pic != null" >
+        pic = #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="video != null" >
+        video = #{video,jdbcType=VARCHAR},
+      </if>
+      <if test="autherId != null" >
+        auther_id = #{autherId,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        comments = #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="favours != null" >
+        favours = #{favours,jdbcType=INTEGER},
+      </if>
+      <if test="likes != null" >
+        likes = #{likes,jdbcType=INTEGER},
+      </if>
+      <if test="coverSelect != null" >
+        cover_select = #{coverSelect,jdbcType=INTEGER},
+      </if>
+      <if test="views != null" >
+        views = #{views,jdbcType=INTEGER},
+      </if>
+      <if test="setTime != null" >
+        set_time = #{setTime,jdbcType=VARCHAR},
+      </if>
+      <if test="kind != null" >
+        kind = #{kind,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Feeds" >
+    update feeds
+    set title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      pic = #{pic,jdbcType=VARCHAR},
+      video = #{video,jdbcType=VARCHAR},
+      auther_id = #{autherId,jdbcType=VARCHAR},
+      comments = #{comments,jdbcType=INTEGER},
+      favours = #{favours,jdbcType=INTEGER},
+      likes = #{likes,jdbcType=INTEGER},
+      cover_select = #{coverSelect,jdbcType=INTEGER},
+      views = #{views,jdbcType=INTEGER},
+      set_time = #{setTime,jdbcType=VARCHAR},
+      kind = #{kind,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

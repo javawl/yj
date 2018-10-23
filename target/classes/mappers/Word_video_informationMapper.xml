@@ -9,6 +9,9 @@
       <arg column="sentence" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="sentence_audio" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="translation" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="views" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="comments" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="favours" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="video_name" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="img" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="tag" jdbcType="VARCHAR" javaType="java.lang.String" />
@@ -19,8 +22,8 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, word_usage, rank, sentence, sentence_audio, translation, video_name, img, tag, 
-    video, word_id, filemd, subindex
+    id, word_usage, rank, sentence, sentence_audio, translation, views, comments, favours, 
+    video_name, img, tag, video, word_id, filemd, subindex
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -35,11 +38,13 @@
   <insert id="insert" parameterType="com.yj.pojo.Word_video_information" >
     insert into word_video_information (id, word_usage, rank, 
       sentence, sentence_audio, translation, 
+      views, comments, favours, 
       video_name, img, tag, 
       video, word_id, filemd, 
       subindex)
     values (#{id,jdbcType=INTEGER}, #{wordUsage,jdbcType=VARCHAR}, #{rank,jdbcType=DOUBLE}, 
       #{sentence,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{translation,jdbcType=VARCHAR}, 
+      #{views,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER}, #{favours,jdbcType=INTEGER}, 
       #{videoName,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR}, #{tag,jdbcType=VARCHAR}, 
       #{video,jdbcType=VARCHAR}, #{wordId,jdbcType=INTEGER}, #{filemd,jdbcType=VARCHAR}, 
       #{subindex,jdbcType=VARCHAR})
@@ -64,6 +69,15 @@
       </if>
       <if test="translation != null" >
         translation,
+      </if>
+      <if test="views != null" >
+        views,
+      </if>
+      <if test="comments != null" >
+        comments,
+      </if>
+      <if test="favours != null" >
+        favours,
       </if>
       <if test="videoName != null" >
         video_name,
@@ -106,6 +120,15 @@
       <if test="translation != null" >
         #{translation,jdbcType=VARCHAR},
       </if>
+      <if test="views != null" >
+        #{views,jdbcType=INTEGER},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="favours != null" >
+        #{favours,jdbcType=INTEGER},
+      </if>
       <if test="videoName != null" >
         #{videoName,jdbcType=VARCHAR},
       </if>
@@ -147,6 +170,15 @@
       <if test="translation != null" >
         translation = #{translation,jdbcType=VARCHAR},
       </if>
+      <if test="views != null" >
+        views = #{views,jdbcType=INTEGER},
+      </if>
+      <if test="comments != null" >
+        comments = #{comments,jdbcType=INTEGER},
+      </if>
+      <if test="favours != null" >
+        favours = #{favours,jdbcType=INTEGER},
+      </if>
       <if test="videoName != null" >
         video_name = #{videoName,jdbcType=VARCHAR},
       </if>
@@ -178,6 +210,9 @@
       sentence = #{sentence,jdbcType=VARCHAR},
       sentence_audio = #{sentenceAudio,jdbcType=VARCHAR},
       translation = #{translation,jdbcType=VARCHAR},
+      views = #{views,jdbcType=INTEGER},
+      comments = #{comments,jdbcType=INTEGER},
+      favours = #{favours,jdbcType=INTEGER},
       video_name = #{videoName,jdbcType=VARCHAR},
       img = #{img,jdbcType=VARCHAR},
       tag = #{tag,jdbcType=VARCHAR},

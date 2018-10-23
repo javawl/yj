@@ -45,13 +45,17 @@ public class Dictionary {
 
     private String phrase;
 
+    private Integer favours;
+
     private String synonym;
 
     private String wordOfSimilarForm;
 
     private String stemAffix;
 
-    public Dictionary(Integer id, String word, String meaning, String phoneticSymbolEn, String pronunciationEn, String sentence, String pic, String tv, Integer type, String phoneticSymbolUs, String pronunciationUs, String phoneticSymbol, String pronunciation, String sentenceCn, String sentenceAudio, String realMeaning, String phoneticSymbolEnMumbler, String pronunciationEnMumbler, String phoneticSymbolUsMumbler, String pronunciationUsMumbler, String meaningMumbler, String phrase, String synonym, String wordOfSimilarForm, String stemAffix) {
+    private String paraphrase;
+
+    public Dictionary(Integer id, String word, String meaning, String phoneticSymbolEn, String pronunciationEn, String sentence, String pic, String tv, Integer type, String phoneticSymbolUs, String pronunciationUs, String phoneticSymbol, String pronunciation, String sentenceCn, String sentenceAudio, String realMeaning, String phoneticSymbolEnMumbler, String pronunciationEnMumbler, String phoneticSymbolUsMumbler, String pronunciationUsMumbler, String meaningMumbler, String phrase, Integer favours, String synonym, String wordOfSimilarForm, String stemAffix, String paraphrase) {
         this.id = id;
         this.word = word;
         this.meaning = meaning;
@@ -74,9 +78,11 @@ public class Dictionary {
         this.pronunciationUsMumbler = pronunciationUsMumbler;
         this.meaningMumbler = meaningMumbler;
         this.phrase = phrase;
+        this.favours = favours;
         this.synonym = synonym;
         this.wordOfSimilarForm = wordOfSimilarForm;
         this.stemAffix = stemAffix;
+        this.paraphrase = paraphrase;
     }
 
     public Dictionary() {
@@ -259,6 +265,14 @@ public class Dictionary {
         this.phrase = phrase == null ? null : phrase.trim();
     }
 
+    public Integer getFavours() {
+        return favours;
+    }
+
+    public void setFavours(Integer favours) {
+        this.favours = favours;
+    }
+
     public String getSynonym() {
         return synonym;
     }
@@ -281,5 +295,13 @@ public class Dictionary {
 
     public void setStemAffix(String stemAffix) {
         this.stemAffix = stemAffix == null ? null : stemAffix.trim();
+    }
+
+    public String getParaphrase() {
+        return paraphrase;
+    }
+
+    public void setParaphrase(String paraphrase) {
+        this.paraphrase = paraphrase == null ? null : paraphrase.trim();
     }
 }

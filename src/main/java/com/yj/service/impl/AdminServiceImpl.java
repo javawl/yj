@@ -1,6 +1,5 @@
 package com.yj.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 //import com.iflytek.cloud.speech.*;
 import com.yj.common.Const;
@@ -14,9 +13,7 @@ import com.yj.util.FTPUtill;
 import com.yj.util.XunfeiLib;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

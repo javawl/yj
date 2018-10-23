@@ -7,9 +7,19 @@ public class User {
 
     private String password;
 
+    private String portrait;
+
     private String phone;
 
     private Integer gender;
+
+    private String myPlan;
+
+    private Integer planDays;
+
+    private Integer planWordsNumber;
+
+    private String personalitySignature;
 
     private String wechat;
 
@@ -19,16 +29,30 @@ public class User {
 
     private String lastLogin;
 
-    public User(Integer id, String username, String password, String phone, Integer gender, String wechat, String qq, String registerTime, String lastLogin) {
+    private Integer insistDay;
+
+    private Integer whetherOpen;
+
+    private Integer clockDay;
+
+    public User(Integer id, String username, String password, String portrait, String phone, Integer gender, String myPlan, Integer planDays, Integer planWordsNumber, String personalitySignature, String wechat, String qq, String registerTime, String lastLogin, Integer insistDay, Integer whetherOpen, Integer clockDay) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.portrait = portrait;
         this.phone = phone;
         this.gender = gender;
+        this.myPlan = myPlan;
+        this.planDays = planDays;
+        this.planWordsNumber = planWordsNumber;
+        this.personalitySignature = personalitySignature;
         this.wechat = wechat;
         this.qq = qq;
         this.registerTime = registerTime;
         this.lastLogin = lastLogin;
+        this.insistDay = insistDay;
+        this.whetherOpen = whetherOpen;
+        this.clockDay = clockDay;
     }
 
     public User() {
@@ -59,6 +83,14 @@ public class User {
         this.password = password == null ? null : password.trim();
     }
 
+    public String getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(String portrait) {
+        this.portrait = portrait == null ? null : portrait.trim();
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -73,6 +105,38 @@ public class User {
 
     public void setGender(Integer gender) {
         this.gender = gender;
+    }
+
+    public String getMyPlan() {
+        return myPlan;
+    }
+
+    public void setMyPlan(String myPlan) {
+        this.myPlan = myPlan == null ? null : myPlan.trim();
+    }
+
+    public Integer getPlanDays() {
+        return planDays;
+    }
+
+    public void setPlanDays(Integer planDays) {
+        this.planDays = planDays;
+    }
+
+    public Integer getPlanWordsNumber() {
+        return planWordsNumber;
+    }
+
+    public void setPlanWordsNumber(Integer planWordsNumber) {
+        this.planWordsNumber = planWordsNumber;
+    }
+
+    public String getPersonalitySignature() {
+        return personalitySignature;
+    }
+
+    public void setPersonalitySignature(String personalitySignature) {
+        this.personalitySignature = personalitySignature == null ? null : personalitySignature.trim();
     }
 
     public String getWechat() {
@@ -105,5 +169,29 @@ public class User {
 
     public void setLastLogin(String lastLogin) {
         this.lastLogin = lastLogin == null ? null : lastLogin.trim();
+    }
+
+    public Integer getInsistDay() {
+        return insistDay;
+    }
+
+    public void setInsistDay(Integer insistDay) {
+        this.insistDay = insistDay;
+    }
+
+    public Integer getWhetherOpen() {
+        return whetherOpen;
+    }
+
+    public void setWhetherOpen(Integer whetherOpen) {
+        this.whetherOpen = whetherOpen;
+    }
+
+    public Integer getClockDay() {
+        return clockDay;
+    }
+
+    public void setClockDay(Integer clockDay) {
+        this.clockDay = clockDay;
     }
 }

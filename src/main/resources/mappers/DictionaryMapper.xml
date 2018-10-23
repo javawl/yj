@@ -25,17 +25,19 @@
       <arg column="pronunciation_us_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="meaning_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="phrase" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="favours" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="synonym" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="word_of_similar_form" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="stem_affix" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="paraphrase" jdbcType="VARCHAR" javaType="java.lang.String" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
     id, word, meaning, phonetic_symbol_en, pronunciation_en, sentence, pic, tv, type, 
     phonetic_symbol_us, pronunciation_us, phonetic_symbol, pronunciation, sentence_cn, 
     sentence_audio, real_meaning, phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
-    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler, phrase, synonym, 
-    word_of_similar_form, stem_affix
+    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler, phrase, favours, 
+    synonym, word_of_similar_form, stem_affix, paraphrase
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -55,8 +57,9 @@
       sentence_cn, sentence_audio, real_meaning, 
       phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
       phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, 
-      meaning_Mumbler, phrase, synonym, 
-      word_of_similar_form, stem_affix)
+      meaning_Mumbler, phrase, favours, 
+      synonym, word_of_similar_form, stem_affix, 
+      paraphrase)
     values (#{id,jdbcType=INTEGER}, #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR}, 
       #{phoneticSymbolEn,jdbcType=VARCHAR}, #{pronunciationEn,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR}, 
       #{pic,jdbcType=VARCHAR}, #{tv,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{phoneticSymbolUs,jdbcType=VARCHAR}, 
@@ -64,8 +67,9 @@
       #{sentenceCn,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, 
       #{phoneticSymbolEnMumbler,jdbcType=VARCHAR}, #{pronunciationEnMumbler,jdbcType=VARCHAR}, 
       #{phoneticSymbolUsMumbler,jdbcType=VARCHAR}, #{pronunciationUsMumbler,jdbcType=VARCHAR}, 
-      #{meaningMumbler,jdbcType=VARCHAR}, #{phrase,jdbcType=VARCHAR}, #{synonym,jdbcType=VARCHAR}, 
-      #{wordOfSimilarForm,jdbcType=VARCHAR}, #{stemAffix,jdbcType=VARCHAR})
+      #{meaningMumbler,jdbcType=VARCHAR}, #{phrase,jdbcType=VARCHAR}, #{favours,jdbcType=INTEGER}, 
+      #{synonym,jdbcType=VARCHAR}, #{wordOfSimilarForm,jdbcType=VARCHAR}, #{stemAffix,jdbcType=VARCHAR}, 
+      #{paraphrase,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.yj.pojo.Dictionary" >
     insert into dictionary
@@ -136,6 +140,9 @@
       <if test="phrase != null" >
         phrase,
       </if>
+      <if test="favours != null" >
+        favours,
+      </if>
       <if test="synonym != null" >
         synonym,
       </if>
@@ -144,6 +151,9 @@
       </if>
       <if test="stemAffix != null" >
         stem_affix,
+      </if>
+      <if test="paraphrase != null" >
+        paraphrase,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -213,6 +223,9 @@
       <if test="phrase != null" >
         #{phrase,jdbcType=VARCHAR},
       </if>
+      <if test="favours != null" >
+        #{favours,jdbcType=INTEGER},
+      </if>
       <if test="synonym != null" >
         #{synonym,jdbcType=VARCHAR},
       </if>
@@ -221,6 +234,9 @@
       </if>
       <if test="stemAffix != null" >
         #{stemAffix,jdbcType=VARCHAR},
+      </if>
+      <if test="paraphrase != null" >
+        #{paraphrase,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -290,6 +306,9 @@
       <if test="phrase != null" >
         phrase = #{phrase,jdbcType=VARCHAR},
       </if>
+      <if test="favours != null" >
+        favours = #{favours,jdbcType=INTEGER},
+      </if>
       <if test="synonym != null" >
         synonym = #{synonym,jdbcType=VARCHAR},
       </if>
@@ -298,6 +317,9 @@
       </if>
       <if test="stemAffix != null" >
         stem_affix = #{stemAffix,jdbcType=VARCHAR},
+      </if>
+      <if test="paraphrase != null" >
+        paraphrase = #{paraphrase,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -325,12 +347,13 @@
       pronunciation_us_Mumbler = #{pronunciationUsMumbler,jdbcType=VARCHAR},
       meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
       phrase = #{phrase,jdbcType=VARCHAR},
+      favours = #{favours,jdbcType=INTEGER},
       synonym = #{synonym,jdbcType=VARCHAR},
       word_of_similar_form = #{wordOfSimilarForm,jdbcType=VARCHAR},
-      stem_affix = #{stemAffix,jdbcType=VARCHAR}
+      stem_affix = #{stemAffix,jdbcType=VARCHAR},
+      paraphrase = #{paraphrase,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
 
 
   <!--下面是自己写的-->
@@ -949,13 +972,13 @@
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
-  SELECT word_id as id,word,real_meaning
-  FROM reciting_words
-  WHERE plan = #{plan}
-  AND user_id = #{id}
-  ORDER BY word
-  LIMIT #{param1},#{param2}
-</select>
+    SELECT word_id as id,word,real_meaning
+    FROM reciting_words
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+    ORDER BY word
+    LIMIT #{param1},#{param2}
+  </select>
 
   <select id="getWordByType" resultType="map" parameterType="int">
     SELECT id,sentence
@@ -1121,7 +1144,7 @@
     LIMIT 0,3) tb WHERE tb.id = subtitles.video_id
   </select>
 
-<!--获取三条视频信息不含字幕-->
+  <!--获取三条视频信息不含字幕-->
   <select id="getVideoInfoByWordIdWithOutSubtitles" resultType="map" parameterType="string">
     SELECT * FROM word_video_information
     WHERE word_video_information.word_id = #{id}
@@ -1195,7 +1218,7 @@
     FROM dictionary
     WHERE word = #{word}
   </select>
-  
+
   <delete id="deleteWordInfo" parameterType="string">
     DELETE FROM dictionary
     WHERE word = #{word}

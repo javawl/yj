@@ -18,12 +18,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
@@ -172,6 +170,10 @@ public class UserServiceImpl implements IUserService {
                 User user = new User();
                 user.setPassword(md5Password);
                 user.setPhone(phone);
+                String portrait = "user/";
+                int number = (int)(1+Math.random()*(20-1+1));
+                portrait = portrait + String.valueOf(number) + ".jpg";
+                user.setPortrait(portrait);
                 //时间戳
                 user.setRegisterTime(String.valueOf(new Date().getTime()));
 

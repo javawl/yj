@@ -13,6 +13,12 @@ public class Word_video_information {
 
     private String translation;
 
+    private Integer views;
+
+    private Integer comments;
+
+    private Integer favours;
+
     private String videoName;
 
     private String img;
@@ -27,13 +33,16 @@ public class Word_video_information {
 
     private String subindex;
 
-    public Word_video_information(Integer id, String wordUsage, Double rank, String sentence, String sentenceAudio, String translation, String videoName, String img, String tag, String video, Integer wordId, String filemd, String subindex) {
+    public Word_video_information(Integer id, String wordUsage, Double rank, String sentence, String sentenceAudio, String translation, Integer views, Integer comments, Integer favours, String videoName, String img, String tag, String video, Integer wordId, String filemd, String subindex) {
         this.id = id;
         this.wordUsage = wordUsage;
         this.rank = rank;
         this.sentence = sentence;
         this.sentenceAudio = sentenceAudio;
         this.translation = translation;
+        this.views = views;
+        this.comments = comments;
+        this.favours = favours;
         this.videoName = videoName;
         this.img = img;
         this.tag = tag;
@@ -93,6 +102,30 @@ public class Word_video_information {
 
     public void setTranslation(String translation) {
         this.translation = translation == null ? null : translation.trim();
+    }
+
+    public Integer getViews() {
+        return views;
+    }
+
+    public void setViews(Integer views) {
+        this.views = views;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
+    }
+
+    public Integer getFavours() {
+        return favours;
+    }
+
+    public void setFavours(Integer favours) {
+        this.favours = favours;
     }
 
     public String getVideoName() {

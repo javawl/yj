@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.Feeds_innerMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Feeds_inner" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="feeds_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="paragraph" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="pic" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="order" jdbcType="INTEGER" javaType="java.lang.Integer" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, feeds_id, paragraph, type, pic, order
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from feeds_inner
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from feeds_inner
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Feeds_inner" >
+    insert into feeds_inner (id, feeds_id, paragraph, 
+      type, pic, order)
+    values (#{id,jdbcType=INTEGER}, #{feedsId,jdbcType=INTEGER}, #{paragraph,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{pic,jdbcType=VARCHAR}, #{order,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Feeds_inner" >
+    insert into feeds_inner
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="feedsId != null" >
+        feeds_id,
+      </if>
+      <if test="paragraph != null" >
+        paragraph,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="pic != null" >
+        pic,
+      </if>
+      <if test="order != null" >
+        order,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="feedsId != null" >
+        #{feedsId,jdbcType=INTEGER},
+      </if>
+      <if test="paragraph != null" >
+        #{paragraph,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="pic != null" >
+        #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="order != null" >
+        #{order,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Feeds_inner" >
+    update feeds_inner
+    <set >
+      <if test="feedsId != null" >
+        feeds_id = #{feedsId,jdbcType=INTEGER},
+      </if>
+      <if test="paragraph != null" >
+        paragraph = #{paragraph,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="pic != null" >
+        pic = #{pic,jdbcType=VARCHAR},
+      </if>
+      <if test="order != null" >
+        order = #{order,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Feeds_inner" >
+    update feeds_inner
+    set feeds_id = #{feedsId,jdbcType=INTEGER},
+      paragraph = #{paragraph,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      pic = #{pic,jdbcType=VARCHAR},
+      order = #{order,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

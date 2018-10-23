@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.Reciting_wordsMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Reciting_words" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="word_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="word" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="meaning" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="level" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="plan" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="real_meaning" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="meaning_Mumbler" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="set_time" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, word_id, user_id, word, meaning, level, plan, real_meaning, meaning_Mumbler, 
+    set_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from reciting_words
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from reciting_words
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Reciting_words" >
+    insert into reciting_words (id, word_id, user_id, 
+      word, meaning, level, 
+      plan, real_meaning, meaning_Mumbler, 
+      set_time)
+    values (#{id,jdbcType=INTEGER}, #{wordId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
+      #{plan,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, #{meaningMumbler,jdbcType=VARCHAR}, 
+      #{setTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Reciting_words" >
+    insert into reciting_words
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="wordId != null" >
+        word_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="word != null" >
+        word,
+      </if>
+      <if test="meaning != null" >
+        meaning,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="plan != null" >
+        plan,
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning,
+      </if>
+      <if test="meaningMumbler != null" >
+        meaning_Mumbler,
+      </if>
+      <if test="setTime != null" >
+        set_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="wordId != null" >
+        #{wordId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="word != null" >
+        #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="meaning != null" >
+        #{meaning,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="plan != null" >
+        #{plan,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="meaningMumbler != null" >
+        #{meaningMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="setTime != null" >
+        #{setTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Reciting_words" >
+    update reciting_words
+    <set >
+      <if test="wordId != null" >
+        word_id = #{wordId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="word != null" >
+        word = #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="meaning != null" >
+        meaning = #{meaning,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="plan != null" >
+        plan = #{plan,jdbcType=VARCHAR},
+      </if>
+      <if test="realMeaning != null" >
+        real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      </if>
+      <if test="meaningMumbler != null" >
+        meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
+      </if>
+      <if test="setTime != null" >
+        set_time = #{setTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Reciting_words" >
+    update reciting_words
+    set word_id = #{wordId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      word = #{word,jdbcType=VARCHAR},
+      meaning = #{meaning,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      plan = #{plan,jdbcType=VARCHAR},
+      real_meaning = #{realMeaning,jdbcType=VARCHAR},
+      meaning_Mumbler = #{meaningMumbler,jdbcType=VARCHAR},
+      set_time = #{setTime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.Daily_picMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Daily_pic" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="small_pic" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="favours" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="daily_pic" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="set_time" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, small_pic, favours, daily_pic, set_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from daily_pic
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from daily_pic
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Daily_pic" >
+    insert into daily_pic (id, small_pic, favours, 
+      daily_pic, set_time)
+    values (#{id,jdbcType=INTEGER}, #{smallPic,jdbcType=VARCHAR}, #{favours,jdbcType=INTEGER}, 
+      #{dailyPic,jdbcType=VARCHAR}, #{setTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Daily_pic" >
+    insert into daily_pic
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="smallPic != null" >
+        small_pic,
+      </if>
+      <if test="favours != null" >
+        favours,
+      </if>
+      <if test="dailyPic != null" >
+        daily_pic,
+      </if>
+      <if test="setTime != null" >
+        set_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="smallPic != null" >
+        #{smallPic,jdbcType=VARCHAR},
+      </if>
+      <if test="favours != null" >
+        #{favours,jdbcType=INTEGER},
+      </if>
+      <if test="dailyPic != null" >
+        #{dailyPic,jdbcType=VARCHAR},
+      </if>
+      <if test="setTime != null" >
+        #{setTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Daily_pic" >
+    update daily_pic
+    <set >
+      <if test="smallPic != null" >
+        small_pic = #{smallPic,jdbcType=VARCHAR},
+      </if>
+      <if test="favours != null" >
+        favours = #{favours,jdbcType=INTEGER},
+      </if>
+      <if test="dailyPic != null" >
+        daily_pic = #{dailyPic,jdbcType=VARCHAR},
+      </if>
+      <if test="setTime != null" >
+        set_time = #{setTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Daily_pic" >
+    update daily_pic
+    set small_pic = #{smallPic,jdbcType=VARCHAR},
+      favours = #{favours,jdbcType=INTEGER},
+      daily_pic = #{dailyPic,jdbcType=VARCHAR},
+      set_time = #{setTime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

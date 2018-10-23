@@ -3,13 +3,11 @@ package com.yj.service;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.ServerResponse;
 import com.yj.pojo.User;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.Cookie;
 import java.util.List;
 import java.util.Map;
 

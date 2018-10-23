@@ -1,36 +1,21 @@
 package com.yj.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.serializer.IntegerCodec;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.github.pagehelper.StringUtil;
 import com.yj.dao.DictionaryMapper;
+import com.yj.dao.UserMapper;
 import com.yj.service.IHomeService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
-import com.yj.controller.portal.BaseController;
-import com.yj.dao.UserMapper;
-import com.yj.pojo.User;
-import com.yj.util.AES;
-import com.yj.util.MD5Util;
-import org.apache.commons.lang.StringUtils;
-import org.hamcrest.core.Is;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 import java.util.*;
 /**
  * Created by 63254 on 2018/8/26.

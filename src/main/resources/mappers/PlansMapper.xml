@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yj.dao.PlansMapper" >
+  <resultMap id="BaseResultMap" type="com.yj.pojo.Plans" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="plan" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="word_number" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="type_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="dictionary_type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, plan, word_number, type_id, dictionary_type
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from plans
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from plans
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yj.pojo.Plans" >
+    insert into plans (id, plan, word_number, 
+      type_id, dictionary_type)
+    values (#{id,jdbcType=INTEGER}, #{plan,jdbcType=VARCHAR}, #{wordNumber,jdbcType=INTEGER}, 
+      #{typeId,jdbcType=INTEGER}, #{dictionaryType,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yj.pojo.Plans" >
+    insert into plans
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="plan != null" >
+        plan,
+      </if>
+      <if test="wordNumber != null" >
+        word_number,
+      </if>
+      <if test="typeId != null" >
+        type_id,
+      </if>
+      <if test="dictionaryType != null" >
+        dictionary_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="plan != null" >
+        #{plan,jdbcType=VARCHAR},
+      </if>
+      <if test="wordNumber != null" >
+        #{wordNumber,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="dictionaryType != null" >
+        #{dictionaryType,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yj.pojo.Plans" >
+    update plans
+    <set >
+      <if test="plan != null" >
+        plan = #{plan,jdbcType=VARCHAR},
+      </if>
+      <if test="wordNumber != null" >
+        word_number = #{wordNumber,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null" >
+        type_id = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="dictionaryType != null" >
+        dictionary_type = #{dictionaryType,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Plans" >
+    update plans
+    set plan = #{plan,jdbcType=VARCHAR},
+      word_number = #{wordNumber,jdbcType=INTEGER},
+      type_id = #{typeId,jdbcType=INTEGER},
+      dictionary_type = #{dictionaryType,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
