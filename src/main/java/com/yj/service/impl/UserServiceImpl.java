@@ -89,8 +89,8 @@ public class UserServiceImpl implements IUserService {
         String token = CommonFunc.generateToken(Const.PHONE_REGISTER_SALT);
 
         //发送验证码
-//        String PhoneCode = func.sendPhoneMessage(phone);
-        String PhoneCode = "1234";
+        String PhoneCode = func.sendPhoneMessage(phone);
+//        String PhoneCode = "1234";
 
         //创建map来装几条信息
         Map<String,String> m1 = new HashMap<String,String>();
