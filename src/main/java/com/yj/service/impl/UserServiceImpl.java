@@ -89,8 +89,8 @@ public class UserServiceImpl implements IUserService {
         String token = CommonFunc.generateToken(Const.PHONE_REGISTER_SALT);
 
         //发送验证码
-        String PhoneCode = func.sendPhoneMessage(phone);
-//        String PhoneCode = "1234";
+//        String PhoneCode = func.sendPhoneMessage(phone);
+        String PhoneCode = "1234";
 
         //创建map来装几条信息
         Map<String,String> m1 = new HashMap<String,String>();
@@ -174,6 +174,12 @@ public class UserServiceImpl implements IUserService {
                 int number = (int)(1+Math.random()*(20-1+1));
                 portrait = portrait + String.valueOf(number) + ".jpg";
                 user.setPortrait(portrait);
+                user.setGender(0);
+                user.setPlanDays(0);
+                user.setPlanWordsNumber(0);
+                user.setInsistDay(0);
+                user.setWhetherOpen(1);
+                user.setClockDay(0);
                 //时间戳
                 user.setRegisterTime(String.valueOf(new Date().getTime()));
 
