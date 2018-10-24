@@ -69,4 +69,19 @@ public class VariousController {
         //调用service层
         return iVariousService.favour_daily_pic(id,request);
     }
+
+
+    /**
+     * 每日一图的信息
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "daily_pic_info.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> daily_pic_info(String page,String size,HttpServletRequest request){
+        //调用service层
+        return iVariousService.daily_pic_info(page,size,request);
+    }
 }

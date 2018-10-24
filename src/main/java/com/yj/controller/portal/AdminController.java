@@ -2,6 +2,7 @@ package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yj.common.CommonFunc;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
 import com.yj.service.IAdminService;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 /**
@@ -198,6 +201,18 @@ public class AdminController {
 
 
     /**
+     * 删除某个单词所有信息
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "delete_daily_pic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse delete_daily_pic(String id, HttpServletResponse response){
+        return iAdminService.delete_daily_pic(id, response);
+    }
+
+
+    /**
      * 测试上传
      * @param file
      * @param response
@@ -217,6 +232,40 @@ public class AdminController {
             return ServerResponse.createByErrorMessage("更新失败");
         }
         return ServerResponse.createBySuccess("成功",url);
+    }
+
+
+
+
+
+    @RequestMapping(value = "upload_daily_pic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_daily_pic(@RequestParam(value = "daily_pic",required = false) MultipartFile daily_pic,@RequestParam(value = "small_pic",required = false) MultipartFile small_pic, String year,String month, String day, HttpServletResponse response, HttpServletRequest request){
+        if (!CommonFunc.isInteger(year)||!CommonFunc.isInteger(month)||!CommonFunc.isInteger(day)){
+            return ServerResponse.createByErrorMessage("年份 月份或者日期必须为数字！");
+        }
+        //获取时间错
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.MONTH, Integer.valueOf(month));
+        calendar.set(Calendar.YEAR, Integer.valueOf(year));
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(day));
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long date =calendar.getTime().getTime();
+        String set_time =  String.valueOf(date);
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name1 = iFileService.upload(daily_pic,path,"l_e/daily_pic");
+        String url1 = "daily_pic/"+name1;
+        String name2 = iFileService.upload(small_pic,path,"l_e/daily_pic");
+        String url2 = "daily_pic/"+name2;
+        //存到数据库
+        int result = dictionaryMapper.insertDailyPic(url2,url1,set_time);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url1);
     }
 
     /**

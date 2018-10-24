@@ -22,4 +22,7 @@ public interface IVariousService {
 
     //每日一句喜欢
     ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request);
+
+    //每日一图信息
+    ServerResponse<List<Map<Object,Object>>> daily_pic_info(String page,String size,HttpServletRequest request);
 }

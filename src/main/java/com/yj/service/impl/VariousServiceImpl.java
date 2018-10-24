@@ -128,6 +128,33 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> daily_pic_info(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //每日一句
+        List<Map> DailyPic = userMapper.getDailyPicInfo(start,Integer.valueOf(size));
+        //遍历加上前缀并且判断是否喜欢
+        List<Map<Object,Object>> DailyPicResult = new ArrayList<>();
+        for(int i = 0; i < DailyPic.size(); i++){
+            Map<Object,Object> singlePic = new HashMap<>();
+            singlePic.put("daily_pic",Const.FTP_PREFIX + DailyPic.get(i).get("daily_pic").toString());
+            singlePic.put("set_time",CommonFunc.getFormatTime(Long.valueOf(DailyPic.get(i).get("set_time").toString()),"yyyy/MM/dd"));
+            singlePic.put("small_pic",Const.FTP_PREFIX + DailyPic.get(i).get("small_pic").toString());
+            singlePic.put("id",DailyPic.get(i).get("id").toString());
+            DailyPicResult.add(singlePic);
+        }
+        return ServerResponse.createBySuccess(dictionaryMapper.countDailyPic(),DailyPicResult);
+    }
+
+
     //喜欢daily_pic取消喜欢
     public ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request){
         String token = request.getHeader("token");

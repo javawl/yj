@@ -13,7 +13,11 @@ import com.yj.util.FTPUtill;
 import com.yj.util.XunfeiLib;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,6 +108,30 @@ public class AdminServiceImpl implements IAdminService {
             }
         }
         return ServerResponse.createBySuccess("成功",videos_info);
+    }
+
+    public ServerResponse delete_daily_pic(String id, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除单词
+            int resultDictionary = dictionaryMapper.deleteDailyPic(id);
+            if (resultDictionary == 0){
+                throw new Exception();
+            }
+            //删除每日一图的喜欢
+            dictionaryMapper.deleteDailyPicFavourAdmin(id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
     }
 
 

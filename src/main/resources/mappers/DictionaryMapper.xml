@@ -739,7 +739,7 @@
 
   <update id="changeUserClockDayStatus" parameterType="string">
     UPDATE `user`
-    set insist_day = insist_day + 1
+    set clock_day = clock_day + 1
     WHERE id = #{id}
   </update>
 
@@ -822,6 +822,11 @@
   <insert id="insertFeedsComment" parameterType="string">
     INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
+  </insert>
+
+  <insert id="insertDailyPic" parameterType="string">
+    INSERT INTO daily_pic (small_pic, daily_pic, favours, set_time)
+    values (#{small_pic}, #{daily_pic}, 0, #{set_time})
   </insert>
 
 
@@ -959,6 +964,12 @@
     AND daily_pic_id = #{daily_pic_id}
   </delete>
 
+
+  <delete id="deleteDailyPicFavourAdmin" parameterType="string" >
+    delete from daily_pic_favour
+    WHERE daily_pic_id = #{id}
+  </delete>
+
   <delete id="deleteDictionaryFavour" parameterType="string" >
     delete from dictionary_favour
     WHERE user_id = #{user_id}
@@ -999,6 +1010,11 @@
     SELECT count(id)
     FROM dictionary
     WHERE type = #{type}
+  </select>
+
+  <select id="countDailyPic" resultType="string">
+    SELECT count(id)
+    FROM daily_pic
   </select>
 
   <select id="selectAdminVideo" resultType="map" parameterType="string">
@@ -1222,6 +1238,11 @@
   <delete id="deleteWordInfo" parameterType="string">
     DELETE FROM dictionary
     WHERE word = #{word}
+  </delete>
+
+  <delete id="deleteDailyPic" parameterType="string">
+    DELETE FROM daily_pic
+    WHERE id = #{id}
   </delete>
 
   <delete id="deleteWordSub" parameterType="string">

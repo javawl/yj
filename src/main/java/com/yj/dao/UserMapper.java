@@ -141,4 +141,8 @@ public interface UserMapper {
 
     //每日一句
     List<Map> getDailyPic(@Param("start") int start,@Param("size") int size,@Param("id") String id);
+
+
+    //每日一句信息
+    List<Map> getDailyPicInfo(@Param("start") int start,@Param("size") int size);
 }

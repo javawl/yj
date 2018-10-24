@@ -144,6 +144,9 @@ public interface DictionaryMapper {
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
+    //插入每日一图
+    int insertDailyPic(@Param("small_pic") String small_pic,@Param("daily_pic") String daily_pic,@Param("set_time") String set_time);
+
     //comment表插入数据
     int insertVideoComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
 
@@ -283,6 +286,9 @@ public interface DictionaryMapper {
     String countWord(@Param("type") String type);
 
     //后台
+    String countDailyPic();
+
+    //后台
     List<Map> selectAdminVideo(@Param("id") String id);
 
     //后台
@@ -313,6 +319,9 @@ public interface DictionaryMapper {
     int deleteWordInfo(@Param("word") String word);
 
     //后台
+    int deleteDailyPic(@Param("id") String id);
+
+    //后台
     List<Map> selectAllWord(@Param("word") String word);
 
     //后台
@@ -328,6 +337,9 @@ public interface DictionaryMapper {
 
     //后台
     int deleteWordVideo(@Param("word") String word);
+
+    //后台
+    int deleteDailyPicFavourAdmin(@Param("id") String id);
 
     //后台
     int existWordVideo(@Param("word") String word);

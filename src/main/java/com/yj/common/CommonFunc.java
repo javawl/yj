@@ -314,6 +314,8 @@ public class CommonFunc {
     public static String getZeroDate(){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
+        //说是先放出来，所以设置个之前的年份，如果哪天回归当天了，把下面这行代码删了
+        calendar.set(Calendar.YEAR, 2017);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 1);

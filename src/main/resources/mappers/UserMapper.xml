@@ -330,6 +330,14 @@
     AND daily_pic_favour.user_id = #{id}
   </select>
 
+
+  <select id="getDailyPicInfo" resultType="map">
+    SELECT  id,daily_pic,set_time,small_pic
+    FROM `daily_pic`
+    ORDER BY set_time desc
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
     SELECT my_plan
     FROM user
