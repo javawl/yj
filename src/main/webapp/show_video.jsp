@@ -1,3 +1,4 @@
+<%@ page import="com.yj.common.Const" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -5,9 +6,13 @@
     <title>后台管理系统</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
-//        var url = 'http://localhost:8088';
-        var url = 'http://47.107.62.22:8080';
-        var root_url = 'http://47.107.62.22/l_e/';
+        <%
+            String url = Const.DOMAIN_NAME;
+            String root_url = Const.FTP_PREFIX;
+        %>
+        var url = "<%=url %>";
+        //        var url = 'http://47.107.62.22:8080';
+        var root_url = "<%=root_url %>";
         function GetQueryString(name)
         {
             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");

@@ -374,13 +374,13 @@
     (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
     FROM feeds,`user`
     WHERE auther_id = `user`.id
-    ORDER BY 2*feeds.comments+feeds.likes DESC
+    ORDER BY feeds.set_time DESC
     LIMIT 0,3)
     UNION
     (SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
     FROM feeds,`user`
     WHERE auther_id = `user`.id
-    ORDER BY feeds.set_time DESC
+    ORDER BY 2*feeds.comments+feeds.likes DESC
     LIMIT 0,3)
   </select>
 

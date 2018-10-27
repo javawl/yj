@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -31,6 +33,8 @@ public class HomeServiceImpl implements IHomeService {
 
     @Autowired
     private ApplicationContext ctx;
+
+    private Logger logger = LoggerFactory.getLogger(HomeServiceImpl.class);
 
     @Override
     public ServerResponse<JSONObject> home_page_info(HttpServletRequest request){
@@ -110,7 +114,7 @@ public class HomeServiceImpl implements IHomeService {
                 for(int i = 0; i < feeds.size(); i++){
                     Map m2 = feeds.get(i);
                     Map<String,Object> m3 = new HashMap<String,Object>();
-                    //当type为0是图片，为1是视频
+                    //当type为0是视频，为1是图片
                     if (m2.get("cover_select").toString().equals("1")){
                         m3.put("type",0);
                         m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
@@ -1662,6 +1666,8 @@ public class HomeServiceImpl implements IHomeService {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 transactionManager.rollback(status);
+                logger.error("上传单词异常",e.getStackTrace());
+                logger.error("上传单词异常",e);
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
         }
