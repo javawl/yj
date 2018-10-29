@@ -1137,7 +1137,7 @@
   </delete>
 
   <insert id="insertRecitingWord" parameterType="string">
-    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word, meaning, real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word}, #{meaning}, #{real_meaning})
+    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word, meaning, real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word}, #{meaning}, #{meaning})
   </insert>
 
   <update id="updateRecitingWord" parameterType="string">

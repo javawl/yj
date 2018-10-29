@@ -17,6 +17,10 @@
         <button id="add_pic">添加一张图片</button>
         <button id="add_text">添加一段文字</button>
         <button id="submit">提交</button>
+        <button id="btn1">get</button>
+    </div>
+    <div id="special">
+
     </div>
     <script>
         <%
@@ -31,7 +35,6 @@
     <script type="text/javascript" src="<%=root_url %>"></script>
     <script type="text/javascript">
         var flag = 1;
-        var flag_pic = 0;
         var editor = new Array()
         var E = window.wangEditor;
 
@@ -39,7 +42,15 @@
         editor[1].create();
         document.getElementById('btn1').addEventListener('click', function () {
             // 读取 html
-            alert(editor1.txt.html())
+            alert(editor[1].txt.html());
+            var result = new Array();
+            for(var ii = 0; ii < flag; ii++){
+                if (editor[ii+1] == 'undefined'){
+                    result[ii] = editor[ii+1].txt.html();
+                }else {
+                    result[ii] = editor[ii+1].txt.html();
+                }
+            }
         }, false);
         document.getElementById('add_text').addEventListener('click', function () {
             flag++;
@@ -51,10 +62,10 @@
             editor[flag].create();
         }, false);
         document.getElementById('add_pic').addEventListener('click', function () {
-            flag_pic++;
+            flag++;
             var div_name = "#div"+flag;
             //添加div
-            $("#inner").append('<h2>上传需要插入的图片</h2> <input style="margin-bottom: 25px;" id="pic'+flag_pic+'" type="file">');
+            $("#inner").append('<h2>上传需要插入的图片</h2> <input style="margin-bottom: 25px;" id="pic'+flag+'" type="file">');
         }, false);
     </script>
 </body>

@@ -921,6 +921,17 @@ public class HomeServiceImpl implements IHomeService {
             //去评论评论表中查
             List<Map<Object,Object>> comment_comment = dictionaryMapper.getCommentByCommentId(id);
             for (int n_i = 0; n_i < comment_comment.size(); n_i++){
+
+                //todo 是否点赞
+                Map ReplyCommentIsLike = dictionaryMapper.commentReplyFindIsLike(uid, comment_comment.get(n_i).get("id").toString());
+                if (ReplyCommentIsLike == null){
+                    //未点赞
+                    comment_comment.get(n_i).put("is_like",0);
+                }else {
+                    comment_comment.get(n_i).put("is_like",1);
+                }
+
+
                 //时间转换和图片格式处理
                 String change_reply_pic_url = Const.FTP_PREFIX + comment_comment.get(n_i).get("portrait");
                 comment_comment.get(n_i).put("portrait", change_reply_pic_url);
