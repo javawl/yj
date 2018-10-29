@@ -19,10 +19,9 @@
         </commentGenerator>
 
         <!--jdbc的数据库连接 -->
-        <!--connectionURL="jdbc:mysql://123.207.85.37:3306/language_environment?characterEncoding=utf8mb4"-->
         <jdbcConnection
                 driverClass="com.mysql.jdbc.Driver"
-                connectionURL="jdbc:mysql://123.207.85.37:3306/language_environment"
+                connectionURL="jdbc:mysql://123.207.85.37:3306/language_environment?characterEncoding=utf-8"
                 userId="test"
                 password="wq43621549fg">
         </jdbcConnection>

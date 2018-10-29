@@ -1,6 +1,7 @@
 package com.yj.service.impl;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.vdurmont.emoji.EmojiParser;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IHomeService;
