@@ -43,14 +43,40 @@
         document.getElementById('btn1').addEventListener('click', function () {
             // 读取 html
             alert(editor[1].txt.html());
-            var result = new Array();
+            var result = [];
             for(var ii = 0; ii < flag; ii++){
-                if (editor[ii+1] == 'undefined'){
-                    result[ii] = editor[ii+1].txt.html();
-                }else {
-                    result[ii] = editor[ii+1].txt.html();
+                if (editor[ii+1] != undefined){
+                    alert(ii+1);
+                    var single_json = {
+                        "inner": editor[ii+1].txt.html(),
+                        "order": ii+1
+                    };
+                    result.push(single_json);
                 }
             }
+            var formData = new FormData();
+            formData.append('sentence', JSON.stringify(result));
+            $.ajax({
+                url:url+"/admin/upload_feeds_sentences.do",
+                type:'POST',
+                data:formData,
+                dataType:'json',
+                processData: false,
+                contentType: false,
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
         }, false);
         document.getElementById('add_text').addEventListener('click', function () {
             flag++;

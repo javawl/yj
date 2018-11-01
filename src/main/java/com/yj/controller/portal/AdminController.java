@@ -20,10 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 /**
  * Created by 63254 on 2018/9/4.
  */
@@ -209,6 +207,19 @@ public class AdminController {
     @ResponseBody
     public ServerResponse delete_daily_pic(String id, HttpServletResponse response){
         return iAdminService.delete_daily_pic(id, response);
+    }
+
+
+    /**
+     * 上传feeds流的段子
+     * @param sentence
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "upload_feeds_sentences.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response){
+        return iAdminService.upload_feeds_sentences(sentence, response);
     }
 
 

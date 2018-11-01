@@ -19,4 +19,6 @@ public interface IAdminService {
     ServerResponse<String> change_mp3( HttpServletResponse response, HttpServletRequest request);
 
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
+
+    ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response);
 }

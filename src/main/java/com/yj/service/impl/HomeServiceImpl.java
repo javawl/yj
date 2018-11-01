@@ -171,6 +171,8 @@ public class HomeServiceImpl implements IHomeService {
 
                 return ServerResponse.createBySuccess("成功!",json);
             }catch (Exception e){
+                logger.error("查找信息有误",e.getStackTrace());
+                logger.error("查找信息有误",e);
                 return ServerResponse.createByErrorMessage("查找信息有误！");
             }
         }

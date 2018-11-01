@@ -187,4 +187,15 @@
       kind = #{kind,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <!--下面是自己的-->
+  <insert id="insertFeedsInner" parameterType="string">
+    INSERT INTO feeds_inner (feeds_id, paragraph, `type`, `order`)
+    values (#{feeds_id}, #{inner}, 0, #{order})
+    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+      SELECT @@IDENTITY AS customerID
+    </selectKey>
+  </insert>
 </mapper>

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
+import com.yj.dao.FeedsMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
@@ -38,6 +39,9 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private FeedsMapper feedsMapper;
 
     @Autowired
     private IFileService iFileService;
@@ -125,6 +129,34 @@ public class AdminServiceImpl implements IAdminService {
             }
             //删除每日一图的喜欢
             dictionaryMapper.deleteDailyPicFavourAdmin(id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    public ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response){
+        //将sentence转换成json
+        net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            if(sentence_json.size()>0){
+                for(int i=0;i<sentence_json.size();i++){
+                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
+                    String inner = job.get("inner").toString();
+                    String order = job.get("order").toString();
+                    feedsMapper.insertFeedsInner(inner,order,"5");
+                }
+            }
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
