@@ -218,8 +218,8 @@ public class AdminController {
      */
     @RequestMapping(value = "upload_feeds_sentences.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response){
-        return iAdminService.upload_feeds_sentences(sentence, response);
+    public ServerResponse upload_feeds_sentences(String files_order,@RequestParam(value = "file",required = false) MultipartFile[] files,@RequestParam(value = "pic",required = false) MultipartFile pic,@RequestParam(value = "video_file",required = false) MultipartFile video_file,String title,String select,String kind,String author,String sentence, HttpServletResponse response, HttpServletRequest request ){
+        return iAdminService.upload_feeds_sentences(files_order,files,pic,video_file, title, select, kind, author,sentence, response,request);
     }
 
 

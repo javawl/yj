@@ -411,23 +411,29 @@ public class UserController extends BaseController {
     @RequestMapping(value = "test.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<JSONObject> test(HttpServletRequest request,HttpServletResponse httpServletResponse){
-        String token = CommonFunc.generateToken(Const.PHONE_REGISTER_SALT);
+//        String token = CommonFunc.generateToken(Const.PHONE_REGISTER_SALT);
+//
+//        //将phone和code存入缓存
+//        Cookie cookie = new Cookie("1",token);
+//        cookie.setMaxAge(Const.REGISTER_STATE_EXISIT_TIME);
+////        cookie.setPath("/");
+//        httpServletResponse.addCookie(cookie);
+//        //创建map来放返回信息
+//        Map<String,String> m2 = new HashMap<String,String>();
+//        m2.put("register_token",token);
+//        //转JSON串
+//        String JSONString2 = JSON.toJSONString(m2);
+//        //转json对象
+//        JSONObject JSON2 = JSONObject.parseObject(JSONString2);
+        Map result = dictionaryMapper.getInsistDayMessage("46","六级词汇","1541001601000");
+        System.out.println(result);
+        Map result1 = dictionaryMapper.getInsistDayMessage("46","六级词汇","1541001601001");
+        System.out.println(result1);
+        if (result1 == null){
+            System.out.println("test");
+        }
 
-        //将phone和code存入缓存
-        Cookie cookie = new Cookie("1",token);
-        cookie.setMaxAge(Const.REGISTER_STATE_EXISIT_TIME);
-//        cookie.setPath("/");
-        httpServletResponse.addCookie(cookie);
-        //创建map来放返回信息
-        Map<String,String> m2 = new HashMap<String,String>();
-        m2.put("register_token",token);
-        //转JSON串
-        String JSONString2 = JSON.toJSONString(m2);
-        //转json对象
-        JSONObject JSON2 = JSONObject.parseObject(JSONString2);
-
-
-        return ServerResponse.createBySuccess("发送成功!",JSON2);
+        return ServerResponse.createBySuccessMessage("发送成功!");
     }
 
     /**

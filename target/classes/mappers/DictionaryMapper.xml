@@ -516,6 +516,7 @@
     WHERE user_id = #{user_id}
     AND plan = #{plan}
     AND set_time = #{time}
+    LIMIT 1
   </select>
 
   <select id="getLikeOfFeedsReplyComment" resultType="map">

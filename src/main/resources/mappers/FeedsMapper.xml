@@ -194,8 +194,21 @@
   <insert id="insertFeedsInner" parameterType="string">
     INSERT INTO feeds_inner (feeds_id, paragraph, `type`, `order`)
     values (#{feeds_id}, #{inner}, 0, #{order})
-    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
-      SELECT @@IDENTITY AS customerID
-    </selectKey>
+  </insert>
+  <insert id="insertFeedsInnerPic" parameterType="string">
+    INSERT INTO feeds_inner (feeds_id, pic, `type`, `order`)
+    values (#{feeds_id}, #{pic}, 1, #{order})
+  </insert>
+  <insert id="insertFeeds" parameterType="com.yj.pojo.Feeds" useGeneratedKeys="true" keyProperty="id">
+    insert into feeds (id, title, content,
+    pic, video, auther_id,
+    comments, favours, likes,
+    cover_select, views, set_time,
+    kind)
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+    #{pic,jdbcType=VARCHAR}, #{video,jdbcType=VARCHAR}, #{autherId,jdbcType=VARCHAR},
+    #{comments,jdbcType=INTEGER}, #{favours,jdbcType=INTEGER}, #{likes,jdbcType=INTEGER},
+    #{coverSelect,jdbcType=INTEGER}, #{views,jdbcType=INTEGER}, #{setTime,jdbcType=VARCHAR},
+    #{kind,jdbcType=VARCHAR})
   </insert>
 </mapper>

@@ -2,11 +2,13 @@ package com.yj.service.impl;
 
 import com.google.common.collect.Lists;
 //import com.iflytek.cloud.speech.*;
+import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.FeedsMapper;
 import com.yj.dao.UserMapper;
+import com.yj.pojo.Feeds;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
 import com.yj.util.ExcelUtil;
@@ -19,6 +21,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +31,8 @@ import java.net.URL;
 import java.net.URI;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by 63254 on 2018/9/4.
@@ -139,7 +145,7 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
-    public ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response){
+    public ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file,String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request ){
         //将sentence转换成json
         net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
         //事务
@@ -149,20 +155,175 @@ public class AdminServiceImpl implements IAdminService {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
         try{
-            if(sentence_json.size()>0){
-                for(int i=0;i<sentence_json.size();i++){
-                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
-                    String inner = job.get("inner").toString();
-                    String order = job.get("order").toString();
-                    feedsMapper.insertFeedsInner(inner,order,"5");
+            //先插入标题和封面图那些
+            //上传图片
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String name1 = iFileService.upload(pic,path,"l_e/feeds");
+            String pic_url = "feeds/"+name1;
+            String video_url = null;
+            //判断是否有视频
+            if (select.equals("0")){
+                //有视频
+                String name2 = iFileService.upload(video_file,path,"l_e/feeds");
+                video_url = "feeds/"+name2;
+            }
+
+            //这里插入一下
+            Feeds feed = new Feeds();
+            feed.setTitle(title);
+            feed.setAutherId(author);
+            feed.setComments(0);
+            feed.setCoverSelect(Integer.valueOf(select));
+            feed.setFavours(0);
+            feed.setLikes(0);
+            feed.setViews(0);
+            feed.setPic(pic_url);
+            feed.setSetTime(String.valueOf((new Date()).getTime()));
+            feed.setVideo(video_url);
+            int result_feeds = feedsMapper.insertFeeds(feed);
+            if (result_feeds == 0){
+                throw new Exception();
+            }
+            //新的feeds id
+            int new_feeds_id = feed.getId();
+
+//            if(sentence_json.size()>0){
+//                for(int i=0;i<sentence_json.size();i++){
+//                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
+//                    String inner = job.get("inner").toString();
+//                    String order = job.get("order").toString();
+//                    String pattern = "<span style=\"(.*?)\">";
+//                    // 创建 Pattern 对象
+//                    Pattern r = Pattern.compile(pattern);
+//                    Matcher m = r.matcher(inner);
+//                    while(m.find()) {
+//                        //这里先构建一个总的字符串
+//                        String replace_result = "<font ";
+//                        //这个group1里面装的就是我们的style
+//                        System.out.println("Found value: " + m.group(1) );
+//                        //从style里面将color取出来
+//                        // 创建 Pattern 对象
+//                        Pattern color_p = Pattern.compile("color: rgb[(](.*?),(.*?),(.*?)[)];");
+//                        Matcher color_m = color_p.matcher(m.group(1));
+//                        if (color_m.find()){
+//                            //这个group1里面装的就是我们的color
+//                            System.out.println("Found value: " + color_m.group(0) );
+//                            //将rgb转成16进制
+//                            String rgb_16 = CommonFunc.convertRGBToHex(Integer.valueOf(color_m.group(1).trim()),Integer.valueOf(color_m.group(2).trim()),Integer.valueOf(color_m.group(3).trim()));
+//                            //拼接
+//                            replace_result = replace_result + "color=\"" + rgb_16 + "\"" + " ";
+//                        }
+//
+//                        //从style里面将size取出来
+//                        // 创建 Pattern 对象
+//                        Pattern size_p = Pattern.compile("font-size: (.*?);");
+//                        Matcher size_m = size_p.matcher(m.group(1));
+//                        if (size_m.find()){
+//                            //这个group1里面装的就是我们的color
+//                            System.out.println("Found value: " + size_m.group(0) );
+//                            String size_string = "";
+//                            if (size_m.group(1).trim().equals("x-large")){
+//                                size_string+= "size=\"6px\"";
+//                            }else if(size_m.group(1).trim().equals("xx-large")){
+//                                size_string+= "size=\"8px\"";
+//                            }else if(size_m.group(1).trim().equals("large")||size_m.group(1).equals("normal")){
+//                                size_string+= "size=\"5px\"";
+//                            }else if(size_m.group(1).trim().equals("small")){
+//                                size_string+= "size=\"4px\"";
+//                            }else if(size_m.group(1).trim().equals("x-small")){
+//                                size_string+= "size=\"2px\"";
+//                            }
+//                            //拼接
+//                            replace_result = replace_result + size_string + " ";
+//                        }
+//
+//                        //从style里面将font-family取出来
+//                        // 创建 Pattern 对象
+//                        Pattern face_p = Pattern.compile("font-family: (.*?);");
+//                        Matcher face_m = face_p.matcher(m.group(1));
+//                        if (face_m.find()){
+//                            //这个group1里面装的就是我们的face
+//                            System.out.println("Found value: " + face_m.group(0) );
+//                            //拼接
+//                            replace_result = replace_result + "face=\"" + face_m.group(1).trim()+"\"";
+//                        }
+//
+//                        String replace_regex = "<span";
+//                        Pattern pp = Pattern.compile(replace_regex);
+//                        Matcher mm = pp.matcher(inner);
+//                        inner = mm.replaceFirst(replace_result);
+//                        System.out.println("final: "+ inner);
+//                    }
+//                    String replace_regex = "span";
+//                    Pattern pp = Pattern.compile(replace_regex);
+//                    Matcher mm = pp.matcher(inner);
+//                    inner = mm.replaceAll("font");
+//                    System.out.println("final -: "+ inner);
+//
+////                    String pattern_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
+////                    // 创建 Pattern 对象
+////                    Pattern r_center = Pattern.compile(pattern_center);
+////                    Matcher m_center = r_center.matcher(inner);
+////                    if (m_center.find()){
+////                        //构造最后居中的字符串
+////                        String result_center = "<center " + m_center.group(1) + m_center.group(2) + ">" + m_center.group(3) + "</center>";
+////                        String replace_regex_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
+////                        Pattern pp_center = Pattern.compile(replace_regex_center);
+////                        Matcher mp_center = pp_center.matcher(inner);
+////                        inner = mp_center.replaceFirst(result_center);
+////                    }
+////
+////                    String pattern_div_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
+////                    // 创建 Pattern 对象
+////                    Pattern r_div_center = Pattern.compile(pattern_div_center);
+////                    Matcher m_div_center = r_div_center.matcher(inner);
+////                    if (m_div_center.find()){
+////                        //构造最后居中的字符串
+////                        String result_div_center = "<center " + m_div_center.group(1) + m_div_center.group(2) + ">" + m_div_center.group(3) + "</center>";
+////                        String replace_div_regex_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
+////                        Pattern pp_div_center = Pattern.compile(replace_div_regex_center);
+////                        Matcher mp_div_center = pp_div_center.matcher(inner);
+////                        inner = mp_div_center.replaceFirst(result_div_center);
+////                    }
+//
+//
+//                    //插入内部
+//                    int result_inner = feedsMapper.insertFeedsInner(String.valueOf(new_feeds_id),inner,order);
+//                    if (result_inner == 0){
+//                        throw new Exception();
+//                    }
+//                }
+//            }
+
+            System.out.println(files);
+            //插入文章里面的图片
+            //判断file数组不能为空并且长度大于0
+            if(files!=null&&files.length>0){
+                System.out.println("test");
+                //将files_order转换成json
+                net.sf.json.JSONArray files_order_json = net.sf.json.JSONArray.fromObject(files_order);
+                //循环获取file数组中得文件
+                for(int i = 0;i<files.length;i++){
+                    net.sf.json.JSONObject single_order = files_order_json.getJSONObject(i);
+                    String order = single_order.get("order").toString();
+                    MultipartFile file = files[i];
+                    //保存文件
+                    String name_file = iFileService.upload(file,path,"l_e/feeds");
+                    String file_url = "feeds/"+name_file;
+                    //插入内部
+                    int result_inner = feedsMapper.insertFeedsInner(String.valueOf(new_feeds_id),file_url,order);
+                    if (result_inner == 0){
+                        throw new Exception();
+                    }
                 }
             }
+
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
             transactionManager.rollback(status);
             e.printStackTrace();
-            return ServerResponse.createByErrorMessage("更新出错！");
+            return ServerResponse.createByErrorMessage("更新出错！（太长了）");
         }
     }
 

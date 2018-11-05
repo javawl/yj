@@ -1,6 +1,8 @@
 package com.yj.service;
 
 import com.yj.common.ServerResponse;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,5 +22,5 @@ public interface IAdminService {
 
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
-    ServerResponse upload_feeds_sentences(String sentence, HttpServletResponse response);
+    ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file, String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request );
 }

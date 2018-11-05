@@ -7,6 +7,38 @@
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
+    <div>
+        <table>
+            <tr>
+                <td>标题：</td>
+                <td><input name="title" type="text"></td>
+            </tr>
+            <tr>
+                <td>作者id：</td>
+                <td><select id="author">
+                        <option value ="7" selected>贝贝</option>
+                        <option value ="6">小i</option>
+                    </select>(贝贝的id为7，小i的id为6)</td>
+            </tr>
+            <tr>
+                <td>分类：</td>
+                <td><input name="kind" type="text"></td>
+            </tr>
+            <tr>
+                <td>封面选择：</td>
+                <td><input name="select" type="radio" value="0" onclick="document.getElementById('video').style.display = 'inline'"/>封面为视频</td>
+                <td><input name="select" type="radio" value="1" onclick="document.getElementById('video').style.display = 'none'"/>封面为图片</td>
+            </tr>
+            <tr>
+                <td>封面图片（视频也要上传封面图片）：</td>
+                <td><input id="pic" name="pic" type="file"></td>
+            </tr>
+            <tr id="video" style="display: none">
+                <td>封面视频（请上传MP4格式并且内嵌字幕）：</td>
+                <td><input id="video_file" name="video" type="file"></td>
+            </tr>
+        </table>
+    </div>
     <div id="inner">
         <h2>第1段文字（不超过800字，超过部分请新开一段）</h2>
         <div id="div1" class="text">
@@ -16,8 +48,8 @@
     <div>
         <button id="add_pic">添加一张图片</button>
         <button id="add_text">添加一段文字</button>
-        <button id="submit">提交</button>
-        <button id="btn1">get</button>
+        <button id="submit">获取html</button>
+        <button id="btn1">提交</button>
     </div>
     <div id="special">
 
@@ -40,22 +72,67 @@
 
         editor[1] = new E('#div1');
         editor[1].create();
-        document.getElementById('btn1').addEventListener('click', function () {
-            // 读取 html
+        document.getElementById('submit').addEventListener('click', function () {
             alert(editor[1].txt.html());
+        }, false);
+        document.getElementById('btn1').addEventListener('click', function () {
+            var select = $('input[name=select]:checked').val();
+            var title = $('input[name=title]').val();
+            var kind = $('input[name=kind]').val();
+            var author = $("#author option:selected").val();
+            if(select == undefined){
+                alert("请选择封面的格式！");
+                return;
+            }
+            if (typeof($('#pic')[0].files[0]) == "undefined"){
+                alert("请选择封面图,不能为空！");
+                return;
+            }
+            if (select == "0" && typeof($('#video_file')[0].files[0]) == "undefined") {
+                alert("请选择视频,不能为空！");
+                return;
+            }
+            // 读取 html
             var result = [];
+            //建立图片数组
+            var files_order = [];
+            var formData = new FormData();
             for(var ii = 0; ii < flag; ii++){
                 if (editor[ii+1] != undefined){
+                    //文本
                     alert(ii+1);
                     var single_json = {
                         "inner": editor[ii+1].txt.html(),
                         "order": ii+1
                     };
                     result.push(single_json);
+                }else {
+                    //图片
+                    //获取id
+                    var pic_id = "#pic"+(ii+1).toString();
+                    formData.append('file', $(pic_id)[0].files[0]);
+
+                    //这里加一个order的数组
+                    var single_order = {
+                        "order": ii+1
+                    };
+                    files_order.push(single_order);
+
                 }
             }
-            var formData = new FormData();
+
+            formData.append('pic', $('#pic')[0].files[0]);
+            if (select == "0"){
+                formData.append('video_file', $('#video_file')[0].files[0]);
+            }else {
+                formData.append('video_file', null);
+            }
+            formData.append('title', title);
+            formData.append('select', select);
+            formData.append('kind', kind);
+            formData.append('author', author);
             formData.append('sentence', JSON.stringify(result));
+            formData.append('files_order', JSON.stringify(files_order));
             $.ajax({
                 url:url+"/admin/upload_feeds_sentences.do",
                 type:'POST',

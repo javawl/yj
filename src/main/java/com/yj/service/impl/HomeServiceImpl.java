@@ -758,7 +758,7 @@ public class HomeServiceImpl implements IHomeService {
             List<Map<Object,Object>> order = dictionaryMapper.findFeedsInner(feeds_id);
             //给图片上域名
             for (int ii = 0; ii < order.size(); ii++){
-                if (order.get(ii).get("pic") != null){
+                if (order.get(ii).get("type").toString().equals("1")){
                     order.get(ii).put("pic",Const.FTP_PREFIX+order.get(ii).get("pic"));
                 }
             }
