@@ -170,7 +170,7 @@ public class UserServiceImpl implements IUserService {
                 User user = new User();
                 //给个默认的用户名
                 //生成一个七位的随机数
-                String rand_number = String.valueOf((1+Math.random()*(90000000-1+1)));
+                String rand_number = String.valueOf((long)(1+Math.random()*(9000000-1+1)));
                 user.setUsername("我爱背呗" + rand_number);
                 user.setPassword(md5Password);
                 user.setPhone(phone);
