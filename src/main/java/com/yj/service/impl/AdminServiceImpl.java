@@ -295,7 +295,6 @@ public class AdminServiceImpl implements IAdminService {
 //                }
 //            }
 
-            System.out.println(files);
             //插入文章里面的图片
             //判断file数组不能为空并且长度大于0
             if(files!=null&&files.length>0){
@@ -311,7 +310,7 @@ public class AdminServiceImpl implements IAdminService {
                     String name_file = iFileService.upload(file,path,"l_e/feeds");
                     String file_url = "feeds/"+name_file;
                     //插入内部
-                    int result_inner = feedsMapper.insertFeedsInner(String.valueOf(new_feeds_id),file_url,order);
+                    int result_inner = feedsMapper.insertFeedsInnerPic(String.valueOf(new_feeds_id),file_url,order);
                     if (result_inner == 0){
                         throw new Exception();
                     }
@@ -502,7 +501,7 @@ public class AdminServiceImpl implements IAdminService {
 
         //把四六级的词取出来逐个生成视频
 
-        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,3);
+        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,4);
 //        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
         for (int i = 0; i < word_list.size(); i++){
             String id = word_list.get(i).get("id").toString();
@@ -516,18 +515,18 @@ public class AdminServiceImpl implements IAdminService {
             }
         }
 
-        List<Map> w_list = dictionaryMapper.getWordByType(0,6000,4);
-        for (int j = 0; j < w_list.size(); j++){
-            String id = word_list.get(j).get("id").toString();
-            String sentence = word_list.get(j).get("sentence").toString();
-            String uploadFileName = make_voice(sentence,response,request);
-            uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
-            //判断文件存不存在
-            Boolean is_exist = existHttpPath(Const.FTP_PREFIX + uploadFileName);
-            if (is_exist){
-                dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
-            }
-        }
+//        List<Map> w_list = dictionaryMapper.getWordByType(0,6000,4);
+//        for (int j = 0; j < w_list.size(); j++){
+//            String id = word_list.get(j).get("id").toString();
+//            String sentence = word_list.get(j).get("sentence").toString();
+//            String uploadFileName = make_voice(sentence,response,request);
+//            uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
+//            //判断文件存不存在
+//            Boolean is_exist = existHttpPath(Const.FTP_PREFIX + uploadFileName);
+//            if (is_exist){
+//                dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
+//            }
+//        }
 
 
 //        String path = request.getSession().getServletContext().getRealPath("upload");

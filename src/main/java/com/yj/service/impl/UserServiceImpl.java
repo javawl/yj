@@ -168,6 +168,10 @@ public class UserServiceImpl implements IUserService {
                 String phone = json.getString("phone");
                 String md5Password = MD5Util.MD5EncodeUtf8(password+Const.LOGIN_SALT);
                 User user = new User();
+                //给个默认的用户名
+                //生成一个七位的随机数
+                String rand_number = String.valueOf((1+Math.random()*(90000000-1+1)));
+                user.setUsername("我爱背呗" + rand_number);
                 user.setPassword(md5Password);
                 user.setPhone(phone);
                 String portrait = "user/";
