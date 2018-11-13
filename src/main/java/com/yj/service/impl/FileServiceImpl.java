@@ -3,6 +3,7 @@ package com.yj.service.impl;
 import com.google.common.collect.Lists;
 import com.yj.service.IFileService;
 import com.yj.util.FTPUtill;
+import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,12 @@ public class FileServiceImpl implements IFileService {
         try {
             //上传文件
             file.transferTo(targetFile);
+            //压缩图片
+            Thumbnails.of(targetFile)
+            .scale(1f)//指定图片大小    0-1f  1f是原图
+            .outputQuality(0.1f)//图片质量  0-1f  1f是原图
+            .toFile(targetFile);
+
             //todo 将文件传到ftp服务器上
             FTPUtill.uploadFile(Lists.newArrayList(targetFile),removePath);
 
