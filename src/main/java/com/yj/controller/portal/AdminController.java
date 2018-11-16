@@ -258,7 +258,7 @@ public class AdminController {
         //获取时间错
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.set(Calendar.MONTH, Integer.valueOf(month));
+        calendar.set(Calendar.MONTH, Integer.valueOf(month)-1);
         calendar.set(Calendar.YEAR, Integer.valueOf(year));
         calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(day));
         calendar.set(Calendar.HOUR_OF_DAY, 0);

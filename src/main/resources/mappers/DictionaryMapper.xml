@@ -770,6 +770,25 @@
   </select>
 
 
+  <select id="yjFourWordWhenNotFount" resultType="map" parameterType="int">
+    SELECT tb.*,word_video_information.img,word_video_information.views,word_video_information.comments,word_video_information.favours,
+    word_video_information.video,word_video_information.id as video_id
+    FROM
+    (select word,id as word_id,dictionary.phonetic_symbol
+    from dictionary
+    order by rand() limit #{size}) tb
+    JOIN word_video_information
+    ON tb.word_id = word_video_information.word_id
+  </select>
+
+  <select id="reciting_words_exist" resultType="int" parameterType="string">
+    select COUNT(id)
+    from reciting_words
+    WHERE user_id = #{id}
+    LIMIT 1
+  </select>
+
+
   <update id="updateWordInfo" parameterType="string">
     UPDATE `dictionary` SET
     `word`= #{word},

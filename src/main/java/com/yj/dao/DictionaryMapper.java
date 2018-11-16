@@ -279,6 +279,13 @@ public interface DictionaryMapper {
     //语境那里已背单词视频
     List<Map<Object,Object>> yjFourWord(@Param("id") String id,@Param("start") int start,@Param("size") int size);
 
+
+    //语境那里已背单词视频(没有已背单词情况)
+    List<Map<Object,Object>> yjFourWordWhenNotFount(@Param("size") int size);
+
+
+    int reciting_words_exist(@Param("id") String id);
+
     //后台
     List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
 

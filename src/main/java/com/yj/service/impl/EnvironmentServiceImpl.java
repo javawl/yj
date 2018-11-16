@@ -67,7 +67,13 @@ public class EnvironmentServiceImpl implements IEnvironmentService {
             }
             result.put("top_video",top_video_result);
             //获取下面四个单词的信息
-            List<Map<Object,Object>> user_word = dictionaryMapper.yjFourWord(id,0,4);
+            //这里判断用户是否有已背单词
+            List<Map<Object,Object>> user_word;
+            if (dictionaryMapper.reciting_words_exist(id) > 0){
+                user_word = dictionaryMapper.yjFourWord(id,0,4);
+            }else {
+                user_word = dictionaryMapper.yjFourWordWhenNotFount(10);
+            }
             String flag_word_id = "0";
             int flag_index = -1;
             List<Map<Object,Object>> final_result = new ArrayList<>();
