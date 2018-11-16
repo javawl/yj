@@ -356,7 +356,7 @@ public class UserServiceImpl implements IUserService {
             }
             //到时候装多个map
             List<Map<String,Object>> L1 = new ArrayList<Map<String, Object>>();
-            for (Double i = 2.0; i <= 12; i++){
+            for (Double i = 2.0; i <= 10; i++){
                 //创建map来装几条信息
                 Map<String,Object> m1 = new HashMap<String,Object>();
                 Double daily_word_number = i * Const.WORD_SPACE;

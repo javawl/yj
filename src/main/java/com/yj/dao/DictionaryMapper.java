@@ -144,6 +144,15 @@ public interface DictionaryMapper {
     //comment表插入数据
     int insertFeedsComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("feeds_id") String feeds_id,@Param("set_time") String set_time);
 
+    //上传单词笔记
+    int upload_word_note(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("word_note") String word_note,@Param("set_time") String set_time);
+
+    //更新单词笔记
+    int updateWordNote(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("word_note") String word_note);
+
+    //展示笔记
+    String show_word_note(@Param("word_id") String word_id,@Param("user_id") String user_id);
+
     //插入每日一图
     int insertDailyPic(@Param("small_pic") String small_pic,@Param("daily_pic") String daily_pic,@Param("set_time") String set_time);
 

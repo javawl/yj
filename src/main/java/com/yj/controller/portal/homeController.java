@@ -361,4 +361,33 @@ public class homeController {
         //调用service层
         return iHomeService.clock_history(request);
     }
+
+
+    /**
+     * 上传单词笔记
+     * @param word_id
+     * @param word_note
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "upload_word_note.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_word_note(String word_id, String word_note,HttpServletRequest request){
+        //调用service层
+        return iHomeService.upload_word_note(word_id, word_note, request);
+    }
+
+
+    /**
+     * 展示笔记
+     * @param word_id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "show_word_note.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> show_word_note(String word_id,HttpServletRequest request){
+        //调用service层
+        return iHomeService.show_word_note(word_id, request);
+    }
 }

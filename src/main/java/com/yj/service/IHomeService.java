@@ -83,4 +83,10 @@ public interface IHomeService {
 
     //打卡历史
     ServerResponse<Map<Object,List<Object>>> clock_history(HttpServletRequest request);
+
+    //上传单词笔记
+    ServerResponse<String> upload_word_note(String word_id, String word_note,HttpServletRequest request);
+
+    //展示笔记
+    ServerResponse<String> show_word_note(String word_id,HttpServletRequest request);
 }

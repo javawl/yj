@@ -13,6 +13,7 @@ import com.yj.common.ServerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -1984,6 +1985,71 @@ public class HomeServiceImpl implements IHomeService {
             List<Map<Object,Object>> insist_day = userMapper.getUserAllInsistDay(uid);
             Map<Object,List<Object>> result = CommonFunc.clock_history(insist_day);
             return ServerResponse.createBySuccess("成功",result);
+        }
+    }
+
+
+
+    //上传单词笔记
+    public ServerResponse<String> upload_word_note(String word_id, String word_note,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(word_id);
+            add(word_note);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //上传
+            //先找一下有没有，没有的话要插入
+            //获取
+            String find = dictionaryMapper.show_word_note(word_id,uid);
+            if (find == null){
+                int result = dictionaryMapper.upload_word_note(word_id,uid,word_note,String.valueOf(new Date().getTime()));
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("上传失败!");
+                }
+            }else {
+                int result = dictionaryMapper.updateWordNote(word_id,uid,word_note);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("上传失败!");
+                }
+            }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+    //返回单词笔记
+    public ServerResponse<String> show_word_note(String word_id,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(word_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //获取
+            String result = dictionaryMapper.show_word_note(word_id,uid);
+            if (result == null){
+                return ServerResponse.createBySuccess("成功","暂时未添加笔记!");
+            }else {
+                return ServerResponse.createBySuccess("成功",result);
+            }
         }
     }
 }

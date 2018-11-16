@@ -844,6 +844,25 @@
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})
   </insert>
 
+  <select id="show_word_note" parameterType="string" resultType="string">
+    select word_note
+    from word_note
+    WHERE user_id = #{user_id}
+    AND word_id = #{word_id}
+  </select>
+
+  <update id="updateWordNote" parameterType="string">
+    UPDATE `word_note` SET
+    `word_note`= #{word_note}
+    WHERE user_id = #{user_id}
+    AND word_id = #{word_id}
+  </update>
+
+  <insert id="upload_word_note" parameterType="string">
+    INSERT INTO word_note (user_id, word_id, word_note, set_time)
+    values (#{user_id}, #{word_id}, #{word_note}, #{set_time})
+  </insert>
+
   <insert id="insertDailyPic" parameterType="string">
     INSERT INTO daily_pic (small_pic, daily_pic, favours, set_time)
     values (#{small_pic}, #{daily_pic}, 0, #{set_time})
