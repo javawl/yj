@@ -9,7 +9,10 @@ import com.yj.dao.DictionaryMapper;
 import com.yj.pojo.User;
 import com.yj.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private ApplicationContext ctx;
 
 
     /**
@@ -449,15 +456,38 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 测试
+     * 单词去重
      * @return
      */
     @RequestMapping(value = "test2.do", method = RequestMethod.GET)
     @ResponseBody
     public String test2(HttpServletRequest Request){
-        CommonFunc func = new CommonFunc();
-        String check = func.getCookieValueBykey(Request,"1");
-        return check;
+//        //开启事务
+//        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+//        TransactionStatus status = CommonFunc.starTransaction(transactionManager);
+//        try {
+//            //查出该type下的单词列表
+//            for (int i = 76; i <= 76; i++){
+//                List<Map> word_list = dictionaryMapper.selectSingleTypeWordForUnique(String.valueOf(i));
+//                //单词list去重
+//                for (int k = 0; k < word_list.size(); k++){
+//                    for (int l = k+1; l < word_list.size(); l++){
+//                        if (word_list.get(k).get("word").toString().equals(word_list.get(l).get("word").toString())){
+//                            word_list.remove(l);
+//                        }
+//                    }
+//                }
+//                for (int j = 0; j < word_list.size(); j++){
+//                    dictionaryMapper.deleteRepeatWord(word_list.get(j).get("id").toString(),word_list.get(j).get("type").toString(),word_list.get(j).get("word").toString());
+//                }
+//            }
+//            transactionManager.commit(status);
+//            return "成功!";
+//        } catch (Exception e) {
+//            transactionManager.rollback(status);
+//            return "失败!";
+//        }
+        return null;
     }
 
     /**

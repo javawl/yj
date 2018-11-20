@@ -79,12 +79,12 @@
                         if (data[i]['daily_pic']==''){
                             string1 = '此资源为空'
                         }else {
-                            string1 = '<img src="'+data[i]['daily_pic']+'">';
+                            string1 = '<img style="max-width: 550px; max-height: 800px;" src="'+data[i]['daily_pic']+'">';
                         }
                         if (data[i]['small_pic']==''){
                             string2 = '此资源为空'
                         }else {
-                            string2 = '<img src="'+data[i]['small_pic']+'">';
+                            string2 = '<img style="max-width: 550px; max-height: 800px;" src="'+data[i]['small_pic']+'">';
                         }
                         $("#special").append('<tr>'+
                                 '<td style="width: 4%;">'+data[i]['id']+'</td>'+
@@ -110,20 +110,23 @@
 <center>
     <h1>每日一图</h1>
 
-    <table cellpadding="8" width="100%" border="1" cellspacing="0" id="special">
+    <table cellpadding="8" width="87%" border="1" cellspacing="0" id="special">
         <tr>
             <button style="float: right" id="select">
                 <a href="add_daily_pic.jsp">新增</a>
             </button>
         </tr>
         <tr>
-            <td style="width: 4%;">每日一图id</td>
-            <td style="width: 4%;">每日一图截取图</td>
-            <td style="width: 4%;">每日一图完整图</td>
-            <td style="width: 4%;">日期</td>
-            <td  style="width: 6%;">操作</td>
+            <td>每日一图id</td>
+            <td>每日一图截取图</td>
+            <td>每日一图完整图</td>
+            <td>日期</td>
+            <td>操作</td>
         </tr>
     </table>
+
+
+
     <table id="page">
     </table>
 </center>

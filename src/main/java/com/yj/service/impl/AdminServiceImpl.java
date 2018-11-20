@@ -56,10 +56,14 @@ public class AdminServiceImpl implements IAdminService {
     private ApplicationContext ctx;
 
     @Override
-    public ServerResponse<List> get_word(String page, String size, String type, HttpServletResponse response){
+    public ServerResponse<List> get_word(String page, String size, String type, String condition, HttpServletResponse response){
         //将页数和大小转化为limit
         int start = (Integer.parseInt(page) - 1) * Integer.parseInt(size);
-        return ServerResponse.createBySuccess(dictionaryMapper.countWord(type),dictionaryMapper.selectAdminWords(start,Integer.parseInt(size),type));
+        if (condition.equals("undefined")){
+            return ServerResponse.createBySuccess(dictionaryMapper.countWord(type),dictionaryMapper.selectAdminWords(start,Integer.parseInt(size),type));
+        }else {
+            return ServerResponse.createBySuccess(dictionaryMapper.countWord(type),dictionaryMapper.selectAdminWordsForSelect(start,Integer.parseInt(size),type,"%"+condition+"%"));
+        }
     }
 
     @Override
@@ -142,6 +146,33 @@ public class AdminServiceImpl implements IAdminService {
             e.printStackTrace();
             return ServerResponse.createByErrorMessage("更新出错！");
         }
+    }
+
+    //展示feeds流
+    @Override
+    public ServerResponse<List<Map>> feeds_info(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //feeds
+        List<Map> feeds = userMapper.getFeedsInfo(start,Integer.valueOf(size));
+
+        //遍历加上前缀并且判断是否喜欢
+        List<Map> feedsResult = new ArrayList<>();
+        for(int i = 0; i < feeds.size(); i++){
+            Map<Object,Object> singlePic = new HashMap<>();
+            singlePic.put("set_time",CommonFunc.getFormatTime(Long.valueOf(feeds.get(i).get("set_time").toString()),"yyyy/MM/dd"));
+            singlePic.put("id",feeds.get(i).get("id").toString());
+            singlePic.put("title",feeds.get(i).get("title").toString());
+            feedsResult.add(singlePic);
+        }
+        return ServerResponse.createBySuccess(dictionaryMapper.countFeeds(),feedsResult);
     }
 
 

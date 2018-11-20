@@ -8,13 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 63254 on 2018/9/4.
  */
 public interface IAdminService {
 
-    ServerResponse<List> get_word(String page, String size, String type, HttpServletResponse response);
+    ServerResponse<List> get_word(String page, String size, String type, String condition, HttpServletResponse response);
 
     ServerResponse<List> get_word_video(String id, HttpServletResponse response);
 
@@ -23,4 +24,6 @@ public interface IAdminService {
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
     ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file, String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request );
+
+    ServerResponse<List<Map>> feeds_info(String page, String size, HttpServletRequest request);
 }

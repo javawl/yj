@@ -338,6 +338,13 @@
     LIMIT #{start},#{size}
   </select>
 
+  <select id="getFeedsInfo" resultType="map">
+    SELECT  id,title,set_time
+    FROM `feeds`
+    ORDER BY set_time desc
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="getUserSelectPlan" resultType="string" parameterType="string">
     SELECT my_plan
     FROM user

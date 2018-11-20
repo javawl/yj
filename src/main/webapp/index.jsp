@@ -100,7 +100,7 @@
         var page = parseInt(GetQueryString("page"));
         var type = parseInt(GetQueryString("type"));
         var size = 15;
-        var all_url = url+"/admin/get_word.do?page="+page+"&size="+size+"&type="+type;
+        var all_url = url+"/admin/get_word.do?page="+page+"&size="+size+"&type="+type+"&condition=undefined";
         $(document).ready(function(){
             $.ajax({
                 url:all_url,

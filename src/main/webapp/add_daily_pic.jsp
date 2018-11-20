@@ -53,7 +53,7 @@
 </head>
 <body>
     <div id="static">
-        <center style="margin-top: 300px;">
+        <center style="margin-top: 15%;">
             <h2>每日一图更新</h2>
             <table>
                 <tr>

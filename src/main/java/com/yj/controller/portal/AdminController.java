@@ -53,8 +53,8 @@ public class AdminController {
      */
     @RequestMapping(value = "get_word.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<List> get_word(String page, String size, String type, HttpServletResponse response){
-        return iAdminService.get_word(page, size, type, response);
+    public ServerResponse<List> get_word(String page, String size, String type, String condition, HttpServletResponse response){
+        return iAdminService.get_word(page, size, type, condition, response);
     }
 
     /**
@@ -288,6 +288,20 @@ public class AdminController {
     @ResponseBody
     public ServerResponse<String> change_mp3(String sentence,HttpServletResponse response, HttpServletRequest request){
         return iAdminService.change_mp3(response,request);
+    }
+
+
+    /**
+     * 后台管理得到feeds信息
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "feeds_info.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> feeds_info(String page,String size,HttpServletRequest request){
+        return iAdminService.feeds_info(page,size,request);
     }
 
 

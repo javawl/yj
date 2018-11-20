@@ -1045,6 +1045,29 @@
     LIMIT #{param1},#{param2}
   </select>
 
+  <select id="selectAdminWordsForSelect" resultType="map">
+    SELECT *
+    FROM dictionary
+    WHERE type = #{type}
+    AND word LIKE #{condition}
+    ORDER BY id
+    LIMIT #{param1},#{param2}
+  </select>
+
+  <select id="selectSingleTypeWordForUnique" resultType="map" parameterType="string">
+    SELECT id,word,`type`
+    FROM dictionary
+    WHERE type = #{type}
+    ORDER BY id
+  </select>
+
+  <delete id="deleteRepeatWord" parameterType="string">
+    DELETE FROM dictionary
+    WHERE id != #{word_id}
+    AND `type` = #{type}
+    AND word = #{word}
+  </delete>
+
   <select id="countWord" resultType="string">
     SELECT count(id)
     FROM dictionary
@@ -1054,6 +1077,11 @@
   <select id="countDailyPic" resultType="string">
     SELECT count(id)
     FROM daily_pic
+  </select>
+
+  <select id="countFeeds" resultType="string">
+    SELECT count(id)
+    FROM feeds
   </select>
 
   <select id="selectAdminVideo" resultType="map" parameterType="string">

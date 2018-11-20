@@ -299,10 +299,19 @@ public interface DictionaryMapper {
     List<Map> selectAdminWords(@Param("start") int start,@Param("size") int size,@Param("type") String type);
 
     //后台
+    List<Map> selectAdminWordsForSelect(@Param("start") int start,@Param("size") int size,@Param("type") String type,@Param("condition") String condition);
+
+    //后台
+    List<Map> selectSingleTypeWordForUnique(@Param("type") String type);
+
+    //后台
     String countWord(@Param("type") String type);
 
     //后台
     String countDailyPic();
+
+    //后台
+    String countFeeds();
 
     //后台
     List<Map> selectAdminVideo(@Param("id") String id);
@@ -413,6 +422,9 @@ public interface DictionaryMapper {
 
     //删除已背
     int deleteRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("plan") String plan,@Param("word") String word);
+
+    //单词去重
+    int deleteRepeatWord(@Param("word_id") String word_id,@Param("type") String type,@Param("word") String word);
 
     //查一下已背单词
     String selectRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
