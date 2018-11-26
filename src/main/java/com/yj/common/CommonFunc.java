@@ -23,6 +23,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -315,12 +316,26 @@ public class CommonFunc {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         //说是先放出来，所以设置个之前的年份，如果哪天回归当天了，把下面这行代码删了
-        calendar.set(Calendar.YEAR, 2017);
+//        calendar.set(Calendar.YEAR, 2017);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 1);
         long date =calendar.getTime().getTime();
         return String.valueOf(date);
+    }
+
+    //获取当月一号零点时间戳
+    public static String getMonthOneDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 1);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
     }
 
     //获取当天零点多一秒时间戳
@@ -336,13 +351,83 @@ public class CommonFunc {
         return time + "000";
     }
 
+    //获取传入时间的那天的零点多一秒的时间戳
+    public static String getRegisterTimeOne(String register_time) {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(register_time)));
+        //计算注册当天的零点
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+    //判断两个时间相差是否超过一天,超过一天返回true
+    public static boolean wheatherInADay(String register_time, String last_login){
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(register_time)));
+        //计算注册当天的零点
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        //和这次登录时间做对比
+        long last_login_int = Long.valueOf(last_login);
+        //是否超过一天
+        if (last_login_int - history_one > Const.ONE_DAY_DATE){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+
+    //判断两个时间相差在哪个等级，第二天第二次登录为1，七天内第二次登录为2，一个月内第二次登录为3,什么都不是就是4
+    public static int retentionRank(String register_time, String last_login){
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(register_time)));
+        //计算注册当天的零点
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        //和这次登录时间做对比
+        long last_login_int = Long.valueOf(last_login);
+        long during_time = last_login_int - history_one;
+        //是否超过一天
+        if (during_time > Const.ONE_DAY_DATE){
+            //第二天
+            if (during_time < 2 * Const.ONE_DAY_DATE){
+                return 1;
+            }else if (during_time < 7 * Const.ONE_DAY_DATE){
+                //七日留存
+                return 2;
+            }else if (during_time < 30 * Const.ONE_DAY_DATE){
+                //一个月留存
+                return 3;
+            }else {
+                return 4;
+            }
+        }else {
+            return 4;
+        }
+    }
+
+
     //评论时间从时间戳转换为标准时间
     //评论时间显示规则：显示评论的时间时，在1小时内显示“X分钟前”，超过1小时，在一天内显示“今天 XX：XX”。超过1天，在3天内，显示“一天前”，之后显示“XXXX/XX/XX”
     public static String commentTime(String time){
         Long input_time = Long.valueOf(time);
         Long now_time = new Date().getTime();
         Long last_one_hour = now_time - Const.ONE_HOUR_DATE;
-        Long last_one_day = now_time - Const.ONE_DAY_DATE;
+        //当天零点
+        Long last_one_day = Long.valueOf(getZeroDate());
         Long last_three_day = now_time - Const.THREE_DAY_DATE;
         //判断是否是一个小时内
         if (input_time > last_one_hour){
@@ -504,13 +589,20 @@ public class CommonFunc {
         return result;
     }
 
-    //获取时间戳
+    //获取时间格式
     public static String getFormatTime(Long time,String format){
         if (format == null){
             format= "yyyy-MM-dd HH:mm:ss";
         }
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(new Date(time));
+    }
+
+    //时间格式转换时间戳
+    public static String date2TimeStamp(String date_str) throws ParseException {
+        String format= "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return String.valueOf(sdf.parse(date_str).getTime());
     }
 
     //通过token获取用户id

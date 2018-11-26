@@ -81,4 +81,141 @@
       get_home_page_portrait_max = #{getHomePagePortraitMax,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <!--下面的是自己添加的-->
+  <update id="changeLastLogin" parameterType="string">
+    UPDATE `user`
+    set last_login = #{time}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="changeRetentionFlag">
+    UPDATE `user`
+    set retention_flag = #{flag}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeDauAndTimes">
+    UPDATE data_info
+    set `daily_app_start` = daily_app_start + #{daily_app_start},
+    `dau` = dau + #{dau}
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="changeMAU">
+    UPDATE data_info
+    set `mau` = mau + #{mau}
+    WHERE set_time > #{set_time}
+  </update>
+
+  <update id="changeRetention">
+    UPDATE data_info
+    set `two_day_retention` = two_day_retention + #{two_day_retention},
+    `seven_day_retention` = seven_day_retention + #{seven_day_retention},
+    `month_retention` = month_retention + #{month_retention}
+    WHERE set_time = #{set_time}
+  </update>
+
+  <insert id="insertDataInfo">
+    INSERT INTO data_info (daily_app_start, dau, set_time)
+    values (#{daily_app_start}, #{dau}, #{set_time})
+  </insert>
+
+  <insert id="insertWelfareService" parameterType="string">
+    INSERT INTO welfare_service (pic, url, st, et)
+    values (#{pic}, #{url}, #{st}, #{et})
+  </insert>
+
+
+  <select id="getDailyAdminInfo" resultType="map">
+    SELECT  *
+    FROM `data_info`
+    ORDER BY set_time desc
+    LIMIT #{start},#{size}
+  </select>
+
+
+  <select id="showAuthorInfo" resultType="map">
+    SELECT id,username,portrait,gender,personality_signature
+    FROM `user`
+    WHERE id IN (SELECT  user_id as id
+    FROM `author_info`)
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="getCommonConfig" resultType="map">
+    SELECT  *
+    FROM `common_config`
+    WHERE id = 1
+  </select>
+
+  <select id="getAdvice" resultType="map">
+    SELECT  *
+    FROM `advice`
+    LIMIT #{start},#{size}
+  </select>
+
+  <update id="changeDailyFinishWork">
+    UPDATE data_info
+    set `daily_finish_work` = daily_finish_work + #{daily_finish_work}
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="changeTopWelfareService" parameterType="string">
+    UPDATE welfare_service,(SELECT MAX(`order`) as number FROM welfare_service) tb
+    set `order` = tb.number+1
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteFeedsReply" parameterType="string" >
+    DELETE FROM `feeds_reply_comments`
+    WHERE feeds_comment_id IN
+    (SELECT id FROM feeds_comment
+    where feeds_id = #{id})
+  </delete>
+
+  <delete id="deleteFeedsCommentLikes" parameterType="string" >
+    DELETE FROM `feeds_comment_like`
+    WHERE feeds_comment_id IN
+    (SELECT id FROM feeds_comment
+    where feeds_id = #{id})
+  </delete>
+
+  <delete id="deleteFeedsComment" parameterType="string" >
+    DELETE FROM feeds_comment
+    where feeds_id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsFavour" parameterType="string" >
+    DELETE FROM feeds_favour
+    where feeds_id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsLike" parameterType="string" >
+    DELETE FROM feeds_like
+    where feeds_id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsInner" parameterType="string" >
+    DELETE FROM feeds_inner
+    where feeds_id = #{id}
+  </delete>
+
+  <delete id="deleteFeeds" parameterType="string" >
+    DELETE FROM feeds
+    where id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsReplyLike" parameterType="string" >
+    DELETE FROM `feeds_reply_comment_like`
+    WHERE feeds_reply_comment_id IN
+    (SELECT id
+    FROM `feeds_reply_comments`
+    WHERE feeds_comment_id IN
+    (SELECT id FROM feeds_comment
+    where feeds_id = #{id}))
+  </delete>
 </mapper>

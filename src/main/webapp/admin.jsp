@@ -38,14 +38,14 @@
         <%--左侧导航栏--%>
         <div class="left_bar">
             <center>
-                <p class="first_p"><a href="word_page.jsp?page=1&size=15&type=1" style="text-decoration: none; color: black;">单词列表</a></p>
-                <p>用户列表</p>
+                <p class="first_p"><a href="word_page.jsp?page=1&size=15&type=1&undefined" style="text-decoration: none; color: black;">单词列表</a></p>
+                <p onclick="change_src('show_users.jsp?page=1&size=15')">用户列表</p>
                 <p onclick="change_src('show_daily_pic.jsp?page=1&size=15')">每日一句</p>
-                <p>广告位</p>
-                <p>福利社</p>
-                <p>用户反馈</p>
-                <p>创建账号</p>
-                <p>数据查看</p>
+                <%--<p>广告位</p>--%>
+                <p onclick="change_src('show_welfare_service.jsp?page=1&size=15')">福利社</p>
+                <p onclick="change_src('show_advice.jsp?page=1&size=15')">用户反馈</p>
+                <p onclick="change_src('show_author.jsp?page=1&size=15')">创建账号</p>
+                <p onclick="change_src('show_data.jsp?page=1&size=15')">数据查看</p>
                 <p onclick="change_src('show_feeds.jsp?page=1&size=15')">feeds流</p>
             </center>
         </div>

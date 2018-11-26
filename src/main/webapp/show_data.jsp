@@ -37,7 +37,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/feeds_info.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/show_admin_data.do?page="+page+"&size="+size+"&type="+type;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
@@ -51,7 +51,7 @@
                 if (page == 1){
                     $("#page").append('<td><p>第一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page=1&size='+size+'">第一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_data.jsp?page=1&size='+size+'">第一页</a></td>');
                 }
                 var ff = 0;
                 var f = 0;
@@ -66,7 +66,7 @@
                     if (no == page){
                         $("#page").append('<td><p>'+no+'</p></td>');
                     }else {
-                        $("#page").append('<td><a href="'+url+'?page='+no+'&size='+size+'">'+no+'</a></td>');
+                        $("#page").append('<td><a href="'+url+'/show_data.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
                     }
                     if (ff == 8)break;
                     ff++;
@@ -77,15 +77,32 @@
                 if (page == page_no){
                     $("#page").append('<td><p>最后一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page='+page_no+'&size='+size+'">最后一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_data.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
                 }
+                $("#common_config").append('<tr>'+
+                        '<td>'+data['common_data']['user_number']+'</td>'+
+                        '</tr>');
+                for(var i = 0; i < data['daily_data'].length; i++){
+                    if (parseInt(data['daily_data'][i]['daily_add_user']) == 0){
+                        two_day_retention = "0%";
+                        seven_day_retention = "0%";
+                        month_retention = "0%";
+                    }else {
+                        var two_day_retention = String(parseFloat(data['daily_data'][i]['two_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
+                        var seven_day_retention = String(parseFloat(data['daily_data'][i]['seven_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
+                        var month_retention = String(parseFloat(data['daily_data'][i]['month_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
+                    }
 
-                for(var i = 0; i < data.length; i++){
-                    $("#special").append('<tr>'+
-                            '<td style="width: 4%;">'+data[i]['id']+'</td>'+
-                            '<td style="width: 4%;"><div style="width: 400px;">'+data[i]['title']+'</div></td>'+
-                            '<td style="width: 4%;">'+data[i]['set_time']+'</td>'+
-                            '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                    $("#daily_data").append('<tr>'+
+                            '<td>'+data['daily_data'][i]['daily_add_user']+'</td>'+
+                            '<td><div style="width: 400px;">'+data['daily_data'][i]['daily_app_start']+'</div></td>'+
+                            '<td>'+data['daily_data'][i]['daily_finish_work']+'</td>'+
+                            '<td>'+data['daily_data'][i]['dau']+'</td>'+
+                            '<td>'+data['daily_data'][i]['mau']+'</td>'+
+                            '<td>'+two_day_retention+'</td>'+
+                            '<td>'+seven_day_retention+'</td>'+
+                            '<td>'+month_retention+'</td>'+
+                            '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
 //                if (result.status == 200){
@@ -101,24 +118,44 @@
 </script>
 <body>
 <center>
-    <h1>feeds流</h1>
+    <h1>数据查看</h1>
 
-    <table cellpadding="4" width="87%" border="1" cellspacing="0" id="special">
+    <table cellpadding="4" width="87%" border="1" cellspacing="0" id="common_config">
+        <tr>
+            <%--<td style="border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;">--%>
+            <%--</td>--%>
+        </tr>
+        <tr>
+            <td>用户量</td>
+        </tr>
+    </table>
+    <br>
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="daily_data">
         <tr>
             <td style="border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;">
-                <button style="float: right" id="select">
-                    <a href="edit_feeds.jsp">新增</a>
-                </button>
             </td>
         </tr>
         <tr>
-            <td>用户数</td>
             <td>日增用户数</td>
             <td>APP日启动次数</td>
-            <td>操作</td>
+            <td>日完成学习任务用户数</td>
+            <td>DAU</td>
+            <td>当月MAU</td>
+            <td>次日留存率</td>
+            <td>7日留存率</td>
+            <td>30日留存率</td>
+            <td>日期</td>
         </tr>
     </table>
     <table id="page">

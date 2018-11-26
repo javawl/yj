@@ -868,6 +868,10 @@
     values (#{small_pic}, #{daily_pic}, 0, #{set_time})
   </insert>
 
+  <insert id="insertAuthorId" parameterType="string">
+    INSERT INTO author_info (user_id)
+    values (#{user_id})
+  </insert>
 
   <insert id="insertVideoComment" parameterType="string">
     INSERT INTO video_comment (user_id, comment, video_id, set_time)
@@ -1009,6 +1013,11 @@
     WHERE daily_pic_id = #{id}
   </delete>
 
+  <delete id="deleteAuthorRecord" parameterType="string" >
+    delete from author_info
+    WHERE user_id = #{id}
+  </delete>
+
   <delete id="deleteDictionaryFavour" parameterType="string" >
     delete from dictionary_favour
     WHERE user_id = #{user_id}
@@ -1082,6 +1091,31 @@
   <select id="countFeeds" resultType="string">
     SELECT count(id)
     FROM feeds
+  </select>
+
+  <select id="countDataInfo" resultType="string">
+    SELECT count(id)
+    FROM data_info
+  </select>
+
+  <select id="countFeedsAuthor" resultType="string">
+    SELECT count(id)
+    FROM author_info
+  </select>
+
+  <select id="countAdvice" resultType="string">
+    SELECT count(id)
+    FROM advice
+  </select>
+
+  <select id="countWelfareService" resultType="string">
+    SELECT count(id)
+    FROM welfare_service
+  </select>
+
+  <select id="countUsers" resultType="string">
+    SELECT count(id)
+    FROM `user`
   </select>
 
   <select id="selectAdminVideo" resultType="map" parameterType="string">
@@ -1277,7 +1311,7 @@
     FROM welfare_service
     WHERE st &gt;= #{time}
     OR et &lt;= #{time}
-    ORDER BY st DESC
+    ORDER BY `order` DESC ,abs(st-#{time}) ASC
     LIMIT #{number}
   </select>
 
@@ -1286,7 +1320,20 @@
     FROM welfare_service
     WHERE st &lt; #{time}
     AND et &gt; #{time}
-    ORDER BY st DESC
+    ORDER BY `order` DESC ,abs(st-#{time}) ASC
+  </select>
+
+  <select id="welfareServiceAll" resultType="map">
+    SELECT *
+    FROM welfare_service
+    ORDER BY `order` DESC ,abs(st-#{time}) ASC
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="showUsers" resultType="map">
+    SELECT id,username,gender,phone,register_time,last_login
+    FROM `user`
+    LIMIT #{start},#{size}
   </select>
 
   <select id="isWelfareFavour" resultType="map" parameterType="string">
@@ -1309,6 +1356,16 @@
 
   <delete id="deleteDailyPic" parameterType="string">
     DELETE FROM daily_pic
+    WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteWelfareService" parameterType="string">
+    DELETE FROM welfare_service
+    WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteFeedsAuthor" parameterType="string">
+    DELETE FROM `user`
     WHERE id = #{id}
   </delete>
 

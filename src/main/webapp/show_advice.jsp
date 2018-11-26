@@ -2,7 +2,7 @@
   Created by IntelliJ IDEA.
   User: 63254
   Date: 2018/11/18
-  Time: 18:52
+  Time: 21:49
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -37,7 +37,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/feeds_info.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/show_advice.do?page="+page+"&size="+size+"&type="+type;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
@@ -51,7 +51,7 @@
                 if (page == 1){
                     $("#page").append('<td><p>第一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page=1&size='+size+'">第一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_advice.jsp?page=1&size='+size+'">第一页</a></td>');
                 }
                 var ff = 0;
                 var f = 0;
@@ -66,7 +66,7 @@
                     if (no == page){
                         $("#page").append('<td><p>'+no+'</p></td>');
                     }else {
-                        $("#page").append('<td><a href="'+url+'?page='+no+'&size='+size+'">'+no+'</a></td>');
+                        $("#page").append('<td><a href="'+url+'/show_advice.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
                     }
                     if (ff == 8)break;
                     ff++;
@@ -77,15 +77,14 @@
                 if (page == page_no){
                     $("#page").append('<td><p>最后一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page='+page_no+'&size='+size+'">最后一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_advice.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
                 }
-
                 for(var i = 0; i < data.length; i++){
-                    $("#special").append('<tr>'+
-                            '<td style="width: 4%;">'+data[i]['id']+'</td>'+
-                            '<td style="width: 4%;"><div style="width: 400px;">'+data[i]['title']+'</div></td>'+
-                            '<td style="width: 4%;">'+data[i]['set_time']+'</td>'+
-                            '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+
+                    $("#daily_data").append('<tr>'+
+                            '<td>'+data[i]['set_time']+'</td>'+
+                            '<td>'+data[i]['advice']+'</td>'+
+                            '<td>'+data[i]['level']+'</td>'+
                             '</tr>');
                 }
 //                if (result.status == 200){
@@ -100,57 +99,30 @@
     });
 </script>
 <body>
-    <center>
-        <h1>feeds流</h1>
-
-        <table cellpadding="4" width="87%" border="1" cellspacing="0" id="special">
-            <tr>
-                <td style="border-right: 0;"></td>
-                <td style="border-left: 0;border-right: 0;"></td>
-                <td style="border-left: 0;border-right: 0;"></td>
-                <td style="border-left: 0;">
-                    <button style="float: right" id="select">
-                        <a href="edit_feeds.jsp">新增</a>
-                    </button>
-                </td>
-            </tr>
-            <tr>
-                <td>feeds的id</td>
-                <td>feeds标题</td>
-                <td>发布时间</td>
-                <td>操作</td>
-            </tr>
-        </table>
-        <table id="page">
-        </table>
-    </center>
+<center>
+    <h1>用户反馈</h1>
+    <br>
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="daily_data">
+        <%--<tr>--%>
+            <%--<td style="border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+            <%--<td style="border-left: 0;">--%>
+            <%--</td>--%>
+        <%--</tr>--%>
+        <tr>
+            <td>日期</td>
+            <td>反馈</td>
+            <td>评分</td>
+        </tr>
+    </table>
+    <table id="page">
+    </table>
+</center>
 </body>
-<script>
-    function del(id) {
-        if (confirm("你确定要删除？删除之后不可恢复！")){
-            $.ajax({
-                url:url+"/admin/delete_feeds.do",
-                type:'POST',
-                data:{
-                    id:id
-                },
-                dataType:'json',
-                success:function (result) {
-                    var code = result['code'];
-                    var msg = result['msg'];
-                    if (code != 200){
-                        alert(msg);
-                    }else {
-                        alert(msg);
-                        history.go(0);
-                    }
-                },
-                error:function (result) {
-                    console.log(result);
-                    alert("服务器出错！");
-                }
-            });
-        }
-    }
-</script>
 </html>

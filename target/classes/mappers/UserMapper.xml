@@ -271,6 +271,12 @@
     WHERE phone = #{phone}
   </update>
 
+  <update id="updateDataDailyAddUser" parameterType="string" >
+    UPDATE data_info
+    set daily_add_user = daily_add_user + 1
+    WHERE set_time = #{set_time}
+  </update>
+
   <select id="selectPlanTypes" resultType="map" >
     SELECT
     type
@@ -460,7 +466,7 @@
     WHERE plans.id = tb.plan_id
   </select>
   <select id="getUserPlanDaysNumber" resultType="map" parameterType="string">
-    SELECT my_plan,plan_days,plan_words_number,insist_day
+    SELECT my_plan,plan_days,plan_words_number,insist_day,last_login,register_time,retention_flag
     FROM user
     WHERE id = #{id}
   </select>
@@ -498,6 +504,13 @@
     ORDER BY set_time DESC
   </select>
 
+  <select id="getDailyDataInfo" resultType="map" parameterType="string">
+    SELECT id,daily_add_user
+    FROM data_info
+    WHERE set_time = #{time}
+    LIMIT 1
+  </select>
+
   <select id="getUserAllInsistDay" resultType="map" parameterType="string">
     SELECT *
     FROM `insist_day`
@@ -516,6 +529,12 @@
     set plan_days = #{days},
     plan_words_number = #{daily_word_number}
     WHERE id = #{id}
+  </update>
+
+  <update id="changeAllUserNumber">
+    UPDATE common_config
+    set `user_number` = user_number + 1
+    WHERE id = 1
   </update>
 
   <update id="change_open_status">
@@ -552,6 +571,11 @@
     values (#{plan}, #{id}, (SELECT id FROM plans WHERE plan = #{plan}), #{days}, #{daily_word_number})
   </insert>
 
+  <insert id="insertDataInfo" parameterType="string">
+    INSERT INTO data_info (daily_add_user, set_time)
+    values (#{daily_add_user}, #{set_time})
+  </insert>
+
   <insert id="add_tip_off">
     INSERT INTO tip_off (`type`, report_reason)
     values (#{type}, #{report_reason})
@@ -580,4 +604,19 @@
     WHERE plan = #{plan}
     AND user_id = #{id}
   </select>
+
+  <insert id="insertUser" parameterType="com.yj.pojo.User" useGeneratedKeys="true" keyProperty="id">
+    insert into user (id, username, password,
+    portrait, phone, gender,
+    my_plan, plan_days, plan_words_number,
+    personality_signature, wechat, qq,
+    register_time, last_login, insist_day,
+    whether_open, clock_day)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+    #{portrait,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER},
+    #{myPlan,jdbcType=VARCHAR}, #{planDays,jdbcType=INTEGER}, #{planWordsNumber,jdbcType=INTEGER},
+    #{personalitySignature,jdbcType=VARCHAR}, #{wechat,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR},
+    #{registerTime,jdbcType=VARCHAR}, #{lastLogin,jdbcType=VARCHAR}, #{insistDay,jdbcType=INTEGER},
+    #{whetherOpen,jdbcType=INTEGER}, #{clockDay,jdbcType=INTEGER})
+  </insert>
 </mapper>

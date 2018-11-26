@@ -2,8 +2,10 @@ package com.yj.service.impl;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.vdurmont.emoji.EmojiParser;
+import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
+import com.yj.pojo.Common_config;
 import com.yj.service.IHomeService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -16,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.PagedListHolder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -32,6 +36,9 @@ public class HomeServiceImpl implements IHomeService {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private Common_configMapper common_config;
 
     @Autowired
     private ApplicationContext ctx;
@@ -153,7 +160,7 @@ public class HomeServiceImpl implements IHomeService {
                 int ii = 0;
                 while (ii < during_time){
                     all_people += 3;
-                    ii+=400;
+                    ii+=2000;
                 }
                 m1.put("study_people",all_people);
                 //随机抽取用户头像
@@ -170,6 +177,84 @@ public class HomeServiceImpl implements IHomeService {
                 //转json
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue));
 
+                //事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                //隔离级别
+                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus status = transactionManager.getTransaction(def);
+                try {
+                    //在这里更新那些后台需要查看的数据（app日启动次数，dau）
+                    //计算上次登录时间有没有比今日零点大
+                    //获取当天0点时间戳
+                    String zero = CommonFunc.getZeroDate();
+                    //获取当月一号零点的时间戳
+                    String Month_one = CommonFunc.getMonthOneDate();
+                    //先判断当天有没有数据，有的话更新
+                    Map is_exist = userMapper.getDailyDataInfo(one);
+                    //注册当天不更新上次登录时间
+                    if (SelectPlan.get(0).get("last_login") == null && !CommonFunc.wheatherInADay(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()))){
+                        //这种情况注册当天的登录
+                        //注册当天不算dau
+                        if (is_exist == null){
+                            common_config.insertDataInfo(1,0,one);
+                        }else {
+                            common_config.changeDauAndTimes(1,0,one);
+                        }
+                    }else if (SelectPlan.get(0).get("last_login") == null && CommonFunc.wheatherInADay(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()))){
+                        //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
+                        common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
+                        if (is_exist == null){
+                            common_config.insertDataInfo(1,1,one);
+                        }else {
+                            common_config.changeDauAndTimes(1,1,one);
+                        }
+                        common_config.changeMAU(1, Month_one);
+                    }else if (Long.valueOf(SelectPlan.get(0).get("last_login").toString()) < Long.valueOf(zero)){
+                        //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
+                        common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
+                        if (is_exist == null){
+                            common_config.insertDataInfo(1,1,one);
+                        }else {
+                            common_config.changeDauAndTimes(1,1,one);
+                        }
+                        common_config.changeMAU(1, Month_one);
+                    }else {
+                        if (is_exist == null){
+                            common_config.insertDataInfo(1,0,one);
+                        }else {
+                            common_config.changeDauAndTimes(1,0,one);
+                        }
+                    }
+
+                    if (Integer.valueOf(SelectPlan.get(0).get("retention_flag").toString()) == 0){
+                        int decide = CommonFunc.retentionRank(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()));
+                        //获取注册那天零点多一秒的信息
+                        String register_one = CommonFunc.getRegisterTimeOne(SelectPlan.get(0).get("register_time").toString());
+                        if (decide == 1){
+                            //第二天
+                            //找出注册那天的0点多一秒
+                            //直接把数据加在那里因为有日增
+                            //不用判空因为添加注册额时候一定有了
+                            common_config.changeRetention(1,1,1,register_one);
+                            common_config.changeRetentionFlag(id,1);
+                        }else if (decide == 2){
+                            //七天内
+                            common_config.changeRetention(0,1,1,register_one);
+                            common_config.changeRetentionFlag(id,1);
+                        }else if (decide == 3){
+                            //一月内
+                            common_config.changeRetention(0,0,1,register_one);
+                            common_config.changeRetentionFlag(id,1);
+                        }
+                    }
+
+                    transactionManager.commit(status);
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
+                    e.printStackTrace();
+                    return ServerResponse.createByErrorMessage("获取失败！");
+                }
                 return ServerResponse.createBySuccess("成功!",json);
             }catch (Exception e){
                 logger.error("查找信息有误",e.getStackTrace());
@@ -1482,6 +1567,7 @@ public class HomeServiceImpl implements IHomeService {
                             if (insertResult == 0){
                                 throw new Exception();
                             }
+                            common_config.changeDailyFinishWork(1,one);
                             //todo 用户表坚持天数增加
                             int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
                             if (updateUserResult == 0){
@@ -1505,6 +1591,7 @@ public class HomeServiceImpl implements IHomeService {
                             if (updateResult == 0){
                                 throw new Exception();
                             }
+                            common_config.changeDailyFinishWork(1,one);
                             //todo 用户表坚持天数增加
                             int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
                             if (updateUserResult == 0){

@@ -6,6 +6,35 @@
     <title>后台管理</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 </head>
+<script type="text/javascript">
+    <%
+        String url = Const.DOMAIN_NAME;
+    %>
+    var url = "<%=url %>";
+    var all_url = url+"/admin/show_author_info.do?page=1&size=10000";
+    $(document).ready(function(){
+        $.ajax({
+            url:all_url,
+            type:'GET',
+            dataType:'json',
+            success:function (result) {
+                var data = result["data"];
+                for(var i = 0; i < data.length; i++){
+                    if (i == 0){
+                        //第一个被选中
+                        $("#author").append('<option value ="'+ data[i]['id'] +'" selected>'+ data[i]['username'] +'</option>');
+                    }else {
+                        $("#author").append('<option value ="'+ data[i]['id'] +'">'+ data[i]['username'] +'</option>');
+                    }
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    });
+</script>
 <body>
     <div>
         <table>
@@ -18,7 +47,7 @@
                 <td><select id="author">
                         <option value ="7" selected>贝贝</option>
                         <option value ="6">小i</option>
-                    </select>(贝贝的id为7，小i的id为6)</td>
+                    </select></td>
             </tr>
             <tr>
                 <td>分类：</td>
@@ -56,7 +85,6 @@
     </div>
     <script>
         <%
-            String url = Const.DOMAIN_NAME;
             String root_url = Const.FTP_PREFIX + "js/wangEditor.min.js";
         %>
         var url = "<%=url %>";

@@ -165,39 +165,77 @@ public class UserServiceImpl implements IUserService {
             JSONObject json = JSON.parseObject(check);
             System.out.println(json.getString("state"));
             if (json.getString("state").equals("1")){
-                String phone = json.getString("phone");
-                String md5Password = MD5Util.MD5EncodeUtf8(password+Const.LOGIN_SALT);
-                User user = new User();
-                //给个默认的用户名
-                //生成一个七位的随机数
-                String rand_number = String.valueOf((long)(1+Math.random()*(9000000-1+1)));
-                user.setUsername("我爱背呗" + rand_number);
-                user.setPassword(md5Password);
-                user.setPhone(phone);
-                String portrait = "user/";
-                int number = (int)(1+Math.random()*(20-1+1));
-                portrait = portrait + String.valueOf(number) + ".jpg";
-                user.setPortrait(portrait);
-                user.setGender(0);
-                user.setPlanDays(0);
-                user.setPlanWordsNumber(0);
-                user.setInsistDay(0);
-                user.setWhetherOpen(1);
-                user.setClockDay(0);
-                //时间戳
-                user.setRegisterTime(String.valueOf(new Date().getTime()));
+                //事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                //隔离级别
+                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus status = transactionManager.getTransaction(def);
+                try {
+                    String phone = json.getString("phone");
+                    String md5Password = MD5Util.MD5EncodeUtf8(password+Const.LOGIN_SALT);
+                    User user = new User();
+                    //给个默认的用户名
+                    //生成一个七位的随机数
+                    String rand_number = String.valueOf((long)(1+Math.random()*(9000000-1+1)));
+                    user.setUsername("我爱背呗" + rand_number);
+                    user.setPassword(md5Password);
+                    user.setPhone(phone);
+                    String portrait = "user/";
+                    int number = (int)(1+Math.random()*(20-1+1));
+                    portrait = portrait + String.valueOf(number) + ".jpg";
+                    user.setPortrait(portrait);
+                    user.setGender(0);
+                    user.setPlanDays(0);
+                    user.setPlanWordsNumber(0);
+                    user.setInsistDay(0);
+                    user.setWhetherOpen(1);
+                    user.setClockDay(0);
+                    //时间戳
+                    user.setRegisterTime(String.valueOf(new Date().getTime()));
 
-                //插入之前先查一下有没有了
-                int resultCounts = userMapper.checkUser(phone);
-                if (resultCounts > 0){
-                    return ServerResponse.createByErrorMessage("该号码已经注册过了！");
-                }
+                    //插入之前先查一下有没有了
+                    int resultCounts = userMapper.checkUser(phone);
+                    if (resultCounts > 0){
+                        return ServerResponse.createByErrorMessage("该号码已经注册过了！");
+                    }
 
-                int resultCount = userMapper.insert(user);
-                System.out.println(resultCount);
-                if (resultCount == 1){
-                    return ServerResponse.createBySuccessMessage("注册成功!");
-                }else {
+                    int resultCount = userMapper.insert(user);
+                    System.out.println(resultCount);
+                    if (resultCount != 1){
+                        throw new Exception();
+                    }
+
+                    //添加总用户量
+                    int addAllUserNumber = userMapper.changeAllUserNumber();
+                    if (addAllUserNumber != 1){
+                        throw new Exception();
+                    }
+
+                    //添加日增量
+
+                    //获取当天0点多一秒时间戳
+                    String one = CommonFunc.getOneDate();
+                    //先判断当天有没有数据，有的话更新
+                    Map is_exist = userMapper.getDailyDataInfo(one);
+                    if (is_exist == null){
+                        //没有的话插入
+                        int insert_result = userMapper.insertDataInfo("1",one);
+                        if (insert_result != 1){
+                            throw new Exception();
+                        }
+                    }else{
+                        //有的話加一
+                        int update_result = userMapper.updateDataDailyAddUser(one);
+                        if (update_result != 1){
+                            throw new Exception();
+                        }
+                    }
+
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("注册成功！");
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
                     return ServerResponse.createByErrorMessage("注册失败！");
                 }
             }else {

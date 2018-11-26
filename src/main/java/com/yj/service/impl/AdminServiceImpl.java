@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.FeedsMapper;
 import com.yj.dao.UserMapper;
@@ -48,6 +49,9 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private FeedsMapper feedsMapper;
+
+    @Autowired
+    private Common_configMapper common_configMapper;
 
     @Autowired
     private IFileService iFileService;
@@ -132,13 +136,48 @@ public class AdminServiceImpl implements IAdminService {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
         try{
-            //删除单词
+            //删除作者
             int resultDictionary = dictionaryMapper.deleteDailyPic(id);
             if (resultDictionary == 0){
                 throw new Exception();
             }
             //删除每日一图的喜欢
             dictionaryMapper.deleteDailyPicFavourAdmin(id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+
+    public ServerResponse delete_feeds(String id, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除feeds的回复评论点赞
+            common_configMapper.deleteFeedsReplyLike(id);
+            //删除feeds的回复评论
+            common_configMapper.deleteFeedsReply(id);
+            //删除feeds的评论点赞
+            common_configMapper.deleteFeedsCommentLikes(id);
+            //删除feeds的评论
+            common_configMapper.deleteFeedsComment(id);
+            //删除feeds的喜欢
+            common_configMapper.deleteFeedsFavour(id);
+            //删除feeds的点赞
+            common_configMapper.deleteFeedsLike(id);
+            //删除feeds的内容
+            common_configMapper.deleteFeedsInner(id);
+            //删除feeds
+            common_configMapper.deleteFeeds(id);
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
@@ -173,6 +212,64 @@ public class AdminServiceImpl implements IAdminService {
             feedsResult.add(singlePic);
         }
         return ServerResponse.createBySuccess(dictionaryMapper.countFeeds(),feedsResult);
+    }
+
+
+    //展示查看数据
+    @Override
+    public ServerResponse<Map> show_admin_data(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取每日的信息，倒序展示
+        List<Map> daily_data_analysis = common_configMapper.getDailyAdminInfo(start,Integer.valueOf(size));
+
+        for(int i = 0; i < daily_data_analysis.size(); i++){
+            daily_data_analysis.get(i).put("set_time",CommonFunc.getFormatTime(Long.valueOf(daily_data_analysis.get(i).get("set_time").toString()),"yyyy/MM/dd"));
+        }
+        //获取基础的那些信息
+        Map all_data_analysis = common_configMapper.getCommonConfig();
+        //构造最后的数组
+        Map<Object,Object> final_result = new HashMap<Object,Object>();
+        final_result.put("common_data",all_data_analysis);
+        final_result.put("daily_data",daily_data_analysis);
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countDataInfo(),final_result);
+    }
+
+
+    //展示查看数据
+    @Override
+    public ServerResponse<List<Map>> show_author_info(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取feeds流的作者信息
+        List<Map> authorInfo = common_configMapper.showAuthorInfo(start,Integer.valueOf(size));
+
+        for(int i = 0; i < authorInfo.size(); i++){
+            if (Integer.valueOf(authorInfo.get(i).get("gender").toString()) == 0){
+                //代表男
+                authorInfo.get(i).put("gender","男");
+            }else {
+                authorInfo.get(i).put("gender","女");
+            }
+            authorInfo.get(i).put("portrait",Const.FTP_PREFIX + authorInfo.get(i).get("portrait").toString());
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countFeedsAuthor(),authorInfo);
     }
 
 

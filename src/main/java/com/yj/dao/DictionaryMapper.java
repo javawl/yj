@@ -156,6 +156,9 @@ public interface DictionaryMapper {
     //插入每日一图
     int insertDailyPic(@Param("small_pic") String small_pic,@Param("daily_pic") String daily_pic,@Param("set_time") String set_time);
 
+    //插入作者id
+    int insertAuthorId(@Param("user_id") String user_id);
+
     //comment表插入数据
     int insertVideoComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
 
@@ -314,6 +317,21 @@ public interface DictionaryMapper {
     String countFeeds();
 
     //后台
+    String countDataInfo();
+
+    //后台
+    String countFeedsAuthor();
+
+    //后台
+    String countAdvice();
+
+    //后台
+    String countWelfareService();
+
+    //后台
+    String countUsers();
+
+    //后台
     List<Map> selectAdminVideo(@Param("id") String id);
 
     //后台
@@ -347,6 +365,12 @@ public interface DictionaryMapper {
     int deleteDailyPic(@Param("id") String id);
 
     //后台
+    int deleteWelfareService(@Param("id") String id);
+
+    //后台
+    int deleteFeedsAuthor(@Param("id") String id);
+
+    //后台
     List<Map> selectAllWord(@Param("word") String word);
 
     //后台
@@ -365,6 +389,9 @@ public interface DictionaryMapper {
 
     //后台
     int deleteDailyPicFavourAdmin(@Param("id") String id);
+
+    //后台
+    int deleteAuthorRecord(@Param("id") String id);
 
     //后台
     int existWordVideo(@Param("word") String word);
@@ -386,6 +413,12 @@ public interface DictionaryMapper {
 
     //福利社(大于等于5个正在进行）
     List<Map> welfareServiceOnlineAll(@Param("time") String time);
+
+    //后台取出所有福利社
+    List<Map> welfareServiceAll(@Param("start") int start,@Param("size") int size,@Param("time") String time);
+
+    //后台取出需要的用户信息
+    List<Map> showUsers(@Param("start") int start,@Param("size") int size,@Param("time") String time);
 
     //判断用户是否喜欢过这个每日一句
     Map isWelfareFavour(@Param("id") String id,@Param("daily_pic_id") String daily_pic_id);

@@ -23,7 +23,13 @@ public interface IAdminService {
 
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
+    ServerResponse delete_feeds(String id, HttpServletResponse response);
+
     ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file, String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request );
 
     ServerResponse<List<Map>> feeds_info(String page, String size, HttpServletRequest request);
+
+    ServerResponse<Map> show_admin_data(String page,String size,HttpServletRequest request);
+
+    ServerResponse<List<Map>> show_author_info(String page,String size,HttpServletRequest request);
 }

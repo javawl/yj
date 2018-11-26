@@ -33,6 +33,9 @@ public interface UserMapper {
 
     int updatePassword(@Param("password") String password, @Param("phone") String phone);
 
+    //日增用戶加一
+    int updateDataDailyAddUser(@Param("set_time") String set_time);
+
     //查计划的类别
     List<Map> selectPlanTypes();
 
@@ -87,6 +90,9 @@ public interface UserMapper {
     //决定天数和单词数
     int decide_plan_days(@Param("id") String id, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //用户注册增加总的用户量
+    int changeAllUserNumber();
+
     //决定天数和单词数
     int change_open_status(@Param("id") String id, @Param("number") int number);
 
@@ -102,6 +108,9 @@ public interface UserMapper {
     //计划表添加计划
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //后台查看数据没有的时候插入一条初始化的
+    int insertDataInfo(@Param("daily_add_user") String daily_add_user, @Param("set_time") String set_time);
+
     //举报
     int add_tip_off(@Param("type") int type, @Param("report_reason") String report_reason);
 
@@ -116,7 +125,7 @@ public interface UserMapper {
 
     int check_plan(@Param("plan") String plan);
 
-    //获取我的计划、天数、每日学习单词数、坚持天数
+    //获取我的计划、天数、每日学习单词数、坚持天数、上次登录时间、注册时间
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
 
     //获取feeds_comment的点赞
@@ -127,6 +136,9 @@ public interface UserMapper {
 
     //获取视频评论的点赞
     List<Map<Object,Object>> getUserVideoCommentLikes(@Param("id") String id);
+
+    //取出后台查看数据的是否存在
+    Map getDailyDataInfo(@Param("time") String time);
 
     //获取打卡历史记录
     List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);
@@ -148,4 +160,6 @@ public interface UserMapper {
 
     //后台feeds信息
     List<Map> getFeedsInfo(@Param("start") int start,@Param("size") int size);
+
+    int insertUser(User record);
 }

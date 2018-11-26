@@ -1,8 +1,8 @@
 <%@ page import="com.yj.common.Const" %><%--
   Created by IntelliJ IDEA.
   User: 63254
-  Date: 2018/11/18
-  Time: 18:52
+  Date: 2018/11/23
+  Time: 19:02
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -27,7 +27,6 @@
     //        if (url1 == url || url1 == url+'/'){
     //            window.location.href=url+"/show_daily_pic.jsp?page=1&size=15"
     //        }
-    // 获取get参数的方法
     function GetQueryString(name)
     {
         var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -37,7 +36,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/feeds_info.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/show_author_info.do?page="+page+"&size="+size+"&type="+type;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
@@ -51,7 +50,7 @@
                 if (page == 1){
                     $("#page").append('<td><p>第一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page=1&size='+size+'">第一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_author.jsp?page=1&size='+size+'">第一页</a></td>');
                 }
                 var ff = 0;
                 var f = 0;
@@ -66,7 +65,7 @@
                     if (no == page){
                         $("#page").append('<td><p>'+no+'</p></td>');
                     }else {
-                        $("#page").append('<td><a href="'+url+'?page='+no+'&size='+size+'">'+no+'</a></td>');
+                        $("#page").append('<td><a href="'+url+'/show_author.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
                     }
                     if (ff == 8)break;
                     ff++;
@@ -77,14 +76,22 @@
                 if (page == page_no){
                     $("#page").append('<td><p>最后一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'?page='+page_no+'&size='+size+'">最后一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_author.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
                 }
 
                 for(var i = 0; i < data.length; i++){
-                    $("#special").append('<tr>'+
+                    var string2;
+                    if (data[i]['small_pic']==''){
+                        string2 = '此资源为空'
+                    }else {
+                        string2 = '<img style="max-width: 550px; max-height: 550px;" src="'+data[i]['portrait']+'">';
+                    }
+                    $("#author_info").append('<tr>'+
                             '<td style="width: 4%;">'+data[i]['id']+'</td>'+
-                            '<td style="width: 4%;"><div style="width: 400px;">'+data[i]['title']+'</div></td>'+
-                            '<td style="width: 4%;">'+data[i]['set_time']+'</td>'+
+                            '<td style="width: 4%;">'+string2+'</td>'+
+                            '<td style="width: 4%;">'+data[i]['username']+'</td>'+
+                            '<td style="width: 4%;">'+data[i]['gender']+'</td>'+
+                            '<td style="width: 6%;">'+data[i]['personality_signature']+'</td>'+
                             '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
                             '</tr>');
                 }
@@ -101,23 +108,25 @@
 </script>
 <body>
     <center>
-        <h1>feeds流</h1>
-
-        <table cellpadding="4" width="87%" border="1" cellspacing="0" id="special">
+        <h1>作者查看</h1>
+        <br>
+        <table cellpadding="9" width="87%" border="1" cellspacing="0" id="author_info">
             <tr>
                 <td style="border-right: 0;"></td>
                 <td style="border-left: 0;border-right: 0;"></td>
                 <td style="border-left: 0;border-right: 0;"></td>
+                <td style="border-left: 0;border-right: 0;"></td>
+                <td style="border-left: 0;border-right: 0;"></td>
                 <td style="border-left: 0;">
-                    <button style="float: right" id="select">
-                        <a href="edit_feeds.jsp">新增</a>
-                    </button>
+                    <button style="float: right"><a href="add_author.jsp">新建</a></button>
                 </td>
             </tr>
             <tr>
-                <td>feeds的id</td>
-                <td>feeds标题</td>
-                <td>发布时间</td>
+                <td>序号</td>
+                <td>头像</td>
+                <td>昵称</td>
+                <td>性别</td>
+                <td>个性签名</td>
                 <td>操作</td>
             </tr>
         </table>
@@ -127,9 +136,9 @@
 </body>
 <script>
     function del(id) {
-        if (confirm("你确定要删除？删除之后不可恢复！")){
+        if (confirm("你确定要删除此单词？删除之后不可恢复！")){
             $.ajax({
-                url:url+"/admin/delete_feeds.do",
+                url:url+"/admin/delete_author.do",
                 type:'POST',
                 data:{
                     id:id

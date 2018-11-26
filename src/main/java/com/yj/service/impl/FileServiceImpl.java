@@ -42,7 +42,7 @@ public class FileServiceImpl implements IFileService {
             //压缩图片
             Thumbnails.of(targetFile)
             .scale(1f)//指定图片大小    0-1f  1f是原图
-            .outputQuality(0.1f)//图片质量  0-1f  1f是原图
+            .outputQuality(0.23f)//图片质量  0-1f  1f是原图
             .toFile(targetFile);
 
             //todo 将文件传到ftp服务器上
