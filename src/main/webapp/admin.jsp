@@ -38,7 +38,7 @@
         <%--左侧导航栏--%>
         <div class="left_bar">
             <center>
-                <p class="first_p"><a href="word_page.jsp?page=1&size=15&type=1&undefined" style="text-decoration: none; color: black;">单词列表</a></p>
+                <p class="first_p"><a href="word_page.jsp?page=1&size=15&type=1&condition=undefined" style="text-decoration: none; color: black;">单词列表</a></p>
                 <p onclick="change_src('show_users.jsp?page=1&size=15')">用户列表</p>
                 <p onclick="change_src('show_daily_pic.jsp?page=1&size=15')">每日一句</p>
                 <%--<p>广告位</p>--%>

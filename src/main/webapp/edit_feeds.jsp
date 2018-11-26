@@ -45,8 +45,6 @@
             <tr>
                 <td>作者id：</td>
                 <td><select id="author">
-                        <option value ="7" selected>贝贝</option>
-                        <option value ="6">小i</option>
                     </select></td>
             </tr>
             <tr>
