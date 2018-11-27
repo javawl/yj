@@ -20,6 +20,7 @@
     <bean id="iFileService" class="com.yj.service.impl.FileServiceImpl"></bean>
     <bean id="iMessageService" class="com.yj.service.impl.MessageServiceImpl"></bean>
     <bean id="iVariousService" class="com.yj.service.impl.VariousServiceImpl"></bean>
+    <bean id="iTokenService" class="com.yj.service.impl.TokenServiceImpl"></bean>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>

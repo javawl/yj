@@ -48,6 +48,9 @@ public interface UserMapper {
     //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //获取我的计划的计划名
+    Map getUserSelectPlanAndDays(@Param("id") String id);
+
     //获取用户动态是否公开
     String getUserOpenStatus(@Param("id") String id);
 

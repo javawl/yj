@@ -431,8 +431,8 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
             //这是用户选择的那个词库
-            String SelectPlan = userMapper.getUserSelectPlan(id);
-            String SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan);
+            Map SelectPlan = userMapper.getUserSelectPlanAndDays(id);
+            String SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan.get("my_plan").toString());
             m2.put("plan",SelectPlan);
             m2.put("word_number",SelectPlanNumber);
             //这是用户除了选择的词库外拥有的词库
@@ -443,10 +443,14 @@ public class UserServiceImpl implements IUserService {
                 String PlanNumber = have_plan.get(i).get("word_number").toString();
                 m3.put("plan",plan);
                 m3.put("word_number",PlanNumber);
+                m3.put("days",have_plan.get(i).get("days").toString());
+                m3.put("daily_word_number",have_plan.get(i).get("daily_word_number").toString());
                 m3.put("learned_word",have_plan.get(i).get("learned_word_number").toString());
                 have_plan.set(i, m3);
             }
-            m1.put("selected_plan",SelectPlan);
+            m1.put("selected_plan",SelectPlan.get("my_plan").toString());
+            m1.put("selected_plan_days",SelectPlan.get("plan_days").toString());
+            m1.put("selected_plan_words_number",SelectPlan.get("plan_words_number").toString());
             m1.put("have_plan",have_plan);
             return ServerResponse.createBySuccess("成功！",m1);
         }

@@ -357,6 +357,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getUserSelectPlanAndDays" resultType="map" parameterType="string">
+    SELECT my_plan,plan_days,plan_words_number
+    FROM user
+    WHERE id = #{id}
+  </select>
+
   <select id="getUserOpenStatus" resultType="string" parameterType="string">
     SELECT whether_open
     FROM `user`
@@ -459,8 +465,8 @@
   </delete>
 
   <select id="getUserPlan" resultType="map" parameterType="string">
-    SELECT plan,word_number,learned_word_number
-    FROM plans,(SELECT plan_id,take_plans.learned_word_number
+    SELECT plan,word_number,learned_word_number,days,daily_word_number
+    FROM plans,(SELECT plan_id,take_plans.learned_word_number,take_plans.days,take_plans.daily_word_number
     FROM take_plans
     WHERE user_id = #{id}) tb
     WHERE plans.id = tb.plan_id
