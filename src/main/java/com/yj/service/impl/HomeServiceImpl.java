@@ -197,7 +197,7 @@ public class HomeServiceImpl implements IHomeService {
                         //这种情况注册当天的登录
                         //注册当天不算dau
                         if (is_exist == null){
-                            common_config.insertDataInfo(1,0,one);
+                            common_config.insertDataInfo(1,0,one, Month_one);
                         }else {
                             common_config.changeDauAndTimes(1,0,one);
                         }
@@ -205,7 +205,7 @@ public class HomeServiceImpl implements IHomeService {
                         //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
                         common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
                         if (is_exist == null){
-                            common_config.insertDataInfo(1,1,one);
+                            common_config.insertDataInfo(1,1,one, Month_one);
                         }else {
                             common_config.changeDauAndTimes(1,1,one);
                         }
@@ -214,14 +214,14 @@ public class HomeServiceImpl implements IHomeService {
                         //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
                         common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
                         if (is_exist == null){
-                            common_config.insertDataInfo(1,1,one);
+                            common_config.insertDataInfo(1,1,one, Month_one);
                         }else {
                             common_config.changeDauAndTimes(1,1,one);
                         }
                         common_config.changeMAU(1, Month_one);
                     }else {
                         if (is_exist == null){
-                            common_config.insertDataInfo(1,0,one);
+                            common_config.insertDataInfo(1,0,one, Month_one);
                         }else {
                             common_config.changeDauAndTimes(1,0,one);
                         }

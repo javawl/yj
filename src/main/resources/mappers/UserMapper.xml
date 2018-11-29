@@ -357,6 +357,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="isExistOpenid" resultType="string" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE wechat = #{openid}
+  </select>
+
   <select id="getUserSelectPlanAndDays" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number
     FROM user
@@ -578,8 +584,8 @@
   </insert>
 
   <insert id="insertDataInfo" parameterType="string">
-    INSERT INTO data_info (daily_add_user, set_time)
-    values (#{daily_add_user}, #{set_time})
+    INSERT INTO data_info (daily_add_user, mau, set_time)
+    values (#{daily_add_user}, (SELECT max_mau FROM (SELECT MAX(`mau`) as max_mau FROM data_info WHERE set_time >= #{mau_time}) tb), #{set_time})
   </insert>
 
   <insert id="add_tip_off">

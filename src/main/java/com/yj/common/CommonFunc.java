@@ -23,6 +23,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -257,20 +258,37 @@ public class CommonFunc {
 
     //获取cookie中某个键值的值，没有的话返回null
     public String getCookieValueBykey(HttpServletRequest request,String key){
+        //这里获取session_id
+        //key = session_id + token  其中token是32位的
+        String session_id = key.substring(0,key.length() - 32);
+        //获取token
+        String token = key.substring(key.length()-32);
+        MySessionContext myc= MySessionContext.getInstance();
+        HttpSession session = myc.getSession(session_id);
         Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
-        if(null==cookies) {
+        if(null == cookies && session == null) {
             //没有cookie
             return null;
         }else{
-            String value = "";
-            for(Cookie cookie : cookies){
-                //找到
-                if (cookie.getName().equals(key)) {
-                    // 取出cookie的值
-                    value = cookie.getValue();
-                    return value;
+            if (cookies != null){
+                String value = "";
+                for(Cookie cookie : cookies){
+                    //找到
+                    if (cookie.getName().equals(key)) {
+                        // 取出cookie的值
+                        value = cookie.getValue();
+                        return value;
+                    }
                 }
             }
+
+            if (session != null){
+                Map user_info = (Map) session.getAttribute(token);
+                if (user_info != null){
+                    return user_info.get("uid").toString();
+                }
+            }
+
             //没找到返回null
             return null;
         }

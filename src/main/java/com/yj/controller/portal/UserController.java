@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
+import com.yj.common.MySessionContext;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
 import com.yj.pojo.User;
+import com.yj.service.ITokenService;
 import com.yj.service.IUserService;
+import com.yj.service.impl.TokenServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -33,6 +36,9 @@ public class UserController extends BaseController {
     //将Service注入进来
     @Autowired
     private IUserService iUserService;
+
+    @Autowired
+    private ITokenService iTokenService;
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
@@ -432,6 +438,7 @@ public class UserController extends BaseController {
 //        String JSONString2 = JSON.toJSONString(m2);
 //        //转json对象
 //        JSONObject JSON2 = JSONObject.parseObject(JSONString2);
+
         Map result = dictionaryMapper.getInsistDayMessage("46","六级词汇","1541001601000");
         System.out.println(result);
         Map result1 = dictionaryMapper.getInsistDayMessage("46","六级词汇","1541001601001");
@@ -447,12 +454,11 @@ public class UserController extends BaseController {
      * 测试
      * @return
      */
-    @RequestMapping(value = "test1.do", method = RequestMethod.GET)
+    @RequestMapping(value = "wx_login.do", method = RequestMethod.POST)
     @ResponseBody
-    public Cookie[] test1(HttpServletResponse httpServletResponse,HttpServletRequest request){
-       Cookie[] cookies = request.getCookies();
-
-        return cookies;
+    public ServerResponse<String> wx_login(String code, String portrait, String nickname, String gender, HttpSession session,HttpServletRequest request){
+//        System.out.println(request.getParameterMap());
+        return iTokenService.wx_token(portrait, nickname, gender, session, code);
     }
 
     /**
@@ -461,7 +467,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test2.do", method = RequestMethod.GET)
     @ResponseBody
-    public String test2(HttpServletRequest Request){
+    public String test2(String session_id, HttpServletRequest Request){
 //        //开启事务
 //        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
 //        TransactionStatus status = CommonFunc.starTransaction(transactionManager);

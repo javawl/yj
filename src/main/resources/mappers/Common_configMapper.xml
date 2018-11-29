@@ -120,8 +120,8 @@
   </update>
 
   <insert id="insertDataInfo">
-    INSERT INTO data_info (daily_app_start, dau, set_time)
-    values (#{daily_app_start}, #{dau}, #{set_time})
+    INSERT INTO data_info (daily_app_start, dau, mau, set_time)
+    values (#{daily_app_start}, #{dau}, (SELECT max_mau FROM (SELECT MAX(`mau`) as max_mau FROM data_info WHERE set_time >= #{mau_time}) tb), #{set_time})
   </insert>
 
   <insert id="insertWelfareService" parameterType="string">

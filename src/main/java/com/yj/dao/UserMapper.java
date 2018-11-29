@@ -48,6 +48,9 @@ public interface UserMapper {
     //获取我的计划的计划名
     String getUserSelectPlan(@Param("id") String id);
 
+    //获取token那里判断openid是否已经在数据库里了
+    String isExistOpenid(@Param("openid") String openid);
+
     //获取我的计划的计划名
     Map getUserSelectPlanAndDays(@Param("id") String id);
 
@@ -112,7 +115,7 @@ public interface UserMapper {
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
     //后台查看数据没有的时候插入一条初始化的
-    int insertDataInfo(@Param("daily_add_user") String daily_add_user, @Param("set_time") String set_time);
+    int insertDataInfo(@Param("daily_add_user") String daily_add_user, @Param("set_time") String set_time, @Param("mau_time") String mau_time);
 
     //举报
     int add_tip_off(@Param("type") int type, @Param("report_reason") String report_reason);

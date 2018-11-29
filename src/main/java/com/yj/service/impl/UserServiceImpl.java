@@ -218,9 +218,11 @@ public class UserServiceImpl implements IUserService {
                     String one = CommonFunc.getOneDate();
                     //先判断当天有没有数据，有的话更新
                     Map is_exist = userMapper.getDailyDataInfo(one);
+                    //获取当月一号零点的时间戳
+                    String Month_one = CommonFunc.getMonthOneDate();
                     if (is_exist == null){
                         //没有的话插入
-                        int insert_result = userMapper.insertDataInfo("1",one);
+                        int insert_result = userMapper.insertDataInfo("1",one, Month_one);
                         if (insert_result != 1){
                             throw new Exception();
                         }
@@ -432,9 +434,21 @@ public class UserServiceImpl implements IUserService {
         }else {
             //这是用户选择的那个词库
             Map SelectPlan = userMapper.getUserSelectPlanAndDays(id);
-            String SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan.get("my_plan").toString());
-            m2.put("plan",SelectPlan);
-            m2.put("word_number",SelectPlanNumber);
+            if (SelectPlan.get("my_plan") == null){
+                m2.put("plan",(new HashMap<>()));
+                m2.put("word_number",0);
+                m1.put("selected_plan",null);
+                m1.put("selected_plan_days","0");
+                m1.put("selected_plan_words_number","0");
+            }else {
+                String SelectPlanNumber = userMapper.getPlanWordsNumberByPlan(SelectPlan.get("my_plan").toString());
+                m2.put("plan",SelectPlan);
+                m2.put("word_number",SelectPlanNumber);
+                m1.put("selected_plan",SelectPlan.get("my_plan").toString());
+                m1.put("selected_plan_days",SelectPlan.get("plan_days").toString());
+                m1.put("selected_plan_words_number",SelectPlan.get("plan_words_number").toString());
+            }
+
             //这是用户除了选择的词库外拥有的词库
             List<Map> have_plan = userMapper.getUserPlan(id);
             for (int i = 0; i < have_plan.size(); i++){
@@ -448,9 +462,6 @@ public class UserServiceImpl implements IUserService {
                 m3.put("learned_word",have_plan.get(i).get("learned_word_number").toString());
                 have_plan.set(i, m3);
             }
-            m1.put("selected_plan",SelectPlan.get("my_plan").toString());
-            m1.put("selected_plan_days",SelectPlan.get("plan_days").toString());
-            m1.put("selected_plan_words_number",SelectPlan.get("plan_words_number").toString());
             m1.put("have_plan",have_plan);
             return ServerResponse.createBySuccess("成功！",m1);
         }
