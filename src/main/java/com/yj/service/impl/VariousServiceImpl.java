@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
@@ -29,6 +30,9 @@ public class VariousServiceImpl implements IVariousService {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private Common_configMapper common_configMapper;
 
     @Autowired
     private ApplicationContext ctx;
@@ -263,6 +267,84 @@ public class VariousServiceImpl implements IVariousService {
             }
 
             return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+
+
+
+    //下面是抽奖和奖金池机制
+    public ServerResponse<Map<Object,Object>> lottery_draw_description(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //展示抽奖描述页面
+            Map<Object,Object> select_result = common_configMapper.getLotteryDrawDescription(String.valueOf((new Date()).getTime()));
+
+            if (select_result == null){
+                //没查到
+                return ServerResponse.createByErrorMessage("抱歉未查到相关信息");
+            }
+
+            //给图片加上路径
+            select_result.put("prize_pic", Const.FTP_PREFIX + select_result.get("prize_pic").toString());
+            select_result.put("prize_tomorrow_pic", Const.FTP_PREFIX + select_result.get("prize_tomorrow_pic").toString());
+
+            return ServerResponse.createBySuccess("成功！", select_result);
+        }
+    }
+
+    public ServerResponse<Map<Object,Object>> lottery_draw_winner(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //展示抽奖结果页面
+            List<Map<Object,Object>> select_result = common_configMapper.getLotteryDrawWinner(String.valueOf((new Date()).getTime()));
+
+            if (select_result == null){
+                //没查到
+                return ServerResponse.createByErrorMessage("抱歉未查到相关信息");
+            }
+            //奖品
+            Map<Object,Object> prize = new HashMap<Object,Object>();
+            List<Map<Object,Object>> tmp = new ArrayList<>();
+
+            for (int i = 0; i < select_result.size(); i++){
+                Map<Object,Object> tmp_map = new HashMap<Object,Object>();
+                if (i == 0){
+                    prize.put("prize", select_result.get(i).get("prize").toString());
+                    prize.put("prize_pic", Const.FTP_PREFIX + select_result.get(i).get("prize_pic").toString());
+                }
+                //给图片加上路径
+                tmp_map.put("portrait", Const.FTP_PREFIX + select_result.get(i).get("portrait").toString());
+                tmp_map.put("username", select_result.get(i).get("username").toString());
+                tmp.add(tmp_map);
+            }
+
+            prize.put("winner_list", tmp);
+
+            return ServerResponse.createBySuccess("成功！", prize);
         }
     }
 }

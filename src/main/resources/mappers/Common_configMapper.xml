@@ -158,6 +158,31 @@
     LIMIT #{start},#{size}
   </select>
 
+
+  <select id="getLotteryDrawDescription" resultType="map" parameterType="string">
+    SELECT prize,prize_pic,prize_tomorrow,prize_tomorrow_pic,set_time as end_time
+    FROM lottery_draw
+    WHERE set_time &gt; #{now_time}
+    ORDER BY abs(set_time- #{now_time}) ASC
+    LIMIT 1
+  </select>
+
+
+  <select id="getLotteryDrawWinner" resultType="map" parameterType="string">
+    SELECT table1.prize,table1.prize_pic,`user`.username,`user`.portrait
+    FROM `user`,
+    (SELECT user_id,tb.prize,prize_pic
+    FROM lottery_draw_winner,
+    (SELECT id,prize,prize_pic
+    FROM lottery_draw
+    WHERE set_time &lt; #{now_time}
+    ORDER BY abs(set_time - #{now_time}) ASC
+    LIMIT 1) tb
+    WHERE lottery_draw_winner.lottery_draw_id = tb.id) table1
+    WHERE table1.user_id = `user`.id
+  </select>
+
+
   <update id="changeDailyFinishWork">
     UPDATE data_info
     set `daily_finish_work` = daily_finish_work + #{daily_finish_work}

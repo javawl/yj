@@ -629,11 +629,14 @@ public class AdminServiceImpl implements IAdminService {
 
         //把四六级的词取出来逐个生成视频
 
-        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,4);
+        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,6);
 //        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
         for (int i = 0; i < word_list.size(); i++){
             String id = word_list.get(i).get("id").toString();
             String sentence = word_list.get(i).get("sentence").toString();
+            if (sentence.length() == 0){
+                continue;
+            }
             String uploadFileName = make_voice(sentence,response,request);
             uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
             //判断文件存不存在

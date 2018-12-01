@@ -45,6 +45,7 @@
 
     <logger name="com.yj" additivity="false" level="INFO" >
         <appender-ref ref="yj" />
+        <appender-ref ref="error" />
         <appender-ref ref="console"/>
     </logger>
 

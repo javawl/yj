@@ -83,4 +83,10 @@ public interface Common_configMapper {
 
     //后台获取基础信息（总用户等）
     List<Map> getAdvice(@Param("start") int start, @Param("size") int size);
+
+    //获取奖品描述页面信息
+    Map<Object,Object> getLotteryDrawDescription(@Param("now_time") String  now_time);
+
+    //获取奖品结果页面信息
+    List<Map<Object,Object>> getLotteryDrawWinner(@Param("now_time") String  now_time);
 }
