@@ -252,6 +252,8 @@ public class HomeServiceImpl implements IHomeService {
                     transactionManager.commit(status);
                 } catch (Exception e) {
                     transactionManager.rollback(status);
+                    logger.error("首页获取失败",e.getStackTrace());
+                    logger.error("首页获取失败",e);
                     e.printStackTrace();
                     return ServerResponse.createByErrorMessage("获取失败！");
                 }
