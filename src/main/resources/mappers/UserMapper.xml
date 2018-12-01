@@ -585,7 +585,7 @@
 
   <insert id="insertDataInfo" parameterType="string">
     INSERT INTO data_info (daily_add_user, mau, set_time)
-    values (#{daily_add_user}, (SELECT max_mau FROM (SELECT MAX(`mau`) as max_mau FROM data_info WHERE set_time >= #{mau_time}) tb), #{set_time})
+    values (#{daily_add_user}, IFNULL((SELECT max_mau FROM (SELECT MAX(`mau`) as max_mau FROM data_info WHERE set_time >= #{mau_time}) tb),0), #{set_time})
   </insert>
 
   <insert id="add_tip_off">
