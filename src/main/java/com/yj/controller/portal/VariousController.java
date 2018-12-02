@@ -73,15 +73,41 @@ public class VariousController {
 
     /**
      * 每日一图的信息
-     * @param page
-     * @param size
-     * @param request
-     * @return
+     * @param page  页号
+     * @param size  页大小
+     * @param request   request
+     * @return    Map
      */
     @RequestMapping(value = "daily_pic_info.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<List<Map<Object,Object>>> daily_pic_info(String page,String size,HttpServletRequest request){
         //调用service层
         return iVariousService.daily_pic_info(page,size,request);
+    }
+
+
+    /**
+     * 抽奖描述
+     * @param request request
+     * @return Map
+     */
+    @RequestMapping(value = "lottery_draw_description.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> lottery_draw_description(HttpServletRequest request){
+        //调用service层
+        return iVariousService.lottery_draw_description(request);
+    }
+
+
+    /**
+     * 抽奖结果
+     * @param request request
+     * @return  Map
+     */
+    @RequestMapping(value = "lottery_draw_winner.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> lottery_draw_winner(HttpServletRequest request){
+        //调用service层
+        return iVariousService.lottery_draw_winner(request);
     }
 }

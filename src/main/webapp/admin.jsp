@@ -47,6 +47,7 @@
                 <p onclick="change_src('show_author.jsp?page=1&size=15')">创建账号</p>
                 <p onclick="change_src('show_data.jsp?page=1&size=15')">数据查看</p>
                 <p onclick="change_src('show_feeds.jsp?page=1&size=15')">feeds流</p>
+                <p onclick="change_src('lottery_draw.jsp?page=1&size=15')">抽奖赢奖品</p>
             </center>
         </div>
         <div class="main">

@@ -332,6 +332,9 @@ public interface DictionaryMapper {
     String countUsers();
 
     //后台
+    String countLotteryDraw();
+
+    //后台
     List<Map> selectAdminVideo(@Param("id") String id);
 
     //后台
@@ -371,6 +374,9 @@ public interface DictionaryMapper {
     int deleteFeedsAuthor(@Param("id") String id);
 
     //后台
+    int deleteLotteryDraw(@Param("id") String id);
+
+    //后台
     List<Map> selectAllWord(@Param("word") String word);
 
     //后台
@@ -392,6 +398,12 @@ public interface DictionaryMapper {
 
     //后台
     int deleteAuthorRecord(@Param("id") String id);
+
+    //后台
+    int deleteLotteryDrawContestants(@Param("id") String id);
+
+    //后台
+    int deleteLotteryDrawWinner(@Param("id") String id);
 
     //后台
     int existWordVideo(@Param("word") String word);
@@ -419,6 +431,9 @@ public interface DictionaryMapper {
 
     //后台取出需要的用户信息
     List<Map> showUsers(@Param("start") int start,@Param("size") int size,@Param("time") String time);
+
+    //后台取出需要的抽奖活动
+    List<Map> showLotteryDraw(@Param("start") int start,@Param("size") int size);
 
     //判断用户是否喜欢过这个每日一句
     Map isWelfareFavour(@Param("id") String id,@Param("daily_pic_id") String daily_pic_id);

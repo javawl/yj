@@ -273,6 +273,53 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
+    //展示单个奖品和奖品的详情
+    public ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        Map<Object,Object> LotteryDrawInfo = common_configMapper.showLotteryDraw(id);
+        LotteryDrawInfo.put("prize_pic", Const.FTP_PREFIX + LotteryDrawInfo.get("prize_pic"));
+        //最终结果
+        Map<Object,Object> result = new HashMap<Object, Object>();
+        result.put("lottery_draw", LotteryDrawInfo);
+        if ((new Date()).getTime() >= Long.valueOf(LotteryDrawInfo.get("set_time").toString())){
+            //已经开过奖了，展示获奖者
+            List<Map<Object,Object>> LotteryDrawWinner = common_configMapper.showLotteryDrawWinner(id);
+            for (int i = 0; i < LotteryDrawWinner.size(); i++){
+                LotteryDrawWinner.get(i).put("portrait", Const.FTP_PREFIX + LotteryDrawWinner.get(i).get("portrait"));
+            }
+            result.put("winner", LotteryDrawWinner);
+        }else {
+            //没开奖展示空的
+            List<Map<Object,Object>> LotteryDrawWinner = new ArrayList<>();
+            result.put("winner", LotteryDrawWinner);
+        }
+        //展示参与者
+        List<Map<Object,Object>> LotteryContestants = new ArrayList<>();
+        //虚拟用户
+        List<Map<Object,Object>> LotteryContestantsVirtual = common_configMapper.showLotteryDrawContestantsVirtual(id);
+        for (int i = 0; i < LotteryContestantsVirtual.size(); i++){
+            LotteryContestantsVirtual.get(i).put("portrait", Const.FTP_PREFIX + LotteryContestantsVirtual.get(i).get("portrait"));
+            LotteryContestantsVirtual.get(i).put("status", "virtual");
+            LotteryContestants.add(LotteryContestantsVirtual.get(i));
+        }
+        //真实用户
+        List<Map<Object,Object>> LotteryContestantsReal = common_configMapper.showLotteryDrawContestantsReal(id);
+        for (int i = 0; i < LotteryContestantsReal.size(); i++){
+            LotteryContestantsReal.get(i).put("portrait", Const.FTP_PREFIX + LotteryContestantsReal.get(i).get("portrait"));
+            LotteryContestantsReal.get(i).put("status", "real");
+            LotteryContestants.add(LotteryContestantsReal.get(i));
+        }
+        result.put("contestants", LotteryContestants);
+
+        return ServerResponse.createBySuccess("成功！",result);
+    }
+
+
     public ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file,String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request ){
         //将sentence转换成json
         net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);

@@ -129,6 +129,11 @@
     values (#{pic}, #{url}, #{st}, #{et})
   </insert>
 
+  <insert id="insertLotteryDraw" parameterType="string">
+    INSERT INTO lottery_draw (prize, prize_pic, prize_tomorrow, prize_tomorrow_pic, upload_time, set_time)
+    values (#{prize}, #{prize_pic}, #{prize_tomorrow}, #{prize_tomorrow_pic}, #{upload_time}, #{et})
+  </insert>
+
 
   <select id="getDailyAdminInfo" resultType="map">
     SELECT  *
@@ -144,6 +149,45 @@
     WHERE id IN (SELECT  user_id as id
     FROM `author_info`)
     LIMIT #{start},#{size}
+  </select>
+
+  <select id="showLotteryDraw" resultType="map">
+    SELECT *
+    FROM `lottery_draw`
+    WHERE id = #{id}
+  </select>
+
+  <select id="showLotteryDrawWinner" resultType="map" parameterType="string">
+    SELECT id,username,portrait,tb.virtual
+    FROM `user`,(SELECT lottery_draw_contestants.user_id,lottery_draw_contestants.virtual
+                FROM `lottery_draw_contestants`
+                WHERE lottery_draw_id = #{id}
+                AND `status` = 1) tb
+    WHERE `user`.id = tb.user_id
+  </select>
+
+  <select id="showLotteryDrawContestantsVirtual" resultType="map" parameterType="string">
+    SELECT id,username,portrait
+    FROM `user`
+    WHERE id IN
+          (SELECT user_id
+           FROM `virtual_user`
+           WHERE user_id IN
+          (SELECT user_id
+           FROM `lottery_draw_contestants`
+           WHERE lottery_draw_id = #{id}))
+  </select>
+
+  <select id="showLotteryDrawContestantsReal" resultType="map" parameterType="string">
+    SELECT id,username,portrait
+    FROM `user`
+    WHERE id IN
+          (SELECT user_id
+           FROM `lottery_draw_contestants`
+           WHERE lottery_draw_id = #{id} NOT IN
+          (SELECT user_id
+           FROM `virtual_user`
+           WHERE user_id))
   </select>
 
   <select id="getCommonConfig" resultType="map">
@@ -162,7 +206,7 @@
   <select id="getLotteryDrawDescription" resultType="map" parameterType="string">
     SELECT prize,prize_pic,prize_tomorrow,prize_tomorrow_pic,set_time as end_time
     FROM lottery_draw
-    WHERE set_time &gt; #{now_time}
+    WHERE set_time > #{now_time}
     ORDER BY abs(set_time- #{now_time}) ASC
     LIMIT 1
   </select>
@@ -172,13 +216,14 @@
     SELECT table1.prize,table1.prize_pic,`user`.username,`user`.portrait
     FROM `user`,
     (SELECT user_id,tb.prize,prize_pic
-    FROM lottery_draw_winner,
+    FROM lottery_draw_contestants,
     (SELECT id,prize,prize_pic
     FROM lottery_draw
     WHERE set_time &lt; #{now_time}
     ORDER BY abs(set_time - #{now_time}) ASC
     LIMIT 1) tb
-    WHERE lottery_draw_winner.lottery_draw_id = tb.id) table1
+    WHERE lottery_draw_contestants.lottery_draw_id = tb.id
+    AND lottery_draw_contestants.status = 1) table1
     WHERE table1.user_id = `user`.id
   </select>
 

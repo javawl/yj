@@ -71,12 +71,27 @@ public interface Common_configMapper {
     //后台插入福利社
     int insertWelfareService(@Param("pic") String pic,@Param("url") String url,@Param("st") String st,@Param("et") String et);
 
+    //后台插入抽奖奖品
+    int insertLotteryDraw(@Param("prize_pic") String prize_pic,@Param("prize_tomorrow_pic") String prize_tomorrow_pic,@Param("prize") String prize,@Param("prize_tomorrow") String prize_tomorrow,@Param("upload_time") String upload_time,@Param("et") String et);
+
 
     //后台获取每日的那些信息（DAU等）
     List<Map> getDailyAdminInfo(@Param("start") int start, @Param("size") int size);
 
     //后台feeds的作者信息
     List<Map> showAuthorInfo(@Param("start") int start, @Param("size") int size);
+
+    //后台根据id获取奖品
+    Map<Object,Object> showLotteryDraw(@Param("id") String id);
+
+    //后台根据id获取奖品获奖者
+    List<Map<Object,Object>> showLotteryDrawWinner(@Param("id") String id);
+
+    //后台根据id获取奖品参与者虚拟
+    List<Map<Object,Object>> showLotteryDrawContestantsVirtual(@Param("id") String id);
+
+    //后台根据id获取奖品参与者虚拟
+    List<Map<Object,Object>> showLotteryDrawContestantsReal(@Param("id") String id);
 
     //后台获取基础信息（总用户等）
     Map getCommonConfig();

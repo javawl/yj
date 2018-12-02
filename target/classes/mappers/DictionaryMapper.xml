@@ -33,14 +33,14 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, word, meaning, phonetic_symbol_en, pronunciation_en, sentence, pic, tv, type, 
-    phonetic_symbol_us, pronunciation_us, phonetic_symbol, pronunciation, sentence_cn, 
-    sentence_audio, real_meaning, phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
-    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler, phrase, favours, 
+    id, word, meaning, phonetic_symbol_en, pronunciation_en, sentence, pic, tv, type,
+    phonetic_symbol_us, pronunciation_us, phonetic_symbol, pronunciation, sentence_cn,
+    sentence_audio, real_meaning, phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler,
+    phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, meaning_Mumbler, phrase, favours,
     synonym, word_of_similar_form, stem_affix, paraphrase
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from dictionary
     where id = #{id,jdbcType=INTEGER}
@@ -50,25 +50,25 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.yj.pojo.Dictionary" >
-    insert into dictionary (id, word, meaning, 
-      phonetic_symbol_en, pronunciation_en, sentence, 
-      pic, tv, type, phonetic_symbol_us, 
-      pronunciation_us, phonetic_symbol, pronunciation, 
-      sentence_cn, sentence_audio, real_meaning, 
-      phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler, 
-      phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler, 
-      meaning_Mumbler, phrase, favours, 
-      synonym, word_of_similar_form, stem_affix, 
+    insert into dictionary (id, word, meaning,
+      phonetic_symbol_en, pronunciation_en, sentence,
+      pic, tv, type, phonetic_symbol_us,
+      pronunciation_us, phonetic_symbol, pronunciation,
+      sentence_cn, sentence_audio, real_meaning,
+      phonetic_symbol_en_Mumbler, pronunciation_en_Mumbler,
+      phonetic_symbol_us_Mumbler, pronunciation_us_Mumbler,
+      meaning_Mumbler, phrase, favours,
+      synonym, word_of_similar_form, stem_affix,
       paraphrase)
-    values (#{id,jdbcType=INTEGER}, #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR}, 
-      #{phoneticSymbolEn,jdbcType=VARCHAR}, #{pronunciationEn,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR}, 
-      #{pic,jdbcType=VARCHAR}, #{tv,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{phoneticSymbolUs,jdbcType=VARCHAR}, 
-      #{pronunciationUs,jdbcType=VARCHAR}, #{phoneticSymbol,jdbcType=VARCHAR}, #{pronunciation,jdbcType=VARCHAR}, 
-      #{sentenceCn,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR}, 
-      #{phoneticSymbolEnMumbler,jdbcType=VARCHAR}, #{pronunciationEnMumbler,jdbcType=VARCHAR}, 
-      #{phoneticSymbolUsMumbler,jdbcType=VARCHAR}, #{pronunciationUsMumbler,jdbcType=VARCHAR}, 
-      #{meaningMumbler,jdbcType=VARCHAR}, #{phrase,jdbcType=VARCHAR}, #{favours,jdbcType=INTEGER}, 
-      #{synonym,jdbcType=VARCHAR}, #{wordOfSimilarForm,jdbcType=VARCHAR}, #{stemAffix,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{word,jdbcType=VARCHAR}, #{meaning,jdbcType=VARCHAR},
+      #{phoneticSymbolEn,jdbcType=VARCHAR}, #{pronunciationEn,jdbcType=VARCHAR}, #{sentence,jdbcType=VARCHAR},
+      #{pic,jdbcType=VARCHAR}, #{tv,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{phoneticSymbolUs,jdbcType=VARCHAR},
+      #{pronunciationUs,jdbcType=VARCHAR}, #{phoneticSymbol,jdbcType=VARCHAR}, #{pronunciation,jdbcType=VARCHAR},
+      #{sentenceCn,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{realMeaning,jdbcType=VARCHAR},
+      #{phoneticSymbolEnMumbler,jdbcType=VARCHAR}, #{pronunciationEnMumbler,jdbcType=VARCHAR},
+      #{phoneticSymbolUsMumbler,jdbcType=VARCHAR}, #{pronunciationUsMumbler,jdbcType=VARCHAR},
+      #{meaningMumbler,jdbcType=VARCHAR}, #{phrase,jdbcType=VARCHAR}, #{favours,jdbcType=INTEGER},
+      #{synonym,jdbcType=VARCHAR}, #{wordOfSimilarForm,jdbcType=VARCHAR}, #{stemAffix,jdbcType=VARCHAR},
       #{paraphrase,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.yj.pojo.Dictionary" >
@@ -1018,6 +1018,16 @@
     WHERE user_id = #{id}
   </delete>
 
+  <delete id="deleteLotteryDrawContestants" parameterType="string" >
+    delete from lottery_draw_contestants
+    WHERE lottery_draw_id = #{id}
+  </delete>
+
+  <delete id="deleteLotteryDrawWinner" parameterType="string" >
+    delete from lottery_draw_winner
+    WHERE lottery_draw_id = #{id}
+  </delete>
+
   <delete id="deleteDictionaryFavour" parameterType="string" >
     delete from dictionary_favour
     WHERE user_id = #{user_id}
@@ -1116,6 +1126,11 @@
   <select id="countUsers" resultType="string">
     SELECT count(id)
     FROM `user`
+  </select>
+
+  <select id="countLotteryDraw" resultType="string">
+    SELECT count(id)
+    FROM `lottery_draw`
   </select>
 
   <select id="selectAdminVideo" resultType="map" parameterType="string">
@@ -1336,6 +1351,13 @@
     LIMIT #{start},#{size}
   </select>
 
+  <select id="showLotteryDraw" resultType="map">
+    SELECT *
+    FROM `lottery_draw`
+    ORDER BY set_time DESC
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="isWelfareFavour" resultType="map" parameterType="string">
     SELECT id,set_time
     FROM daily_pic_favour
@@ -1366,6 +1388,11 @@
 
   <delete id="deleteFeedsAuthor" parameterType="string">
     DELETE FROM `user`
+    WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteLotteryDraw" parameterType="string">
+    DELETE FROM `lottery_draw`
     WHERE id = #{id}
   </delete>
 

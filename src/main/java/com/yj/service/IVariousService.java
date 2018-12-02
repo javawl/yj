@@ -25,4 +25,10 @@ public interface IVariousService {
 
     //每日一图信息
     ServerResponse<List<Map<Object,Object>>> daily_pic_info(String page,String size,HttpServletRequest request);
+
+    //抽奖描述
+    ServerResponse<Map<Object,Object>> lottery_draw_description(HttpServletRequest request);
+
+    //奖品结果
+    ServerResponse<Map<Object,Object>> lottery_draw_winner(HttpServletRequest request);
 }

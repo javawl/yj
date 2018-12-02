@@ -143,6 +143,19 @@ public class AdminController {
 
 
     /**
+     * 展示单个抽奖的详情
+     * @param id         奖品id
+     * @param request    request
+     * @return           Map
+     */
+    @RequestMapping(value = "show_lottery_draw_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request){
+        return iAdminService.show_lottery_draw_info(id, request);
+    }
+
+
+    /**
      * 展示用户反馈
      * @param page
      * @param size
@@ -236,6 +249,37 @@ public class AdminController {
         }
 
         return ServerResponse.createBySuccess(dictionaryMapper.countUsers(),Info);
+    }
+
+
+    /**
+     * 展示 奖品
+     * @param page 页数
+     * @param size 页大小
+     * @return  List
+     */
+    @RequestMapping(value = "show_lottery_draw.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> show_lottery_draw(String page,String size){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取抽奖信息
+        List<Map> Info = dictionaryMapper.showLotteryDraw(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("set_time",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("set_time").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("prize_pic", Const.FTP_PREFIX + Info.get(i).get("prize_pic").toString());
+            Info.get(i).put("prize_tomorrow_pic", Const.FTP_PREFIX + Info.get(i).get("prize_tomorrow_pic").toString());
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countLotteryDraw(),Info);
     }
 
 
@@ -454,6 +498,43 @@ public class AdminController {
 
 
     /**
+     * 删除奖品
+     * @param id   奖品id
+     * @param response   response
+     * @return  msg
+     */
+    @RequestMapping(value = "delete_lottery_draw.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse delete_lottery_draw(String id, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除奖品
+            int resultLotteryDraw = dictionaryMapper.deleteLotteryDraw(id);
+            if (resultLotteryDraw == 0){
+                throw new Exception();
+            }
+            //删除参加者
+            dictionaryMapper.deleteLotteryDrawContestants(id);
+
+            //删除中奖者
+            dictionaryMapper.deleteLotteryDrawWinner(id);
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            transactionManager.rollback(status);
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
      * 上传feeds流的段子
      * @param sentence
      * @param response
@@ -489,9 +570,17 @@ public class AdminController {
     }
 
 
-
-
-
+    /**
+     * 上传每日一图
+     * @param daily_pic  每日一图全图
+     * @param small_pic  每日一图缩略图
+     * @param year       年份
+     * @param month      月份
+     * @param day        日期
+     * @param response   response
+     * @param request    request
+     * @return           String
+     */
     @RequestMapping(value = "upload_daily_pic.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> upload_daily_pic(@RequestParam(value = "daily_pic",required = false) MultipartFile daily_pic,@RequestParam(value = "small_pic",required = false) MultipartFile small_pic, String year,String month, String day, HttpServletResponse response, HttpServletRequest request){
@@ -531,7 +620,7 @@ public class AdminController {
      * @param et   结束时间
      * @param response  http response
      * @param request   http request
-     * @return
+     * @return String
      */
     @RequestMapping(value = "upload_welfare_service.do", method = RequestMethod.POST)
     @ResponseBody
@@ -551,6 +640,43 @@ public class AdminController {
         String url1 = "welfare_service/"+name1;
         //存到数据库
         int result = common_configMapper.insertWelfareService(url1,url,st_str,et_str);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 上传奖品
+     * @param prize_pic  奖品图片
+     * @param prize_tomorrow_pic   预告奖品图片
+     * @param prize   奖品名称
+     * @param prize_tomorrow   预告奖品名称
+     * @param et  开奖时间  （精确到每一日）
+     * @param request  request
+     * @return  String
+     */
+    @RequestMapping(value = "upload_lottery_draw.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_lottery_draw(@RequestParam(value = "prize_pic",required = false) MultipartFile prize_pic,@RequestParam(value = "prize_tomorrow_pic",required = false) MultipartFile prize_tomorrow_pic,String prize,String prize_tomorrow, String et, HttpServletRequest request){
+        String et_str;
+        try {
+            //获取时间错
+            et_str =  CommonFunc.date2TimeStamp(et+" 12:00:00");
+        }catch (ParseException e){
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("传入日期有误");
+        }
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name1 = iFileService.upload(prize_pic,path,"l_e/lottery_draw");
+        String url1 = "lottery_draw/"+name1;
+
+        String name2 = iFileService.upload(prize_tomorrow_pic,path,"l_e/lottery_draw");
+        String url2 = "lottery_draw/"+name2;
+
+        //存到数据库
+        int result = common_configMapper.insertLotteryDraw(url1, url2, prize, prize_tomorrow,  String.valueOf((new Date()).getTime()),et_str);
         if (result == 0){
             return ServerResponse.createByErrorMessage("更新失败");
         }

@@ -32,4 +32,6 @@ public interface IAdminService {
     ServerResponse<Map> show_admin_data(String page,String size,HttpServletRequest request);
 
     ServerResponse<List<Map>> show_author_info(String page,String size,HttpServletRequest request);
+
+    ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request);
 }
