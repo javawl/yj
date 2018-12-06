@@ -391,113 +391,113 @@ public class AdminServiceImpl implements IAdminService {
             //新的feeds id
             int new_feeds_id = feed.getId();
 
-//            if(sentence_json.size()>0){
-//                for(int i=0;i<sentence_json.size();i++){
-//                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
-//                    String inner = job.get("inner").toString();
-//                    String order = job.get("order").toString();
-//                    String pattern = "<span style=\"(.*?)\">";
+            if(sentence_json.size()>0){
+                for(int i=0;i<sentence_json.size();i++){
+                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
+                    String inner = job.get("inner").toString();
+                    String order = job.get("order").toString();
+                    String pattern = "<span style=\"(.*?)\">";
+                    // 创建 Pattern 对象
+                    Pattern r = Pattern.compile(pattern);
+                    Matcher m = r.matcher(inner);
+                    while(m.find()) {
+                        //这里先构建一个总的字符串
+                        String replace_result = "<font ";
+                        //这个group1里面装的就是我们的style
+                        System.out.println("Found value: " + m.group(1) );
+                        //从style里面将color取出来
+                        // 创建 Pattern 对象
+                        Pattern color_p = Pattern.compile("color: rgb[(](.*?),(.*?),(.*?)[)];");
+                        Matcher color_m = color_p.matcher(m.group(1));
+                        if (color_m.find()){
+                            //这个group1里面装的就是我们的color
+                            System.out.println("Found value: " + color_m.group(0) );
+                            //将rgb转成16进制
+                            String rgb_16 = CommonFunc.convertRGBToHex(Integer.valueOf(color_m.group(1).trim()),Integer.valueOf(color_m.group(2).trim()),Integer.valueOf(color_m.group(3).trim()));
+                            //拼接
+                            replace_result = replace_result + "color=\"" + rgb_16 + "\"" + " ";
+                        }
+
+                        //从style里面将size取出来
+                        // 创建 Pattern 对象
+                        Pattern size_p = Pattern.compile("font-size: (.*?);");
+                        Matcher size_m = size_p.matcher(m.group(1));
+                        if (size_m.find()){
+                            //这个group1里面装的就是我们的color
+                            System.out.println("Found value: " + size_m.group(0) );
+                            String size_string = "";
+                            if (size_m.group(1).trim().equals("x-large")){
+                                size_string+= "size=\"6px\"";
+                            }else if(size_m.group(1).trim().equals("xx-large")){
+                                size_string+= "size=\"8px\"";
+                            }else if(size_m.group(1).trim().equals("large")||size_m.group(1).equals("normal")){
+                                size_string+= "size=\"5px\"";
+                            }else if(size_m.group(1).trim().equals("small")){
+                                size_string+= "size=\"4px\"";
+                            }else if(size_m.group(1).trim().equals("x-small")){
+                                size_string+= "size=\"2px\"";
+                            }
+                            //拼接
+                            replace_result = replace_result + size_string + " ";
+                        }
+
+                        //从style里面将font-family取出来
+                        // 创建 Pattern 对象
+                        Pattern face_p = Pattern.compile("font-family: (.*?);");
+                        Matcher face_m = face_p.matcher(m.group(1));
+                        if (face_m.find()){
+                            //这个group1里面装的就是我们的face
+                            System.out.println("Found value: " + face_m.group(0) );
+                            //拼接
+                            replace_result = replace_result + "face=\"" + face_m.group(1).trim()+"\"";
+                        }
+
+                        String replace_regex = "<span";
+                        Pattern pp = Pattern.compile(replace_regex);
+                        Matcher mm = pp.matcher(inner);
+                        inner = mm.replaceFirst(replace_result);
+                        System.out.println("final: "+ inner);
+                    }
+                    String replace_regex = "span";
+                    Pattern pp = Pattern.compile(replace_regex);
+                    Matcher mm = pp.matcher(inner);
+                    inner = mm.replaceAll("font");
+                    System.out.println("final -: "+ inner);
+
+//                    String pattern_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
 //                    // 创建 Pattern 对象
-//                    Pattern r = Pattern.compile(pattern);
-//                    Matcher m = r.matcher(inner);
-//                    while(m.find()) {
-//                        //这里先构建一个总的字符串
-//                        String replace_result = "<font ";
-//                        //这个group1里面装的就是我们的style
-//                        System.out.println("Found value: " + m.group(1) );
-//                        //从style里面将color取出来
-//                        // 创建 Pattern 对象
-//                        Pattern color_p = Pattern.compile("color: rgb[(](.*?),(.*?),(.*?)[)];");
-//                        Matcher color_m = color_p.matcher(m.group(1));
-//                        if (color_m.find()){
-//                            //这个group1里面装的就是我们的color
-//                            System.out.println("Found value: " + color_m.group(0) );
-//                            //将rgb转成16进制
-//                            String rgb_16 = CommonFunc.convertRGBToHex(Integer.valueOf(color_m.group(1).trim()),Integer.valueOf(color_m.group(2).trim()),Integer.valueOf(color_m.group(3).trim()));
-//                            //拼接
-//                            replace_result = replace_result + "color=\"" + rgb_16 + "\"" + " ";
-//                        }
-//
-//                        //从style里面将size取出来
-//                        // 创建 Pattern 对象
-//                        Pattern size_p = Pattern.compile("font-size: (.*?);");
-//                        Matcher size_m = size_p.matcher(m.group(1));
-//                        if (size_m.find()){
-//                            //这个group1里面装的就是我们的color
-//                            System.out.println("Found value: " + size_m.group(0) );
-//                            String size_string = "";
-//                            if (size_m.group(1).trim().equals("x-large")){
-//                                size_string+= "size=\"6px\"";
-//                            }else if(size_m.group(1).trim().equals("xx-large")){
-//                                size_string+= "size=\"8px\"";
-//                            }else if(size_m.group(1).trim().equals("large")||size_m.group(1).equals("normal")){
-//                                size_string+= "size=\"5px\"";
-//                            }else if(size_m.group(1).trim().equals("small")){
-//                                size_string+= "size=\"4px\"";
-//                            }else if(size_m.group(1).trim().equals("x-small")){
-//                                size_string+= "size=\"2px\"";
-//                            }
-//                            //拼接
-//                            replace_result = replace_result + size_string + " ";
-//                        }
-//
-//                        //从style里面将font-family取出来
-//                        // 创建 Pattern 对象
-//                        Pattern face_p = Pattern.compile("font-family: (.*?);");
-//                        Matcher face_m = face_p.matcher(m.group(1));
-//                        if (face_m.find()){
-//                            //这个group1里面装的就是我们的face
-//                            System.out.println("Found value: " + face_m.group(0) );
-//                            //拼接
-//                            replace_result = replace_result + "face=\"" + face_m.group(1).trim()+"\"";
-//                        }
-//
-//                        String replace_regex = "<span";
-//                        Pattern pp = Pattern.compile(replace_regex);
-//                        Matcher mm = pp.matcher(inner);
-//                        inner = mm.replaceFirst(replace_result);
-//                        System.out.println("final: "+ inner);
+//                    Pattern r_center = Pattern.compile(pattern_center);
+//                    Matcher m_center = r_center.matcher(inner);
+//                    if (m_center.find()){
+//                        //构造最后居中的字符串
+//                        String result_center = "<center " + m_center.group(1) + m_center.group(2) + ">" + m_center.group(3) + "</center>";
+//                        String replace_regex_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
+//                        Pattern pp_center = Pattern.compile(replace_regex_center);
+//                        Matcher mp_center = pp_center.matcher(inner);
+//                        inner = mp_center.replaceFirst(result_center);
 //                    }
-//                    String replace_regex = "span";
-//                    Pattern pp = Pattern.compile(replace_regex);
-//                    Matcher mm = pp.matcher(inner);
-//                    inner = mm.replaceAll("font");
-//                    System.out.println("final -: "+ inner);
 //
-////                    String pattern_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
-////                    // 创建 Pattern 对象
-////                    Pattern r_center = Pattern.compile(pattern_center);
-////                    Matcher m_center = r_center.matcher(inner);
-////                    if (m_center.find()){
-////                        //构造最后居中的字符串
-////                        String result_center = "<center " + m_center.group(1) + m_center.group(2) + ">" + m_center.group(3) + "</center>";
-////                        String replace_regex_center = "<p (.*?)text-align: center;(.*?)>(.*?)</p>";
-////                        Pattern pp_center = Pattern.compile(replace_regex_center);
-////                        Matcher mp_center = pp_center.matcher(inner);
-////                        inner = mp_center.replaceFirst(result_center);
-////                    }
-////
-////                    String pattern_div_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
-////                    // 创建 Pattern 对象
-////                    Pattern r_div_center = Pattern.compile(pattern_div_center);
-////                    Matcher m_div_center = r_div_center.matcher(inner);
-////                    if (m_div_center.find()){
-////                        //构造最后居中的字符串
-////                        String result_div_center = "<center " + m_div_center.group(1) + m_div_center.group(2) + ">" + m_div_center.group(3) + "</center>";
-////                        String replace_div_regex_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
-////                        Pattern pp_div_center = Pattern.compile(replace_div_regex_center);
-////                        Matcher mp_div_center = pp_div_center.matcher(inner);
-////                        inner = mp_div_center.replaceFirst(result_div_center);
-////                    }
-//
-//
-//                    //插入内部
-//                    int result_inner = feedsMapper.insertFeedsInner(String.valueOf(new_feeds_id),inner,order);
-//                    if (result_inner == 0){
-//                        throw new Exception();
+//                    String pattern_div_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
+//                    // 创建 Pattern 对象
+//                    Pattern r_div_center = Pattern.compile(pattern_div_center);
+//                    Matcher m_div_center = r_div_center.matcher(inner);
+//                    if (m_div_center.find()){
+//                        //构造最后居中的字符串
+//                        String result_div_center = "<center " + m_div_center.group(1) + m_div_center.group(2) + ">" + m_div_center.group(3) + "</center>";
+//                        String replace_div_regex_center = "<div (.*?)text-align: center;(.*?)>(.*?)</div>";
+//                        Pattern pp_div_center = Pattern.compile(replace_div_regex_center);
+//                        Matcher mp_div_center = pp_div_center.matcher(inner);
+//                        inner = mp_div_center.replaceFirst(result_div_center);
 //                    }
-//                }
-//            }
+
+
+                    //插入内部
+                    int result_inner = feedsMapper.insertFeedsInner(String.valueOf(new_feeds_id),inner,order);
+                    if (result_inner == 0){
+                        throw new Exception();
+                    }
+                }
+            }
 
             //插入文章里面的图片
             //判断file数组不能为空并且长度大于0
