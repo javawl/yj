@@ -117,6 +117,8 @@ public class HomeServiceImpl implements IHomeService {
                 m1.put("learned_word",learned_word);
                 m1.put("my_plan",plan);
                 m1.put("plan_number",word_number);
+                m1.put("whether_template",SelectPlan.get(0).get("whether_template"));
+                m1.put("whether_reminder",SelectPlan.get(0).get("whether_reminder"));
                 //查出feeds信息并捡出有用的
                 List<Map> feeds = dictionaryMapper.homePageFirstGet();
                 List<Map> feeds_result = new ArrayList<Map>();

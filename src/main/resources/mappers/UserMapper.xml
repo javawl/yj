@@ -478,7 +478,7 @@
     WHERE plans.id = tb.plan_id
   </select>
   <select id="getUserPlanDaysNumber" resultType="map" parameterType="string">
-    SELECT my_plan,plan_days,plan_words_number,insist_day,last_login,register_time,retention_flag
+    SELECT my_plan,plan_days,plan_words_number,insist_day,last_login,register_time,retention_flag,whether_reminder,whether_template
     FROM user
     WHERE id = #{id}
   </select>
