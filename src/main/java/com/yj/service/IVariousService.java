@@ -20,6 +20,9 @@ public interface IVariousService {
     //意见反馈
     ServerResponse<String> advice(String advice,String level,HttpServletRequest request);
 
+    //收集form_id
+    ServerResponse<String> collect_form_id(String form_id,HttpServletRequest request);
+
     //每日一句喜欢
     ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request);
 

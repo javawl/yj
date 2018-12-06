@@ -1018,6 +1018,11 @@
     WHERE user_id = #{id}
   </delete>
 
+  <delete id="deleteVirtualRecord" parameterType="string" >
+    delete from virtual_user
+    WHERE user_id = #{id}
+  </delete>
+
   <delete id="deleteLotteryDrawContestants" parameterType="string" >
     delete from lottery_draw_contestants
     WHERE lottery_draw_id = #{id}
@@ -1111,6 +1116,11 @@
   <select id="countFeedsAuthor" resultType="string">
     SELECT count(id)
     FROM author_info
+  </select>
+
+  <select id="countVirtualUser" resultType="string">
+    SELECT count(id)
+    FROM virtual_user
   </select>
 
   <select id="countAdvice" resultType="string">

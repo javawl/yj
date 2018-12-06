@@ -65,7 +65,7 @@
                         '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+string1+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">设为中奖</button><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">取消中奖</button></td>'+
                         '</tr>');
                 }
                 for(var i = 0; i < winner.length; i++){
@@ -138,9 +138,9 @@
             <td style="border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"><button style="float: right"><a href="show_virtual_user.jsp?page=1&size=15">展示虚拟用户</a></button></td>
             <td style="border-left: 0;">
-                <button style="float: right"><a href="add_author.jsp">新建虚拟用户</a></button>
+                <button style="float: right"><a href="add_virtual_user.jsp">新建虚拟用户</a></button>
             </td>
         </tr>
         <tr>
@@ -156,13 +156,14 @@
 </center>
 </body>
 <script>
-    function del(id) {
-        if (confirm("你确定要删除此单词？删除之后不可恢复！")){
+    function win(id,draw_id) {
+        if (confirm("你确定要设置为中奖？")){
             $.ajax({
-                url:url+"/admin/delete_author.do",
+                url:url+"/admin/change_draw_win_status.do",
                 type:'POST',
                 data:{
-                    id:id
+                    id:id,
+                    draw_id:draw_id
                 },
                 dataType:'json',
                 success:function (result) {

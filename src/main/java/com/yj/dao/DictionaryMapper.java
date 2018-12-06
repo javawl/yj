@@ -323,6 +323,9 @@ public interface DictionaryMapper {
     String countFeedsAuthor();
 
     //后台
+    String countVirtualUser();
+
+    //后台
     String countAdvice();
 
     //后台
@@ -398,6 +401,9 @@ public interface DictionaryMapper {
 
     //后台
     int deleteAuthorRecord(@Param("id") String id);
+
+    //后台
+    int deleteVirtualRecord(@Param("id") String id);
 
     //后台
     int deleteLotteryDrawContestants(@Param("id") String id);

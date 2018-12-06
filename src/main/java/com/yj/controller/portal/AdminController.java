@@ -143,6 +143,20 @@ public class AdminController {
 
 
     /**
+     * 虚拟用户信息
+     * @param page     页数
+     * @param size     页大小
+     * @param request  请求
+     * @return         List
+     */
+    @RequestMapping(value = "show_virtual_user.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> show_virtual_user(String page,String size,HttpServletRequest request){
+        return iAdminService.show_virtual_user(page, size, request);
+    }
+
+
+    /**
      * 展示单个抽奖的详情
      * @param id         奖品id
      * @param request    request
@@ -301,6 +315,42 @@ public class AdminController {
         int result = common_configMapper.changeTopWelfareService(id);
         if (result != 1){
             return ServerResponse.createByErrorMessage("更新出错");
+        }
+
+        return ServerResponse.createBySuccessMessage("成功!");
+    }
+
+
+    /**
+     * 修改中奖状态
+     * @param id        用户id
+     * @param draw_id   活动id
+     * @return          Str
+     */
+    @RequestMapping(value = "change_draw_win_status.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> change_draw_win_status(String id, String draw_id){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(draw_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //先查一下用户的状态
+        String result = common_configMapper.getUserWinStatus(draw_id, id);
+        if (result.equals("1")){
+            //中奖改成没中奖
+            int change_result = common_configMapper.change_draw_win_status("0", id, draw_id);
+            if (change_result != 1){
+                return ServerResponse.createByErrorMessage("更新出错");
+            }
+        }else {
+            //没中奖改成中奖
+            int change_result = common_configMapper.change_draw_win_status("1", id, draw_id);
+            if (change_result != 1){
+                return ServerResponse.createByErrorMessage("更新出错");
+            }
         }
 
         return ServerResponse.createBySuccessMessage("成功!");
@@ -487,6 +537,44 @@ public class AdminController {
             if (result_recode == 0){
                 throw new Exception();
             }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            transactionManager.rollback(status);
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 删除虚拟用户
+     * @param id         虚拟用户id
+     * @param response   response
+     * @return           Str
+     */
+    @RequestMapping(value = "delete_virtual_user.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse delete_virtual_user(String id, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除用户列表信息（这里借用一下读者那里的sql）
+            int resultAuthor = dictionaryMapper.deleteFeedsAuthor(id);
+            if (resultAuthor == 0){
+                throw new Exception();
+            }
+            //删除虚拟用户记录
+            int result_recode = dictionaryMapper.deleteVirtualRecord(id);
+            if (result_recode == 0){
+                throw new Exception();
+            }
+            //删除参与记录
+            common_configMapper.deleteDrawVirtualUser(id);
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
@@ -732,6 +820,65 @@ public class AdminController {
         }
     }
 
+
+    /**
+     * 新建虚拟用户
+     * @param portrait   头像
+     * @param username   昵称
+     * @param gender     性别
+     * @param sign       个性签名
+     * @param response   response
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "upload_virtual_user.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_virtual_user(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username,String gender, String sign, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //头像
+            String name1 = iFileService.upload(portrait,path,"l_e/user/portrait");
+            String url1 = "user/portrait/"+name1;
+            //存到数据库
+            //这里插入一下
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("B305FDA58B6ADD5B4EBE25E94FB09FD2");
+            user.setPortrait(url1);
+            user.setGender(Integer.valueOf(gender));
+            user.setPlanDays(0);
+            user.setPlanWordsNumber(0);
+            user.setInsistDay(0);
+            user.setWhetherOpen(1);
+            user.setClockDay(0);
+            user.setPersonalitySignature(sign);
+            //时间戳
+            user.setRegisterTime(String.valueOf(new Date().getTime()));
+
+            int resultCount = userMapper.insertUser(user);
+            System.out.println(resultCount);
+            if (resultCount != 1){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            //新的user id
+            int new_user_id = user.getId();
+            //插到虚拟用户
+            common_configMapper.insertVirtualId(String.valueOf(new_user_id));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
     /**
      * 合成音频
      * @param response
@@ -759,13 +906,12 @@ public class AdminController {
 
 
 
-    @RequestMapping(value = "test.do", method = RequestMethod.POST)
+    @RequestMapping(value = "test.do", method = RequestMethod.GET)
     @ResponseBody
     public String test(HttpServletResponse response, HttpServletRequest request){
-        String path = request.getSession().getServletContext().getRealPath("upload");
-        System.out.println(path);
+        System.out.println(CommonFunc.getMonthOneDate());
 //        String name = iFileService.upload(file,path);
-        return path;
+        return CommonFunc.getMonthOneDate();
     }
 
     @RequestMapping(value = "test2.do", method = RequestMethod.POST)

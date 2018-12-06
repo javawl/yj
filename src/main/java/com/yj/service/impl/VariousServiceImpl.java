@@ -271,6 +271,40 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+    @Override
+    public ServerResponse<String> collect_form_id(String form_id,HttpServletRequest request){
+        //意见反馈
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+            add(form_id);
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+
+            //将openid查出来
+            String openid = common_configMapper.getUserOpenid(id);
+            if (openid == null || openid.length() == 0){
+                return ServerResponse.createByErrorMessage("非微信用户！");
+            }
+            //插入
+            int result = common_configMapper.insertTemplateFormId(id, openid, form_id, String.valueOf((new Date()).getTime()));
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("提交失败！");
+            }
+
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
 
 
 

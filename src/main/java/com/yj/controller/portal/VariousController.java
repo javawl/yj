@@ -58,6 +58,20 @@ public class VariousController {
 
 
     /**
+     * 收集form_id
+     * @param form_id    form_id
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "collect_form_id.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> collect_form_id(String form_id,HttpServletRequest request){
+        //调用service层
+        return iVariousService.collect_form_id(form_id,request);
+    }
+
+
+    /**
      * 每日一图的喜欢和取消
      * @param id
      * @param request

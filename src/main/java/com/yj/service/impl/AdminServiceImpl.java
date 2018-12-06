@@ -273,6 +273,35 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
+    //展示查看数据
+    @Override
+    public ServerResponse<List<Map>> show_virtual_user(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取虚拟用户信息
+        List<Map> userInfo = common_configMapper.showVirtualUser(start,Integer.valueOf(size));
+
+        for(int i = 0; i < userInfo.size(); i++){
+            if (Integer.valueOf(userInfo.get(i).get("gender").toString()) == 0){
+                //代表男
+                userInfo.get(i).put("gender","男");
+            }else {
+                userInfo.get(i).put("gender","女");
+            }
+            userInfo.get(i).put("portrait",Const.FTP_PREFIX + userInfo.get(i).get("portrait").toString());
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUser(),userInfo);
+    }
+
+
     //展示单个奖品和奖品的详情
     public ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request){
         //验证参数是否为空
@@ -676,7 +705,7 @@ public class AdminServiceImpl implements IAdminService {
 
         //把四六级的词取出来逐个生成视频
 
-        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,6);
+        List<Map> word_list = dictionaryMapper.getWordByType(0,6000,76);
 //        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
         for (int i = 0; i < word_list.size(); i++){
             String id = word_list.get(i).get("id").toString();
@@ -692,6 +721,25 @@ public class AdminServiceImpl implements IAdminService {
                 dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
             }
         }
+
+//        for (int j = 0; j < 1; j++){
+//            word_list = dictionaryMapper.getWordByType(0,6000,76+j);
+////        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
+//            for (int i = 0; i < word_list.size(); i++){
+//                String id = word_list.get(i).get("id").toString();
+//                String sentence = word_list.get(i).get("sentence").toString();
+//                if (sentence.length() == 0){
+//                    continue;
+//                }
+//                String uploadFileName = make_voice(sentence,response,request);
+//                uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
+//                //判断文件存不存在
+//                Boolean is_exist = existHttpPath(Const.FTP_PREFIX + uploadFileName);
+//                if (is_exist){
+//                    dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
+//                }
+//            }
+//        }
 
 //        List<Map> w_list = dictionaryMapper.getWordByType(0,6000,4);
 //        for (int j = 0; j < w_list.size(); j++){

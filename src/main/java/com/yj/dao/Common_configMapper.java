@@ -32,6 +32,9 @@ public interface Common_configMapper {
     //修改MAU
     int changeMAU(@Param("mau") int mau, @Param("set_time") String set_time);
 
+    //修改中奖状态
+    int change_draw_win_status(@Param("status") String status, @Param("user_id") String user_id, @Param("lottery_draw_id") String lottery_draw_id);
+
     //修改日完成任务次数
     int changeDailyFinishWork(@Param("daily_finish_work") int daily_finish_work, @Param("set_time") String set_time);
 
@@ -56,6 +59,9 @@ public interface Common_configMapper {
     //删除feeds的内部内容
     int deleteFeedsInner(@Param("id") String id);
 
+    //删除参与抽奖的虚拟用户
+    int deleteDrawVirtualUser(@Param("id") String id);
+
     //删除feeds
     int deleteFeeds(@Param("id") String id);
 
@@ -74,6 +80,11 @@ public interface Common_configMapper {
     //后台插入抽奖奖品
     int insertLotteryDraw(@Param("prize_pic") String prize_pic,@Param("prize_tomorrow_pic") String prize_tomorrow_pic,@Param("prize") String prize,@Param("prize_tomorrow") String prize_tomorrow,@Param("upload_time") String upload_time,@Param("et") String et);
 
+    //插入虚拟id
+    int insertVirtualId(@Param("user_id") String user_id);
+
+    //插入模板消息的form_id
+    int insertTemplateFormId(@Param("user_id") String user_id,@Param("wechat") String wechat,@Param("form_id") String form_id,@Param("set_time") String set_time);
 
     //后台获取每日的那些信息（DAU等）
     List<Map> getDailyAdminInfo(@Param("start") int start, @Param("size") int size);
@@ -81,8 +92,14 @@ public interface Common_configMapper {
     //后台feeds的作者信息
     List<Map> showAuthorInfo(@Param("start") int start, @Param("size") int size);
 
+    //后台虚拟用户信息
+    List<Map> showVirtualUser(@Param("start") int start, @Param("size") int size);
+
     //后台根据id获取奖品
     Map<Object,Object> showLotteryDraw(@Param("id") String id);
+
+    //获取openid
+    String getUserOpenid(@Param("id") String id);
 
     //后台根据id获取奖品获奖者
     List<Map<Object,Object>> showLotteryDrawWinner(@Param("id") String id);
@@ -95,6 +112,9 @@ public interface Common_configMapper {
 
     //后台获取基础信息（总用户等）
     Map getCommonConfig();
+
+    //查看用户的获奖情况
+    String getUserWinStatus(@Param("lottery_draw_id") String  lottery_draw_id,@Param("user_id") String  user_id);
 
     //后台获取基础信息（总用户等）
     List<Map> getAdvice(@Param("start") int start, @Param("size") int size);
