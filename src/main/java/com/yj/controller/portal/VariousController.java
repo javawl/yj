@@ -72,6 +72,32 @@ public class VariousController {
 
 
     /**
+     * 点击小鱼预约提醒 & 关闭预约
+     * @param request   request
+     * @return          Str
+     */
+    @RequestMapping(value = "appointment_to_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> appointment_to_remind(HttpServletRequest request){
+        //调用service层
+        return iVariousService.appointment_to_remind(request);
+    }
+
+
+    /**
+     * 开启 & 关闭模板消息
+     * @param request request
+     * @return        Str
+     */
+    @RequestMapping(value = "change_template_status.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> change_template_status(HttpServletRequest request){
+        //调用service层
+        return iVariousService.change_template_status(request);
+    }
+
+
+    /**
      * 每日一图的喜欢和取消
      * @param id
      * @param request

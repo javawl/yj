@@ -38,6 +38,15 @@ public interface Common_configMapper {
     //修改日完成任务次数
     int changeDailyFinishWork(@Param("daily_finish_work") int daily_finish_work, @Param("set_time") String set_time);
 
+    //修改用户预约提醒状态
+    int changeUserRemind(@Param("whether_reminder") String whether_reminder, @Param("id") String id);
+
+    //开启模板消息
+    int changeUserTemplateOpen(@Param("id") String id);
+
+    //关闭模板消息(因为要关多一个状态就是预约提醒状态)
+    int changeUserTemplateClose(@Param("id") String id);
+
     //置顶福利社
     int changeTopWelfareService(@Param("id") String id);
 
@@ -100,6 +109,12 @@ public interface Common_configMapper {
 
     //获取openid
     String getUserOpenid(@Param("id") String id);
+
+    //获取是否预约提醒
+    String getUserWhetherReminder(@Param("id") String id);
+
+    //获取是否开启模板消息
+    String getUserWhetherTemplate(@Param("id") String id);
 
     //后台根据id获取奖品获奖者
     List<Map<Object,Object>> showLotteryDrawWinner(@Param("id") String id);

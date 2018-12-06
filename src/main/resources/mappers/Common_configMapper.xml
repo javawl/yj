@@ -187,6 +187,18 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getUserWhetherReminder" resultType="string">
+    SELECT whether_reminder
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
+  <select id="getUserWhetherTemplate" resultType="string">
+    SELECT whether_template
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
   <select id="showLotteryDrawWinner" resultType="map" parameterType="string">
     SELECT id,username,portrait,tb.virtual
     FROM `user`,(SELECT lottery_draw_contestants.user_id,lottery_draw_contestants.virtual
@@ -267,6 +279,25 @@
     UPDATE data_info
     set `daily_finish_work` = daily_finish_work + #{daily_finish_work}
     WHERE set_time = #{set_time}
+  </update>
+
+  <update id="changeUserRemind">
+    UPDATE `user`
+    set `whether_reminder` = #{whether_reminder}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeUserTemplateOpen">
+    UPDATE `user`
+    set `whether_template` = 1
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeUserTemplateClose">
+    UPDATE `user`
+    set `whether_template` = 0,
+    `whether_reminder` = 0
+    WHERE id = #{id}
   </update>
 
   <update id="changeTopWelfareService" parameterType="string">

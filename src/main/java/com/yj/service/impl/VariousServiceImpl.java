@@ -304,8 +304,76 @@ public class VariousServiceImpl implements IVariousService {
         }
     }
 
+    //Wx预约提醒和关闭
+    public ServerResponse<String> appointment_to_remind(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //将状态查出来
+            String status = common_configMapper.getUserWhetherReminder(id);
+            if (status.equals("1")){
+                //提醒状态变回非提醒
+                int result = common_configMapper.changeUserRemind("0", id);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("提交失败！");
+                }
+            }else {
+                //变成提醒
+                int result = common_configMapper.changeUserRemind("1", id);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("提交失败！");
+                }
+            }
+
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
 
 
+    //Wx开启和关闭模板消息
+    public ServerResponse<String> change_template_status(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //将状态查出来
+            String status = common_configMapper.getUserWhetherTemplate(id);
+            if (status.equals("1")){
+                //开启状态变回关闭
+                int result = common_configMapper.changeUserTemplateClose(id);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("提交失败！");
+                }
+            }else {
+                //变成开启
+                int result = common_configMapper.changeUserTemplateOpen(id);
+                if (result == 0){
+                    return ServerResponse.createByErrorMessage("提交失败！");
+                }
+            }
+
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
 
 
     //下面是抽奖和奖金池机制

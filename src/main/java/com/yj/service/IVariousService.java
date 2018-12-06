@@ -23,6 +23,12 @@ public interface IVariousService {
     //收集form_id
     ServerResponse<String> collect_form_id(String form_id,HttpServletRequest request);
 
+    //Wx预约提醒和关闭
+    ServerResponse<String> appointment_to_remind(HttpServletRequest request);
+
+    //Wx开启和关闭模板消息
+    ServerResponse<String> change_template_status(HttpServletRequest request);
+
     //每日一句喜欢
     ServerResponse<String> favour_daily_pic(String id, HttpServletRequest request);
 
