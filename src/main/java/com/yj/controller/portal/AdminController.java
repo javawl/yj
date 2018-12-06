@@ -610,7 +610,7 @@ public class AdminController {
             dictionaryMapper.deleteLotteryDrawContestants(id);
 
             //删除中奖者
-            dictionaryMapper.deleteLotteryDrawWinner(id);
+//            dictionaryMapper.deleteLotteryDrawWinner(id);
 
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
