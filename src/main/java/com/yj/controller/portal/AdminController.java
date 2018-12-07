@@ -661,6 +661,7 @@ public class AdminController {
                 //发送模板消息
                 WxMssVo wxMssVo = new WxMssVo();
                 wxMssVo.setTemplate_id(Const.TMP_ID1);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
                 wxMssVo.setTouser(info.get("wechat").toString());
                 wxMssVo.setPage(Const.WX_HOME_PATH);
                 wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
@@ -703,6 +704,7 @@ public class AdminController {
                 //发送模板消息
                 WxMssVo wxMssVo = new WxMssVo();
                 wxMssVo.setTemplate_id(Const.TMP_ID2);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
                 wxMssVo.setTouser(info.get("wechat").toString());
                 wxMssVo.setPage(Const.WX_HOME_PATH);
                 wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
