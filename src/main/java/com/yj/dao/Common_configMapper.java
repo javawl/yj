@@ -126,7 +126,7 @@ public interface Common_configMapper {
     List<Map<Object,Object>> getAllVirtualUser();
 
     //获取所有微信用户id
-    List<Map<Object,Object>> getAllWxUser();
+    List<Map<Object,Object>> getAllWxUser(@Param("last_login") String last_login);
 
     //获取所有参与抽奖微信用户id
     List<Map<Object,Object>> getAllDrawWxUser(@Param("lottery_draw_id") String lottery_draw_id);

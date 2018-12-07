@@ -651,7 +651,7 @@ public class AdminController {
         //获取accessToken
         AccessToken access_token = CommonFunc.getAccessToken();
         //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
         for(int i = 0; i < all_user.size(); i++){
             //查没过期的from_id
             Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
@@ -692,7 +692,7 @@ public class AdminController {
         //获取accessToken
         AccessToken access_token = CommonFunc.getAccessToken();
         //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
         //查找明天奖品
         String prize = common_configMapper.getDrawName(CommonFunc.getNextDate12());
         for(int i = 0; i < all_user.size(); i++){
@@ -736,7 +736,7 @@ public class AdminController {
         //获取accessToken
         AccessToken access_token = CommonFunc.getAccessToken();
         //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
         for(int i = 0; i < all_user.size(); i++){
             //查没过期的from_id
             Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
