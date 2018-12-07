@@ -146,6 +146,12 @@
     values (#{user_id})
   </insert>
 
+
+  <insert id="insertLotteryDrawReal" parameterType="string">
+    INSERT INTO lottery_draw_contestants (user_id,lottery_draw_id,set_time,`virtual`)
+    values (#{user_id},#{lottery_draw_id},#{set_time},#{virtual})
+  </insert>
+
   <insert id="insertTemplateFormId" parameterType="string">
     INSERT INTO template_msg (user_id,wechat,form_id,set_time)
     values (#{user_id},#{wechat},#{form_id},#{set_time})
@@ -179,6 +185,37 @@
     SELECT *
     FROM `lottery_draw`
     WHERE id = #{id}
+  </select>
+
+
+  <select id="getAllVirtualUser" resultType="map">
+    SELECT user_id
+    FROM `virtual_user`
+  </select>
+
+  <select id="getAllWxUser" resultType="map">
+    SELECT id,my_plan,last_login
+    FROM `user`
+    WHERE wechat is NOT NULL
+    AND (`last_login` &lt; #{last_login}
+    OR `last_login` is NULL)
+  </select>
+
+  <select id="getAllDrawWxUser" resultType="map">
+    SELECT `user`.id
+    FROM `user`,lottery_draw_contestants
+    WHERE `user`.wechat is NOT NULL
+    AND `user`.id = lottery_draw_contestants.user_id
+    AND lottery_draw_contestants.lottery_draw_id = #{lottery_draw_id}
+  </select>
+
+  <select id="getTmpInfo" resultType="map">
+    SELECT id,form_id,wechat
+    FROM `template_msg`
+    WHERE user_id = #{user_id}
+    AND set_time > #{set_time}
+    ORDER BY set_time ASC
+    LIMIT 1
   </select>
 
   <select id="getUserOpenid" resultType="string">
@@ -226,7 +263,8 @@
     WHERE id IN
           (SELECT user_id
            FROM `lottery_draw_contestants`
-           WHERE lottery_draw_id = #{id})
+           WHERE lottery_draw_id = #{id}
+           AND `virtual` = 0)
   </select>
 
   <select id="getCommonConfig" resultType="map">
@@ -246,6 +284,28 @@
     SELECT  *
     FROM `advice`
     LIMIT #{start},#{size}
+  </select>
+
+
+  <select id="getDrawId" resultType="string">
+    SELECT  id
+    FROM `lottery_draw`
+    WHERE set_time = #{time}
+  </select>
+
+  <select id="getDrawName" resultType="string">
+    SELECT  prize
+    FROM `lottery_draw`
+    WHERE set_time = #{time}
+  </select>
+
+  <select id="getVirtualWinner" resultType="map">
+    SELECT  `virtual_user`.user_id as user_id
+    FROM `virtual_user`,lottery_draw_contestants
+    WHERE `virtual_user`.status = 0
+    AND lottery_draw_contestants.user_id = `virtual_user`.user_id
+    AND lottery_draw_contestants.lottery_draw_id = #{lottery_draw_id}
+    LIMIT #{number}
   </select>
 
 
@@ -275,6 +335,25 @@
   </select>
 
 
+  <select id="getLotteryDrawWinnerNumber" resultType="int" parameterType="string">
+    SELECT count(lottery_draw_contestants.id)
+    FROM lottery_draw_contestants,
+         (SELECT id,prize,prize_pic
+          FROM lottery_draw
+          ORDER BY abs(set_time - #{now_time}) ASC
+                   LIMIT 1) tb
+    WHERE lottery_draw_contestants.lottery_draw_id = tb.id
+    AND lottery_draw_contestants.status = 1
+  </select>
+
+  <select id="getNowPrize" resultType="string" parameterType="string">
+    SELECT id
+    FROM lottery_draw
+    ORDER BY abs(set_time - #{now_time}) ASC
+    LIMIT 1
+  </select>
+
+
   <update id="changeDailyFinishWork">
     UPDATE data_info
     set `daily_finish_work` = daily_finish_work + #{daily_finish_work}
@@ -291,6 +370,18 @@
     UPDATE `user`
     set `whether_template` = 1
     WHERE id = #{id}
+  </update>
+
+  <update id="changeVirtualStatus">
+    UPDATE `virtual_user`
+    set `status` = 1
+    WHERE user_id = #{id}
+  </update>
+
+  <update id="changeVirtualStatusNot">
+    UPDATE `virtual_user`
+    set `status` = 0
+    WHERE user_id = #{id}
   </update>
 
   <update id="changeUserTemplateClose">
@@ -340,6 +431,11 @@
     where feeds_id = #{id}
   </delete>
 
+  <delete id="deleteWinVirtual">
+    DELETE FROM virtual_user
+    where status = 1
+  </delete>
+
   <delete id="deleteDrawVirtualUser" parameterType="string" >
     DELETE FROM lottery_draw_contestants
     where user_id = #{id}
@@ -347,6 +443,11 @@
 
   <delete id="deleteFeeds" parameterType="string" >
     DELETE FROM feeds
+    where id = #{id}
+  </delete>
+
+  <delete id="deleteTemplateMsg" parameterType="string" >
+    DELETE FROM template_msg
     where id = #{id}
   </delete>
 

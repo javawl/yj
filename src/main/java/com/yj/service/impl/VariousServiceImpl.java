@@ -295,7 +295,7 @@ public class VariousServiceImpl implements IVariousService {
                 return ServerResponse.createByErrorMessage("非微信用户！");
             }
             //插入
-            int result = common_configMapper.insertTemplateFormId(id, openid, form_id, String.valueOf((new Date()).getTime()));
+            int result = common_configMapper.insertTemplateFormId(id, openid, form_id, CommonFunc.getNextSixDate());
             if (result == 0){
                 return ServerResponse.createByErrorMessage("提交失败！");
             }

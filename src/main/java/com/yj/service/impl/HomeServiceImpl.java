@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import jdk.nashorn.internal.parser.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1676,11 +1677,21 @@ public class HomeServiceImpl implements IHomeService {
                     throw new Exception();
                 }
 
+                //如果是微信用户的话加进抽奖名单
+                if (token.length() > 32){
+                    String act = common_config.getDrawId(CommonFunc.getNextDate12());
+                    if (act != null){
+                        common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
+                    }
+                }
+
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 transactionManager.rollback(status);
+                logger.error("打卡异常",e.getStackTrace());
+                logger.error("打卡异常",e);
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
         }

@@ -2,9 +2,7 @@ package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yj.common.CommonFunc;
-import com.yj.common.Const;
-import com.yj.common.ServerResponse;
+import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
@@ -339,21 +337,37 @@ public class AdminController {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //先查一下用户的状态
         String result = common_configMapper.getUserWinStatus(draw_id, id);
-        if (result.equals("1")){
-            //中奖改成没中奖
-            int change_result = common_configMapper.change_draw_win_status("0", id, draw_id);
-            if (change_result != 1){
-                return ServerResponse.createByErrorMessage("更新出错");
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            if (result.equals("1")){
+                //中奖改成没中奖
+                int change_result = common_configMapper.change_draw_win_status("0", id, draw_id);
+                if (change_result != 1){
+                    return ServerResponse.createByErrorMessage("更新出错");
+                }
+                //状态改为没中奖
+                common_configMapper.changeVirtualStatusNot(id);
+            }else {
+                //没中奖改成中奖
+                int change_result = common_configMapper.change_draw_win_status("1", id, draw_id);
+                if (change_result != 1){
+                    return ServerResponse.createByErrorMessage("更新出错");
+                }
+                //状态改为中奖
+                common_configMapper.changeVirtualStatus(id);
             }
-        }else {
-            //没中奖改成中奖
-            int change_result = common_configMapper.change_draw_win_status("1", id, draw_id);
-            if (change_result != 1){
-                return ServerResponse.createByErrorMessage("更新出错");
-            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错");
         }
-
-        return ServerResponse.createBySuccessMessage("成功!");
     }
 
 
@@ -623,6 +637,202 @@ public class AdminController {
 
 
     /**
+     * 发送第一个学习提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "send_remind1.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String send_remind1(String token, HttpServletResponse response){
+        if (!token.equals("beibei1")){
+            return "false";
+        }
+        //获取accessToken
+        AccessToken access_token = CommonFunc.getAccessToken();
+        //给所有用户发送
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        for(int i = 0; i < all_user.size(); i++){
+            //查没过期的from_id
+            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+            if (info != null){
+                common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_ID1);
+                wxMssVo.setTouser(info.get("wechat").toString());
+                wxMssVo.setPage(Const.WX_HOME_PATH);
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(info.get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
+                list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
+                wxMssVo.setParams(list);
+                CommonFunc.sendTemplateMessage(wxMssVo);
+            }
+        }
+        return "success";
+    }
+
+
+    /**
+     * 发送第2个学习提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "send_remind2.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String send_remind2(String token, HttpServletResponse response){
+        if (!token.equals("beibei2")){
+            return "false";
+        }
+        //获取accessToken
+        AccessToken access_token = CommonFunc.getAccessToken();
+        //给所有用户发送
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        //查找明天奖品
+        String prize = common_configMapper.getDrawName(CommonFunc.getNextDate12());
+        for(int i = 0; i < all_user.size(); i++){
+            //查没过期的from_id
+            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+            if (info != null){
+                common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_ID2);
+                wxMssVo.setTouser(info.get("wechat").toString());
+                wxMssVo.setPage(Const.WX_HOME_PATH);
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(info.get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData(prize,"#ffffff"));
+                list.add(new TemplateData("完成学习任务就可参加抽奖获"+ prize ,"#ffffff"));
+                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                wxMssVo.setParams(list);
+                CommonFunc.sendTemplateMessage(wxMssVo);
+            }
+        }
+        return "success";
+    }
+
+
+    /**
+     * 发送第3个学习提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "send_remind3.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String send_remind3(String token, HttpServletResponse response){
+        if (!token.equals("beibei3")){
+            return "false";
+        }
+        //获取accessToken
+        AccessToken access_token = CommonFunc.getAccessToken();
+        //给所有用户发送
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser();
+        for(int i = 0; i < all_user.size(); i++){
+            //查没过期的from_id
+            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+            if (info != null){
+                common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_ID3);
+                wxMssVo.setTouser(info.get("wechat").toString());
+                wxMssVo.setPage(Const.WX_HOME_PATH);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(info.get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("每天起床第一句，宝贝快来背呗背单词嘛~~","#ffffff"));
+                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                wxMssVo.setParams(list);
+                CommonFunc.sendTemplateMessage(wxMssVo);
+            }
+        }
+        return "success";
+    }
+
+
+    /**
+     * 开奖
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "send_remind4.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String send_remind4(String token, HttpServletResponse response){
+        if (!token.equals("end_draw")){
+            return "false";
+        }
+        //获取本期
+        int prize_id = Integer.valueOf(common_configMapper.getNowPrize(String.valueOf((new Date()).getTime())));
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除以前中奖的虚拟用户
+            common_configMapper.deleteWinVirtual();
+            //首先先看看有没有三个中奖者
+            int winner_number = common_configMapper.getLotteryDrawWinnerNumber(String.valueOf((new Date()).getTime()));
+            if (winner_number < 3){
+                //不够中奖者抽取虚拟用户
+                List<Map<Object,Object>> virtual_list = common_configMapper.getVirtualWinner(String.valueOf(prize_id),(3-winner_number));
+                //插入
+                for (int i = 0; i < virtual_list.size(); i ++){
+                    //中奖
+                    common_configMapper.change_draw_win_status("1", virtual_list.get(i).get("user_id").toString(), String.valueOf(prize_id));
+                    //状态改为中奖
+                    common_configMapper.changeVirtualStatus(virtual_list.get(i).get("user_id").toString());
+                }
+            }
+            transactionManager.commit(status);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return "更新出错！";
+        }
+
+        //获取accessToken
+        AccessToken access_token = CommonFunc.getAccessToken();
+        //给所有用户发送
+        List<Map<Object,Object>> all_user =  common_configMapper.getAllDrawWxUser(String.valueOf(prize_id));
+        for(int i = 0; i < all_user.size(); i++){
+            //查没过期的from_id
+            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+            if (info != null){
+                //删除这个form_id
+                common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_ID4);
+                wxMssVo.setTouser(info.get("wechat").toString());
+                wxMssVo.setPage(Const.DRAW_RESULT_PATH);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(info.get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("今天的幸运儿已经诞生啦，快来看看是不是你吧~~","#ffffff"));
+                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                wxMssVo.setParams(list);
+                CommonFunc.sendTemplateMessage(wxMssVo);
+            }
+        }
+        return "success";
+    }
+
+
+    /**
      * 上传feeds流的段子
      * @param sentence
      * @param response
@@ -763,12 +973,35 @@ public class AdminController {
         String name2 = iFileService.upload(prize_tomorrow_pic,path,"l_e/lottery_draw");
         String url2 = "lottery_draw/"+name2;
 
-        //存到数据库
-        int result = common_configMapper.insertLotteryDraw(url1, url2, prize, prize_tomorrow,  String.valueOf((new Date()).getTime()),et_str);
-        if (result == 0){
-            return ServerResponse.createByErrorMessage("更新失败");
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //存到数据库
+            int result = common_configMapper.insertLotteryDraw(url1, url2, prize, prize_tomorrow,  String.valueOf((new Date()).getTime()),et_str);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            //将新插的id找出来
+            String act = common_configMapper.getDrawId(et_str);
+
+            //将所有的虚拟用户加进抽奖
+            List<Map<Object,Object>> all_virtual_user = common_configMapper.getAllVirtualUser();
+            for (int i = 0; i < all_virtual_user.size(); i++){
+                String user_id = all_virtual_user.get(i).get("user_id").toString();
+                common_configMapper.insertLotteryDrawReal(user_id,act,et_str,"1");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
         }
-        return ServerResponse.createBySuccessMessage("成功");
     }
 
 

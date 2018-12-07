@@ -13,6 +13,12 @@ public class Const {
 //    public static final String DOMAIN_NAME = "http://localhost:8088";   //域名
     public static final String DOMAIN_NAME = "http://47.107.62.22:8080";   //域名
     public static final String FTP_PREFIX = "http://47.107.62.22/l_e/";   //文件服务器域名前缀
+    public static final String TMP_ID1 = "qJ2eNCoVi2gL2cXa3UP0nBfaeJ3pGPHrLAtsaWFSyv0";   //第一条提醒的tmp_id
+    public static final String TMP_ID2 = "qJ2eNCoVi2gL2cXa3UP0nE9nIOuV5pf1UtWnJNxL9PI";   //第二条提醒的tmp_id
+    public static final String TMP_ID3 = "qJ2eNCoVi2gL2cXa3UP0nI6BF51HUr89vu1QOB76A_c";   //第三条提醒的tmp_id
+    public static final String TMP_ID4 = "n8LmNWU0Z76k07USceUqbwWc7oZE8tQnfnN-xsi80jo";   //抽奖结果的tmp_id
+    public static final String DRAW_RESULT_PATH = "pages/home/prize/prize_result";   //抽奖结果的路径
+    public static final String WX_HOME_PATH = "pages/home/home";   //home的路径
     public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间

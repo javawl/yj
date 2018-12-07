@@ -451,6 +451,7 @@ public class UserServiceImpl implements IUserService {
 
             //这是用户除了选择的词库外拥有的词库
             List<Map> have_plan = userMapper.getUserPlan(id);
+            List<Map> result = new ArrayList<>();
             //置顶已学计划
             for (int i = 0; i < have_plan.size(); i++){
                 if (have_plan.get(i).get("plan").toString().equals(SelectPlan.get("my_plan").toString())){
@@ -462,7 +463,7 @@ public class UserServiceImpl implements IUserService {
                     m3.put("days",have_plan.get(i).get("days").toString());
                     m3.put("daily_word_number",have_plan.get(i).get("daily_word_number").toString());
                     m3.put("learned_word",have_plan.get(i).get("learned_word_number").toString());
-                    have_plan.set(i, m3);
+                    result.add(m3);
                 }
             }
             for (int i = 0; i < have_plan.size(); i++){
@@ -475,10 +476,10 @@ public class UserServiceImpl implements IUserService {
                     m3.put("days", have_plan.get(i).get("days").toString());
                     m3.put("daily_word_number", have_plan.get(i).get("daily_word_number").toString());
                     m3.put("learned_word", have_plan.get(i).get("learned_word_number").toString());
-                    have_plan.set(i, m3);
+                    result.add(m3);
                 }
             }
-            m1.put("have_plan",have_plan);
+            m1.put("have_plan",result);
             return ServerResponse.createBySuccess("成功！",m1);
         }
     }

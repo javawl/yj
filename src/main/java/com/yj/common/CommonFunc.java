@@ -1,6 +1,7 @@
 package com.yj.common;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
@@ -12,6 +13,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.yj.dao.DictionaryMapper;
 import com.yj.util.MD5Util;
+import com.yj.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -386,6 +393,33 @@ public class CommonFunc {
         return time + "000";
     }
 
+    //获取第二天十二点时间戳
+    public static String getNextDate12(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, +1);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+    //获取六天后的时间戳
+    public static String getNextSixDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, +6);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
     //获取传入时间的那天的零点多一秒的时间戳
     public static String getRegisterTimeOne(String register_time) {
         //获取注册时间零点
@@ -696,5 +730,91 @@ public class CommonFunc {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
         return status;
+    }
+
+    public static AccessToken getAccessToken() {
+        AccessToken token = null;
+        String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
+        String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
+        // 发起GET请求获取凭证
+        JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
+
+        if (null != jsonObject) {
+            try {
+                token = new AccessToken();
+                token.setAccessToken(jsonObject.getString("access_token"));
+                token.setExpiresIn(jsonObject.getInteger("expires_in"));
+            } catch (JSONException e) {
+                token = null;
+                // 获取token失败
+                System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
+//                log.error("获取token失败 errcode:{} errmsg:{}", jsonObject.getInteger("errcode"), jsonObject.getString("errmsg"));
+            }
+        }
+        return token;
+    }
+
+    //发送模板消息
+    public static String sendTemplateMessage(WxMssVo wxMssVo) {
+        String info = "";
+        try {
+            //创建连接
+            URL url = new URL(wxMssVo.getRequest_url());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "utf-8");
+            connection.connect();
+            //POST请求
+            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+            JSONObject obj = new JSONObject();
+
+            obj.put("access_token", wxMssVo.getAccess_token());
+            obj.put("touser", wxMssVo.getTouser());
+            obj.put("template_id", wxMssVo.getTemplate_id());
+            obj.put("form_id", wxMssVo.getForm_id());
+            obj.put("page", wxMssVo.getPage());
+            System.out.println("access_token:"+wxMssVo.getAccess_token());
+            System.out.println("touser:"+wxMssVo.getTouser());
+            System.out.println("template_id:"+wxMssVo.getTemplate_id());
+            System.out.println("form_id:"+wxMssVo.getForm_id());
+            System.out.println("page:"+wxMssVo.getPage());
+
+            JSONObject jsonObject = new JSONObject();
+
+            for (int i = 0; i < wxMssVo.getParams().size(); i++) {
+                JSONObject dataInfo = new JSONObject();
+                dataInfo.put("value", wxMssVo.getParams().get(i).getValue());
+                dataInfo.put("color", wxMssVo.getParams().get(i).getColor());
+                jsonObject.put("keyword" + (i + 1), dataInfo);
+            }
+
+            obj.put("data", jsonObject);
+            System.out.println(jsonObject.toJSONString());
+            out.write(obj.toString().getBytes("utf-8"));
+            out.flush();
+            out.close();
+
+            //读取响应
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String lines;
+            StringBuffer sb = new StringBuffer("");
+            while ((lines = reader.readLine()) != null) {
+                lines = new String(lines.getBytes(), "utf-8");
+                sb.append(lines);
+            }
+            info = sb.toString();
+            System.out.println("测试" + sb);
+            reader.close();
+            // 断开连接
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return info;
     }
 }

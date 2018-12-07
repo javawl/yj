@@ -315,18 +315,18 @@ public class AdminServiceImpl implements IAdminService {
         //最终结果
         Map<Object,Object> result = new HashMap<Object, Object>();
         result.put("lottery_draw", LotteryDrawInfo);
-        if ((new Date()).getTime() >= Long.valueOf(LotteryDrawInfo.get("set_time").toString())){
+//        if ((new Date()).getTime() >= Long.valueOf(LotteryDrawInfo.get("set_time").toString())){
             //已经开过奖了，展示获奖者
             List<Map<Object,Object>> LotteryDrawWinner = common_configMapper.showLotteryDrawWinner(id);
             for (int i = 0; i < LotteryDrawWinner.size(); i++){
                 LotteryDrawWinner.get(i).put("portrait", Const.FTP_PREFIX + LotteryDrawWinner.get(i).get("portrait"));
             }
             result.put("winner", LotteryDrawWinner);
-        }else {
-            //没开奖展示空的
-            List<Map<Object,Object>> LotteryDrawWinner = new ArrayList<>();
-            result.put("winner", LotteryDrawWinner);
-        }
+//        }else {
+//            //没开奖展示空的
+//            List<Map<Object,Object>> LotteryDrawWinner = new ArrayList<>();
+//            result.put("winner", LotteryDrawWinner);
+//        }
         //展示参与者
         List<Map<Object,Object>> LotteryContestants = new ArrayList<>();
         //虚拟用户
