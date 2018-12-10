@@ -199,6 +199,15 @@
     WHERE wechat is NOT NULL
     AND (`last_login` &lt; #{last_login}
     OR `last_login` is NULL)
+    AND whether_template = 1
+  </select>
+
+
+  <select id="getAllAppointmentWxUser" resultType="map">
+    SELECT id,my_plan,last_login
+    FROM `user`
+    WHERE wechat is NOT NULL
+    AND whether_reminder = 1
   </select>
 
   <select id="getAllDrawWxUser" resultType="map">

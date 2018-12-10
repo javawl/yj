@@ -1046,7 +1046,7 @@
   </delete>
 
   <select id="selectRecitingWords" resultType="map">
-    SELECT word_id as id,word,real_meaning
+    SELECT word_id as id,word,real_meaning as meaning
     FROM reciting_words
     WHERE plan = #{plan}
     AND user_id = #{id}
@@ -1312,7 +1312,7 @@
   </select>
 
   <select id="selectRecitingWordsAll" resultType="map" parameterType="string">
-    SELECT word_id as id,word,meaning
+    SELECT word_id as id,word,read_meaning as meaning
     FROM reciting_words
     WHERE plan = #{plan}
     AND user_id = #{id}

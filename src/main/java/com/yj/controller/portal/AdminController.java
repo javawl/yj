@@ -9,6 +9,8 @@ import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -51,6 +53,8 @@ public class AdminController {
 
     @Autowired
     private ApplicationContext ctx;
+
+    private Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     /**
      * 获取单词接口
@@ -648,30 +652,36 @@ public class AdminController {
         if (!token.equals("beibei1")){
             return "false";
         }
-        //获取accessToken
-        AccessToken access_token = CommonFunc.getAccessToken();
-        //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
-        for(int i = 0; i < all_user.size(); i++){
-            //查没过期的from_id
-            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
 
-            if (info != null){
-                common_configMapper.deleteTemplateMsg(info.get("id").toString());
-                //发送模板消息
-                WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_ID1);
-                wxMssVo.setAccess_token(access_token.getAccessToken());
-                wxMssVo.setTouser(info.get("wechat").toString());
-                wxMssVo.setPage(Const.WX_HOME_PATH);
-                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                wxMssVo.setForm_id(info.get("form_id").toString());
-                List<TemplateData> list = new ArrayList<>();
-                list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
-                list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
-                wxMssVo.setParams(list);
-                CommonFunc.sendTemplateMessage(wxMssVo);
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID1);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
+                    list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
             }
+        }catch (Exception e){
+            logger.error("发送模板消息一异常",e.getStackTrace());
+            logger.error("发送模板消息一异常",e);
+            e.printStackTrace();
         }
         return "success";
     }
@@ -689,33 +699,39 @@ public class AdminController {
         if (!token.equals("beibei2")){
             return "false";
         }
-        //获取accessToken
-        AccessToken access_token = CommonFunc.getAccessToken();
-        //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
-        //查找明天奖品
-        String prize = common_configMapper.getDrawName(CommonFunc.getNextDate12());
-        for(int i = 0; i < all_user.size(); i++){
-            //查没过期的from_id
-            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
+            //查找明天奖品
+            String prize = common_configMapper.getDrawName(CommonFunc.getNextDate12());
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
 
-            if (info != null){
-                common_configMapper.deleteTemplateMsg(info.get("id").toString());
-                //发送模板消息
-                WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_ID2);
-                wxMssVo.setAccess_token(access_token.getAccessToken());
-                wxMssVo.setTouser(info.get("wechat").toString());
-                wxMssVo.setPage(Const.WX_HOME_PATH);
-                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                wxMssVo.setForm_id(info.get("form_id").toString());
-                List<TemplateData> list = new ArrayList<>();
-                list.add(new TemplateData(prize,"#ffffff"));
-                list.add(new TemplateData("完成学习任务就可参加抽奖获"+ prize ,"#ffffff"));
-                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
-                wxMssVo.setParams(list);
-                CommonFunc.sendTemplateMessage(wxMssVo);
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID2);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData(prize,"#ffffff"));
+                    list.add(new TemplateData("完成学习任务就可参加抽奖获"+ prize ,"#ffffff"));
+                    list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
             }
+        }catch (Exception e){
+            logger.error("发送模板消息二异常",e.getStackTrace());
+            logger.error("发送模板消息二异常",e);
+            e.printStackTrace();
         }
         return "success";
     }
@@ -733,30 +749,36 @@ public class AdminController {
         if (!token.equals("beibei3")){
             return "false";
         }
-        //获取accessToken
-        AccessToken access_token = CommonFunc.getAccessToken();
-        //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllWxUser(CommonFunc.getOneDate());
-        for(int i = 0; i < all_user.size(); i++){
-            //查没过期的from_id
-            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllAppointmentWxUser(CommonFunc.getOneDate());
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
 
-            if (info != null){
-                common_configMapper.deleteTemplateMsg(info.get("id").toString());
-                //发送模板消息
-                WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_ID3);
-                wxMssVo.setTouser(info.get("wechat").toString());
-                wxMssVo.setPage(Const.WX_HOME_PATH);
-                wxMssVo.setAccess_token(access_token.getAccessToken());
-                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                wxMssVo.setForm_id(info.get("form_id").toString());
-                List<TemplateData> list = new ArrayList<>();
-                list.add(new TemplateData("每天起床第一句，宝贝快来背呗背单词嘛~~","#ffffff"));
-                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
-                wxMssVo.setParams(list);
-                CommonFunc.sendTemplateMessage(wxMssVo);
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID3);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("每天起床第一句，宝贝快来背呗背单词嘛~~","#ffffff"));
+                    list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
             }
+        }catch (Exception e){
+            logger.error("发送模板消息三异常",e.getStackTrace());
+            logger.error("发送模板消息三异常",e);
+            e.printStackTrace();
         }
         return "success";
     }
@@ -801,35 +823,43 @@ public class AdminController {
             transactionManager.commit(status);
         }catch (Exception e){
             transactionManager.rollback(status);
+            logger.error("自动开奖过程操作异常",e.getStackTrace());
+            logger.error("自动开奖过程操作异常",e);
             e.printStackTrace();
             return "更新出错！";
         }
-
-        //获取accessToken
-        AccessToken access_token = CommonFunc.getAccessToken();
-        //给所有用户发送
-        List<Map<Object,Object>> all_user =  common_configMapper.getAllDrawWxUser(String.valueOf(prize_id));
-        for(int i = 0; i < all_user.size(); i++){
-            //查没过期的from_id
-            Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
-            if (info != null){
-                //删除这个form_id
-                common_configMapper.deleteTemplateMsg(info.get("id").toString());
-                //发送模板消息
-                WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_ID4);
-                wxMssVo.setTouser(info.get("wechat").toString());
-                wxMssVo.setPage(Const.DRAW_RESULT_PATH);
-                wxMssVo.setAccess_token(access_token.getAccessToken());
-                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                wxMssVo.setForm_id(info.get("form_id").toString());
-                List<TemplateData> list = new ArrayList<>();
-                list.add(new TemplateData("今天的幸运儿已经诞生啦，快来看看是不是你吧~~","#ffffff"));
-                list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
-                wxMssVo.setParams(list);
-                CommonFunc.sendTemplateMessage(wxMssVo);
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllDrawWxUser(String.valueOf(prize_id));
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+                if (info != null){
+                    //删除这个form_id
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID4);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.DRAW_RESULT_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("今天的幸运儿已经诞生啦，快来看看是不是你吧~~","#ffffff"));
+                    list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
             }
+        }catch (Exception e){
+            logger.error("发送抽奖模板消息异常",e.getStackTrace());
+            logger.error("发送抽奖模板消息异常",e);
+            e.printStackTrace();
         }
+
         return "success";
     }
 
