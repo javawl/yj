@@ -50,6 +50,9 @@ public interface Common_configMapper {
     //将虚拟用户改为没中奖
     int changeVirtualStatusNot(@Param("id") String id);
 
+    //记录单词挑战的虚拟用户数
+    int changeWordChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
+
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
 
@@ -101,11 +104,17 @@ public interface Common_configMapper {
     //后台插入抽奖奖品
     int insertLotteryDraw(@Param("prize_pic") String prize_pic,@Param("prize_tomorrow_pic") String prize_tomorrow_pic,@Param("prize") String prize,@Param("prize_tomorrow") String prize_tomorrow,@Param("upload_time") String upload_time,@Param("et") String et);
 
+    //后台插入单词挑战
+    int insertWordChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time);
+
     //插入虚拟id
     int insertVirtualId(@Param("user_id") String user_id);
 
     //打卡参与抽奖
     int insertLotteryDrawReal(@Param("user_id") String user_id,@Param("lottery_draw_id") String lottery_draw_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
+
+    //打卡参与单词挑战
+    int insertWordChallengeContestants(@Param("user_id") String user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
     //插入模板消息的form_id
     int insertTemplateFormId(@Param("user_id") String user_id,@Param("wechat") String wechat,@Param("form_id") String form_id,@Param("set_time") String set_time);
@@ -124,6 +133,9 @@ public interface Common_configMapper {
 
     //获取所有虚拟用户id
     List<Map<Object,Object>> getAllVirtualUser();
+
+    //获取所有单次挑战的虚拟用户id
+    List<Map<Object,Object>> getAllVirtualUserChallenge(@Param("number") int number);
 
     //获取所有微信用户id
     List<Map<Object,Object>> getAllWxUser(@Param("last_login") String last_login);
@@ -166,6 +178,9 @@ public interface Common_configMapper {
 
     //获取第二天十二点的活动
     String getDrawId(@Param("time") String time);
+
+    //获取新建单次挑战id
+    String getWordChallengeId(@Param("time") String time);
 
     //获取第二天十二点的活动奖品
     String getDrawName(@Param("time") String time);

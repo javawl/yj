@@ -1037,6 +1037,64 @@ public class AdminController {
     }
 
 
+    /**
+     * 上传单词挑战
+     * @param people   挑战人数
+     * @param st       开始时间  格式  xxxx-xx-xx
+     * @param et       结束时间  格式如上
+     * @param virtual  需要参与挑战的虚拟用户数
+     * @param request  request
+     * @return         string
+     */
+    @RequestMapping(value = "upload_word_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_word_challenge(String people, String st, String et, String virtual, HttpServletRequest request){
+        String st_str;
+        String et_str;
+        try {
+            //获取时间错
+            st_str =  CommonFunc.date2TimeStamp(st+" 00:00:01");
+            et_str =  CommonFunc.date2TimeStamp(et+" 23:59:59");
+        }catch (ParseException e){
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("传入日期有误");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String now_time = String.valueOf((new Date()).getTime());
+            //存到数据库
+            int result = common_configMapper.insertWordChallenge(st_str, et_str, people, now_time);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            //将新插的id找出来
+            String challenge_id = common_configMapper.getWordChallengeId(now_time);
+
+            //将所有的虚拟用户加进抽奖
+            List<Map<Object,Object>> all_virtual_user = common_configMapper.getAllVirtualUserChallenge(Integer.valueOf(virtual));
+            //记录单词挑战的虚拟用户数
+            int real_virtual_user_number = all_virtual_user.size();
+            common_configMapper.changeWordChallengeVirtualNumber(challenge_id, real_virtual_user_number);
+            for (int i = 0; i < all_virtual_user.size(); i++){
+                String user_id = all_virtual_user.get(i).get("user_id").toString();
+                common_configMapper.insertWordChallengeContestants(user_id,challenge_id,now_time,"1");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
     @RequestMapping(value = "upload_author_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> upload_author_info(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username,String gender, String sign, HttpServletResponse response, HttpServletRequest request){

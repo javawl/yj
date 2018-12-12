@@ -116,7 +116,7 @@
 </script>
 <body>
 <center>
-    <h1>奖品查看</h1>
+    <h1>单词挑战查看</h1>
     <br>
     <table cellpadding="9" width="87%" border="1" cellspacing="0" id="author_info">
         <tr>
@@ -126,17 +126,21 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;">
-                <button style="float: right"><a href="add_lottery_draw.jsp">新建</a></button>
+                <button style="float: right"><a href="add_word_challenge.jsp">新建</a></button>
             </td>
         </tr>
         <tr>
             <td>序号</td>
-            <td>奖品名称</td>
-            <td>奖品图片</td>
-            <td>奖品预告</td>
-            <td>预告图片</td>
-            <td>开奖时间</td>
+            <td>期数</td>
+            <td>开始时间</td>
+            <td>结束时间</td>
+            <td>可报名上限</td>
+            <td>虚拟用户数</td>
+            <td>报名用户数</td>
+            <td>盈亏</td>
             <td>操作</td>
         </tr>
     </table>
