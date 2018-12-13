@@ -35,5 +35,9 @@ public interface IAdminService {
 
     ServerResponse<List<Map>> show_virtual_user(String page,String size,HttpServletRequest request);
 
+    ServerResponse<List<Map>> show_virtual_user_challenge(String page,String size,HttpServletRequest request);
+
     ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request);
+
+    ServerResponse<Map<Object,Object>> show_word_challenge_info(String id,HttpServletRequest request);
 }

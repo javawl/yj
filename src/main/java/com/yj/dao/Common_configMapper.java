@@ -110,6 +110,9 @@ public interface Common_configMapper {
     //插入虚拟id
     int insertVirtualId(@Param("user_id") String user_id);
 
+    //插入虚拟id
+    int insertVirtualChallengeId(@Param("user_id") String user_id);
+
     //打卡参与抽奖
     int insertLotteryDrawReal(@Param("user_id") String user_id,@Param("lottery_draw_id") String lottery_draw_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
@@ -128,8 +131,14 @@ public interface Common_configMapper {
     //后台虚拟用户信息
     List<Map> showVirtualUser(@Param("start") int start, @Param("size") int size);
 
+    //后台虚拟用户信息
+    List<Map> showVirtualUserChallenge(@Param("start") int start, @Param("size") int size);
+
     //后台根据id获取奖品
     Map<Object,Object> showLotteryDraw(@Param("id") String id);
+
+    //后台根据id获取单词挑战
+    Map<Object,Object> showWordChallenge(@Param("id") String id);
 
     //获取所有虚拟用户id
     List<Map<Object,Object>> getAllVirtualUser();
@@ -161,11 +170,20 @@ public interface Common_configMapper {
     //后台根据id获取奖品获奖者
     List<Map<Object,Object>> showLotteryDrawWinner(@Param("id") String id);
 
+    //后台根据id获取单词挑战成功者
+    List<Map<Object,Object>> showWordChallengeWinner(@Param("id") String id);
+
     //后台根据id获取奖品参与者虚拟
     List<Map<Object,Object>> showLotteryDrawContestantsVirtual(@Param("id") String id);
 
-    //后台根据id获取奖品参与者虚拟
+    //后台根据id获取单词挑战参与者虚拟
+    List<Map<Object,Object>> showWordChallengeContestantsVirtual(@Param("id") String id);
+
+    //后台根据id获取奖品参与者真实
     List<Map<Object,Object>> showLotteryDrawContestantsReal(@Param("id") String id);
+
+    //后台根据id获取单词挑战参与真实
+    List<Map<Object,Object>> showWordChallengeContestantsReal(@Param("id") String id);
 
     //后台获取基础信息（总用户等）
     Map getCommonConfig();

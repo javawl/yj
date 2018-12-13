@@ -36,7 +36,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/show_word_challenge.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/show_virtual_user_challenge.do?page="+page+"&size="+size+"&type="+type;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
@@ -50,7 +50,7 @@
                 if (page == 1){
                     $("#page").append('<td><p>第一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'/show_word_challenge.jsp?page=1&size='+size+'">第一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_virtual_user_challenge.jsp?page=1&size='+size+'">第一页</a></td>');
                 }
                 var ff = 0;
                 var f = 0;
@@ -65,7 +65,7 @@
                     if (no == page){
                         $("#page").append('<td><p>'+no+'</p></td>');
                     }else {
-                        $("#page").append('<td><a href="'+url+'/show_word_challenge.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
+                        $("#page").append('<td><a href="'+url+'/show_virtual_user_challenge.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
                     }
                     if (ff == 8)break;
                     ff++;
@@ -76,20 +76,23 @@
                 if (page == page_no){
                     $("#page").append('<td><p>最后一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'/show_word_challenge.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/show_virtual_user_challenge.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
                 }
 
                 for(var i = 0; i < data.length; i++){
-                    $("#info").append('<tr>'+
+                    var string2;
+                    if (data[i]['portrait']==''){
+                        string2 = '此资源为空'
+                    }else {
+                        string2 = '<img style="max-width: 550px; max-height: 550px;" src="'+data[i]['portrait']+'">';
+                    }
+                    $("#author_info").append('<tr>'+
                         '<td style="width: 4%;">'+data[i]['id']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['periods']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['st']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['et']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['upper_limit']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['virtual_number']+'</td>'+
-                        '<td style="width: 6%;">'+data[i]['enrollment']+'</td>'+
-                        '<td style="width: 6%;">'+data[i]['profit_loss']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td style="width: 4%;">'+string2+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['username']+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['gender']+'</td>'+
+                        '<td style="width: 6%;">'+data[i]['personality_signature']+'</td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -105,31 +108,25 @@
 </script>
 <body>
 <center>
-    <h1>单词挑战查看</h1>
+    <h1>虚拟用户查看</h1>
     <br>
-    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="info">
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="author_info">
         <tr>
             <td style="border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;">
-                <button style="float: right"><a href="add_word_challenge.jsp">新建</a></button>
+                <button style="float: right"><a href="add_virtual_user.jsp">新建</a></button>
             </td>
         </tr>
         <tr>
             <td>序号</td>
-            <td>期数</td>
-            <td>开始时间</td>
-            <td>结束时间</td>
-            <td>可报名上限</td>
-            <td>虚拟用户数</td>
-            <td>报名用户数</td>
-            <td>盈亏</td>
+            <td>头像</td>
+            <td>昵称</td>
+            <td>性别</td>
+            <td>个性签名</td>
             <td>操作</td>
         </tr>
     </table>
@@ -138,13 +135,10 @@
 </center>
 </body>
 <script>
-    function single(id) {
-        window.location.href = "single_lottery_draw.jsp?id="+id;
-    }
     function del(id) {
-        if (confirm("你确定要删除此奖品？删除之后不可恢复！")){
+        if (confirm("你确定要删除此虚拟用户？删除之后不可恢复！")){
             $.ajax({
-                url:url+"/admin/delete_lottery_draw.do",
+                url:url+"/admin/delete_virtual_user.do",
                 type:'POST',
                 data:{
                     id:id

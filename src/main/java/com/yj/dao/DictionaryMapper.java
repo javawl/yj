@@ -338,6 +338,9 @@ public interface DictionaryMapper {
     String countLotteryDraw();
 
     //后台
+    String countWordChallenge();
+
+    //后台
     List<Map> selectAdminVideo(@Param("id") String id);
 
     //后台
@@ -440,6 +443,9 @@ public interface DictionaryMapper {
 
     //后台取出需要的抽奖活动
     List<Map> showLotteryDraw(@Param("start") int start,@Param("size") int size);
+
+    //后台取出需要的单词挑战
+    List<Map<Object,Object>> showWordChallenge(@Param("start") int start,@Param("size") int size);
 
     //判断用户是否喜欢过这个每日一句
     Map isWelfareFavour(@Param("id") String id,@Param("daily_pic_id") String daily_pic_id);

@@ -159,6 +159,20 @@ public class AdminController {
 
 
     /**
+     * 单词挑战虚拟用户信息
+     * @param page     页数
+     * @param size     页大小
+     * @param request  请求
+     * @return         List
+     */
+    @RequestMapping(value = "show_virtual_user_challenge.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> show_virtual_user_challenge(String page,String size,HttpServletRequest request){
+        return iAdminService.show_virtual_user_challenge(page, size, request);
+    }
+
+
+    /**
      * 展示单个抽奖的详情
      * @param id         奖品id
      * @param request    request
@@ -168,6 +182,19 @@ public class AdminController {
     @ResponseBody
     public ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request){
         return iAdminService.show_lottery_draw_info(id, request);
+    }
+
+
+    /**
+     * 展示单个单词挑战详情
+     * @param id           单词挑战id
+     * @param request      request
+     * @return             Map
+     */
+    @RequestMapping(value = "show_word_challenge_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_word_challenge_info(String id,HttpServletRequest request){
+        return iAdminService.show_word_challenge_info(id, request);
     }
 
 
@@ -296,6 +323,31 @@ public class AdminController {
         }
 
         return ServerResponse.createBySuccess(dictionaryMapper.countLotteryDraw(),Info);
+    }
+
+
+
+    @RequestMapping(value = "show_word_challenge.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_word_challenge(String page,String size){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取抽奖信息
+        List<Map<Object,Object>> Info = dictionaryMapper.showWordChallenge(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("et",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countWordChallenge(),Info);
     }
 
 
@@ -1193,6 +1245,65 @@ public class AdminController {
             int new_user_id = user.getId();
             //插到虚拟用户
             common_configMapper.insertVirtualId(String.valueOf(new_user_id));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 上传单词挑战的虚拟用户
+     * @param portrait   头像
+     * @param username   昵称
+     * @param gender     性别
+     * @param sign       个性签名
+     * @param response   response
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "upload_virtual_user_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_virtual_user_challenge(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username,String gender, String sign, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //头像
+            String name1 = iFileService.upload(portrait,path,"l_e/user/portrait");
+            String url1 = "user/portrait/"+name1;
+            //存到数据库
+            //这里插入一下
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("B305FDA58B6ADD5B4EBE25E94FB09FD2");
+            user.setPortrait(url1);
+            user.setGender(Integer.valueOf(gender));
+            user.setPlanDays(0);
+            user.setPlanWordsNumber(0);
+            user.setInsistDay(0);
+            user.setWhetherOpen(1);
+            user.setClockDay(0);
+            user.setPersonalitySignature(sign);
+            //时间戳
+            user.setRegisterTime(String.valueOf(new Date().getTime()));
+
+            int resultCount = userMapper.insertUser(user);
+            System.out.println(resultCount);
+            if (resultCount != 1){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            //新的user id
+            int new_user_id = user.getId();
+            //插到虚拟用户
+            common_configMapper.insertVirtualChallengeId(String.valueOf(new_user_id));
             transactionManager.commit(status);
             return ServerResponse.createBySuccess("成功",url1);
         }catch (Exception e){

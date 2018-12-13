@@ -302,6 +302,36 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
+
+    //展示查看数据
+    @Override
+    public ServerResponse<List<Map>> show_virtual_user_challenge(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取虚拟用户信息
+        List<Map> userInfo = common_configMapper.showVirtualUserChallenge(start,Integer.valueOf(size));
+
+        for(int i = 0; i < userInfo.size(); i++){
+            if (Integer.valueOf(userInfo.get(i).get("gender").toString()) == 0){
+                //代表男
+                userInfo.get(i).put("gender","男");
+            }else {
+                userInfo.get(i).put("gender","女");
+            }
+            userInfo.get(i).put("portrait",Const.FTP_PREFIX + userInfo.get(i).get("portrait").toString());
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUser(),userInfo);
+    }
+
+
     //展示单个奖品和奖品的详情
     public ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request){
         //验证参数是否为空
@@ -344,6 +374,47 @@ public class AdminServiceImpl implements IAdminService {
             LotteryContestants.add(LotteryContestantsReal.get(i));
         }
         result.put("contestants", LotteryContestants);
+
+        return ServerResponse.createBySuccess("成功！",result);
+    }
+
+    //展示单个单词挑战详情
+    public ServerResponse<Map<Object,Object>> show_word_challenge_info(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
+        WordChallengeInfo.put("st", CommonFunc.getFormatTime(Long.valueOf(WordChallengeInfo.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+        WordChallengeInfo.put("et", CommonFunc.getFormatTime(Long.valueOf(WordChallengeInfo.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        //最终结果
+        Map<Object,Object> result = new HashMap<Object, Object>();
+        result.put("word_challenge", WordChallengeInfo);
+        //展示获奖者
+        List<Map<Object,Object>> WordChallengeWinner = common_configMapper.showWordChallengeWinner(id);
+        for (int i = 0; i < WordChallengeWinner.size(); i++){
+            WordChallengeWinner.get(i).put("portrait", Const.FTP_PREFIX + WordChallengeWinner.get(i).get("portrait"));
+        }
+        result.put("winner", WordChallengeWinner);
+        //展示参与者
+        List<Map<Object,Object>> WordChallengeContestants = new ArrayList<>();
+        //虚拟用户
+        List<Map<Object,Object>> WordChallengeContestantsVirtual = common_configMapper.showWordChallengeContestantsVirtual(id);
+        for (int i = 0; i < WordChallengeContestantsVirtual.size(); i++){
+            WordChallengeContestantsVirtual.get(i).put("portrait", Const.FTP_PREFIX + WordChallengeContestantsVirtual.get(i).get("portrait"));
+            WordChallengeContestantsVirtual.get(i).put("status", "virtual");
+            WordChallengeContestants.add(WordChallengeContestantsVirtual.get(i));
+        }
+        //真实用户
+        List<Map<Object,Object>> WordChallengeContestantsReal = common_configMapper.showWordChallengeContestantsReal(id);
+        for (int i = 0; i < WordChallengeContestantsReal.size(); i++){
+            WordChallengeContestantsReal.get(i).put("portrait", Const.FTP_PREFIX + WordChallengeContestantsReal.get(i).get("portrait"));
+            WordChallengeContestantsReal.get(i).put("status", "real");
+            WordChallengeContestants.add(WordChallengeContestantsReal.get(i));
+        }
+        result.put("contestants", WordChallengeContestants);
 
         return ServerResponse.createBySuccess("成功！",result);
     }

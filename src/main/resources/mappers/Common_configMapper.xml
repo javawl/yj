@@ -152,6 +152,12 @@
   </insert>
 
 
+  <insert id="insertVirtualChallengeId" parameterType="string">
+    INSERT INTO virtual_user_challenge (user_id)
+    values (#{user_id})
+  </insert>
+
+
   <insert id="insertLotteryDrawReal" parameterType="string">
     INSERT INTO lottery_draw_contestants (user_id,lottery_draw_id,set_time,`virtual`)
     values (#{user_id},#{lottery_draw_id},#{set_time},#{virtual})
@@ -191,9 +197,23 @@
     LIMIT #{start},#{size}
   </select>
 
+  <select id="showVirtualUserChallenge" resultType="map">
+    SELECT id,username,portrait,gender,personality_signature
+    FROM `user`
+    WHERE id IN (SELECT  user_id as id
+    FROM `virtual_user_challenge`)
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="showLotteryDraw" resultType="map">
     SELECT *
     FROM `lottery_draw`
+    WHERE id = #{id}
+  </select>
+
+  <select id="showWordChallenge" resultType="map">
+    SELECT *
+    FROM `word_challenge`
     WHERE id = #{id}
   </select>
 
@@ -270,6 +290,16 @@
     WHERE `user`.id = tb.user_id
   </select>
 
+
+  <select id="showWordChallengeWinner" resultType="map" parameterType="string">
+    SELECT id,username,portrait,tb.virtual
+    FROM `user`,(SELECT word_challenge_contestants.user_id,word_challenge_contestants.virtual
+                FROM `word_challenge_contestants`
+                WHERE lottery_draw_id = #{id}
+                AND `insist_day` >= 28) tb
+    WHERE `user`.id = tb.user_id
+  </select>
+
   <select id="showLotteryDrawContestantsVirtual" resultType="map" parameterType="string">
     SELECT id,username,portrait
     FROM `user`
@@ -282,6 +312,16 @@
            WHERE lottery_draw_id = #{id}))
   </select>
 
+  <select id="showWordChallengeContestantsVirtual" resultType="map" parameterType="string">
+    SELECT id,username,portrait
+    FROM `user`
+    WHERE id IN
+          (SELECT user_id
+           FROM `word_challenge_contestants`
+           WHERE word_challenge_id = #{id}
+             AND `virtual` = 1)
+  </select>
+
   <select id="showLotteryDrawContestantsReal" resultType="map" parameterType="string">
     SELECT id,username,portrait
     FROM `user`
@@ -289,6 +329,16 @@
           (SELECT user_id
            FROM `lottery_draw_contestants`
            WHERE lottery_draw_id = #{id}
+           AND `virtual` = 0)
+  </select>
+
+  <select id="showWordChallengeContestantsReal" resultType="map" parameterType="string">
+    SELECT id,username,portrait
+    FROM `user`
+    WHERE id IN
+          (SELECT user_id
+           FROM `word_challenge_contestants`
+           WHERE word_challenge_id = #{id}
            AND `virtual` = 0)
   </select>
 

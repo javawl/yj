@@ -1143,6 +1143,11 @@
     FROM `lottery_draw`
   </select>
 
+  <select id="countWordChallenge" resultType="string">
+    SELECT count(id)
+    FROM `word_challenge`
+  </select>
+
   <select id="selectAdminVideo" resultType="map" parameterType="string">
     SELECT *
     FROM word_video_information
@@ -1365,6 +1370,13 @@
     SELECT *
     FROM `lottery_draw`
     ORDER BY set_time DESC
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="showWordChallenge" resultType="map">
+    SELECT *
+    FROM `word_challenge`
+    ORDER BY et DESC
     LIMIT #{start},#{size}
   </select>
 

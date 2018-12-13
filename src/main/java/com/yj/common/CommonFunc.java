@@ -267,6 +267,9 @@ public class CommonFunc {
     public String getCookieValueBykey(HttpServletRequest request,String key){
         //这里获取session_id
         //key = session_id + token  其中token是32位的
+        if (key.length() != 32 && key.length() != 64){
+            return null;
+        }
         String session_id = key.substring(0,key.length() - 32);
         //获取token
         String token = key.substring(key.length()-32);
