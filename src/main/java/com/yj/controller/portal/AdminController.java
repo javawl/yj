@@ -428,6 +428,34 @@ public class AdminController {
 
 
     /**
+     * 后台修改用户头像
+     * @param file      图片
+     * @param id        用户id
+     * @param request   request
+     * @return          String
+     */
+    @RequestMapping(value = "admin_change_user_portrait.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> admin_change_user_portrait(@RequestParam(value = "upload_file",required = false) MultipartFile file,String id, HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload(file,path,"l_e/user/portrait");
+        String url = "user/portrait/"+name;
+        //存到数据库
+        int result = userMapper.update_my_portrait(id,url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
      * 更新基本信息
      * @param word
      * @param response
@@ -472,6 +500,24 @@ public class AdminController {
             if (result == 0){
                 return ServerResponse.createByErrorMessage("更新出错");
             }
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 修改虚拟用户头像
+     * @param id         虚拟用户id
+     * @param username   用户名
+     * @param response   response
+     * @return           string
+     */
+    @RequestMapping(value = "admin_update_username.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse admin_update_username(String id,String username, HttpServletResponse response){
+        int result = common_configMapper.adminChangeUserUsername(id, username);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新出错");
         }
         return ServerResponse.createBySuccessMessage("成功");
     }

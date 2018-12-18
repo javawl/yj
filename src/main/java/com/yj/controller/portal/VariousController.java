@@ -150,4 +150,82 @@ public class VariousController {
         //调用service层
         return iVariousService.lottery_draw_winner(request);
     }
+
+
+    /**
+     * 展示单词挑战
+     * @param request     请求
+     * @return            Map
+     */
+    @RequestMapping(value = "show_word_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_word_challenge(HttpServletRequest request){
+        //调用service层
+        return iVariousService.show_word_challenge(request);
+    }
+
+
+    /**
+     * 展示单词挑战打卡排行榜
+     * @param request  request
+     * @return         Map
+     */
+    @RequestMapping(value = "show_word_challenge_rank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request){
+        //调用service层
+        return iVariousService.show_word_challenge_rank(request);
+    }
+
+
+    /**
+     * 邀请排行榜
+     * @param request  request
+     * @return         Map
+     */
+    @RequestMapping(value = "show_invite_reward_rank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_invite_reward_rank(HttpServletRequest request){
+        //调用service层
+        return iVariousService.show_invite_reward_rank(request);
+    }
+
+
+    /**
+     * 展现邀请链接的内容
+     * @param request  request
+     * @return         Map
+     */
+    @RequestMapping(value = "show_invite_link_inner.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_invite_link_inner(HttpServletRequest request){
+        //调用service层
+        return iVariousService.show_invite_link_inner(request);
+    }
+
+
+    /**
+     * 展现用户账单明细
+     * @param request  request
+     * @return         Map
+     */
+    @RequestMapping(value = "show_user_bill.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_user_bill(HttpServletRequest request){
+        //调用service层
+        return iVariousService.show_user_bill(request);
+    }
+
+
+    /**
+     * 获取免死金牌的用户id和用户参加单词挑战事件id
+     * @param request  request
+     * @return         Map
+     */
+    @RequestMapping(value = "get_medallion_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> get_medallion_info(HttpServletRequest request){
+        //调用service层
+        return iVariousService.get_medallion_info(request);
+    }
 }

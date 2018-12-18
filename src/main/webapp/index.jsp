@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>后台管理系统</title>
+    <title>背呗背单词</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <style type="text/css" rel="stylesheet">
         body{ margin: 0 auto; padding: 0; width: 100%;}

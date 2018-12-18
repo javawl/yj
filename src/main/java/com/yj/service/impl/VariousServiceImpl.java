@@ -449,4 +449,341 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createBySuccess("成功！", prize);
         }
     }
+
+
+    //下面是赢奖金的接口
+    public ServerResponse<Map<Object,Object>> show_word_challenge(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //展示单词挑战首页数据
+            String now_time_stamp = String.valueOf((new Date()).getTime());
+
+            //找出未开始的期数并且找有空位的最近的开始时间
+            Map<Object,Object> word_challenge = common_configMapper.show_word_challenge(now_time_stamp);
+
+            Map<Object,Object> result = new HashMap<>();
+            if (word_challenge == null){
+                return ServerResponse.createBySuccess("成功！", result);
+            }
+            result.put("st", CommonFunc.getFormatTime(Long.valueOf(word_challenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            result.put("et", CommonFunc.getFormatTime(Long.valueOf(word_challenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+            result.put("periods", word_challenge.get("periods"));
+            Long during = (new Date()).getTime() - Long.valueOf(word_challenge.get("set_time").toString());
+            //计算有多少人报名
+            int number = Integer.valueOf(word_challenge.get("enrollment").toString()) + Integer.valueOf(word_challenge.get("virtual_number").toString());
+            int all_people = 0;
+            Long ii = 0L;
+            while (ii < during){
+                if (all_people + 3 > number){
+                    all_people = number;
+                    break;
+                }
+                all_people += 3;
+                ii+=3600000;
+            }
+            result.put("people", all_people);
+
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //下面是单词挑战展现排行的接口
+    public ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //展示单词挑战首页数据
+            String now_time_stamp = String.valueOf((new Date()).getTime());
+
+            //找出用户报名的单词挑战
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(now_time_stamp,uid);
+
+            Map<Object,Object> result = new HashMap<>();
+            if (word_challenge == null){
+                return ServerResponse.createByErrorMessage("未找到响应的报名单词挑战！");
+            }
+            //获取单词挑战id
+            String word_challenge_id = word_challenge.get("id").toString();
+            //找出单词挑战的背单词数排行榜
+            List<Map<Object,Object>> rank = common_configMapper.getUserWordChallengeRank(word_challenge_id);
+            int rank_flag = 1;
+            List<Map<Object,Object>> total_rank = new ArrayList<>();
+            for (int i = 0; i < rank.size(); i++){
+                //找出用户自己的排名
+                if (uid.equals(rank.get(i).get("user_id").toString())){
+                    result.put("user_rank",rank_flag);
+                    result.put("username",rank.get(i).get("username").toString());
+                    result.put("word_number",rank.get(i).get("word_number").toString());
+                    result.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
+                }
+                if (rank_flag <= 50){
+                    Map<Object,Object> single_rank = new HashMap<>();
+                    single_rank.put("user_rank",rank_flag);
+                    single_rank.put("username",rank.get(i).get("username").toString());
+                    single_rank.put("word_number",rank.get(i).get("word_number").toString());
+                    single_rank.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
+                    total_rank.add(single_rank);
+                }
+                rank_flag++;
+            }
+            //判断用户是否打卡
+            List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(uid);
+            //取剩余天数和坚持天数
+            Object plan = SelectPlan.get(0).get("my_plan");
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+
+            //todo 记住这个接口调用plan时候一定要判断null
+            if (plan == null){
+                result.put("clock","今日未打卡");
+            }else {
+                //查看坚持天数表中有没有数据
+                Map getInsistDay = dictionaryMapper.getInsistDayMessage(uid,plan.toString(),one);
+                if (getInsistDay == null){
+                    result.put("clock","今日未打卡");
+                }else {
+                    if (Integer.valueOf(getInsistDay.get("is_correct").toString()) >= 2){
+                        result.put("clock","今日已打卡");
+                    }else {
+                        result.put("clock","今日未打卡");
+                    }
+                }
+            }
+            result.put("total_rank",total_rank);
+            Map<Object,Object> top = common_configMapper.findTopInviteReward();
+            result.put("top_invite_reward",top.get("invite_reward"));
+            result.put("top_invite_username",top.get("username"));
+            result.put("top_invite_portrait",CommonFunc.judgePicPath(top.get("portrait").toString()));
+
+
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //下面是单词挑战展现邀请排行的接口
+    public ServerResponse<Map<Object,Object>> show_invite_reward_rank(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //找出单词挑战的邀请奖金数排行榜
+            List<Map<Object,Object>> rank = common_configMapper.showTotalInviteReward();
+            Map<Object,Object> result = new HashMap<>();
+            int rank_flag = 1;
+            List<Map<Object,Object>> total_rank = new ArrayList<>();
+            for (int i = 0; i < rank.size(); i++){
+                //找出用户自己的排名
+                if (uid.equals(rank.get(i).get("user_id").toString())){
+                    result.put("user_rank",rank_flag);
+                    result.put("username",rank.get(i).get("username").toString());
+                    result.put("invite_reward",rank.get(i).get("invite_reward").toString());
+                    result.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
+                }
+                if (rank_flag <= 30){
+                    Map<Object,Object> single_rank = new HashMap<>();
+                    single_rank.put("user_rank",rank_flag);
+                    single_rank.put("username",rank.get(i).get("username").toString());
+                    single_rank.put("invite_reward",rank.get(i).get("invite_reward").toString());
+                    single_rank.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
+                    total_rank.add(single_rank);
+                }
+                rank_flag++;
+            }
+            result.put("total_rank",total_rank);
+
+
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //下面是单词挑战展现分享链接内容
+    public ServerResponse<Map<Object,Object>> show_invite_link_inner(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> result = new HashMap<>();
+            String msg = "";
+            //todo 给出用户单词挑战的三个状态（没挑战，有挑战没开始，有挑战开始了）
+            //找出所有结束时间还没到的挑战，判断用户是否参加
+            //找出未开始的期数并且找有空位的最近的开始时间(和单词挑战首页接口一致
+            Long now_time_stamp = (new Date()).getTime();
+            //从未结束的会议中判断用户是否报名
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(String.valueOf(now_time_stamp),uid);
+            //判断是否报名
+            if (word_challenge == null){
+                //没有挑战
+                //查看往期是否有成功过
+                int success_times = common_configMapper.find_user_whether_success_challenge(String.valueOf(now_time_stamp),uid);
+                if (success_times == 0){
+                    //往期没有成功过
+                    msg += "跟我一起参加单词挑战吧~可以赢取奖励金噢~";
+                }else {
+                    //成功过
+                    msg += "我已成功完成单词挑战赢得奖励金啦！快来背呗背单词跟我一起挑战吧！";
+                }
+            }else {
+                //报了名
+                //判断是否开始
+                if (now_time_stamp >= Long.valueOf(word_challenge.get("st").toString())){
+                    //有挑战且开始了
+                    String insist_day = word_challenge.get("insist_day").toString();
+                    String word_number = word_challenge.get("word_number").toString();
+                    msg += "已在背呗背单词坚持挑战" + insist_day + "天，过关" + word_number + "个单词";
+                }else {
+                    //有挑战没开始
+                    msg += "跟我一起参加单词挑战吧~可以赢取奖励金噢~";
+                }
+            }
+            result.put("msg", msg);
+
+            Map userInfo = userMapper.getAuthorInfo(uid);
+            result.put("portrait",CommonFunc.judgePicPath(userInfo.get("portrait").toString()));
+            result.put("username",userInfo.get("username").toString());
+            result.put("user_id",uid);
+
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //展现明细
+    public ServerResponse<List<Map<Object,Object>>> show_user_bill(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            List<Map<Object,Object>> result = common_configMapper.showUserBill(uid);
+            for (int i = 0; i < result.size(); i++){
+                result.get(i).put("set_time", CommonFunc.getFormatTime(Long.valueOf(result.get(i).get("set_time").toString()),"yyyy/MM/dd HH:mm:ss"));
+            }
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+    //获取免死金牌的用户id和用户参加单词挑战事件id
+    public ServerResponse<Map<Object,Object>> get_medallion_info(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //免死金牌资格判定
+            //判断 [ 单词挑战开始, 当前时间的前一天 ] 区间内的天数 - 坚持天数 >= 3
+            //并且免死金牌次数 < 2
+            String now_time_stamp = String.valueOf((new Date()).getTime());
+            //找出用户报名的单词挑战
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(now_time_stamp,uid);
+            //获取区间天数
+            int total_days = CommonFunc.count_interval_days(word_challenge.get("st").toString(),now_time_stamp);
+            //坚持天数
+            int insist_days = Integer.valueOf(word_challenge.get("insist_day").toString());
+            //未背天数
+            int not_to_recite_days = total_days - insist_days;
+            if (not_to_recite_days < 3){
+                return ServerResponse.createByErrorMessage("大佬您经常背单词哦，这么强不能使用免死金牌！");
+            }
+            if (Integer.valueOf(word_challenge.get("medallion").toString()) >= 2){
+                return ServerResponse.createByErrorMessage("哦豁，免死金牌用完了，别想着捷径了赶紧背单词吧！");
+            }
+            Map<Object,Object> result = new HashMap<>();
+            result.put("word_challenge_contestants_id",Integer.valueOf(word_challenge.get("word_challenge_contestants_id").toString()));
+            result.put("user_id",uid);
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //朋友助力免死金牌
+    public ServerResponse<String> medallion_help(String user_id, String word_challenge_contestants_id,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //先检测是否位置
+            int exist_time = common_configMapper.countMedallionTimes(user_id,word_challenge_contestants_id);
+            if (exist_time >= 3){
+                return ServerResponse.createByErrorMessage("助力已满了哦！");
+            }
+            //检测是否助力过
+            if (common_configMapper.testMedallionWhetherAttend(user_id,word_challenge_contestants_id,uid) != 0){
+                return ServerResponse.createByErrorMessage("已经助力过咯不能在助力了哦！");
+            }
+            //插入
+
+            //todo 最后如果是这一次是满的话就发服务通知
+            if (exist_time == 2){
+                //发服务通知
+            }
+            return ServerResponse.createBySuccessMessage("成功！");
+        }
+    }
 }

@@ -328,7 +328,7 @@ public class AdminServiceImpl implements IAdminService {
             userInfo.get(i).put("portrait",Const.FTP_PREFIX + userInfo.get(i).get("portrait").toString());
         }
 
-        return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUser(),userInfo);
+        return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUserChallenge(),userInfo);
     }
 
 

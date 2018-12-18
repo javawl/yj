@@ -262,6 +262,18 @@ public class CommonFunc {
         httpServletResponse.addCookie(cookie);
     }
 
+    //判断是相对路径还是绝对路径
+    public static String judgePicPath(String path){
+        if (path.length() <= 4){
+            return path;
+        }
+        if (path.substring(0,4).equals("http")){
+            return path;
+        }else {
+            return Const.FTP_PREFIX + path;
+        }
+    }
+
 
     //获取cookie中某个键值的值，没有的话返回null
     public String getCookieValueBykey(HttpServletRequest request,String key){
@@ -432,6 +444,22 @@ public class CommonFunc {
         history.set(Calendar.HOUR_OF_DAY, 0);
         history.set(Calendar.MINUTE, 0);
         history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
+    //获取传入时间的那天的零点0秒的时间戳
+    public static String getInputTimeZero(String input_time) {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(input_time)));
+        //计算注册当天的零点
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 0);
         long history_one = history.getTime().getTime();
         String time = String.valueOf(history_one);
         time = time.substring(0,time.length() - 3);
@@ -719,6 +747,18 @@ public class CommonFunc {
         }
     }
 
+    //计算 [ 开始时间点的那天, 结束时间点的前一天 ] 区间内的天数
+    public static int count_interval_days(String begin, String end){
+        //取出传入开始时间和结束时间0点的时间戳
+        Long begin_day = Long.valueOf(getInputTimeZero(begin))/1000L;
+        Long end_day = Long.valueOf(getInputTimeZero(end))/1000L;
+        Double begin_d = begin_day.doubleValue();
+        Double end_d = end_day.doubleValue();
+        Long long_one_day = Const.ONE_DAY_DATE / 1000L;
+        Double one_day = long_one_day.doubleValue();
+        int days = (int) Math.floor((end_d - begin_d) / one_day);
+        return days;
+    }
 
     //验证传入数据是否为空
     public String first_Validate(Map<String,String> m1){

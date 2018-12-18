@@ -405,6 +405,22 @@ public class UserController extends BaseController {
 
 
     /**
+     * 微信小程序上传头像和名字
+     * @param username   名字
+     * @param portrait   头像
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "wx_upload_portrait_username.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> wx_upload_portrait_username(String username, String portrait, HttpServletRequest request){
+        //调用service层
+        System.out.println(username);
+        return iUserService.wx_upload_portrait_username(username, portrait, request);
+    }
+
+
+    /**
      * 我的评论
      * @param request
      * @return

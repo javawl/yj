@@ -1123,6 +1123,11 @@
     FROM virtual_user
   </select>
 
+  <select id="countVirtualUserChallenge" resultType="string">
+    SELECT count(id)
+    FROM virtual_user_challenge
+  </select>
+
   <select id="countAdvice" resultType="string">
     SELECT count(id)
     FROM advice

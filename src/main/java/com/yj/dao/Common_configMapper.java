@@ -53,6 +53,9 @@ public interface Common_configMapper {
     //记录单词挑战的虚拟用户数
     int changeWordChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
 
+    //后台修改虚拟用户用户名
+    int adminChangeUserUsername(@Param("id") String id,@Param("username") String username);
+
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
 
@@ -197,6 +200,18 @@ public interface Common_configMapper {
     //获取第二天十二点的活动
     String getDrawId(@Param("time") String time);
 
+    //将用户参加这期单词挑战的情况查出来
+    Map<Object,Object> attendWordChallengeInfo(@Param("c_id") String c_id,@Param("user_id") String user_id);
+
+    //单词挑战情况取出单词数排序
+    List<Map<Object,Object>> getUserWordChallengeRank(@Param("c_id") String c_id);
+
+    //找获得邀请奖最多的人
+    Map<Object,Object> findTopInviteReward();
+
+    //找出整个列表并且按照邀请获得的奖金排序
+    List<Map<Object,Object>> showTotalInviteReward();
+
     //获取新建单次挑战id
     String getWordChallengeId(@Param("time") String time);
 
@@ -218,4 +233,22 @@ public interface Common_configMapper {
 
     //获取本期开奖
     String getNowPrize(@Param("now_time") String  now_time);
+
+    //查看免死金牌的助力人数
+    int countMedallionTimes(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id);
+
+    //查看免死金牌是否助力过
+    int testMedallionWhetherAttend(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id,@Param("help_user_id") String  help_user_id);
+
+    //展示收支明细
+    List<Map<Object,Object>> showUserBill(@Param("user_id") String  user_id);
+
+    //展示单词挑战首页
+    Map<Object,Object> show_word_challenge(@Param("now_time") String  now_time);
+
+    //展示单词挑战首页
+    Map<Object,Object> find_user_attend_challenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
+    //展示查看用户往期活动成功条数
+    int find_user_whether_success_challenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 }

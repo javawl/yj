@@ -61,6 +61,8 @@ public interface IUserService {
 
     ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request);
 
+    ServerResponse<String> wx_upload_portrait_username(String username, String portrait, HttpServletRequest request);
+
     ServerResponse<JSONObject> my_comment( HttpServletRequest request);
 
     ServerResponse<String> change_open_status(HttpServletRequest request);

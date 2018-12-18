@@ -1276,6 +1276,31 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
+    public ServerResponse<String> wx_upload_portrait_username(String username, String portrait, HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //存到数据库
+            int result = userMapper.update_username_portrait(id,portrait,username);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+    @Override
     public ServerResponse<String> change_open_status(HttpServletRequest request){
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{

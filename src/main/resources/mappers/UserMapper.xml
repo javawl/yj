@@ -570,6 +570,13 @@
     WHERE id = #{id}
   </update>
 
+  <update id="update_username_portrait" parameterType="string">
+    UPDATE `user`
+    set portrait = #{portrait},
+    username = #{username}
+    WHERE id = #{id}
+  </update>
+
   <update id="decide_plan_user" parameterType="string">
     UPDATE user
     set my_plan = #{plan},

@@ -40,4 +40,22 @@ public interface IVariousService {
 
     //奖品结果
     ServerResponse<Map<Object,Object>> lottery_draw_winner(HttpServletRequest request);
+
+    //单词挑战首页
+    ServerResponse<Map<Object,Object>> show_word_challenge(HttpServletRequest request);
+
+    //单词挑战排行榜
+    ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request);
+
+    //邀请排行榜
+    ServerResponse<Map<Object,Object>> show_invite_reward_rank(HttpServletRequest request);
+
+    //展现邀请链接的内容
+    ServerResponse<Map<Object,Object>> show_invite_link_inner(HttpServletRequest request);
+
+    //展示用户明细
+    ServerResponse<List<Map<Object,Object>>> show_user_bill(HttpServletRequest request);
+
+    //获取免死金牌的用户id和用户参加单词挑战事件id
+    ServerResponse<Map<Object,Object>> get_medallion_info(HttpServletRequest request);
 }

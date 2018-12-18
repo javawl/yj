@@ -119,6 +119,27 @@ public class HomeServiceImpl implements IHomeService {
                 m1.put("plan_number",word_number);
                 m1.put("whether_template",SelectPlan.get(0).get("whether_template"));
                 m1.put("whether_reminder",SelectPlan.get(0).get("whether_reminder"));
+
+                //todo 给出用户单词挑战的三个状态（没挑战，有挑战没开始，有挑战开始了）
+                //找出所有结束时间还没到的挑战，判断用户是否参加
+                //找出未开始的期数并且找有空位的最近的开始时间(和单词挑战首页接口一致
+                Long now_time_stamp = (new Date()).getTime();
+                //从未结束的会议中判断用户是否报名
+                Map<Object,Object> word_challenge = common_config.find_user_attend_challenge(String.valueOf(now_time_stamp),id);
+                //判断是否报名
+                if (word_challenge == null){
+                    m1.put("word_challenge_status",0);
+                }else {
+                    //报了名
+                    //判断是否开始
+                    if (now_time_stamp >= Long.valueOf(word_challenge.get("st").toString())){
+                        //开始了
+                        m1.put("word_challenge_status",2);
+                    }else {
+                        m1.put("word_challenge_status",1);
+                    }
+                }
+
                 //查出feeds信息并捡出有用的
                 List<Map> feeds = dictionaryMapper.homePageFirstGet();
                 List<Map> feeds_result = new ArrayList<Map>();

@@ -45,7 +45,7 @@
             dataType:'json',
             success:function (result) {
                 var data = result["data"]['contestants'];
-                var lottery_draw = result["data"]['lottery_draw'];
+                var lottery_draw = result["data"]['word_challenge'];
                 var winner = result["data"]['winner'];
                 for(var i = 0; i < data.length; i++){
                     var string1;
@@ -65,6 +65,7 @@
                         '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+string1+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['insist_day']+'</td>'+
                         '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">设为中奖</button><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">取消中奖</button></td>'+
                         '</tr>');
                 }
@@ -86,15 +87,11 @@
                         '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+winner[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+string1+'</td>'+
+                        '<td style="width: 4%;">'+winner[i]['insist_day']+'</td>'+
                         '</tr>');
                 }
-                var string3
-                if (lottery_draw['prize_pic']==''){
-                    string3 = '此资源为空'
-                }else {
-                    string3 = '<img style="max-width: 300px; max-height: 300px;" src="'+lottery_draw['prize_pic']+'">';
-                }
-                $("#lottery_draw").append('<p>奖品名称: '+ lottery_draw['prize'] +'</p><br><p>奖品图片： '+string3+'</p>')
+                $("#lottery_draw").append('<p>报名上限: '+ lottery_draw['upper_limit'] +'</p><br><p>可报名上限: '+ lottery_draw['enrollment'] +'</p><br><p>开始时间: '+ lottery_draw['st'] +'</p><br><p>结束时间： '+lottery_draw['et']+'</p>' +
+                    '<br><p>期数： '+lottery_draw['periods']+'</p><br><p>盈亏： '+lottery_draw['profit_loss']+'</p><br><p>虚拟用户： '+lottery_draw['virtual_number']+'</p>')
 //                if (result.status == 200){
 //                    alert(result[0]);
 //                }
@@ -109,7 +106,7 @@
 <body>
 <center>
     <div id="lottery_draw">
-        <h1>奖品</h1>
+        <h1>单词挑战</h1>
         <br>
     </div>
     <h1>成功用户</h1>
@@ -140,7 +137,7 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"><button style="float: right"><a href="show_virtual_user.jsp?page=1&size=15">展示虚拟用户</a></button></td>
+            <td style="border-left: 0;border-right: 0;"><button style="float: right"><a href="show_virtual_user_challenge.jsp?page=1&size=15">展示虚拟用户</a></button></td>
             <td style="border-left: 0;">
                 <button style="float: right"><a href="add_virtual_user_challenge.jsp">新建虚拟用户</a></button>
             </td>

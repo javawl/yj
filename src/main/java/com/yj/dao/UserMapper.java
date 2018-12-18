@@ -108,6 +108,9 @@ public interface UserMapper {
     //修改个人信息
     int update_my_portrait(@Param("id") String id, @Param("portrait") String portrait);
 
+    //修改个人信息
+    int update_username_portrait(@Param("id") String id, @Param("portrait") String portrait, @Param("username") String username);
+
     //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 

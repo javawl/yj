@@ -139,7 +139,7 @@
 </body>
 <script>
     function single(id) {
-        window.location.href = "single_lottery_draw.jsp?id="+id;
+        window.location.href = "single_word_challenge.jsp?id="+id;
     }
     function del(id) {
         if (confirm("你确定要删除此奖品？删除之后不可恢复！")){
