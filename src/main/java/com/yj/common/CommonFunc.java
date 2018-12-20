@@ -67,6 +67,26 @@ public class CommonFunc {
     }
 
 
+
+    public static String getRandomStringByLength(int length){
+        //不能把位数写死了，根据length来确定多少位数随机字符串
+        String str = "";
+        String strPol = "abcdefghijklmnopqrstuvwxyz0123456789";
+        int max = strPol.length() - 1;
+        System.out.println(max);
+
+        Random rand = new Random();
+
+        //从中间抽出字符串加length次
+        for (int i = 0; i < length; i++){
+            int rand_flag = rand.nextInt(max);
+            str += strPol.substring(rand_flag, rand_flag + 1);
+        }
+
+        return str;
+    }
+
+
     //按照指定的盐生成指定的token
     public static String generateToken(String salt){
         //生成token（唯一标示）

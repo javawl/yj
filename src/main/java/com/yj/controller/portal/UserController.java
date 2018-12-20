@@ -552,6 +552,23 @@ public class UserController extends BaseController {
     @RequestMapping(value = "test4.do", method = RequestMethod.GET)
     @ResponseBody
     public String test4(CommonFunc func){
+
+
+//        class A { voi dm() { System.out.println(""outer""); } }
+//        public class TestInners {
+//            public static void main(String[] args) {
+//                new TestInners().go();
+//                }
+//                void go() {
+//                new A().m();
+//                class A { void m() { System.out.println(""inner""); } }
+//                }
+//                class A { void m() { System.out.println(""middle""); } }
+//            }
+
+
         return func.getRandChars(32);
     }
+
+
 }

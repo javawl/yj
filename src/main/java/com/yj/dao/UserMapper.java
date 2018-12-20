@@ -51,6 +51,9 @@ public interface UserMapper {
     //获取token那里判断openid是否已经在数据库里了
     String isExistOpenid(@Param("openid") String openid);
 
+    //获取用户openid
+    String getOpenId(@Param("user_id") String user_id);
+
     //获取我的计划的计划名
     Map getUserSelectPlanAndDays(@Param("id") String id);
 

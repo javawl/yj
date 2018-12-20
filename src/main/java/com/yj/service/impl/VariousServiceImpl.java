@@ -3,13 +3,15 @@ package com.yj.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.yj.common.CommonFunc;
-import com.yj.common.Const;
-import com.yj.common.ServerResponse;
+import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
+import com.yj.util.IpUtils;
+import com.yj.util.PayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -17,6 +19,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -36,6 +39,8 @@ public class VariousServiceImpl implements IVariousService {
 
     @Autowired
     private ApplicationContext ctx;
+
+    private Logger logger = LoggerFactory.getLogger(VariousServiceImpl.class);
 
     @Override
     public ServerResponse<JSONObject> found_page(HttpServletRequest request){
@@ -769,21 +774,151 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             //先检测是否位置
-            int exist_time = common_configMapper.countMedallionTimes(user_id,word_challenge_contestants_id);
-            if (exist_time >= 3){
+            int existTime = common_configMapper.countMedallionTimes(user_id,word_challenge_contestants_id);
+            if (existTime >= 3){
                 return ServerResponse.createByErrorMessage("助力已满了哦！");
             }
             //检测是否助力过
             if (common_configMapper.testMedallionWhetherAttend(user_id,word_challenge_contestants_id,uid) != 0){
                 return ServerResponse.createByErrorMessage("已经助力过咯不能在助力了哦！");
             }
+            String nowTime = String.valueOf((new Date()).getTime());
             //插入
-
+            int insertResult = common_configMapper.insertMedallionHelp(user_id, uid, word_challenge_contestants_id, nowTime);
+            if (insertResult == 0){
+                return ServerResponse.createByErrorMessage("助力失败");
+            }
             //todo 最后如果是这一次是满的话就发服务通知
-            if (exist_time == 2){
+            if (existTime == 2){
+                //日历不用盖个章
+                //将他的天数加一
+
                 //发服务通知
             }
             return ServerResponse.createBySuccessMessage("成功！");
+        }
+    }
+
+    //报名单词挑战
+    public ServerResponse<String> erollWordChallenge(String word_challenge_contestants_id,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            return null;
+        }
+    }
+
+
+    //微信小程序支付
+
+    /**
+     * 发起微信支付
+     * @param request
+     */
+    public ServerResponse<Map<String, Object>> wxPay(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        String openid = userMapper.getOpenId(uid);
+        if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        try{
+            //生成的随机字符串
+            String nonce_str = CommonFunc.getRandomStringByLength(32);
+            //商品名称
+            String body = "测试商品名称";
+            //获取客户端的ip地址
+            String spbill_create_ip = IpUtils.getIpAddr(request);
+
+            //组装参数，用户生成统一下单接口的签名
+            Map<String, String> packageParams = new HashMap<String, String>();
+            packageParams.put("appid", WxConfig.wx_app_id);
+            packageParams.put("mch_id", WxPayConfig.mch_id);
+            packageParams.put("nonce_str", nonce_str);
+            packageParams.put("body", body);
+            packageParams.put("out_trade_no", "123456789");//商户订单号
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("spbill_create_ip", spbill_create_ip);
+            packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
+            packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
+            packageParams.put("openid", openid);
+
+            String prestr = PayUtils.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+
+            //MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+            //文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+            String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+
+            //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+            String xml = "<xml>" + "<appid>" + WxConfig.wx_app_id + "</appid>"
+                    + "<body><![CDATA[" + body + "]]></body>"
+                    + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
+                    + "<nonce_str>" + nonce_str + "</nonce_str>"
+                    + "<notify_url>" + WxPayConfig.notify_url + "</notify_url>"
+                    + "<openid>" + openid + "</openid>"
+                    + "<out_trade_no>" + "123456789" + "</out_trade_no>"
+                    + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
+                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
+                    + "<sign>" + mysign + "</sign>"
+                    + "</xml>";
+
+            System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+
+            //调用统一下单接口，并接受返回的结果
+            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+
+            System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
+
+            // 将解析结果存储在HashMap中
+            Map map = PayUtils.doXMLParse(result);
+
+            String return_code = (String) map.get("return_code");//返回状态码
+            String return_msg = (String) map.get("return_msg"); //返回信息
+
+            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            if(return_code.equals("SUCCESS")){
+                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
+                response.put("nonceStr", nonce_str);
+                response.put("package", "prepay_id=" + prepay_id);
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
+                //拼接签名需要的参数
+                String stringSignTemp = "appId=" + WxConfig.wx_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
+                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
+
+                response.put("paySign", paySign);
+                response.put("appid", WxConfig.wx_app_id);
+                response.put("signType", WxPayConfig.SIGNTYPE);
+                return ServerResponse.createBySuccess("成功",response);
+            }else {
+                return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("支付失败",e.getStackTrace());
+            logger.error("支付失败",e);
+            return ServerResponse.createByErrorMessage("支付失败！");
         }
     }
 }

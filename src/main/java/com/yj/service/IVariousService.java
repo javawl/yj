@@ -58,4 +58,7 @@ public interface IVariousService {
 
     //获取免死金牌的用户id和用户参加单词挑战事件id
     ServerResponse<Map<Object,Object>> get_medallion_info(HttpServletRequest request);
+
+    //微信支付
+    ServerResponse<Map<String, Object>> wxPay(HttpServletRequest request);
 }

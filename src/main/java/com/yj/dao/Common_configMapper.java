@@ -107,6 +107,9 @@ public interface Common_configMapper {
     //后台插入抽奖奖品
     int insertLotteryDraw(@Param("prize_pic") String prize_pic,@Param("prize_tomorrow_pic") String prize_tomorrow_pic,@Param("prize") String prize,@Param("prize_tomorrow") String prize_tomorrow,@Param("upload_time") String upload_time,@Param("et") String et);
 
+    //后台插入免死金牌助力
+    int insertMedallionHelp(@Param("user_id") String user_id,@Param("help_user_id") String help_user_id,@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("set_time") String set_time);
+
     //后台插入单词挑战
     int insertWordChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time);
 

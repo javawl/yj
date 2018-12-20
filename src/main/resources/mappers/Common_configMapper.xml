@@ -141,6 +141,11 @@
     values (#{prize}, #{prize_pic}, #{prize_tomorrow}, #{prize_tomorrow_pic}, #{upload_time}, #{et})
   </insert>
 
+  <insert id="insertMedallionHelp" parameterType="string">
+    INSERT INTO medallion (user_id, help_user_id, word_challenge_contestants_id, set_time)
+    values (#{user_id}, #{help_user_id}, #{word_challenge_contestants_id}, #{set_time})
+  </insert>
+
   <insert id="insertWordChallenge" parameterType="string">
     INSERT INTO word_challenge (st, et, upper_limit, set_time, periods)
     values (#{st}, #{et}, #{upper_limit}, #{set_time}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM word_challenge) tb),0)+1)

@@ -363,6 +363,12 @@
     WHERE wechat = #{openid}
   </select>
 
+  <select id="getOpenId" resultType="string" parameterType="string">
+    SELECT wechat
+    FROM `user`
+    WHERE id = #{user_id}
+  </select>
+
   <select id="getUserSelectPlanAndDays" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number
     FROM user
