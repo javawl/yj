@@ -272,12 +272,14 @@ public class VariousController {
     @RequestMapping(value="wxPayNotify.do")
     @ResponseBody
     public void wxPayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        logger.error("回调开始");
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         //隔离级别
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
+        logger.error("测试事务");
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
             String line = null;
@@ -295,6 +297,7 @@ public class VariousController {
 
             String returnCode = (String) map.get("return_code");
             String out_trade_no = (String) map.get("out_trade_no");
+            logger.error(out_trade_no);
             String return_msg = (String) map.get("return_msg"); //返回信息
             if("SUCCESS".equals(returnCode)){
                 //验证签名是否正确
