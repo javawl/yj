@@ -304,11 +304,11 @@ public class VariousController {
                 //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
                 if(sign.equals(map.get("sign"))){
                     /**此处添加自己的业务逻辑代码start**/
-                    String token = out_trade_no.substring(out_trade_no.length() - 64, out_trade_no.length());
-                    String word_challenge_id = out_trade_no.substring(0,out_trade_no.length() - 64);
+                    String[] str_list = out_trade_no.split("_");
+                    String word_challenge_id = str_list[0];
                     String now_time = String.valueOf((new Date()).getTime());
                     //获取用户id
-                    String uid = CommonFunc.CheckToken(request,token);
+                    String uid = str_list[1];
                     //插入参与数据库
                     common_configMapper.insertWordChallengeContestantsReal(uid,word_challenge_id,now_time);
                     //插入单词挑战总数据库
