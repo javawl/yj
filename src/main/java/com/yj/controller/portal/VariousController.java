@@ -1,8 +1,10 @@
 package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yj.common.CommonFunc;
 import com.yj.common.ServerResponse;
 import com.yj.common.WxPayConfig;
+import com.yj.dao.Common_configMapper;
 import com.yj.service.IFileService;
 import com.yj.service.IVariousService;
 import com.yj.service.impl.VariousServiceImpl;
@@ -10,7 +12,12 @@ import com.yj.util.PayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 /**
@@ -35,6 +43,10 @@ public class VariousController {
 
     @Autowired
     private IFileService iFileService;
+
+    private Common_configMapper common_configMapper;
+
+    private ApplicationContext ctx;
 
     private Logger logger = LoggerFactory.getLogger(VariousController.class);
 
@@ -243,11 +255,11 @@ public class VariousController {
 
 
 
-    @RequestMapping(value = "wxPay.do", method = RequestMethod.POST)
+    @RequestMapping(value = "wordChallengePay.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Map<String, Object>> wxPay(HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> wordChallengePay(String word_challenge_id,HttpServletRequest request){
         //调用service层
-        return iVariousService.wxPay(request);
+        return iVariousService.wordChallengePay(word_challenge_id,request);
     }
 
 
@@ -260,51 +272,81 @@ public class VariousController {
     @RequestMapping(value="wxPayNotify.do")
     @ResponseBody
     public void wxPayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
-        String line = null;
-        StringBuilder sb = new StringBuilder();
-        while((line = br.readLine()) != null){
-            sb.append(line);
-        }
-        br.close();
-        //sb为微信返回的xml
-        String notityXml = sb.toString();
-        String resXml = "";
-        System.out.println("接收到的报文：" + notityXml);
-
-        Map map = PayUtils.doXMLParse(notityXml);
-
-        String returnCode = (String) map.get("return_code");
-        String return_msg = (String) map.get("return_msg"); //返回信息
-        if("SUCCESS".equals(returnCode)){
-            //验证签名是否正确
-            Map<String, String> validParams = PayUtils.paraFilter(map);  //回调验签时需要去除sign和空值参数
-            String validStr = PayUtils.createLinkString(validParams);//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
-            String sign = PayUtils.sign(validStr, WxPayConfig.key, "utf-8").toUpperCase();//拼装生成服务器端验证的签名
-            //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
-            if(sign.equals(map.get("sign"))){
-                /**此处添加自己的业务逻辑代码start**/
-
-
-                /**此处添加自己的业务逻辑代码end**/
-                //通知微信服务器已经支付成功
-                resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
-                        + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            while((line = br.readLine()) != null){
+                sb.append(line);
             }
-        }else{
-            resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+            br.close();
+            //sb为微信返回的xml
+            String notityXml = sb.toString();
+            String resXml = "";
+            System.out.println("接收到的报文：" + notityXml);
+
+            Map map = PayUtils.doXMLParse(notityXml);
+
+            String returnCode = (String) map.get("return_code");
+            String out_trade_no = (String) map.get("out_trade_no");
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            if("SUCCESS".equals(returnCode)){
+                //验证签名是否正确
+                Map<String, String> validParams = PayUtils.paraFilter(map);  //回调验签时需要去除sign和空值参数
+                String validStr = PayUtils.createLinkString(validParams);//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+                String sign = PayUtils.sign(validStr, WxPayConfig.key, "utf-8").toUpperCase();//拼装生成服务器端验证的签名
+                //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
+                if(sign.equals(map.get("sign"))){
+                    /**此处添加自己的业务逻辑代码start**/
+                    String token = out_trade_no.substring(out_trade_no.length() - 64, out_trade_no.length());
+                    String word_challenge_id = out_trade_no.substring(0,out_trade_no.length() - 64);
+                    String now_time = String.valueOf((new Date()).getTime());
+                    //获取用户id
+                    String uid = CommonFunc.CheckToken(request,token);
+                    //插入参与数据库
+                    common_configMapper.insertWordChallengeContestantsReal(uid,word_challenge_id,now_time);
+                    //插入单词挑战总数据库
+                    common_configMapper.changeWordChallengeEnroll(word_challenge_id);
+                    /**此处添加自己的业务逻辑代码end**/
+                    //通知微信服务器已经支付成功
+                    resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
+                            + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                }
+            }else{
+                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                        + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                logger.error(return_msg);
+            }
+            System.out.println(resXml);
+            System.out.println("微信支付回调数据结束");
+            logger.error("微信支付回调数据结束");
+
+
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("报名失败",e.getStackTrace());
+            logger.error("报名失败",e);
+            e.printStackTrace();
+            //出现错误抛错
+            String resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
                     + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
-            logger.error(return_msg);
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
         }
-        System.out.println(resXml);
-        System.out.println("微信支付回调数据结束");
-        logger.error("微信支付回调数据结束");
-
-
-        BufferedOutputStream out = new BufferedOutputStream(
-                response.getOutputStream());
-        out.write(resXml.getBytes());
-        out.flush();
-        out.close();
     }
 }

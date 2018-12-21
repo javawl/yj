@@ -56,6 +56,9 @@ public interface Common_configMapper {
     //后台修改虚拟用户用户名
     int adminChangeUserUsername(@Param("id") String id,@Param("username") String username);
 
+    //修改单词挑战的报名人数
+    int changeWordChallengeEnroll(@Param("word_challenge_id") String word_challenge_id);
+
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
 
@@ -124,6 +127,9 @@ public interface Common_configMapper {
 
     //打卡参与单词挑战
     int insertWordChallengeContestants(@Param("user_id") String user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
+
+    //打卡参与单词挑战
+    int insertWordChallengeContestantsReal(@Param("user_id") String user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_time);
 
     //插入模板消息的form_id
     int insertTemplateFormId(@Param("user_id") String user_id,@Param("wechat") String wechat,@Param("form_id") String form_id,@Param("set_time") String set_time);

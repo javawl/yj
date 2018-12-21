@@ -60,5 +60,5 @@ public interface IVariousService {
     ServerResponse<Map<Object,Object>> get_medallion_info(HttpServletRequest request);
 
     //微信支付
-    ServerResponse<Map<String, Object>> wxPay(HttpServletRequest request);
+    ServerResponse<Map<String, Object>> wordChallengePay(String word_challenge_id,HttpServletRequest request);
 }
