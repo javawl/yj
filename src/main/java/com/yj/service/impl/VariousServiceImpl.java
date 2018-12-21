@@ -842,6 +842,7 @@ public class VariousServiceImpl implements IVariousService {
         String openid = userMapper.getOpenId(uid);
         if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
         try{
+            String now_stamp = String.valueOf((new Date()).getTime());
             //生成的随机字符串
             String nonce_str = CommonFunc.getRandomStringByLength(32);
             //商品名称
@@ -855,7 +856,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", "123456789");//商户订单号
+            packageParams.put("out_trade_no", now_stamp);//商户订单号
             packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
@@ -877,7 +878,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + WxPayConfig.notify_url + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
-                    + "<out_trade_no>" + "123456789" + "</out_trade_no>"
+                    + "<out_trade_no>" + now_stamp + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
