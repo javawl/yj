@@ -44,8 +44,10 @@ public class VariousController {
     @Autowired
     private IFileService iFileService;
 
+    @Autowired
     private Common_configMapper common_configMapper;
 
+    @Autowired
     private ApplicationContext ctx;
 
     private Logger logger = LoggerFactory.getLogger(VariousController.class);
