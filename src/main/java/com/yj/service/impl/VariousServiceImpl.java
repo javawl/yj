@@ -830,6 +830,7 @@ public class VariousServiceImpl implements IVariousService {
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(word_challenge_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -899,6 +900,7 @@ public class VariousServiceImpl implements IVariousService {
 
             String return_code = (String) map.get("return_code");//返回状态码
             String return_msg = (String) map.get("return_msg"); //返回信息
+            logger.error(return_msg);
 
             Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
             if(return_code.equals("SUCCESS")){
