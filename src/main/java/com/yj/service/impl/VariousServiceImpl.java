@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -753,17 +755,25 @@ public class VariousServiceImpl implements IVariousService {
             Map<Object,Object> result = new HashMap<>();
             result.put("word_challenge_contestants_id",Integer.valueOf(word_challenge.get("word_challenge_contestants_id").toString()));
             result.put("user_id",uid);
+            if (Integer.valueOf(word_challenge.get("medallion").toString()) == 0){
+                result.put("flag",0);
+            }
+            if (Integer.valueOf(word_challenge.get("medallion").toString()) == 1){
+                result.put("flag",1);
+            }
             return ServerResponse.createBySuccess("成功！", result);
         }
     }
 
 
     //朋友助力免死金牌
-    public ServerResponse<String> medallion_help(String user_id, String word_challenge_contestants_id,HttpServletRequest request){
+    public ServerResponse<String> medallion_help(String user_id, String word_challenge_contestants_id, String flag,HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(word_challenge_contestants_id);
+            add(flag);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -774,7 +784,7 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             //先检测是否位置
-            int existTime = common_configMapper.countMedallionTimes(user_id,word_challenge_contestants_id);
+            int existTime = common_configMapper.countMedallionTimes(user_id,word_challenge_contestants_id,flag);
             if (existTime >= 3){
                 return ServerResponse.createByErrorMessage("助力已满了哦！");
             }
@@ -782,20 +792,39 @@ public class VariousServiceImpl implements IVariousService {
             if (common_configMapper.testMedallionWhetherAttend(user_id,word_challenge_contestants_id,uid) != 0){
                 return ServerResponse.createByErrorMessage("已经助力过咯不能在助力了哦！");
             }
-            String nowTime = String.valueOf((new Date()).getTime());
-            //插入
-            int insertResult = common_configMapper.insertMedallionHelp(user_id, uid, word_challenge_contestants_id, nowTime);
-            if (insertResult == 0){
-                return ServerResponse.createByErrorMessage("助力失败");
-            }
-            //todo 最后如果是这一次是满的话就发服务通知
-            if (existTime == 2){
-                //日历不用盖个章
-                //将他的天数加一
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                String nowTime = String.valueOf((new Date()).getTime());
+                //插入
+                int insertResult = common_configMapper.insertMedallionHelp(user_id, uid, word_challenge_contestants_id, flag, nowTime);
+                if (insertResult == 0){
+                    throw new Exception();
+                }
+                //todo 最后如果是这一次是满的话就发服务通知
+                if (existTime == 2){
+                    //日历不用盖个章
+                    //将他的天数加一,使用免死金牌数加一
+                    int addResult = common_configMapper.addChallengeInsistDay(word_challenge_contestants_id,user_id);
+                    if (addResult == 0){
+                        throw new Exception();
+                    }
+                    //发服务通知
 
-                //发服务通知
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功！");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("助力失败",e.getStackTrace());
+                logger.error("助力失败",e);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("助力失败！");
             }
-            return ServerResponse.createBySuccessMessage("成功！");
         }
     }
 
@@ -843,11 +872,33 @@ public class VariousServiceImpl implements IVariousService {
         String openid = userMapper.getOpenId(uid);
         if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
         try{
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
             //todo 做判断看看他到底能不能报名
-
+            //报过名不能报(任意一期)
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(now_time,uid);
+            if (word_challenge != null){
+                return ServerResponse.createByErrorMessage("已报名过单词挑战不可再报！");
+            }
+            //满人了不能报，报名人数>=报名上限
+            Map<Object,Object> selectWordChallenge = common_configMapper.getWordChallengeById(word_challenge_id);
+            //判断该挑战id的挑战是否符合条件
+            if (selectWordChallenge == null){
+                return ServerResponse.createByErrorMessage("未找到选择的单词挑战！");
+            }
+            int upper_limit = Integer.valueOf(selectWordChallenge.get("upper_limit").toString());
+            int enrollment = Integer.valueOf(selectWordChallenge.get("enrollment").toString());
+            if (enrollment >= upper_limit){
+                return ServerResponse.createByErrorMessage("报名已满不可再报！");
+            }
+            String st = selectWordChallenge.get("st").toString();
+            if (Long.valueOf(st) <= Long.valueOf(now_time)){
+                return ServerResponse.createByErrorMessage("单词挑战一开始不可报名！");
+            }
 
             //生成的随机字符串
             String nonce_str = CommonFunc.getRandomStringByLength(32);
+
             //商品名称
             String body = "单词挑战报名";
             //获取客户端的ip地址
@@ -859,7 +910,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", word_challenge_id + "_" + uid);//商户订单号
+            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + now_time);//商户订单号
             packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址

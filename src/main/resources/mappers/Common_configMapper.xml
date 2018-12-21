@@ -142,8 +142,8 @@
   </insert>
 
   <insert id="insertMedallionHelp" parameterType="string">
-    INSERT INTO medallion (user_id, help_user_id, word_challenge_contestants_id, set_time)
-    values (#{user_id}, #{help_user_id}, #{word_challenge_contestants_id}, #{set_time})
+    INSERT INTO medallion (user_id, help_user_id, word_challenge_contestants_id, flag, set_time)
+    values (#{user_id}, #{help_user_id}, #{word_challenge_contestants_id}, #{flag}, #{set_time})
   </insert>
 
   <insert id="insertWordChallengeContestantsReal" parameterType="string">
@@ -356,6 +356,12 @@
     WHERE id = 1
   </select>
 
+  <select id="getWordChallengeById" resultType="map">
+    SELECT  *
+    FROM `word_challenge`
+    WHERE id = #{word_challenge_id}
+  </select>
+
   <select id="getUserWinStatus" resultType="string" parameterType="string">
     SELECT status
     FROM `lottery_draw_contestants`
@@ -477,6 +483,7 @@
     FROM medallion
     WHERE user_id = #{user_id}
     AND word_challenge_contestants_id = #{word_challenge_contestants_id}
+    AND flag = #{flag}
   </select>
 
   <select id="testMedallionWhetherAttend" resultType="int" parameterType="string">
@@ -573,6 +580,14 @@
     UPDATE `word_challenge`
     set `enrollment` = `enrollment` + 1
     WHERE id = #{word_challenge_id}
+  </update>
+
+  <update id="addChallengeInsistDay">
+    UPDATE `word_challenge_contestants`
+    set `insist_day` = `insist_day` + 1,
+    medallion = medallion + 1
+    WHERE id = #{word_challenge_contestants_id}
+    AND user_id = #{user_id}
   </update>
 
   <update id="changeUserTemplateClose">

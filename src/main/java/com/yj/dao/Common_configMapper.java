@@ -59,6 +59,9 @@ public interface Common_configMapper {
     //修改单词挑战的报名人数
     int changeWordChallengeEnroll(@Param("word_challenge_id") String word_challenge_id);
 
+    //单词挑战坚持加一
+    int addChallengeInsistDay(@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("user_id") String user_id);
+
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
 
@@ -111,7 +114,7 @@ public interface Common_configMapper {
     int insertLotteryDraw(@Param("prize_pic") String prize_pic,@Param("prize_tomorrow_pic") String prize_tomorrow_pic,@Param("prize") String prize,@Param("prize_tomorrow") String prize_tomorrow,@Param("upload_time") String upload_time,@Param("et") String et);
 
     //后台插入免死金牌助力
-    int insertMedallionHelp(@Param("user_id") String user_id,@Param("help_user_id") String help_user_id,@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("set_time") String set_time);
+    int insertMedallionHelp(@Param("user_id") String user_id,@Param("help_user_id") String help_user_id,@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("flag") String flag,@Param("set_time") String set_time);
 
     //后台插入单词挑战
     int insertWordChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time);
@@ -200,6 +203,9 @@ public interface Common_configMapper {
     //后台获取基础信息（总用户等）
     Map getCommonConfig();
 
+    //后台获取基础信息（总用户等）
+    Map<Object,Object> getWordChallengeById(@Param("word_challenge_id") String word_challenge_id);
+
     //查看用户的获奖情况
     String getUserWinStatus(@Param("lottery_draw_id") String  lottery_draw_id,@Param("user_id") String  user_id);
 
@@ -244,7 +250,7 @@ public interface Common_configMapper {
     String getNowPrize(@Param("now_time") String  now_time);
 
     //查看免死金牌的助力人数
-    int countMedallionTimes(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id);
+    int countMedallionTimes(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id,@Param("flag") String  flag);
 
     //查看免死金牌是否助力过
     int testMedallionWhetherAttend(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id,@Param("help_user_id") String  help_user_id);

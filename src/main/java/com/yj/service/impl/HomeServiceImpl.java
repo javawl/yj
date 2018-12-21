@@ -129,14 +129,30 @@ public class HomeServiceImpl implements IHomeService {
                 //判断是否报名
                 if (word_challenge == null){
                     m1.put("word_challenge_status",0);
+                    //不能使用免死金牌
+                    m1.put("use_medallion",0);
                 }else {
                     //报了名
                     //判断是否开始
                     if (now_time_stamp >= Long.valueOf(word_challenge.get("st").toString())){
                         //开始了
                         m1.put("word_challenge_status",2);
+                        //获取区间天数
+                        int total_days = CommonFunc.count_interval_days(word_challenge.get("st").toString(),String.valueOf(now_time_stamp));
+                        //坚持天数
+                        int challenge_insist_days = Integer.valueOf(word_challenge.get("insist_day").toString());
+                        //未背天数
+                        int not_to_recite_days = total_days - challenge_insist_days;
+                        if (not_to_recite_days >= 3 && Integer.valueOf(word_challenge.get("medallion").toString()) < 2){
+                            //可以使用免死金牌
+                            m1.put("use_medallion",1);
+                        }else {
+                            m1.put("use_medallion",0);
+                        }
                     }else {
                         m1.put("word_challenge_status",1);
+                        //不能使用免死金牌
+                        m1.put("use_medallion",0);
                     }
                 }
 
@@ -1941,6 +1957,7 @@ public class HomeServiceImpl implements IHomeService {
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
         }};
+        logger.error(token);
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
