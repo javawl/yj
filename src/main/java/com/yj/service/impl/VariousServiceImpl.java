@@ -837,7 +837,7 @@ public class VariousServiceImpl implements IVariousService {
         String uid = CommonFunc.CheckToken(request,token);
         if (uid == null){
             //未找到
-            return ServerResponse.createByErrorMessage("身份认证错误！");
+            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
         }
         String openid = userMapper.getOpenId(uid);
         if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
@@ -866,7 +866,9 @@ public class VariousServiceImpl implements IVariousService {
 
             //MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
             //文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+            System.out.println(prestr);
             String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+            System.out.println(mysign);
 
             //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
             String xml = "<xml>" + "<appid>" + WxConfig.wx_app_id + "</appid>"

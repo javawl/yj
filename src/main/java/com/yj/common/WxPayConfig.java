@@ -2,7 +2,7 @@ package com.yj.common;
 
 public class WxPayConfig {
     //微信支付的商户id
-    public static final String mch_id = "1520805121";
+    public static final String mch_id = "1518620031";
     //微信支付的商户密钥
     public static final String key = "Beibeibeidanci12Beibeibeidanci12";
     //支付成功后的服务器回调url
