@@ -755,17 +755,29 @@ public class VariousServiceImpl implements IVariousService {
             if (Integer.valueOf(word_challenge.get("medallion").toString()) >= 2){
                 return ServerResponse.createByErrorMessage("哦豁，免死金牌用完了，别想着捷径了赶紧背单词吧！");
             }
-            if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > Long.valueOf(now_time_stamp)){
-                return ServerResponse.createByErrorMessage("你刚使用过免死金牌哦，明天再来看看吧");
+            if (word_challenge.get("last_medallion_time") != null){
+                if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > Long.valueOf(now_time_stamp)){
+                    return ServerResponse.createByErrorMessage("你刚使用过免死金牌哦，明天再来看看吧");
+                }
             }
             Map<Object,Object> result = new HashMap<>();
             result.put("word_challenge_contestants_id",Integer.valueOf(word_challenge.get("word_challenge_contestants_id").toString()));
             result.put("user_id",uid);
             if (Integer.valueOf(word_challenge.get("medallion").toString()) == 0){
                 result.put("flag",0);
+                //去数据库吧这几个头像找出来
+                List<Map<Object,Object>> medallionHelperPortrait = common_configMapper.getMedallionHelperPortrait(uid,word_challenge.get("word_challenge_contestants_id").toString(),"0");
+                for (int i = 0; i < medallionHelperPortrait.size(); i++){
+                    medallionHelperPortrait.get(i).put("portrait",CommonFunc.judgePicPath(medallionHelperPortrait.get(i).get("portrait").toString()));
+                }
             }
             if (Integer.valueOf(word_challenge.get("medallion").toString()) == 1){
                 result.put("flag",1);
+                //去数据库吧这几个头像找出来
+                List<Map<Object,Object>> medallionHelperPortrait = common_configMapper.getMedallionHelperPortrait(uid,word_challenge.get("word_challenge_contestants_id").toString(),"1");
+                for (int i = 0; i < medallionHelperPortrait.size(); i++){
+                    medallionHelperPortrait.get(i).put("portrait",CommonFunc.judgePicPath(medallionHelperPortrait.get(i).get("portrait").toString()));
+                }
             }
             return ServerResponse.createBySuccess("成功！", result);
         }
@@ -831,6 +843,58 @@ public class VariousServiceImpl implements IVariousService {
                 e.printStackTrace();
                 return ServerResponse.createByErrorMessage("助力失败！");
             }
+        }
+    }
+
+    //我的邀请
+    public ServerResponse<List<Map<Object,Object>>> my_invite_word_challenge(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            List<Map<Object,Object>> result = new ArrayList<>();
+            //时间戳
+            Long now_time = (new Date()).getTime();
+            //获取我的邀请
+            List<Map<Object,Object>> myInviteInfo = common_configMapper.getMyInviteWordChallenge(uid);
+            Double total_fee = 0.0;
+            for (int i = 0; i < myInviteInfo.size(); i++){
+                Map<Object,Object> single_map = new HashMap<>();
+                Double inviteReward = Double.valueOf(myInviteInfo.get(i).get("reward").toString());
+                //把总的金额算好
+                total_fee += inviteReward;
+                //查看该单词挑战是否结束
+                Map<Object,Object> word_challenge = common_configMapper.showWordChallenge(myInviteInfo.get(i).get("word_challenge_id").toString());
+                //查看头像和名字
+                Map user_info = userMapper.getAuthorInfo(uid);
+                single_map.put("username",user_info.get("username").toString());
+                single_map.put("portrait",user_info.get("portrait").toString());
+                if (Long.valueOf(word_challenge.get("et").toString()) < now_time){
+                    //已结束
+                    if (Integer.valueOf(myInviteInfo.get(i).get("insist_day").toString()) >= 28){
+                        //成功
+                        single_map.put("msg","获得" + inviteReward + "元");
+                    }else {
+                        //失败
+                        single_map.put("msg","挑战失败!");
+                    }
+                }else {
+                    //未结束
+                    single_map.put("msg","正在挑战中");
+                }
+                result.add(single_map);
+            }
+
+            return ServerResponse.createBySuccess("成功！", result);
         }
     }
 

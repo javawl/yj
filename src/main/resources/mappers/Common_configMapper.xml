@@ -499,6 +499,28 @@
     AND help_user_id = #{help_user_id}
   </select>
 
+  <select id="getMedallionHelperPortrait" resultType="map" parameterType="string">
+    SELECT portrait
+    FROM `user`,
+    (SELECT help_user_id
+    FROM medallion
+    WHERE user_id = #{user_id}
+    AND word_challenge_contestants_id = #{word_challenge_contestants_id}
+    AND flag = #{flag}) tb
+    WHERE `user`.id = tb.help_user_id
+  </select>
+
+
+  <select id="getMyInviteWordChallenge" resultType="map" parameterType="string">
+    SELECT word_challenge_contestants.insist_day,tb.reward,tb.user_id,tb.word_challenge_id
+    FROM word_challenge_contestants,
+    (SELECT *
+    FROM `word_challenge_invite_relation`
+    WHERE invited_user_id = #{user_id}) tb
+    WHERE tb.word_challenge_id = word_challenge_contestants.word_challenge_id
+    AND tb.user_id = word_challenge_contestants.user_id
+  </select>
+
   <select id="showUserBill" resultType="map" parameterType="string">
     SELECT statement,set_time,bill
     FROM bill
@@ -514,7 +536,6 @@
     ORDER BY word_challenge.st ASC
     LIMIT 1
   </select>
-
 
   <select id="find_user_attend_challenge" resultType="map" parameterType="string">
     SELECT tb.*,word_challenge_contestants.insist_day,word_challenge_contestants.word_number,word_challenge_contestants.medallion,word_challenge_contestants.last_medallion_time,word_challenge_contestants.id as word_challenge_contestants_id

@@ -64,4 +64,7 @@ public interface IVariousService {
 
     //助力免死金牌
     ServerResponse<String> medallion_help(String user_id, String word_challenge_contestants_id, String flag,HttpServletRequest request);
+
+    //我的邀请(单词挑战)
+    ServerResponse<List<Map<Object,Object>>> my_invite_word_challenge(HttpServletRequest request);
 }

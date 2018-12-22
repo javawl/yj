@@ -282,6 +282,19 @@ public class VariousController {
 
 
     /**
+     * 单词挑战我的邀请
+     * @param request   request
+     * @return          String
+     */
+    @RequestMapping(value = "my_invite_word_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> my_invite_word_challenge(HttpServletRequest request){
+        //调用service层
+        return iVariousService.my_invite_word_challenge(request);
+    }
+
+
+    /**
      * 回调
      * @Description:微信支付
      * @return

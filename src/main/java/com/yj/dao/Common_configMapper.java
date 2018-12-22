@@ -258,6 +258,12 @@ public interface Common_configMapper {
     //查看免死金牌是否助力过
     int testMedallionWhetherAttend(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id,@Param("help_user_id") String  help_user_id);
 
+    //获取免死金牌帮助者的头像
+    List<Map<Object,Object>> getMedallionHelperPortrait(@Param("user_id") String  user_id,@Param("word_challenge_contestants_id") String  word_challenge_contestants_id,@Param("flag") String  flag);
+
+    //获取我的邀请
+    List<Map<Object,Object>> getMyInviteWordChallenge(@Param("user_id") String  user_id);
+
     //展示收支明细
     List<Map<Object,Object>> showUserBill(@Param("user_id") String  user_id);
 
