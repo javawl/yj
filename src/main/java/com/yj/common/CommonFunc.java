@@ -445,6 +445,21 @@ public class CommonFunc {
         return time + "000";
     }
 
+
+    //获取第二天零点多一秒的时间戳
+    public static String getNextDate0(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, +1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 1);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
     //获取六天后的时间戳
     public static String getNextSixDate(){
         Calendar calendar = Calendar.getInstance();

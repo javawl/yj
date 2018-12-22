@@ -144,8 +144,13 @@ public class HomeServiceImpl implements IHomeService {
                         //未背天数
                         int not_to_recite_days = total_days - challenge_insist_days;
                         if (not_to_recite_days >= 3 && Integer.valueOf(word_challenge.get("medallion").toString()) < 2){
-                            //可以使用免死金牌
-                            m1.put("use_medallion",1);
+                            if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > now_time_stamp){
+                                //还不可以用下一张
+                                m1.put("use_medallion",0);
+                            }else {
+                                //可以使用免死金牌
+                                m1.put("use_medallion",1);
+                            }
                         }else {
                             m1.put("use_medallion",0);
                         }

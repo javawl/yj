@@ -755,6 +755,9 @@ public class VariousServiceImpl implements IVariousService {
             if (Integer.valueOf(word_challenge.get("medallion").toString()) >= 2){
                 return ServerResponse.createByErrorMessage("哦豁，免死金牌用完了，别想着捷径了赶紧背单词吧！");
             }
+            if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > Long.valueOf(now_time_stamp)){
+                return ServerResponse.createByErrorMessage("你刚使用过免死金牌哦，明天再来看看吧");
+            }
             Map<Object,Object> result = new HashMap<>();
             result.put("word_challenge_contestants_id",Integer.valueOf(word_challenge.get("word_challenge_contestants_id").toString()));
             result.put("user_id",uid);
@@ -812,7 +815,7 @@ public class VariousServiceImpl implements IVariousService {
                 if (existTime == 2){
                     //日历不用盖个章
                     //将他的天数加一,使用免死金牌数加一
-                    int addResult = common_configMapper.addChallengeInsistDay(word_challenge_contestants_id,user_id);
+                    int addResult = common_configMapper.addChallengeInsistDay(word_challenge_contestants_id,user_id,CommonFunc.getNextDate0());
                     if (addResult == 0){
                         throw new Exception();
                     }

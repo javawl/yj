@@ -60,7 +60,7 @@ public interface Common_configMapper {
     int changeWordChallengeEnroll(@Param("word_challenge_id") String word_challenge_id);
 
     //单词挑战坚持加一
-    int addChallengeInsistDay(@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("user_id") String user_id);
+    int addChallengeInsistDay(@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("user_id") String user_id,@Param("last_medallion_time") String last_medallion_time);
 
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);

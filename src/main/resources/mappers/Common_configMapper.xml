@@ -517,7 +517,7 @@
 
 
   <select id="find_user_attend_challenge" resultType="map" parameterType="string">
-    SELECT tb.*,word_challenge_contestants.insist_day,word_challenge_contestants.word_number,word_challenge_contestants.medallion,word_challenge_contestants.id as word_challenge_contestants_id
+    SELECT tb.*,word_challenge_contestants.insist_day,word_challenge_contestants.word_number,word_challenge_contestants.medallion,word_challenge_contestants.last_medallion_time,word_challenge_contestants.id as word_challenge_contestants_id
     FROM word_challenge_contestants,
     (SELECT *
     FROM word_challenge
@@ -590,7 +590,8 @@
   <update id="addChallengeInsistDay">
     UPDATE `word_challenge_contestants`
     set `insist_day` = `insist_day` + 1,
-    medallion = medallion + 1
+    medallion = medallion + 1,
+    last_medallion_time = #{last_medallion_time}
     WHERE id = #{word_challenge_contestants_id}
     AND user_id = #{user_id}
   </update>
