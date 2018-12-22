@@ -773,6 +773,7 @@ public class VariousServiceImpl implements IVariousService {
                 for (int i = 0; i < medallionHelperPortrait.size(); i++){
                     medallionHelperPortrait.get(i).put("portrait",CommonFunc.judgePicPath(medallionHelperPortrait.get(i).get("portrait").toString()));
                 }
+                result.put("user_list",medallionHelperPortrait);
             }
             if (Integer.valueOf(word_challenge.get("medallion").toString()) == 1){
                 List<Map<Object,Object>> medallionHelperPortrait;
@@ -788,6 +789,7 @@ public class VariousServiceImpl implements IVariousService {
                 for (int i = 0; i < medallionHelperPortrait.size(); i++){
                     medallionHelperPortrait.get(i).put("portrait",CommonFunc.judgePicPath(medallionHelperPortrait.get(i).get("portrait").toString()));
                 }
+                result.put("user_list",medallionHelperPortrait);
             }
             return ServerResponse.createBySuccess("成功！", result);
         }
