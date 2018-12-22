@@ -259,9 +259,25 @@ public class VariousController {
 
     @RequestMapping(value = "wordChallengePay.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Map<String, Object>> wordChallengePay(String word_challenge_id,HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,String word_challenge_id,HttpServletRequest request){
         //调用service层
-        return iVariousService.wordChallengePay(word_challenge_id,request);
+        return iVariousService.wordChallengePay(user_id,word_challenge_id,request);
+    }
+
+
+    /**
+     * 助力免死金牌
+     * @param user_id                           用户id
+     * @param word_challenge_contestants_id     用户参加单词挑战这一事件
+     * @param flag                              第一块还是第二块免死金牌   0 or 1
+     * @param request                           request
+     * @return                                  String
+     */
+    @RequestMapping(value = "medallion_help.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> medallion_help(String user_id, String word_challenge_contestants_id, String flag,HttpServletRequest request){
+        //调用service层
+        return iVariousService.medallion_help(user_id,word_challenge_contestants_id,flag,request);
     }
 
 
@@ -314,10 +330,16 @@ public class VariousController {
                     String now_time = String.valueOf((new Date()).getTime());
                     //获取用户id
                     String uid = str_list[1];
+                    //邀请用户id
+                    String user_id = str_list[2];
                     //插入参与数据库
                     common_configMapper.insertWordChallengeContestantsReal(uid,word_challenge_id,now_time);
                     //插入单词挑战总数据库
                     common_configMapper.changeWordChallengeEnroll(word_challenge_id);
+                    if (!user_id.equals("no")){
+                        //通过邀请进来的
+                        common_configMapper.insertWordChallengeInviteRelation(uid,user_id,word_challenge_id,now_time);
+                    }
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

@@ -1957,7 +1957,6 @@ public class HomeServiceImpl implements IHomeService {
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
         }};
-        logger.error(token);
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token

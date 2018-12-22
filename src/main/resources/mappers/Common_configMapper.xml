@@ -173,6 +173,11 @@
     values (#{user_id},#{lottery_draw_id},#{set_time},#{virtual})
   </insert>
 
+  <insert id="insertWordChallengeInviteRelation" parameterType="string">
+    INSERT INTO word_challenge_invite_relation (user_id,invited_user_id,word_challenge_id,set_time)
+    values (#{user_id},#{invited_user_id},#{word_challenge_id},#{set_time})
+  </insert>
+
   <insert id="insertWordChallengeContestants" parameterType="string">
     INSERT INTO word_challenge_contestants (user_id,word_challenge_id,set_time,`virtual`,`insist_day`)
     values (#{user_id},#{word_challenge_id},#{set_time},#{virtual},30)

@@ -543,6 +543,7 @@ public class VariousServiceImpl implements IVariousService {
                     result.put("user_rank",rank_flag);
                     result.put("username",rank.get(i).get("username").toString());
                     result.put("word_number",rank.get(i).get("word_number").toString());
+                    result.put("insist_day",rank.get(i).get("insist_day").toString());
                     result.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
                 }
                 if (rank_flag <= 50){
@@ -679,6 +680,8 @@ public class VariousServiceImpl implements IVariousService {
                     String insist_day = word_challenge.get("insist_day").toString();
                     String word_number = word_challenge.get("word_number").toString();
                     msg += "已在背呗背单词坚持挑战" + insist_day + "天，过关" + word_number + "个单词";
+                    result.put("insist_day",insist_day);
+                    result.put("word_number",word_number);
                 }else {
                     //有挑战没开始
                     msg += "跟我一起参加单词挑战吧~可以赢取奖励金噢~";
@@ -854,7 +857,7 @@ public class VariousServiceImpl implements IVariousService {
      * 发起微信支付
      * @param request  request
      */
-    public ServerResponse<Map<String, Object>> wordChallengePay(String word_challenge_id,HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,String word_challenge_id,HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -910,7 +913,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + now_time);//商户订单号
+            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_" + now_time);//商户订单号
             packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
@@ -932,10 +935,116 @@ public class VariousServiceImpl implements IVariousService {
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + WxPayConfig.notify_url + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
-                    + "<out_trade_no>" + word_challenge_id + "_" + uid + "</out_trade_no>"
+                    + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
+                    + "<sign>" + mysign + "</sign>"
+                    + "</xml>";
+
+            System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+
+            //调用统一下单接口，并接受返回的结果
+            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+
+            System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
+
+            // 将解析结果存储在HashMap中
+            Map map = PayUtils.doXMLParse(result);
+
+            String return_code = (String) map.get("return_code");//返回状态码
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            logger.error(return_msg);
+
+            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            if(return_code.equals("SUCCESS")){
+                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
+                response.put("nonceStr", nonce_str);
+                response.put("package", "prepay_id=" + prepay_id);
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
+                //拼接签名需要的参数
+                String stringSignTemp = "appId=" + WxConfig.wx_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
+                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
+
+                response.put("paySign", paySign);
+                response.put("appid", WxConfig.wx_app_id);
+                response.put("signType", WxPayConfig.SIGNTYPE);
+                return ServerResponse.createBySuccess("成功",response);
+            }else {
+                return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("支付失败",e.getStackTrace());
+            logger.error("支付失败",e);
+            return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+    /**
+     * 发起企业支付
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> sendUserWordChallengeReward(String word_challenge_id,HttpServletRequest request){
+//        String token = request.getHeader("token");
+//        //验证参数是否为空
+//        List<Object> l1 = new ArrayList<Object>(){{
+//            add(token);
+//            add(word_challenge_id);
+//        }};
+//        String CheckNull = CommonFunc.CheckNull(l1);
+//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+//        //验证token
+//        String uid = CommonFunc.CheckToken(request,token);
+//        if (uid == null){
+//            //未找到
+//            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
+//        }
+//        String openid = userMapper.getOpenId(uid);
+        String openid = "o-3J75YlfGj21A201k7-j1Kx1ALE";
+//        if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        try{
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
+
+            //生成的随机字符串
+            String nonce_str = CommonFunc.getRandomStringByLength(32);
+
+            //商品描述
+            String desc = "单词挑战奖励";
+            //获取客户端的ip地址
+            String spbill_create_ip = IpUtils.getIpAddr(request);
+
+            //组装参数，用户生成统一下单接口的签名
+            Map<String, String> packageParams = new HashMap<String, String>();
+            packageParams.put("mch_appid", WxConfig.wx_app_id);
+            packageParams.put("mch_id", WxPayConfig.mch_id);
+            packageParams.put("nonce_str", nonce_str);
+            packageParams.put("partner_trade_no", word_challenge_id + "_" + "303" + "_" + now_time);//商户订单号
+            packageParams.put("openid", openid);
+            packageParams.put("check_name", "NO_CHECK"); // NO_CHECK：不校验真实姓名
+            packageParams.put("amount", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("desc", desc);
+            packageParams.put("spbill_create_ip", spbill_create_ip);
+
+
+            String prestr = PayUtils.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+
+            //MD5运算生成签名
+            String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+            System.out.println(mysign);
+
+            //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+            String xml = "<xml>" + "<mch_appid>" + WxConfig.wx_app_id + "</mch_appid>"
+                    +"<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
+                    + "<nonce_str>" + nonce_str + "</nonce_str>"
+                    + "<partner_trade_no>" + word_challenge_id + "_" + "303" + "</partner_trade_no>"
+                    + "<openid>" + openid + "</openid><check_name>NO_CHECK</check_name>"
+                    + "<amount>" + "1" + "</amount>"
+                    + "<desc>" + desc + "</desc>"
+                    + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
 
