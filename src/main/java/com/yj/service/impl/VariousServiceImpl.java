@@ -755,9 +755,12 @@ public class VariousServiceImpl implements IVariousService {
             if (Integer.valueOf(word_challenge.get("medallion").toString()) >= 2){
                 return ServerResponse.createByErrorMessage("哦豁，免死金牌用完了，别想着捷径了赶紧背单词吧！");
             }
+            //还不能使用新的免死金牌的话status为1
+            int status = 0;
             if (word_challenge.get("last_medallion_time") != null){
                 if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > Long.valueOf(now_time_stamp)){
-                    return ServerResponse.createByErrorMessage("你刚使用过免死金牌哦，明天再来看看吧");
+//                    return ServerResponse.createByErrorMessage("你刚使用过免死金牌哦，明天再来看看吧");
+                    status = 1;
                 }
             }
             Map<Object,Object> result = new HashMap<>();
@@ -772,9 +775,16 @@ public class VariousServiceImpl implements IVariousService {
                 }
             }
             if (Integer.valueOf(word_challenge.get("medallion").toString()) == 1){
-                result.put("flag",1);
-                //去数据库吧这几个头像找出来
-                List<Map<Object,Object>> medallionHelperPortrait = common_configMapper.getMedallionHelperPortrait(uid,word_challenge.get("word_challenge_contestants_id").toString(),"1");
+                List<Map<Object,Object>> medallionHelperPortrait;
+                if (status == 1){
+                    result.put("flag",0);
+                    //去数据库吧这几个头像找出来
+                    medallionHelperPortrait = common_configMapper.getMedallionHelperPortrait(uid,word_challenge.get("word_challenge_contestants_id").toString(),"0");
+                }else {
+                    result.put("flag",1);
+                    //去数据库吧这几个头像找出来
+                    medallionHelperPortrait = common_configMapper.getMedallionHelperPortrait(uid,word_challenge.get("word_challenge_contestants_id").toString(),"1");
+                }
                 for (int i = 0; i < medallionHelperPortrait.size(); i++){
                     medallionHelperPortrait.get(i).put("portrait",CommonFunc.judgePicPath(medallionHelperPortrait.get(i).get("portrait").toString()));
                 }
@@ -847,7 +857,7 @@ public class VariousServiceImpl implements IVariousService {
     }
 
     //我的邀请
-    public ServerResponse<List<Map<Object,Object>>> my_invite_word_challenge(HttpServletRequest request){
+    public ServerResponse<Map<Object,Object>> my_invite_word_challenge(HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -861,6 +871,7 @@ public class VariousServiceImpl implements IVariousService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
+            Map<Object,Object> final_result = new HashMap<>();
             List<Map<Object,Object>> result = new ArrayList<>();
             //时间戳
             Long now_time = (new Date()).getTime();
@@ -893,8 +904,9 @@ public class VariousServiceImpl implements IVariousService {
                 }
                 result.add(single_map);
             }
-
-            return ServerResponse.createBySuccess("成功！", result);
+            final_result.put("invite_list",result);
+            final_result.put("total_reward",total_fee);
+            return ServerResponse.createBySuccess("成功！", final_result);
         }
     }
 

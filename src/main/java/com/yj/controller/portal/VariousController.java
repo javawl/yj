@@ -288,7 +288,7 @@ public class VariousController {
      */
     @RequestMapping(value = "my_invite_word_challenge.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<List<Map<Object,Object>>> my_invite_word_challenge(HttpServletRequest request){
+    public ServerResponse<Map<Object,Object>> my_invite_word_challenge(HttpServletRequest request){
         //调用service层
         return iVariousService.my_invite_word_challenge(request);
     }
