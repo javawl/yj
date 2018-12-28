@@ -119,6 +119,10 @@ public class HomeServiceImpl implements IHomeService {
                 m1.put("plan_number",word_number);
                 m1.put("whether_template",SelectPlan.get(0).get("whether_template"));
                 m1.put("whether_reminder",SelectPlan.get(0).get("whether_reminder"));
+                m1.put("whether_challenge_success",SelectPlan.get(0).get("whether_challenge_success"));
+                m1.put("challenge_red_packet",SelectPlan.get(0).get("challenge_red_packet"));
+                m1.put("whether_invite_challenge_success",SelectPlan.get(0).get("whether_invite_challenge_success"));
+                m1.put("invite_challenge_red_packet",SelectPlan.get(0).get("invite_challenge_red_packet"));
 
                 //todo 给出用户单词挑战的三个状态（没挑战，有挑战没开始，有挑战开始了）
                 //找出所有结束时间还没到的挑战，判断用户是否参加
@@ -1724,6 +1728,14 @@ public class HomeServiceImpl implements IHomeService {
                     if (act != null){
                         common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
                     }
+                }
+
+                //如果参加了正在进行的单词挑战的话坚持天数加一
+                //找出是否有正在进行的计划并且该用户参加了
+                Map<Object,Object> userAttendWordChallenge = common_config.findClockWordChallenge(String.valueOf((new Date()).getTime()),id);
+                if (userAttendWordChallenge != null){
+                    String wordChallengeId = userAttendWordChallenge.get("id").toString();
+                    common_config.addNormalChallengeInsistDay(wordChallengeId,id);
                 }
 
                 transactionManager.commit(status);

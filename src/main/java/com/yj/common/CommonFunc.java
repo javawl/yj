@@ -294,6 +294,18 @@ public class CommonFunc {
         }
     }
 
+    //计算单词挑战最终的reward
+    public static Double calculateWordChallengeReward(int successNumber, Double totalMoney){
+        //先把成功用户的钱还了
+        totalMoney -= successNumber * Const.WORD_CHALLENGE_MONEY;
+        //余下金钱池对半
+        Double half = totalMoney / 2.0;
+        //一半的奖金池除以成功数当做奖励金
+        if (successNumber == 0){
+            return 0.0;
+        }
+        return half / successNumber;
+    }
 
     //获取cookie中某个键值的值，没有的话返回null
     public String getCookieValueBykey(HttpServletRequest request,String key){

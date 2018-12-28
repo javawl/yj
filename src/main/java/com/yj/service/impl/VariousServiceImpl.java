@@ -10,6 +10,8 @@ import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
 import com.yj.util.IpUtils;
 import com.yj.util.PayUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,12 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 import java.util.*;
 
 /**
@@ -843,14 +849,33 @@ public class VariousServiceImpl implements IVariousService {
                     if (addResult == 0){
                         throw new Exception();
                     }
-                    //发服务通知
-
+                    //获取accessToken
+                    AccessToken access_token = CommonFunc.getAccessToken();
+                    //给该用户发送
+                    //查没过期的from_id
+                    Map<Object,Object> info = common_configMapper.getTmpInfo(uid,nowTime);
+                    if (info != null){
+                        common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                        //发送模板消息
+                        WxMssVo wxMssVo = new WxMssVo();
+                        wxMssVo.setTemplate_id(Const.TMP_ID_MEDALLION);
+                        wxMssVo.setAccess_token(access_token.getAccessToken());
+                        wxMssVo.setTouser(info.get("wechat").toString());
+                        wxMssVo.setPage(Const.WX_HOME_PATH);
+                        wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                        wxMssVo.setForm_id(info.get("form_id").toString());
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("免死金牌一枚","#ffffff"));
+                        list.add(new TemplateData("亲爱的已有3位好友为你助力，恭喜你获得免死金牌、成功复活啦~~接下来要每天挑战噢，再忘记背呗可不救你了！哼哼","#ffffff"));
+                        wxMssVo.setParams(list);
+                        CommonFunc.sendTemplateMessage(wxMssVo);
+                    }
                 }
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
                 transactionManager.rollback(status);
-                logger.error("助力失败",e.getStackTrace());
+                logger.error("助力失败或者发送模板消息异常",e.getStackTrace());
                 logger.error("助力失败",e);
                 e.printStackTrace();
                 return ServerResponse.createByErrorMessage("助力失败！");
@@ -938,12 +963,11 @@ public class VariousServiceImpl implements IVariousService {
      * 发起微信支付
      * @param request  request
      */
-    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,String word_challenge_id,HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
-            add(word_challenge_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -964,6 +988,11 @@ public class VariousServiceImpl implements IVariousService {
             if (word_challenge != null){
                 return ServerResponse.createByErrorMessage("已报名过单词挑战不可再报！");
             }
+            Map<Object,Object> word_challenge_capable= common_configMapper.findCanAttendWordChallenge(now_time);
+            if (word_challenge_capable == null){
+                return ServerResponse.createByErrorMessage("没有可报名的单词挑战！");
+            }
+            String word_challenge_id = word_challenge_capable.get("id").toString();
             //满人了不能报，报名人数>=报名上限
             Map<Object,Object> selectWordChallenge = common_configMapper.getWordChallengeById(word_challenge_id);
             //判断该挑战id的挑战是否符合条件
@@ -1131,8 +1160,19 @@ public class VariousServiceImpl implements IVariousService {
 
             System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
 
+
+            KeyStore keyStore = KeyStore.getInstance("PKCS12");
+            FileInputStream inStream = new FileInputStream(new File(WxPayConfig.wxPayCertPath)); // 从配置文件里读取证书的路径信息
+            keyStore.load(inStream, WxPayConfig.mch_id.toCharArray());// 证书密码是商户ID
+            inStream.close();
+            SSLContext sslcontext = SSLContexts.custom().loadKeyMaterial(keyStore, WxPayConfig.mch_id.toCharArray()).build();
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[] { "TLSv1" },
+                    null, SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+
+
+
             //调用统一下单接口，并接受返回的结果
-            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+            String result = PayUtils.httpRequest(WxPayConfig.PAY_USER_URL, "POST", xml);
 
             System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
 
@@ -1145,19 +1185,10 @@ public class VariousServiceImpl implements IVariousService {
 
             Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
             if(return_code.equals("SUCCESS")){
-                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
-                response.put("nonceStr", nonce_str);
-                response.put("package", "prepay_id=" + prepay_id);
-                Long timeStamp = System.currentTimeMillis() / 1000;
-                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
-                //拼接签名需要的参数
-                String stringSignTemp = "appId=" + WxConfig.wx_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
-                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
-                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
-
-                response.put("paySign", paySign);
-                response.put("appid", WxConfig.wx_app_id);
-                response.put("signType", WxPayConfig.SIGNTYPE);
+                String payment_no = (String) map.get("payment_no");//返回支付流水号
+                response.put("payment_no", payment_no);
+                response.put("payment_time", map.get("payment_time"));
+                System.out.println(map.toString());
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);

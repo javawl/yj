@@ -41,6 +41,23 @@ public interface Common_configMapper {
     //修改用户预约提醒状态
     int changeUserRemind(@Param("whether_reminder") String whether_reminder, @Param("id") String id);
 
+    //在参加单词挑战表中把成功用户的reward加上
+    int WordChallengeUserChangeToSuccess(@Param("reward") String reward, @Param("id") String id);
+
+    //在用户表把用户的红包加上
+    int makeWordChallengeRedPacket(@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
+
+    //在用户表把用户的邀请红包加上
+    int makeInviteWordChallengeRedPacket(@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet, @Param("invite_reward") String invite_reward);
+
+    //结算单词挑战表
+    int settleAccounts(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,
+                       @Param("success_rate") String success_rate, @Param("reward_each") String reward_each, @Param("loser") String loser, @Param("invite_success") String invite_success,
+                       @Param("whether_settle_accounts") String whether_settle_accounts, @Param("id") String id);
+
+    //取消单词挑战的确认
+    int cancelChallengeConfirm(@Param("final_confirm") String final_confirm, @Param("id") String id);
+
     //开启模板消息
     int changeUserTemplateOpen(@Param("id") String id);
 
@@ -61,6 +78,12 @@ public interface Common_configMapper {
 
     //单词挑战坚持加一
     int addChallengeInsistDay(@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("user_id") String user_id,@Param("last_medallion_time") String last_medallion_time);
+
+    //单词挑战坚持加一
+    int addNormalChallengeInsistDay(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
+
+    //把邀请成功的人的reward加上
+    int wordChallengeInviteChangeToSuccess(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id,@Param("reward") String reward,@Param("is_success") String is_success);
 
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
@@ -128,6 +151,9 @@ public interface Common_configMapper {
     //打卡参与抽奖
     int insertLotteryDrawReal(@Param("user_id") String user_id,@Param("lottery_draw_id") String lottery_draw_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
+    //系统总资产插入
+    int insertBank(@Param("description") String description,@Param("money") String money,@Param("set_time") String set_time);
+
     //建立单词挑战邀请关系
     int insertWordChallengeInviteRelation(@Param("user_id") String user_id,@Param("invited_user_id") String invited_user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_tim);
 
@@ -191,6 +217,9 @@ public interface Common_configMapper {
     //后台根据id获取单词挑战成功者
     List<Map<Object,Object>> showWordChallengeWinner(@Param("id") String id);
 
+    //获取单词挑战开始的提醒的用户名单,区间开始为当天十点，结束为第二天十点
+    List<Map<Object,Object>> getWordChallengeBeginRemind(@Param("during_begin") String during_begin,@Param("during_end") String during_end);
+
     //后台根据id获取奖品参与者虚拟
     List<Map<Object,Object>> showLotteryDrawContestantsVirtual(@Param("id") String id);
 
@@ -220,6 +249,15 @@ public interface Common_configMapper {
 
     //将用户参加这期单词挑战的情况查出来
     Map<Object,Object> attendWordChallengeInfo(@Param("c_id") String c_id,@Param("user_id") String user_id);
+
+    //找出是否该用户是被人邀请
+    Map<Object,Object> findUserWhetherInvited(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
+
+    //找出是否该用户是被人邀请
+    List<Map<Object,Object>> findWordChallengeInviter(@Param("word_challenge_id") String word_challenge_id);
+
+    //展示所有单词挑战的用户信息
+    List<Map<Object,Object>> showAllChallengeContestants(@Param("word_challenge_id") String word_challenge_id);
 
     //单词挑战情况取出单词数排序
     List<Map<Object,Object>> getUserWordChallengeRank(@Param("c_id") String c_id);
@@ -272,6 +310,12 @@ public interface Common_configMapper {
 
     //展示单词挑战首页
     Map<Object,Object> find_user_attend_challenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
+    //找出用户正在参加的单词挑战
+    Map<Object,Object> findClockWordChallenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
+    //展示单词挑战首页
+    Map<Object,Object> findCanAttendWordChallenge(@Param("now_time") String  now_time);
 
     //展示查看用户往期活动成功条数
     int find_user_whether_success_challenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);

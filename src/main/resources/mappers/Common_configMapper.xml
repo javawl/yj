@@ -173,6 +173,11 @@
     values (#{user_id},#{lottery_draw_id},#{set_time},#{virtual})
   </insert>
 
+  <insert id="insertBank" parameterType="string">
+    INSERT INTO bank (description,money,set_time)
+    values (#{description},#{money},#{set_time})
+  </insert>
+
   <insert id="insertWordChallengeInviteRelation" parameterType="string">
     INSERT INTO word_challenge_invite_relation (user_id,invited_user_id,word_challenge_id,set_time)
     values (#{user_id},#{invited_user_id},#{word_challenge_id},#{set_time})
@@ -315,6 +320,16 @@
     WHERE `user`.id = tb.user_id
   </select>
 
+
+  <select id="getWordChallengeBeginRemind" resultType="map" parameterType="string">
+    SELECT word_challenge_contestants.user_id,tb.periods
+    FROM `word_challenge_contestants`,(SELECT id,periods
+                FROM `word_challenge`
+                WHERE `word_challenge`.st &lt; #{during_end}
+                AND `word_challenge`.st > #{during_begin}) tb
+    WHERE `word_challenge_contestants`.word_challenge_id = tb.id
+  </select>
+
   <select id="showLotteryDrawContestantsVirtual" resultType="map" parameterType="string">
     SELECT id,username,portrait
     FROM `user`
@@ -329,7 +344,7 @@
 
   <select id="showWordChallengeContestantsVirtual" resultType="map" parameterType="string">
     SELECT `user`.id,`user`.username,`user`.portrait,tb.*
-    FROM `user`,(SELECT user_id,insist_day
+    FROM `user`,(SELECT user_id,insist_day,reward
                  FROM `word_challenge_contestants`
                  WHERE word_challenge_id = #{id}
                    AND `virtual` = 1) tb
@@ -348,7 +363,7 @@
 
   <select id="showWordChallengeContestantsReal" resultType="map" parameterType="string">
     SELECT `user`.id,`user`.username,`user`.portrait,tb.*
-    FROM `user`,(SELECT user_id,insist_day
+    FROM `user`,(SELECT user_id,insist_day,reward
                  FROM `word_challenge_contestants`
                  WHERE word_challenge_id = #{id}
                    AND `virtual` = 0) tb
@@ -394,6 +409,25 @@
     AND user_id = #{user_id}
   </select>
 
+  <select id="findUserWhetherInvited" resultType="map">
+    SELECT *
+    FROM `word_challenge_invite_relation`
+    WHERE user_id = #{user_id}
+    AND word_challenge_id = #{word_challenge_id}
+  </select>
+
+  <select id="findWordChallengeInviter" resultType="map">
+    SELECT *
+    FROM `word_challenge_invite_relation`
+    WHERE word_challenge_id = #{word_challenge_id}
+  </select>
+
+    <select id="showAllChallengeContestants" resultType="map">
+        SELECT *
+        FROM `word_challenge_contestants`
+        WHERE word_challenge_id = #{word_challenge_id}
+    </select>
+
   <select id="getUserWordChallengeRank" resultType="map">
     SELECT `user`.username,`user`.portrait,tb.*
     FROM `user`,
@@ -414,7 +448,7 @@
   <select id="showTotalInviteReward" resultType="map">
     SELECT username,portrait,invite_reward,id as user_id
     FROM `user`
-    ORDER BY invite_reward DESC
+    ORDER BY invite_reward DESC,last_login DESC
   </select>
 
   <select id="getWordChallengeId" resultType="string">
@@ -548,6 +582,26 @@
     LIMIT 1
   </select>
 
+
+  <select id="findClockWordChallenge" resultType="map" parameterType="string">
+    SELECT word_challenge.id
+    FROM word_challenge,
+    (SELECT *
+    FROM word_challenge_contestants
+    WHERE user_id = #{user_id}) tb
+    WHERE tb.word_challenge_id = word_challenge.id
+    AND word_challenge.et > #{now_time}
+    AND word_challenge.st &lt; #{now_time}
+    LIMIT 1
+  </select>
+
+  <select id="findCanAttendWordChallenge" resultType="map" parameterType="string">
+    SELECT *
+    FROM word_challenge
+    WHERE word_challenge.st > #{now_time}
+    LIMIT 1
+  </select>
+
   <select id="find_user_whether_success_challenge" resultType="int" parameterType="string">
     SELECT count(1)
     FROM word_challenge_contestants,
@@ -568,6 +622,46 @@
   <update id="changeUserRemind">
     UPDATE `user`
     set `whether_reminder` = #{whether_reminder}
+    WHERE id = #{id}
+  </update>
+
+  <update id="WordChallengeUserChangeToSuccess">
+    UPDATE `word_challenge_contestants`
+    set `reward` = #{reward}
+    WHERE id = #{id}
+  </update>
+
+  <update id="makeWordChallengeRedPacket">
+    UPDATE `user`
+    set `whether_challenge_success` = #{whether_challenge_success},
+    `challenge_red_packet` = #{challenge_red_packet}
+    WHERE id = #{id}
+  </update>
+
+  <update id="makeInviteWordChallengeRedPacket">
+    UPDATE `user`
+    set `whether_invite_challenge_success` = #{whether_invite_challenge_success},
+    `invite_challenge_red_packet` = `invite_challenge_red_packet` + #{invite_challenge_red_packet},
+    `invite_reward` = `invite_reward` + #{invite_reward}
+    WHERE id = #{id}
+  </update>
+
+  <update id="settleAccounts">
+    UPDATE `word_challenge`
+    set `aggregate_amount` = #{aggregate_amount},
+    `profit_loss` = #{profit_loss},
+    `success_people` = #{success_people},
+    `success_rate` = #{success_rate},
+    `reward_each` = #{reward_each},
+    `loser` = #{loser},
+    `invite_success` = #{invite_success},
+    `whether_settle_accounts` = #{whether_settle_accounts}
+    WHERE id = #{id}
+  </update>
+
+  <update id="cancelChallengeConfirm">
+    UPDATE `word_challenge`
+    set `final_confirm` = #{final_confirm}
     WHERE id = #{id}
   </update>
 
@@ -616,6 +710,21 @@
     WHERE id = #{word_challenge_contestants_id}
     AND user_id = #{user_id}
   </update>
+
+  <update id="addNormalChallengeInsistDay">
+    UPDATE `word_challenge_contestants`
+    set `insist_day` = `insist_day` + 1
+    WHERE word_challenge_id = #{word_challenge_id}
+    AND user_id = #{user_id}
+  </update>
+
+    <update id="wordChallengeInviteChangeToSuccess">
+        UPDATE `word_challenge_invite_relation`
+        set `reward` = #{reward},
+            `is_success` = #{is_success}
+        WHERE word_challenge_id = #{word_challenge_id}
+        AND user_id = #{user_id}
+    </update>
 
   <update id="changeUserTemplateClose">
     UPDATE `user`

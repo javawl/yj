@@ -66,6 +66,7 @@
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+string1+'</td>'+
                         '<td style="width: 4%;">'+data[i]['insist_day']+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['reward']+'</td>'+
                         '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">设为中奖</button><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">取消中奖</button></td>'+
                         '</tr>');
                 }
@@ -88,6 +89,7 @@
                         '<td style="width: 4%;">'+winner[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+string1+'</td>'+
                         '<td style="width: 4%;">'+winner[i]['insist_day']+'</td>'+
+                        '<td style="width: 4%;">'+winner[i]['reward']+'</td>'+
                         '</tr>');
                 }
                 $("#lottery_draw").append('<p>报名上限: '+ lottery_draw['upper_limit'] +'</p><br><p>可报名上限: '+ lottery_draw['enrollment'] +'</p><br><p>开始时间: '+ lottery_draw['st'] +'</p><br><p>结束时间： '+lottery_draw['et']+'</p>' +
@@ -95,6 +97,32 @@
 //                if (result.status == 200){
 //                    alert(result[0]);
 //                }
+                if (lottery_draw['whether_finish'] == '0'){
+                    //没结束
+                    $("#this_challenge_info").css("display",'none')
+                    $("#remind").empty()
+                    $("#remind").append("<h3>单词挑战未到结束时间不可清算</h3>")
+                }else {
+                    //已结束
+                    if (lottery_draw['whether_settle_accounts'] == '0'){
+                        //未清算过
+                        $("#this_challenge_info").css("display",'none')
+                    }else {
+                        $("#remind").empty()
+                        $("#this_challenge_info").css("display",'')
+                        $("#this_challenge_info").append('<tr>'+
+                            '<td>'+lottery_draw['aggregate_amount']+'</td>'+
+                            '<td>'+lottery_draw['success_people']+'</td>'+
+                            '<td>'+lottery_draw['success_rate']+'</td>'+
+                            '<td>'+lottery_draw['reward_each']+'</td>'+
+                            '<td>'+lottery_draw['invite_success']+'</td>'+
+                            '<td>'+lottery_draw['loser']+'</td>'+
+                            '<td>'+lottery_draw['profit_loss']+'</td>'+
+                            '<td>'+lottery_draw['final_confirm']+'</td>'+
+                            '<td><button style="margin-left: 5px;" onclick="settle_accounts('+"'"+id+"'"+')">再次结算</button><button style="margin-left: 5px;" onclick="final_confirm('+ "'"+id+"'"+')">最终确认</button></td>'+
+                            '</tr>');
+                    }
+                }
             },
             error:function (result) {
                 console.log(result);
@@ -137,6 +165,7 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"><button style="float: right"><a href="show_virtual_user_challenge.jsp?page=1&size=15">展示虚拟用户</a></button></td>
             <td style="border-left: 0;">
                 <button style="float: right"><a href="add_virtual_user_challenge.jsp">新建虚拟用户</a></button>
@@ -148,22 +177,53 @@
             <td>昵称</td>
             <td>是否虚拟</td>
             <td>坚持天数</td>
+            <td>盈亏</td>
             <td>操作</td>
         </tr>
     </table>
+    <br>
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">
+        <tr>
+            <td style="border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"><button style="float: right"><a href="show_virtual_user_challenge.jsp?page=1&size=15">展示虚拟用户</a></button></td>
+            <td style="border-left: 0;">
+                <button style="float: right"><a href="add_virtual_user_challenge.jsp">新建虚拟用户</a></button>
+            </td>
+        </tr>
+        <tr>
+            <td>总金额</td>
+            <td>成功挑战用户数</td>
+            <td>成功率</td>
+            <td>奖励金金额/人</td>
+            <td>邀请成功数</td>
+            <td>挑战失败用户数</td>
+            <td>最后营收</td>
+            <td>是否最终确认</td>
+            <td>操作</td>
+        </tr>
+    </table>
+    <br>
+    <div id="remind">
+        <h3>单词挑战尚未结束，请点击结束按钮 <button id="over" onclick="settle_accounts(id)">结束(清算)</button></h3>
+    </div>
     <table id="page">
     </table>
 </center>
 </body>
 <script>
-    function win(id,draw_id) {
-        if (confirm("你确定要设置为中奖？")){
+    function settle_accounts(id) {
+        if (confirm("你确定要结算了？")){
             $.ajax({
-                url:url+"/admin/change_draw_win_status.do",
+                url:url+"/admin/settle_accounts.do",
                 type:'POST',
                 data:{
-                    id:id,
-                    draw_id:draw_id
+                    id:id
                 },
                 dataType:'json',
                 success:function (result) {
@@ -181,6 +241,34 @@
                     alert("服务器出错！");
                 }
             });
+        }
+    }
+    function final_confirm(id) {
+        if (confirm("你确定要最终确认了？确认后无法更改")){
+            if (confirm("你真的确定要最终确认了？确认后无法更改")) {
+                $.ajax({
+                    url: url + "/admin/final_confirm.do",
+                    type: 'POST',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    success: function (result) {
+                        var code = result['code'];
+                        var msg = result['msg'];
+                        if (code != 200) {
+                            alert(msg);
+                        } else {
+                            alert(msg);
+                            history.go(0);
+                        }
+                    },
+                    error: function (result) {
+                        console.log(result);
+                        alert("服务器出错！");
+                    }
+                });
+            }
         }
     }
 </script>

@@ -1248,6 +1248,28 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
+    public ServerResponse<Map<Object,Object>> my_wallet(HttpServletRequest request){
+        //编辑我的信息
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(request.getHeader("token"));
+        }};
+        String token = request.getHeader("token");
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String id = CommonFunc.CheckToken(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> result = userMapper.getMyWallet(id);
+            return ServerResponse.createBySuccess("成功",result);
+        }
+    }
+
+
+    @Override
     public ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request){
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{

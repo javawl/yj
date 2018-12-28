@@ -59,6 +59,8 @@ public interface IUserService {
 
     ServerResponse<JSONObject> edit_my_info(String username, String gender, String personality_signature, HttpServletRequest request);
 
+    ServerResponse<Map<Object,Object>> my_wallet(HttpServletRequest request);
+
     ServerResponse<String> edit_portrait(MultipartFile file, HttpServletRequest request);
 
     ServerResponse<String> wx_upload_portrait_username(String username, String portrait, HttpServletRequest request);

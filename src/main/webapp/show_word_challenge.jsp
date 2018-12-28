@@ -142,29 +142,29 @@
         window.location.href = "single_word_challenge.jsp?id="+id;
     }
     function del(id) {
-        if (confirm("你确定要删除此奖品？删除之后不可恢复！")){
-            $.ajax({
-                url:url+"/admin/delete_lottery_draw.do",
-                type:'POST',
-                data:{
-                    id:id
-                },
-                dataType:'json',
-                success:function (result) {
-                    var code = result['code'];
-                    var msg = result['msg'];
-                    if (code != 200){
-                        alert(msg);
-                    }else {
-                        alert(msg);
-                        history.go(0);
-                    }
-                },
-                error:function (result) {
-                    console.log(result);
-                    alert("服务器出错！");
-                }
-            });
+        if (confirm("暂无删除功能")){
+            // $.ajax({
+            //     url:url+"/admin/delete_lottery_draw.do",
+            //     type:'POST',
+            //     data:{
+            //         id:id
+            //     },
+            //     dataType:'json',
+            //     success:function (result) {
+            //         var code = result['code'];
+            //         var msg = result['msg'];
+            //         if (code != 200){
+            //             alert(msg);
+            //         }else {
+            //             alert(msg);
+            //             history.go(0);
+            //         }
+            //     },
+            //     error:function (result) {
+            //         console.log(result);
+            //         alert("服务器出错！");
+            //     }
+            // });
         }
     }
 </script>

@@ -387,8 +387,22 @@ public class AdminServiceImpl implements IAdminService {
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
+        //判断状态是否结束
+        if ((new Date()).getTime() <= Long.valueOf(WordChallengeInfo.get("et").toString())){
+            //未结束
+            WordChallengeInfo.put("whether_finish", "0");
+        }else {
+            //已结束
+            WordChallengeInfo.put("whether_finish", "1");
+        }
         WordChallengeInfo.put("st", CommonFunc.getFormatTime(Long.valueOf(WordChallengeInfo.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
         WordChallengeInfo.put("et", CommonFunc.getFormatTime(Long.valueOf(WordChallengeInfo.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        WordChallengeInfo.put("success_rate", Double.valueOf(WordChallengeInfo.get("success_rate").toString()) * 100 + "%");
+        if (WordChallengeInfo.get("final_confirm").toString().equals("0")){
+            WordChallengeInfo.put("final_confirm", "尚未确认");
+        }else {
+            WordChallengeInfo.put("final_confirm", "已确认");
+        }
         //最终结果
         Map<Object,Object> result = new HashMap<Object, Object>();
         result.put("word_challenge", WordChallengeInfo);
@@ -417,6 +431,204 @@ public class AdminServiceImpl implements IAdminService {
         result.put("contestants", WordChallengeContestants);
 
         return ServerResponse.createBySuccess("成功！",result);
+    }
+
+    //结算账单
+    public ServerResponse<String> settle_accounts(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //成功人数
+        int success_people = 0;
+        //总的真实用户数
+        int total_real_people = 0;
+        //失败人数
+        int loser = 0;
+        //邀请成功数
+        int invite_success = 0;
+        //第一轮先计算reward
+        List<Map<Object,Object>> WordChallengeContestants = common_configMapper.showAllChallengeContestants(id);
+        for (int i = 0; i < WordChallengeContestants.size(); i++){
+            //判断是否真实用户
+            if (WordChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                //真实用户
+                total_real_people += 1;
+                //判断是否成功
+                if (Integer.valueOf(WordChallengeContestants.get(i).get("insist_day").toString()) >= 28){
+                    //挑战成功
+                    success_people += 1;
+                }else {
+                    loser += 1;
+                }
+            }
+        }
+        //总金额
+        Double aggregate_amount = Const.WORD_CHALLENGE_MONEY * total_real_people;
+        //营收
+        Double profit_loss = aggregate_amount;
+        //计算reward
+        Double reward = CommonFunc.calculateWordChallengeReward(success_people,aggregate_amount);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            for (int i = 0; i < WordChallengeContestants.size(); i++){
+                //判断是否真实用户
+                if (WordChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                    //判断是否成功
+                    if (Integer.valueOf(WordChallengeContestants.get(i).get("insist_day").toString()) >= 28){
+                        profit_loss = profit_loss - Const.WORD_CHALLENGE_MONEY - reward;
+                        //挑战成功(把用户表状态清零在搞,在确认那一步)
+                        common_configMapper.WordChallengeUserChangeToSuccess(String.valueOf(Const.WORD_CHALLENGE_MONEY + reward), WordChallengeContestants.get(i).get("id").toString());
+                        //查看该人是否是别人邀请来的(把用户表状态累计)
+                        Map<Object,Object> inviteInfo = common_configMapper.findUserWhetherInvited(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString());
+                        if (inviteInfo != null){
+                            invite_success += 1;
+                            profit_loss = profit_loss - reward;
+                            common_configMapper.wordChallengeInviteChangeToSuccess(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString(),String.valueOf(reward),"1");
+                        }
+                    }
+                }else {
+                    //虚拟用户
+                    common_configMapper.WordChallengeUserChangeToSuccess(String.valueOf(Const.WORD_CHALLENGE_MONEY + reward), WordChallengeContestants.get(i).get("id").toString());
+                    //查看该人是否是别人邀请来的
+                    Map<Object,Object> inviteInfo = common_configMapper.findUserWhetherInvited(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString());
+                    if (inviteInfo != null){
+                        invite_success += 1;
+                        common_configMapper.wordChallengeInviteChangeToSuccess(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString(),String.valueOf(reward),"1");
+                    }
+                }
+            }
+            //成功率
+            Double success_rate = success_people * 1.0 / total_real_people * 1.0;
+            common_configMapper.settleAccounts(String.valueOf(aggregate_amount),String.valueOf(profit_loss),String.valueOf(success_people),String.valueOf(success_rate),String.valueOf(reward),String.valueOf(loser),String.valueOf(invite_success),"1",id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    //最后确认
+    public ServerResponse<String> final_confirm(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        List<Map<Object,Object>> WordChallengeContestants = common_configMapper.showAllChallengeContestants(id);
+        //未确认，先确认
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+//                //要把邀请过别人的人的用户邀请奖金去掉
+//                List<Map<Object,Object>> WordChallengeInviter = common_configMapper.findWordChallengeInviter(id);
+//                for (int j = 0; j < WordChallengeInviter.size(); j++){
+//                    common_configMapper.makeInviteWordChallengeRedPacket("0",WordChallengeContestants.get(j).get("invited_user_id").toString(),WordChallengeContestants.get(j).get("reward").toString());
+//                }
+            for (int i = 0; i < WordChallengeContestants.size(); i++){
+                //判断是否真实用户
+                if (WordChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                    //判断是否成功
+                    if (Integer.valueOf(WordChallengeContestants.get(i).get("insist_day").toString()) >= 28){
+                        //如果奖励金未领取的话划入我们的账户
+                        List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(WordChallengeContestants.get(i).get("user_id").toString());
+                        if (Integer.valueOf(SelectPlan.get(0).get("challenge_red_packet").toString()) != 0){
+                            common_configMapper.insertBank("id为" + WordChallengeContestants.get(i).get("user_id").toString() + "的用户未领取挑战金和奖励金",SelectPlan.get(0).get("challenge_red_packet").toString(),String.valueOf((new Date()).getTime()));
+                        }
+                        //挑战成功(把用户表状态清零在搞,在确认那一步)
+                        common_configMapper.makeWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString());
+                        //查看该人是否是别人邀请来的(把用户表状态累计)
+                        Map<Object,Object> inviteInfo = common_configMapper.findUserWhetherInvited(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString());
+                        if (inviteInfo != null){
+                            common_configMapper.makeInviteWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString(),WordChallengeContestants.get(i).get("reward").toString());
+                        }
+                    }
+                }
+            }
+            //修改最终状态
+            common_configMapper.cancelChallengeConfirm("1",id);
+            //总账单
+            Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
+            common_configMapper.insertBank("第" + WordChallengeInfo.get("periods").toString() + "期单词挑战营收",WordChallengeInfo.get("profit_loss").toString(),String.valueOf((new Date()).getTime()));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    //领取单词挑战的红包
+    public ServerResponse<String> getChallengeRedPacket(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        List<Map<Object,Object>> WordChallengeContestants = common_configMapper.showAllChallengeContestants(id);
+        //未确认，先确认
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+//                //要把邀请过别人的人的用户邀请奖金去掉
+//                List<Map<Object,Object>> WordChallengeInviter = common_configMapper.findWordChallengeInviter(id);
+//                for (int j = 0; j < WordChallengeInviter.size(); j++){
+//                    common_configMapper.makeInviteWordChallengeRedPacket("0",WordChallengeContestants.get(j).get("invited_user_id").toString(),WordChallengeContestants.get(j).get("reward").toString());
+//                }
+            for (int i = 0; i < WordChallengeContestants.size(); i++){
+                //判断是否真实用户
+                if (WordChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                    //判断是否成功
+                    if (Integer.valueOf(WordChallengeContestants.get(i).get("insist_day").toString()) >= 28){
+                        //如果奖励金未领取的话划入我们的账户
+                        List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(WordChallengeContestants.get(i).get("user_id").toString());
+                        if (Integer.valueOf(SelectPlan.get(0).get("challenge_red_packet").toString()) != 0){
+                            common_configMapper.insertBank("id为" + WordChallengeContestants.get(i).get("user_id").toString() + "的用户未领取挑战金和奖励金",SelectPlan.get(0).get("challenge_red_packet").toString(),String.valueOf((new Date()).getTime()));
+                        }
+                        //挑战成功(把用户表状态清零在搞,在确认那一步)
+                        common_configMapper.makeWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString());
+                        //查看该人是否是别人邀请来的(把用户表状态累计)
+                        Map<Object,Object> inviteInfo = common_configMapper.findUserWhetherInvited(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString());
+                        if (inviteInfo != null){
+                            common_configMapper.makeInviteWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString(),WordChallengeContestants.get(i).get("reward").toString());
+                        }
+                    }
+                }
+            }
+            //修改最终状态
+            common_configMapper.cancelChallengeConfirm("1",id);
+            //总账单
+            Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
+            common_configMapper.insertBank("第" + WordChallengeInfo.get("periods").toString() + "期单词挑战营收",WordChallengeInfo.get("profit_loss").toString(),String.valueOf((new Date()).getTime()));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
     }
 
 

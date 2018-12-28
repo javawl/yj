@@ -199,6 +199,32 @@ public class AdminController {
 
 
     /**
+     * 结算单词挑战
+     * @param id           单词挑战id
+     * @param request      request
+     * @return             string
+     */
+    @RequestMapping(value = "settle_accounts.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> settle_accounts(String id,HttpServletRequest request){
+        return iAdminService.settle_accounts(id, request);
+    }
+
+
+    /**
+     * 最终确认单词挑战
+     * @param id           单词挑战id
+     * @param request      request
+     * @return             string
+     */
+    @RequestMapping(value = "final_confirm.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> final_confirm(String id,HttpServletRequest request){
+        return iAdminService.final_confirm(id, request);
+    }
+
+
+    /**
      * 展示用户反馈
      * @param page
      * @param size
@@ -958,6 +984,55 @@ public class AdminController {
             e.printStackTrace();
         }
 
+        return "success";
+    }
+
+
+    /**
+     * 单词挑战开始提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "word_challenge_begin_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String word_challenge_begin_remind(String token, HttpServletResponse response){
+        if (!token.equals("word_challenge_begin")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //如果单词挑战开始时间在今天十点和明天十点之间，算作即将开始
+            String nowTime = String.valueOf((new Date()).getTime());
+            String endTime = String.valueOf(Long.valueOf(nowTime) + Const.ONE_DAY_DATE);
+            List<Map<Object,Object>> all_user =  common_configMapper.getWordChallengeBeginRemind(nowTime,endTime);
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("user_id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_BEGIN);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("第" + all_user.get(i).get("periods").toString() + "期单词挑战","#ffffff"));
+                    list.add(new TemplateData("口喜口喜明天单词挑战就要开始啦~你准备好了吗~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("单词挑战开始提醒异常",e.getStackTrace());
+            logger.error("单词挑战开始提醒异常",e);
+            e.printStackTrace();
+        }
         return "success";
     }
 

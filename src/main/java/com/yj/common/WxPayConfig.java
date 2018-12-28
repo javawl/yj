@@ -13,4 +13,8 @@ public class WxPayConfig {
     public static final String TRADETYPE = "JSAPI";
     //微信统一下单接口地址
     public static final String pay_url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+    //企业支付获取信息接口
+    public static final String PAY_USER_URL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+    //企业支付证书地址
+    public static final String wxPayCertPath = "lala";
 }

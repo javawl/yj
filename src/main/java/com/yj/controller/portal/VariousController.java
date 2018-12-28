@@ -1,9 +1,7 @@
 package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yj.common.CommonFunc;
-import com.yj.common.ServerResponse;
-import com.yj.common.WxPayConfig;
+import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.service.IFileService;
 import com.yj.service.IVariousService;
@@ -28,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -256,12 +255,32 @@ public class VariousController {
     }
 
 
-
+    /**
+     * 立即报名接口
+     * @param user_id    用户id
+     * @param request    request
+     * @return           Map
+     */
     @RequestMapping(value = "wordChallengePay.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,String word_challenge_id,HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> wordChallengePay(String user_id,HttpServletRequest request){
         //调用service层
-        return iVariousService.wordChallengePay(user_id,word_challenge_id,request);
+        return iVariousService.wordChallengePay(user_id,request);
+    }
+
+
+    /**
+     * 企业支付给用户红包
+     * @param word_challenge_id  单词挑战id
+     * @param request            request
+     * @return                   Map
+     */
+    @RequestMapping(value = "sendUserWordChallengeReward.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> sendUserWordChallengeReward(String word_challenge_id,HttpServletRequest request){
+        //调用service层
+//        return iVariousService.sendUserWordChallengeReward(word_challenge_id,request);
+        return null;
     }
 
 
@@ -352,6 +371,27 @@ public class VariousController {
                     if (!user_id.equals("no")){
                         //通过邀请进来的
                         common_configMapper.insertWordChallengeInviteRelation(uid,user_id,word_challenge_id,now_time);
+                        //获取accessToken
+                        AccessToken access_token = CommonFunc.getAccessToken();
+                        //给该用户发送
+                        //查没过期的from_id
+                        Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,now_time);
+                        if (info != null){
+                            common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                            //发送模板消息
+                            WxMssVo wxMssVo = new WxMssVo();
+                            wxMssVo.setTemplate_id(Const.TMP_ID_INVITEE);
+                            wxMssVo.setAccess_token(access_token.getAccessToken());
+                            wxMssVo.setTouser(info.get("wechat").toString());
+                            wxMssVo.setPage(Const.INVITE_DETAIL_PATH);
+                            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                            wxMssVo.setForm_id(info.get("form_id").toString());
+                            List<TemplateData> list = new ArrayList<>();
+                            list.add(new TemplateData("30天单词挑战","#ffffff"));
+                            list.add(new TemplateData("咦~好像有人接受了你的挑战邀请，点击查看是哪个小可爱~","#ffffff"));
+                            wxMssVo.setParams(list);
+                            CommonFunc.sendTemplateMessage(wxMssVo);
+                        }
                     }
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功

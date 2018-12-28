@@ -40,4 +40,8 @@ public interface IAdminService {
     ServerResponse<Map<Object,Object>> show_lottery_draw_info(String id,HttpServletRequest request);
 
     ServerResponse<Map<Object,Object>> show_word_challenge_info(String id,HttpServletRequest request);
+
+    ServerResponse<String> settle_accounts(String id,HttpServletRequest request);
+
+    ServerResponse<String> final_confirm(String id,HttpServletRequest request);
 }

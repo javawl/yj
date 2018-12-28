@@ -388,6 +388,19 @@ public class UserController extends BaseController {
 
 
     /**
+     * 我的钱包
+     * @param request   request
+     * @return          map
+     */
+    @RequestMapping(value = "my_wallet.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> my_wallet(HttpServletRequest request){
+        //调用service层
+        return iUserService.my_wallet(request);
+    }
+
+
+    /**
      * 更换头像
      * @param file
      * @param request

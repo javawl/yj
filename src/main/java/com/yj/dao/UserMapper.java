@@ -140,6 +140,9 @@ public interface UserMapper {
     //获取我的计划、天数、每日学习单词数、坚持天数、上次登录时间、注册时间
     List<Map> getUserPlanDaysNumber(@Param("id") String id);
 
+    //获取我的钱包
+    Map<Object,Object> getMyWallet(@Param("id") String id);
+
     //获取feeds_comment的点赞
     List<Map<Object,Object>> getUserFeedsCommentLikes(@Param("id") String id);
 
