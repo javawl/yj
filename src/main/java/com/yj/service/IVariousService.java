@@ -44,6 +44,12 @@ public interface IVariousService {
     //单词挑战首页
     ServerResponse<Map<Object,Object>> show_word_challenge(HttpServletRequest request);
 
+    //领取单词挑战成功红包
+    ServerResponse<String> getChallengeRedPacket(HttpServletRequest request);
+
+    //领取邀请单词挑战成功红包
+    ServerResponse<String> getChallengeInviteRedPacket(HttpServletRequest request);
+
     //单词挑战排行榜
     ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request);
 

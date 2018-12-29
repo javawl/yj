@@ -314,6 +314,33 @@ public class VariousController {
 
 
     /**
+     * 领取单词挑战成功红包
+     * @param request request
+     * @return        String
+     */
+    @RequestMapping(value = "getChallengeRedPacket.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> getChallengeRedPacket(HttpServletRequest request){
+        //调用service层
+        return iVariousService.getChallengeRedPacket(request);
+    }
+
+
+
+    /**
+     * 领取邀请单词挑战成功红包
+     * @param request request
+     * @return        String
+     */
+    @RequestMapping(value = "getChallengeInviteRedPacket.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> getChallengeInviteRedPacket(HttpServletRequest request){
+        //调用service层
+        return iVariousService.getChallengeInviteRedPacket(request);
+    }
+
+
+    /**
      * 回调
      * @Description:微信支付
      * @return

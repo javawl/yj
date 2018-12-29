@@ -652,6 +652,14 @@
     WHERE id = #{id}
   </update>
 
+  <update id="getWordChallengeInviteRedPack">
+    UPDATE `user`
+    set `bill` = `bill` + #{bill},
+    `whether_invite_challenge_success` = #{whether_invite_challenge_success},
+    `invite_challenge_red_packet` = #{invite_challenge_red_packet}
+    WHERE id = #{id}
+  </update>
+
   <update id="makeInviteWordChallengeRedPacket">
     UPDATE `user`
     set `whether_invite_challenge_success` = #{whether_invite_challenge_success},
