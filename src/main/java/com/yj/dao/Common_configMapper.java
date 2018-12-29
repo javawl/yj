@@ -45,7 +45,10 @@ public interface Common_configMapper {
     int WordChallengeUserChangeToSuccess(@Param("reward") String reward, @Param("id") String id);
 
     //在用户表把用户的红包加上
-    int makeWordChallengeRedPacket(@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
+    int makeWordChallengeRedPacket(@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet, @Param("challenge_success_id") String challenge_success_id);
+
+    //用户领取红包更新用户表
+    int getWordChallengeRedPack(@Param("bill") String bill,@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
 
     //在用户表把用户的邀请红包加上
     int makeInviteWordChallengeRedPacket(@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet, @Param("invite_reward") String invite_reward);
@@ -153,6 +156,9 @@ public interface Common_configMapper {
 
     //系统总资产插入
     int insertBank(@Param("description") String description,@Param("money") String money,@Param("set_time") String set_time);
+
+    //插入明细
+    int insertBill(@Param("user_id") String user_id,@Param("statement") String statement,@Param("bill") String bill,@Param("set_time") String set_time);
 
     //建立单词挑战邀请关系
     int insertWordChallengeInviteRelation(@Param("user_id") String user_id,@Param("invited_user_id") String invited_user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_tim);

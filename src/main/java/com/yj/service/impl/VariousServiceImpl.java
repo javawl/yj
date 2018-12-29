@@ -512,6 +512,52 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+    //领取单词挑战的红包
+    public ServerResponse<String> getChallengeRedPacket(String id,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //未确认，先确认
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try{
+                List<Map> wordChallengePacket = userMapper.getUserPlanDaysNumber(id);
+                if (wordChallengePacket.get(0).get("whether_challenge_success").toString().equals("0")){
+                    return ServerResponse.createByErrorMessage("不可领取红包！");
+                }
+                String redPacket = wordChallengePacket.get(0).get("challenge_red_packet").toString();
+                String now_time = String.valueOf((new Date()).getTime());
+                //获取他成功的那期单词挑战
+                Map<Object,Object> w_c = common_configMapper.getWordChallengeById(wordChallengePacket.get(0).get("challenge_success_id").toString());
+                //塞进钱包,并置零两个状态
+                common_configMapper.getWordChallengeRedPack(redPacket,"0",uid,"0");
+                //用户个人账单更新
+                common_configMapper.insertBill(uid,"第" + w_c.get("periods").toString() + "单词挑战成功获得红包",redPacket,now_time);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                transactionManager.rollback(status);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
     //下面是单词挑战展现排行的接口
     public ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request){
         String token = request.getHeader("token");

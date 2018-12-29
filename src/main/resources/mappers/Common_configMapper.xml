@@ -178,6 +178,11 @@
     values (#{description},#{money},#{set_time})
   </insert>
 
+  <insert id="insertBill" parameterType="string">
+    INSERT INTO bank (user_id,statement,bill,set_time)
+    values (#{user_id},#{statement},#{bill},#{set_time})
+  </insert>
+
   <insert id="insertWordChallengeInviteRelation" parameterType="string">
     INSERT INTO word_challenge_invite_relation (user_id,invited_user_id,word_challenge_id,set_time)
     values (#{user_id},#{invited_user_id},#{word_challenge_id},#{set_time})
@@ -634,6 +639,15 @@
   <update id="makeWordChallengeRedPacket">
     UPDATE `user`
     set `whether_challenge_success` = #{whether_challenge_success},
+    `challenge_red_packet` = #{challenge_red_packet},
+    `challenge_success_id` = #{challenge_success_id}
+    WHERE id = #{id}
+  </update>
+
+  <update id="getWordChallengeRedPack">
+    UPDATE `user`
+    set `bill` = `bill` + #{bill},
+    `whether_challenge_success` = #{whether_challenge_success},
     `challenge_red_packet` = #{challenge_red_packet}
     WHERE id = #{id}
   </update>
