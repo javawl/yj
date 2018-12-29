@@ -67,7 +67,7 @@
                         '<td style="width: 4%;">'+string1+'</td>'+
                         '<td style="width: 4%;">'+data[i]['insist_day']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['reward']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">设为中奖</button><button style="margin-left: 5px;" onclick="win('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">取消中奖</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="user_info('+"'"+data[i]['id']+"',"+ "'"+id+"'"+')">查看</button></td>'+
                         '</tr>');
                 }
                 for(var i = 0; i < winner.length; i++){
@@ -270,6 +270,9 @@
                 });
             }
         }
+    }
+    function user_info(id) {
+        window.location.href = "show_user_challenge_detail.jsp?id="+id;
     }
 </script>
 </html>

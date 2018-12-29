@@ -335,6 +335,9 @@ public interface DictionaryMapper {
     String countWelfareService();
 
     //后台
+    String countWithDrawCash();
+
+    //后台
     String countUsers();
 
     //后台

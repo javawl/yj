@@ -49,6 +49,7 @@
                 <p onclick="change_src('show_feeds.jsp?page=1&size=15')">feeds流</p>
                 <p onclick="change_src('lottery_draw.jsp?page=1&size=15')">抽奖赢奖品</p>
                 <p onclick="change_src('show_word_challenge.jsp?page=1&size=15')">单词挑战</p>
+                <p onclick="change_src('show_withdraw_cash.jsp?page=1&size=15')">提现申请</p>
             </center>
         </div>
         <div class="main">

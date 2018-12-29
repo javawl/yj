@@ -82,6 +82,9 @@ public interface Common_configMapper {
     //修改单词挑战的报名人数
     int changeWordChallengeEnroll(@Param("word_challenge_id") String word_challenge_id);
 
+    //修改提现记录的处理状态
+    int changeWithDrawCashStatus(@Param("whether_pay") String whether_pay,@Param("id") String id);
+
     //单词挑战坚持加一
     int addChallengeInsistDay(@Param("word_challenge_contestants_id") String word_challenge_contestants_id,@Param("user_id") String user_id,@Param("last_medallion_time") String last_medallion_time);
 
@@ -171,6 +174,9 @@ public interface Common_configMapper {
 
     //打卡参与单词挑战
     int insertWordChallengeContestantsReal(@Param("user_id") String user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_time);
+
+    //提现
+    int insertWithDrawCash(@Param("user_id") String user_id,@Param("money") String money,@Param("type") String type,@Param("name") String name,@Param("account_number") String account_number,@Param("set_time") String set_time);
 
     //插入模板消息的form_id
     int insertTemplateFormId(@Param("user_id") String user_id,@Param("wechat") String wechat,@Param("form_id") String form_id,@Param("set_time") String set_time);
@@ -313,6 +319,12 @@ public interface Common_configMapper {
 
     //展示收支明细
     List<Map<Object,Object>> showUserBill(@Param("user_id") String  user_id);
+
+    //后台取出提现的记录
+    List<Map<Object,Object>> adminShowWithDrawCash(@Param("start") int start,@Param("size") int size);
+
+    //后台取出提现的记录
+    Map<Object,Object> findWithDrawCash(@Param("id") String id);
 
     //展示单词挑战首页
     Map<Object,Object> show_word_challenge(@Param("now_time") String  now_time);

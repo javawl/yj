@@ -527,7 +527,11 @@ public class AdminServiceImpl implements IAdminService {
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         List<Map<Object,Object>> WordChallengeContestants = common_configMapper.showAllChallengeContestants(id);
-        //未确认，先确认
+        //未结算，先结算
+        Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
+        if (WordChallengeInfo.get("whether_settle_accounts").toString().equals("0")){
+            return ServerResponse.createByErrorMessage("未结算，请先结算！");
+        }
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -563,7 +567,6 @@ public class AdminServiceImpl implements IAdminService {
             //修改最终状态
             common_configMapper.cancelChallengeConfirm("1",id);
             //总账单
-            Map<Object,Object> WordChallengeInfo = common_configMapper.showWordChallenge(id);
             common_configMapper.insertBank("第" + WordChallengeInfo.get("periods").toString() + "期单词挑战营收",WordChallengeInfo.get("profit_loss").toString(),String.valueOf((new Date()).getTime()));
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");

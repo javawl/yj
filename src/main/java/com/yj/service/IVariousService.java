@@ -50,6 +50,9 @@ public interface IVariousService {
     //领取邀请单词挑战成功红包
     ServerResponse<String> getChallengeInviteRedPacket(HttpServletRequest request);
 
+    //提现
+    ServerResponse<String> withdraw_cash(String type,String money,String name,String account_number,HttpServletRequest request);
+
     //单词挑战排行榜
     ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request);
 

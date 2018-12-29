@@ -602,6 +602,55 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+
+    //提现
+    public ServerResponse<String> withdraw_cash(String type,String money,String name,String account_number,HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(type);
+            add(money);
+            add(name);
+            add(account_number);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (!type.equals("wx") && !type.equals("zfb")){
+            return ServerResponse.createByErrorMessage("传入类型有误！");
+        }
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try{
+                String nowTime = String.valueOf((new Date()).getTime());
+                //判断是哪种转账
+                if (type.equals("wx")){
+                    common_configMapper.insertWithDrawCash(uid,money,"0",name,account_number,nowTime);
+                }else if (type.equals("zfb")){
+                    common_configMapper.insertWithDrawCash(uid,money,"1",name,account_number,nowTime);
+                }
+
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                transactionManager.rollback(status);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
     //下面是单词挑战展现排行的接口
     public ServerResponse<Map<Object,Object>> show_word_challenge_rank(HttpServletRequest request){
         String token = request.getHeader("token");
@@ -1114,7 +1163,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_" + now_time);//商户订单号
-            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "5000");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式

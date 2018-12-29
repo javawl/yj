@@ -341,6 +341,23 @@ public class VariousController {
 
 
     /**
+     * 提现
+     * @param type            提现类型
+     * @param money           提现金额
+     * @param name            账户名字
+     * @param account_number  账户
+     * @param request         req
+     * @return                成功
+     */
+    @RequestMapping(value = "withdraw_cash.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> withdraw_cash(String type,String money,String name,String account_number,HttpServletRequest request){
+        //调用service层
+        return iVariousService.withdraw_cash(type,money,name,account_number,request);
+    }
+
+
+    /**
      * 回调
      * @Description:微信支付
      * @return

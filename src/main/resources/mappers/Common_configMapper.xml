@@ -151,6 +151,12 @@
     values (#{user_id},#{word_challenge_id},#{set_time},0,0)
   </insert>
 
+
+  <insert id="insertWithDrawCash" parameterType="string">
+    INSERT INTO withdraw_cash (user_id,money,`type`,`name`,`account_number`,set_time)
+    values (#{user_id},#{money},#{type},#{name},#{account_number},#{set_time})
+  </insert>
+
   <insert id="insertWordChallenge" parameterType="string">
     INSERT INTO word_challenge (st, et, upper_limit, set_time, periods)
     values (#{st}, #{et}, #{upper_limit}, #{set_time}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM word_challenge) tb),0)+1)
@@ -567,6 +573,22 @@
     ORDER BY set_time DESC
   </select>
 
+  <select id="adminShowWithDrawCash" resultType="map">
+    SELECT username,portrait,wechat,phone,tb.*
+    FROM `user`,
+    (SELECT *
+    FROM withdraw_cash
+    ORDER BY `whether_pay` ASC
+    LIMIT #{start},#{size}) tb
+    WHERE tb.user_id = `user`.id
+  </select>
+
+  <select id="findWithDrawCash" resultType="map">
+    SELECT *
+    FROM withdraw_cash
+    WHERE id = #{id}
+  </select>
+
   <select id="show_word_challenge" resultType="map" parameterType="string">
     SELECT *
     FROM word_challenge
@@ -722,6 +744,12 @@
     UPDATE `word_challenge`
     set `enrollment` = `enrollment` + 1
     WHERE id = #{word_challenge_id}
+  </update>
+
+  <update id="changeWithDrawCashStatus">
+    UPDATE `withdraw_cash`
+    set `whether_pay` = #{whether_pay}
+    WHERE id = #{id}
   </update>
 
   <update id="addChallengeInsistDay">

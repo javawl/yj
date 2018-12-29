@@ -287,6 +287,76 @@ public class AdminController {
 
 
     /**
+     * 展示提现条目
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "show_withdraw_cash.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_withdraw_cash(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取福利社信息
+        List<Map<Object,Object>> Info = common_configMapper.adminShowWithDrawCash(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("set_time",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("set_time").toString()),"yyyy/MM/dd"));
+            Info.get(i).put("portrait",CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+            if (Info.get(i).get("type").toString().equals("0")){
+                Info.get(i).put("type","微信");
+            }else {
+                Info.get(i).put("type","支付宝");
+            }
+
+            if (Info.get(i).get("whether_pay").toString().equals("0")){
+                Info.get(i).put("whether_pay","未处理");
+            }else {
+                Info.get(i).put("whether_pay","已处理");
+            }
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countWithDrawCash(),Info);
+    }
+
+
+    /**
+     * 设为已处理 & 设为未处理
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "changeHandleStatus.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> changeHandleStatus(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取福利社信息
+        Map<Object,Object> Info = common_configMapper.findWithDrawCash(id);
+
+        if (Info.get("whether_pay").toString().equals("0")){
+            common_configMapper.changeWithDrawCashStatus("1",id);
+        }else {
+            common_configMapper.changeWithDrawCashStatus("0",id);
+        }
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
      * 展示用户
      * @param page 页数
      * @param size 页大小
@@ -762,6 +832,37 @@ public class AdminController {
             return ServerResponse.createByErrorMessage("更新出错！");
         }
     }
+
+
+    /**
+     * 后台展示账单
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "show_user_bill.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_user_bill(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        Map user_info = userMapper.getAuthorInfo(id);
+        List<Map<Object,Object>> result = common_configMapper.showUserBill(id);
+        for (int i = 0; i < result.size(); i++){
+            result.get(i).put("set_time", CommonFunc.getFormatTime(Long.valueOf(result.get(i).get("set_time").toString()),"yyyy/MM/dd HH:mm:ss"));
+        }
+        Map<Object,Object> final_result = new HashMap<>();
+        final_result.put("username",user_info.get("username"));
+        final_result.put("portrait",CommonFunc.judgePicPath(user_info.get("portrait").toString()));
+        final_result.put("bill",result);
+        return ServerResponse.createBySuccess("成功！", final_result);
+
+    }
+
+
+
 
 
     /**

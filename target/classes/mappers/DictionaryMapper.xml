@@ -1138,6 +1138,12 @@
     FROM welfare_service
   </select>
 
+
+  <select id="countWithDrawCash" resultType="string">
+    SELECT count(id)
+    FROM withdraw_cash
+  </select>
+
   <select id="countUsers" resultType="string">
     SELECT count(id)
     FROM `user`
