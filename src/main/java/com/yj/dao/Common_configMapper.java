@@ -91,6 +91,9 @@ public interface Common_configMapper {
     //单词挑战坚持加一
     int addNormalChallengeInsistDay(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
 
+    //单词挑战单词数加
+    int addNormalChallengeWordNumber(@Param("word_number") String word_number,@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
+
     //把邀请成功的人的reward加上
     int wordChallengeInviteChangeToSuccess(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id,@Param("reward") String reward,@Param("is_success") String is_success);
 

@@ -768,6 +768,13 @@
     AND user_id = #{user_id}
   </update>
 
+  <update id="addNormalChallengeWordNumber">
+    UPDATE `word_challenge_contestants`
+    set `word_number` = `word_number` + #{word_number}
+    WHERE word_challenge_id = #{word_challenge_id}
+    AND user_id = #{user_id}
+  </update>
+
     <update id="wordChallengeInviteChangeToSuccess">
         UPDATE `word_challenge_invite_relation`
         set `reward` = #{reward},

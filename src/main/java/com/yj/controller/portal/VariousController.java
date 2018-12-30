@@ -413,6 +413,9 @@ public class VariousController {
                     //插入单词挑战总数据库
                     common_configMapper.changeWordChallengeEnroll(word_challenge_id);
                     if (!user_id.equals("no")){
+                        if (!CommonFunc.isInteger(user_id)){
+                            logger.error("传入user_id非法！");
+                        }
                         //通过邀请进来的
                         common_configMapper.insertWordChallengeInviteRelation(uid,user_id,word_challenge_id,now_time);
                         //获取accessToken
