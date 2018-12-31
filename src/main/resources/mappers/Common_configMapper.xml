@@ -589,6 +589,14 @@
     WHERE id = #{id}
   </select>
 
+  <select id="whetherWithDrawing" resultType="map">
+    SELECT money
+    FROM withdraw_cash
+    WHERE user_id = #{user_id}
+    AND whether_pay = 0
+    LIMIT 1
+  </select>
+
   <select id="show_word_challenge" resultType="map" parameterType="string">
     SELECT *
     FROM word_challenge
@@ -672,6 +680,12 @@
     `whether_challenge_success` = #{whether_challenge_success},
     `challenge_red_packet` = #{challenge_red_packet}
     WHERE id = #{id}
+  </update>
+
+  <update id="withDrawChangeUserBill">
+    UPDATE `user`
+    set `bill` = `bill` + #{bill}
+    WHERE id = #{user_id}
   </update>
 
   <update id="getWordChallengeInviteRedPack">

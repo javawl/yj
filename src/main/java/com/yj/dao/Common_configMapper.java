@@ -50,6 +50,9 @@ public interface Common_configMapper {
     //用户领取红包更新用户表
     int getWordChallengeRedPack(@Param("bill") String bill,@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
 
+    //用户领取红包更新用户表
+    int withDrawChangeUserBill(@Param("bill") Double bill,@Param("user_id") String user_id);
+
     //用户领取邀请红包更新用户表
     int getWordChallengeInviteRedPack(@Param("bill") String bill,@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet);
 
@@ -328,6 +331,9 @@ public interface Common_configMapper {
 
     //后台取出提现的记录
     Map<Object,Object> findWithDrawCash(@Param("id") String id);
+
+    //查看是否有正在提现的记录
+    Map<Object,Object> whetherWithDrawing(@Param("user_id") String user_id);
 
     //展示单词挑战首页
     Map<Object,Object> show_word_challenge(@Param("now_time") String  now_time);

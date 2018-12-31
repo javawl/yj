@@ -343,16 +343,40 @@ public class AdminController {
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-        //获取福利社信息
+        //提现记录
         Map<Object,Object> Info = common_configMapper.findWithDrawCash(id);
+        Double withdrawMoney = Double.valueOf(Info.get("money").toString());
+        Map<Object,Object> userInfo = userMapper.getMyWallet(id);
+        Double myBill = Double.valueOf(userInfo.get("bill").toString());
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            if (Info.get("whether_pay").toString().equals("0")){
+                if (myBill < withdrawMoney){
+                    throw new Exception("用户余额不足");
+                }
+                common_configMapper.changeWithDrawCashStatus("1",id);
+                //修改用户的钱包
+                common_configMapper.withDrawChangeUserBill(0-withdrawMoney,id);
+            }else if (Info.get("whether_pay").toString().equals("1")){
+                common_configMapper.changeWithDrawCashStatus("0",id);
+                //修改用户的钱包
+                common_configMapper.withDrawChangeUserBill(withdrawMoney,id);
+            }else {
+                throw new Exception("提现状态不在0和1");
+            }
 
-        if (Info.get("whether_pay").toString().equals("0")){
-            common_configMapper.changeWithDrawCashStatus("1",id);
-        }else {
-            common_configMapper.changeWithDrawCashStatus("0",id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("用户提现状态异常");
         }
-
-        return ServerResponse.createBySuccessMessage("成功");
     }
 
 

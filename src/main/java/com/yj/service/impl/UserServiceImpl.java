@@ -7,6 +7,7 @@ import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
 import com.yj.controller.portal.BaseController;
+import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
@@ -42,6 +43,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private Common_configMapper common_configMapper;
 
     @Autowired
     private IFileService iFileService;
@@ -1264,6 +1268,16 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             Map<Object,Object> result = userMapper.getMyWallet(id);
+            //判断是否有正在提现状态
+            Map<Object,Object> whetherWithDrawing = common_configMapper.whetherWithDrawing(id);
+            if (whetherWithDrawing == null){
+                result.put("whether_withdrawing","0");
+                result.put("money","0");
+            }else {
+                result.put("whether_withdrawing","1");
+                result.put("money",whetherWithDrawing.get("money"));
+            }
+
             return ServerResponse.createBySuccess("成功",result);
         }
     }

@@ -621,10 +621,18 @@ public class VariousServiceImpl implements IVariousService {
         if (!type.equals("wx") && !type.equals("zfb")){
             return ServerResponse.createByErrorMessage("传入类型有误！");
         }
+        if (Double.valueOf(money) < 5 ){
+            return ServerResponse.createByErrorMessage("传入金额不得小于5！");
+        }
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
+            Map<Object,Object> userInfo = userMapper.getMyWallet(uid);
+            Double myBill = Double.valueOf(userInfo.get("bill").toString());
+            if (Double.valueOf(money) > myBill){
+                return ServerResponse.createByErrorMessage("提现不得超过钱包金额！");
+            }
             //事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -1000,7 +1008,7 @@ public class VariousServiceImpl implements IVariousService {
                         wxMssVo.setTemplate_id(Const.TMP_ID_MEDALLION);
                         wxMssVo.setAccess_token(access_token.getAccessToken());
                         wxMssVo.setTouser(info.get("wechat").toString());
-                        wxMssVo.setPage(Const.WX_HOME_PATH);
+                        wxMssVo.setPage(Const.WX_MEDALLION_PATH);
                         wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                         wxMssVo.setForm_id(info.get("form_id").toString());
                         List<TemplateData> list = new ArrayList<>();
