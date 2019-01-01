@@ -185,7 +185,7 @@
   </insert>
 
   <insert id="insertBill" parameterType="string">
-    INSERT INTO bank (user_id,statement,bill,set_time)
+    INSERT INTO bill (user_id,statement,bill,set_time)
     values (#{user_id},#{statement},#{bill},#{set_time})
   </insert>
 
