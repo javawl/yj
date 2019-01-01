@@ -775,7 +775,7 @@ public class VariousServiceImpl implements IVariousService {
                 if (rank_flag <= 30){
                     Map<Object,Object> single_rank = new HashMap<>();
                     single_rank.put("user_rank",rank_flag);
-                    single_rank.put("username",rank.get(i).get("username").toString());
+                    single_rank.put("username",rank.get(i).get("username"));
                     single_rank.put("invite_reward",rank.get(i).get("invite_reward").toString());
                     single_rank.put("portrait",CommonFunc.judgePicPath(rank.get(i).get("portrait").toString()));
                     total_rank.add(single_rank);
@@ -1060,7 +1060,7 @@ public class VariousServiceImpl implements IVariousService {
                 //查看该单词挑战是否结束
                 Map<Object,Object> word_challenge = common_configMapper.showWordChallenge(myInviteInfo.get(i).get("word_challenge_id").toString());
                 //查看头像和名字
-                Map user_info = userMapper.getAuthorInfo(uid);
+                Map user_info = userMapper.getAuthorInfo(myInviteInfo.get(i).get("user_id").toString());
                 single_map.put("username",user_info.get("username").toString());
                 single_map.put("portrait",user_info.get("portrait").toString());
                 if (Long.valueOf(word_challenge.get("et").toString()) < now_time){

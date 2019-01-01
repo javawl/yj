@@ -51,6 +51,9 @@ public interface Common_configMapper {
     int getWordChallengeRedPack(@Param("bill") String bill,@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
 
     //用户领取红包更新用户表
+    int dailyAddVirtualUserWordNumber(@Param("word_number") String word_number,@Param("id") String id);
+
+    //用户领取红包更新用户表
     int withDrawChangeUserBill(@Param("bill") Double bill,@Param("user_id") String user_id);
 
     //用户领取邀请红包更新用户表
@@ -58,6 +61,9 @@ public interface Common_configMapper {
 
     //在用户表把用户的邀请红包加上
     int makeInviteWordChallengeRedPacket(@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet, @Param("invite_reward") String invite_reward);
+
+    //在用户表把用户的状态改为失败
+    int makeUserChallengeFail(@Param("whether_challenge_fail") String whether_challenge_fail, @Param("id") String id);
 
     //结算单词挑战表
     int settleAccounts(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,
@@ -199,6 +205,9 @@ public interface Common_configMapper {
     //后台虚拟用户信息
     List<Map> showVirtualUserChallenge(@Param("start") int start, @Param("size") int size);
 
+    //后台虚拟用户信息
+    List<Map<Object,Object>> getTop100VirtualUserChallenge();
+
     //后台根据id获取奖品
     Map<Object,Object> showLotteryDraw(@Param("id") String id);
 
@@ -216,6 +225,15 @@ public interface Common_configMapper {
 
     //获取所有微信用户id
     List<Map<Object,Object>> getAllAppointmentWxUser(@Param("last_login") String last_login);
+
+    //获取所有有挑战成功红包
+    List<Map<Object,Object>> getChallengeSuccessWxUser();
+
+    //获取所有有挑战失败的
+    List<Map<Object,Object>> getChallengeFailWxUser();
+
+    //获取所有有邀请成功红包
+    List<Map<Object,Object>> getChallengeInviteWxUser();
 
     //获取所有参与抽奖微信用户id
     List<Map<Object,Object>> getAllDrawWxUser(@Param("lottery_draw_id") String lottery_draw_id);
@@ -240,6 +258,12 @@ public interface Common_configMapper {
 
     //获取单词挑战开始的提醒的用户名单,区间开始为当天十点，结束为第二天十点
     List<Map<Object,Object>> getWordChallengeBeginRemind(@Param("during_begin") String during_begin,@Param("during_end") String during_end);
+
+    //获取单词挑战开始所有用户
+    List<Map<Object,Object>> getInBeginningWordChallengeUser(@Param("now_time") String now_time);
+
+    //获取开始的单词挑战
+    List<Map<Object,Object>> getBeginningWordChallenge(@Param("now_time") String now_time);
 
     //后台根据id获取奖品参与者虚拟
     List<Map<Object,Object>> showLotteryDrawContestantsVirtual(@Param("id") String id);
@@ -270,6 +294,9 @@ public interface Common_configMapper {
 
     //将用户参加这期单词挑战的情况查出来
     Map<Object,Object> attendWordChallengeInfo(@Param("c_id") String c_id,@Param("user_id") String user_id);
+
+    //将某期单词挑战的虚拟用户查出来
+    List<Map<Object,Object>> findWordChallengeVirtualUser(@Param("c_id") String c_id);
 
     //找出是否该用户是被人邀请
     Map<Object,Object> findUserWhetherInvited(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);

@@ -236,6 +236,12 @@
     LIMIT #{start},#{size}
   </select>
 
+  <select id="getTop100VirtualUserChallenge" resultType="map">
+    SELECT  user_id as id
+    FROM `virtual_user_challenge`
+    LIMIT 100
+  </select>
+
   <select id="showLotteryDraw" resultType="map">
     SELECT *
     FROM `lottery_draw`
@@ -275,6 +281,28 @@
     FROM `user`
     WHERE wechat is NOT NULL
     AND whether_reminder = 1
+  </select>
+
+  <select id="getChallengeSuccessWxUser" resultType="map">
+    SELECT id,my_plan,last_login
+    FROM `user`
+    WHERE wechat is NOT NULL
+    AND whether_challenge_success = 1
+  </select>
+
+
+  <select id="getChallengeFailWxUser" resultType="map">
+    SELECT id,my_plan,last_login
+    FROM `user`
+    WHERE wechat is NOT NULL
+    AND whether_challenge_fail = 1
+  </select>
+
+  <select id="getChallengeInviteWxUser" resultType="map">
+    SELECT id,my_plan,last_login
+    FROM `user`
+    WHERE wechat is NOT NULL
+    AND whether_invite_challenge_success = 1
   </select>
 
   <select id="getAllDrawWxUser" resultType="map">
@@ -339,6 +367,23 @@
                 WHERE `word_challenge`.st &lt; #{during_end}
                 AND `word_challenge`.st > #{during_begin}) tb
     WHERE `word_challenge_contestants`.word_challenge_id = tb.id
+  </select>
+
+
+  <select id="getInBeginningWordChallengeUser" resultType="map" parameterType="string">
+    SELECT word_challenge_contestants.user_id,tb.periods
+    FROM `word_challenge_contestants`,(SELECT id,periods
+                FROM `word_challenge`
+                WHERE `word_challenge`.st &lt; #{now_time}
+                AND `word_challenge`.et > #{now_time}) tb
+    WHERE `word_challenge_contestants`.word_challenge_id = tb.id
+  </select>
+
+  <select id="getBeginningWordChallenge" resultType="map" parameterType="string">
+    SELECT id,periods
+    FROM `word_challenge`
+    WHERE `word_challenge`.st &lt; #{now_time}
+    AND `word_challenge`.et > #{now_time}
   </select>
 
   <select id="showLotteryDrawContestantsVirtual" resultType="map" parameterType="string">
@@ -418,6 +463,13 @@
     FROM `word_challenge_contestants`
     WHERE word_challenge_id = #{c_id}
     AND user_id = #{user_id}
+  </select>
+
+  <select id="findWordChallengeVirtualUser" resultType="map">
+    SELECT id
+    FROM `word_challenge_contestants`
+    WHERE word_challenge_id = #{c_id}
+    AND `virtual` = 1
   </select>
 
   <select id="findUserWhetherInvited" resultType="map">
@@ -574,7 +626,7 @@
   </select>
 
   <select id="adminShowWithDrawCash" resultType="map">
-    SELECT username,portrait,wechat,phone,tb.*
+    SELECT `user`.id as user_id,username,portrait,wechat,phone,tb.*
     FROM `user`,
     (SELECT *
     FROM withdraw_cash
@@ -682,6 +734,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="dailyAddVirtualUserWordNumber">
+    UPDATE `word_challenge_contestants`
+    set `word_number` = `word_number` + #{word_number}
+    WHERE id = #{id}
+  </update>
+
   <update id="withDrawChangeUserBill">
     UPDATE `user`
     set `bill` = `bill` + #{bill}
@@ -701,6 +759,13 @@
     set `whether_invite_challenge_success` = #{whether_invite_challenge_success},
     `invite_challenge_red_packet` = `invite_challenge_red_packet` + #{invite_challenge_red_packet},
     `invite_reward` = `invite_reward` + #{invite_reward}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="makeUserChallengeFail">
+    UPDATE `user`
+    set `whether_challenge_fail` = #{whether_challenge_fail}
     WHERE id = #{id}
   </update>
 

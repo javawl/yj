@@ -95,7 +95,7 @@
                         '<td style="width: 4%;">'+data[i]['account_number']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['whether_pay']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['set_time']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="handle('+"'"+data[i]['id']+"'"+')">设为处理/设为未处理</button></td>'+
+                        '<td style="width: 12%;"><button style="margin-left: 5px;" onclick="handle('+"'"+data[i]['id']+"'"+","+"'"+data[i]['user_id']+"'"+')">设为成功/设为未处理</button><button style="margin-left: 5px;" onclick="set_fail('+"'"+data[i]['id']+"'"+","+"'"+data[i]['user_id']+"'"+')">设为失败</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -144,13 +144,42 @@
 </center>
 </body>
 <script>
-    function handle(id) {
+    function handle(id,user_id) {
         if (confirm("是否确认")){
             $.ajax({
                 url:url+"/admin/changeHandleStatus.do",
                 type:'POST',
                 data:{
-                    id:id
+                    id:id,
+                    user_id:user_id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
+    }
+
+    function set_fail(id,user_id) {
+        if (confirm("是否确认")){
+            $.ajax({
+                url:url+"/admin/changeWithDrawFail.do",
+                type:'POST',
+                data:{
+                    id:id,
+                    user_id:user_id
                 },
                 dataType:'json',
                 success:function (result) {

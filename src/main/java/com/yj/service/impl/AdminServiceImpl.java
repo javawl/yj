@@ -2,9 +2,8 @@ package com.yj.service.impl;
 
 import com.google.common.collect.Lists;
 //import com.iflytek.cloud.speech.*;
-import com.yj.common.CommonFunc;
-import com.yj.common.Const;
-import com.yj.common.ServerResponse;
+import com.yj.common.*;
+import com.yj.controller.portal.AdminController;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.FeedsMapper;
@@ -15,6 +14,8 @@ import com.yj.service.IFileService;
 import com.yj.util.ExcelUtil;
 import com.yj.util.FTPUtill;
 import com.yj.util.XunfeiLib;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -58,6 +59,8 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private ApplicationContext ctx;
+
+    private Logger logger = LoggerFactory.getLogger(AdminServiceImpl.class);
 
     @Override
     public ServerResponse<List> get_word(String page, String size, String type, String condition, HttpServletResponse response){
@@ -505,6 +508,11 @@ public class AdminServiceImpl implements IAdminService {
                     }
                 }
             }
+
+            //找一百个虚拟用户来增加假的挑战邀请数据
+//            List<Map<Object,Object>> virtual100User = common_configMapper.getTop100VirtualUserChallenge();
+
+
             //成功率
             Double success_rate = success_people * 1.0 / total_real_people * 1.0;
             common_configMapper.settleAccounts(String.valueOf(aggregate_amount),String.valueOf(profit_loss),String.valueOf(success_people),String.valueOf(success_rate),String.valueOf(reward),String.valueOf(loser),String.valueOf(invite_success),"1",id);
@@ -561,6 +569,9 @@ public class AdminServiceImpl implements IAdminService {
                         if (inviteInfo != null){
                             common_configMapper.makeInviteWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString(),WordChallengeContestants.get(i).get("reward").toString());
                         }
+                    }else {
+                        //失败的话在用户那里加入失败的记录
+                        common_configMapper.makeUserChallengeFail("1",WordChallengeContestants.get(i).get("user_id").toString());
                     }
                 }
             }
@@ -573,6 +584,7 @@ public class AdminServiceImpl implements IAdminService {
         }catch (Exception e){
             transactionManager.rollback(status);
             e.printStackTrace();
+            logger.error("最终确认出错",e.getStackTrace());
             return ServerResponse.createByErrorMessage("更新出错！");
         }
     }

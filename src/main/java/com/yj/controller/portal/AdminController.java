@@ -336,7 +336,7 @@ public class AdminController {
      */
     @RequestMapping(value = "changeHandleStatus.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> changeHandleStatus(String id,HttpServletRequest request){
+    public ServerResponse<String> changeHandleStatus(String id,String user_id,HttpServletRequest request){
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(id);
@@ -346,7 +346,7 @@ public class AdminController {
         //提现记录
         Map<Object,Object> Info = common_configMapper.findWithDrawCash(id);
         Double withdrawMoney = Double.valueOf(Info.get("money").toString());
-        Map<Object,Object> userInfo = userMapper.getMyWallet(id);
+        Map<Object,Object> userInfo = userMapper.getMyWallet(user_id);
         Double myBill = Double.valueOf(userInfo.get("bill").toString());
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
@@ -361,11 +361,35 @@ public class AdminController {
                 }
                 common_configMapper.changeWithDrawCashStatus("1",id);
                 //修改用户的钱包
-                common_configMapper.withDrawChangeUserBill(0-withdrawMoney,id);
+                common_configMapper.withDrawChangeUserBill(0-withdrawMoney,user_id);
+
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                //查小姐姐微信
+                Map wx_sister = common_configMapper.getCommonConfig();
+                //发模板消息
+                Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WITHDRAW_SUCCESS);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("财务小姐姐已经成为为你提现啦~请问小可爱收到了吗~~","#ffffff"));
+                    list.add(new TemplateData("如果没有收到，请及时联系我们的财务小姐姐微信："+wx_sister.get("withdraw_manager_wx") ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
             }else if (Info.get("whether_pay").toString().equals("1")){
                 common_configMapper.changeWithDrawCashStatus("0",id);
                 //修改用户的钱包
-                common_configMapper.withDrawChangeUserBill(withdrawMoney,id);
+                common_configMapper.withDrawChangeUserBill(withdrawMoney,user_id);
             }else {
                 throw new Exception("提现状态不在0和1");
             }
@@ -376,6 +400,104 @@ public class AdminController {
             transactionManager.rollback(status);
             e.printStackTrace();
             return ServerResponse.createByErrorMessage("用户提现状态异常");
+        }
+    }
+
+
+
+    /**
+     * 设为提现失败
+     * @param id       提现id
+     * @param request    req
+     * @return           Str
+     */
+    @RequestMapping(value = "changeWithDrawFail.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> changeWithDrawFail(String id,String user_id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //提现记录
+        Map<Object,Object> Info = common_configMapper.findWithDrawCash(id);
+        Double withdrawMoney = Double.valueOf(Info.get("money").toString());
+        Map<Object,Object> userInfo = userMapper.getMyWallet(user_id);
+        Double myBill = Double.valueOf(userInfo.get("bill").toString());
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            if (Info.get("whether_pay").toString().equals("0")){
+                if (myBill < withdrawMoney){
+                    throw new Exception("用户余额不足");
+                }
+                common_configMapper.changeWithDrawCashStatus("2",id);
+
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                //查小姐姐微信
+                Map wx_sister = common_configMapper.getCommonConfig();
+                //发模板消息
+                Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WITHDRAW_FAIL);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("哎呀，小可爱你的提现出现了一点问题，快点加财务小姐姐了解一下情况吧~","#ffffff"));
+                    list.add(new TemplateData("财务小姐姐的微信："+wx_sister.get("withdraw_manager_wx") ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }else if (Info.get("whether_pay").toString().equals("1")){
+                common_configMapper.changeWithDrawCashStatus("2",id);
+                //修改用户的钱包
+                common_configMapper.withDrawChangeUserBill(withdrawMoney,user_id);
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                //查小姐姐微信
+                Map wx_sister = common_configMapper.getCommonConfig();
+                //发模板消息
+                Map<Object,Object> info = common_configMapper.getTmpInfo(id,String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WITHDRAW_FAIL);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("哎呀，小可爱你的提现出现了一点问题，快点加财务小姐姐了解一下情况吧~","#ffffff"));
+                    list.add(new TemplateData("财务小姐姐的微信："+wx_sister.get("withdraw_manager_wx") ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }else {
+                throw new Exception("提现状态不在0和1");
+            }
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("用户提现失败状态异常");
         }
     }
 
@@ -1137,7 +1259,7 @@ public class AdminController {
                 Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
 
                 if (info != null){
-                    common_configMapper.deleteTemplateMsg(info.get("user_id").toString());
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
                     //发送模板消息
                     WxMssVo wxMssVo = new WxMssVo();
                     wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_BEGIN);
@@ -1159,6 +1281,316 @@ public class AdminController {
             e.printStackTrace();
         }
         return "success";
+    }
+
+
+    /**
+     * 单词挑战每日提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "word_challenge_daily_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String word_challenge_daily_remind(String token, HttpServletResponse response){
+        if (!token.equals("word_challenge_daily_remind")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            List<Map<Object,Object>> all_user =  common_configMapper.getInBeginningWordChallengeUser(nowTime);
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_REMIND);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("第" + all_user.get(i).get("periods").toString() + "期单词挑战","#ffffff"));
+                    list.add(new TemplateData("嘿~你的挑战金还在背呗这里呢~~不背单词背呗就拿去买奶茶啦~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("单词挑战每日提醒异常",e.getStackTrace());
+            logger.error("单词挑战每日提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 免死金牌使用
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "medallion_can_use.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String medallion_can_use(String token, HttpServletResponse response){
+        if (!token.equals("medallion_can_use")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            Long now_time_stamp = (new Date()).getTime();
+            //从未结束的会议中判断用户是否报名
+            List<Map<Object,Object>> all_user =  common_configMapper.getInBeginningWordChallengeUser(String.valueOf(now_time_stamp));
+            for(int i = 0; i < all_user.size(); i++){
+                //判断是否有免死金牌
+                Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(String.valueOf(now_time_stamp),all_user.get(i).get("user_id").toString());
+                //报了名
+                //判断是否开始
+                if (now_time_stamp >= Long.valueOf(word_challenge.get("st").toString())){
+                    //获取区间天数
+                    int total_days = CommonFunc.count_interval_days(word_challenge.get("st").toString(),String.valueOf(now_time_stamp));
+                    //坚持天数
+                    int challenge_insist_days = Integer.valueOf(word_challenge.get("insist_day").toString());
+                    //未背天数
+                    int not_to_recite_days = total_days - challenge_insist_days;
+                    if (not_to_recite_days >= 3 && Integer.valueOf(word_challenge.get("medallion").toString()) < 2){
+                        if (word_challenge.get("last_medallion_time") != null){
+                            if (Long.valueOf(word_challenge.get("last_medallion_time").toString()) > now_time_stamp){
+                                //还不可以用下一张
+                                continue;
+                            }
+                        }
+                    }else {
+                        continue;
+                    }
+                }else {
+                    //不能使用免死金牌
+                    continue;
+                }
+
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_MEDALLION_CAN_USE);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_MEDALLION_SHOW_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("第" + all_user.get(i).get("periods").toString() + "期单词挑战","#ffffff"));
+                    list.add(new TemplateData("哎呀~宝贝你已经3天忘记打卡啦！！" ,"#ffffff"));
+                    list.add(new TemplateData("背呗悄悄送你一张免死金牌，下次可不能再偷懒了哟！快快点击领取吧~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("免死金牌使用",e.getStackTrace());
+            logger.error("免死金牌使用",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 发送挑战成功红包 & 失败的模板消息
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "challenge_success_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String challenge_success_remind(String token, HttpServletResponse response){
+        if (!token.equals("challenge_success_remind")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getChallengeSuccessWxUser();
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_CHALLENGE_SUCCESS_RED_PACKET);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("30天单词挑战","#ffffff"));
+                    list.add(new TemplateData("你已成功完成单词挑战获得奖金，快快登录小程序领取红包吧~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+
+            //给失败的发模板消息
+            //给所有用户发送
+            List<Map<Object,Object>> all_user_fail =  common_configMapper.getChallengeFailWxUser();
+            for(int i = 0; i < all_user_fail.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user_fail.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_FAIL);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("30天单词挑战","#ffffff"));
+                    list.add(new TemplateData("嘤嘤嘤，这期单词挑战差一丢就成功了呢~没关系！再来一次一定就成功了！" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("挑战失败提醒异常",e.getStackTrace());
+            logger.error("挑战失败提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+
+    /**
+     * 发送邀请成功红包
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "challenge_invite_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String challenge_invite_remind(String token, HttpServletResponse response){
+        if (!token.equals("challenge_invite_remind")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getChallengeInviteWxUser();
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_CHALLENGE_INVITE_RED_PACKET);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("30天单词挑战","#ffffff"));
+                    list.add(new TemplateData("你邀请的用户棒棒哒，自己挑战成功还为你赢得一份奖励金，还来领取吧~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("挑战邀请成功领红包异常",e.getStackTrace());
+            logger.error("挑战邀请成功领红包异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 每天虚拟用户增加单词
+     * @param token
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "daily_add_virtual_user_word_number.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String daily_add_virtual_user_word_number(String token, HttpServletResponse response){
+        if (!token.equals("daily_add_virtual_user_word_number")){
+            return "false";
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //获取当前时间戳
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取所有在开始的单词挑战
+            List<Map<Object,Object>> beginningWordChallenge = common_configMapper.getBeginningWordChallenge(nowTime);
+            for (int i = 0; i < beginningWordChallenge.size(); i++){
+                //获取挑战id
+                String wc_id = beginningWordChallenge.get(i).get("id").toString();
+                //获取这个挑战的虚拟用户
+                List<Map<Object,Object>> virtualUser = common_configMapper.findWordChallengeVirtualUser(wc_id);
+                //获取用户数量
+                Double countVirtualNumber = virtualUser.size() * 1.0;
+                //比例
+                Double ratio1 = 1.0/13.0;
+                Double ratio2 = 3.0/13.0;
+                Double ratio3 = 6.0/13.0;
+                Double ratio4 = 8.0/13.0;
+                Double ratio5 = 10.0/13.0;
+                Double ratio6 = 12.0/13.0;
+                Double ratio7 = 1.0;
+                for (int j = 0; j < virtualUser.size(); j++){
+                    if ((j+1)/countVirtualNumber < ratio1){
+                        //第一种情况
+                        common_configMapper.dailyAddVirtualUserWordNumber("10",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber < ratio2){
+                        common_configMapper.dailyAddVirtualUserWordNumber("15",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber < ratio3){
+                        common_configMapper.dailyAddVirtualUserWordNumber("25",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber < ratio4){
+                        common_configMapper.dailyAddVirtualUserWordNumber("30",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber < ratio5){
+                        common_configMapper.dailyAddVirtualUserWordNumber("35",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber < ratio6){
+                        common_configMapper.dailyAddVirtualUserWordNumber("40",virtualUser.get(i).get("id").toString());
+                    }else if ((j+1)/countVirtualNumber <= ratio7){
+                        common_configMapper.dailyAddVirtualUserWordNumber("45",virtualUser.get(i).get("id").toString());
+                    }
+                }
+            }
+            transactionManager.commit(status);
+            return "success";
+        }catch (Exception e){
+            logger.error("每天给虚拟用户增加单词数异常",e.getStackTrace());
+            logger.error("每天给虚拟用户增加单词数异常",e);
+            e.printStackTrace();
+            return "error";
+        }
     }
 
 
@@ -1596,7 +2028,28 @@ public class AdminController {
 
     @RequestMapping(value = "test2.do", method = RequestMethod.POST)
     @ResponseBody
-    public String test2(MultipartFile file,HttpServletResponse response, HttpServletRequest request){
-        return "成功";
+    public String test2(HttpServletResponse response, HttpServletRequest request){
+        //获取accessToken
+        AccessToken access_token = CommonFunc.getAccessToken();
+        //给该用户发送
+        //查没过期的from_id
+        Map<Object,Object> info = common_configMapper.getTmpInfo("2964",String.valueOf((new Date()).getTime()));
+        if (info != null){
+            common_configMapper.deleteTemplateMsg(info.get("id").toString());
+            //发送模板消息
+            WxMssVo wxMssVo = new WxMssVo();
+            wxMssVo.setTemplate_id(Const.TMP_ID_INVITEE);
+            wxMssVo.setAccess_token(access_token.getAccessToken());
+            wxMssVo.setTouser(info.get("wechat").toString());
+            wxMssVo.setPage(Const.INVITE_DETAIL_PATH);
+            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+            wxMssVo.setForm_id(info.get("form_id").toString());
+            List<TemplateData> list = new ArrayList<>();
+            list.add(new TemplateData("30天单词挑战","#ffffff"));
+            list.add(new TemplateData("咦~好像有人接受了你的挑战邀请，点击查看是哪个小可爱~","#ffffff"));
+            wxMssVo.setParams(list);
+            CommonFunc.sendTemplateMessage(wxMssVo);
+        }
+        return null;
     }
 }

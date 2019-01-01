@@ -21,11 +21,19 @@ public class Const {
     public static final String TMP_ID_MEDALLION = "uPByOYs10HZqsi3zY6kNtR_fJ1XfzaR_XFGXJF4tDZA";   //免死金牌的tmp_id
     public static final String TMP_ID_INVITEE = "c4K0t7qzDVxlV0HjIEx_8bFqJc2yEY1bFvPNRETUkro";   //被邀请的好友加入挑战
     public static final String TMP_ID_WORD_CHALLENGE_BEGIN = "Jy-Nivl1zN0eq4es1HObmXxwB6pphIxsUeIbEZPkQPg";   //挑战开始
+    public static final String TMP_ID_WORD_CHALLENGE_REMIND = "qvMsMzy_LnGk_GJhK9_ntVHmmib9AjUd7EZiGlD3M88";   //单词挑战每日提醒
+    public static final String TMP_ID_WITHDRAW_SUCCESS = "K0Zn8YVjKO1w9Y9Mt_qsxFSp-Pj5ZKciozOMCCG2s5Y";   //提现成功
+    public static final String TMP_ID_WITHDRAW_FAIL = "NldmN_fp3IoMeJer61PedtrRSBypiCCLo3ytJm8_7vU";   //提现成功
+    public static final String TMP_ID_MEDALLION_CAN_USE = "ffblP6kYhTagU6hdQzRbCtLf8NugHwgPHtGjtyH7vgc";   //免死金牌可用提醒
+    public static final String TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND = "yjT1cESf9MwS_1NJXRoyMgk4BGxMgVjGUxczxXeotQI";   //单词挑战成功提醒
+    public static final String TMP_CHALLENGE_FAIL = "G67GOTfOcX2FAJpIcpLuA5bmV8B3pD3jckAptE_qb1g";   //单词挑战失败提醒
     public static final String DRAW_RESULT_PATH = "pages/home/prize/prize_result";   //抽奖结果的路径
     public static final String INVITE_DETAIL_PATH = "pages/discover/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页
     public static final String WX_HOME_PATH = "pages/home/home";   //home的路径
     public static final String WX_MEDALLION_PATH = "pages/home/home?method=medallion_success";   //免死金牌成功的路径
     public static final String WX_MEDALLION_SHOW_PATH = "pages/home/home?method=medallion_show";   //展示免死金牌的路径
+    public static final String WX_CHALLENGE_SUCCESS_RED_PACKET = "pages/home/home?method=challenge_success_red_packet";   //展示单词挑战成功提醒的路径
+    public static final String WX_CHALLENGE_INVITE_RED_PACKET = "pages/home/home?method=challenge_invite_red_packet";   //展示单词挑战邀请提醒的路径
     public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间
