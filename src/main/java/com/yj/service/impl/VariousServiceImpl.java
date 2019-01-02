@@ -1062,7 +1062,7 @@ public class VariousServiceImpl implements IVariousService {
                 //查看头像和名字
                 Map user_info = userMapper.getAuthorInfo(myInviteInfo.get(i).get("user_id").toString());
                 single_map.put("username",user_info.get("username").toString());
-                single_map.put("portrait",user_info.get("portrait").toString());
+                single_map.put("portrait",CommonFunc.judgePicPath(user_info.get("portrait").toString()));
                 if (Long.valueOf(word_challenge.get("et").toString()) < now_time){
                     //已结束
                     if (Integer.valueOf(myInviteInfo.get(i).get("insist_day").toString()) >= 28){
