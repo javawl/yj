@@ -869,6 +869,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="addVirtualInviteData">
+    UPDATE `user`
+    set `invite_reward` = `invite_reward` + #{invite_reward}
+    WHERE id = #{id}
+  </update>
+
   <update id="changeTopWelfareService" parameterType="string">
     UPDATE welfare_service,(SELECT MAX(`order`) as number FROM welfare_service) tb
     set `order` = tb.number+1

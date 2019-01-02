@@ -34,6 +34,7 @@ public class Const {
     public static final String WX_MEDALLION_SHOW_PATH = "pages/home/home?method=medallion_show";   //展示免死金牌的路径
     public static final String WX_CHALLENGE_SUCCESS_RED_PACKET = "pages/home/home?method=challenge_success_red_packet";   //展示单词挑战成功提醒的路径
     public static final String WX_CHALLENGE_INVITE_RED_PACKET = "pages/home/home?method=challenge_invite_red_packet";   //展示单词挑战邀请提醒的路径
+    public static final String WX_CHALLENGE_SIGNUP = "pages/discover/WordChallenge/SignUp/SignUp";   //挑战报名页
     public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间

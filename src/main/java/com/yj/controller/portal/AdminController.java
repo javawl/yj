@@ -1458,7 +1458,7 @@ public class AdminController {
                     WxMssVo wxMssVo = new WxMssVo();
                     wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_FAIL);
                     wxMssVo.setTouser(info.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setPage(Const.WX_CHALLENGE_SIGNUP);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
@@ -1566,20 +1566,35 @@ public class AdminController {
                 Double ratio7 = 1.0;
                 for (int j = 0; j < virtualUser.size(); j++){
                     if ((j+1)/countVirtualNumber < ratio1){
-                        //第一种情况
-                        common_configMapper.dailyAddVirtualUserWordNumber("10",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 8){
+                            //八点
+                            //第一种情况
+                            common_configMapper.dailyAddVirtualUserWordNumber("10",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber < ratio2){
-                        common_configMapper.dailyAddVirtualUserWordNumber("15",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 9){
+                            common_configMapper.dailyAddVirtualUserWordNumber("15",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber < ratio3){
-                        common_configMapper.dailyAddVirtualUserWordNumber("25",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 10){
+                            common_configMapper.dailyAddVirtualUserWordNumber("25",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber < ratio4){
-                        common_configMapper.dailyAddVirtualUserWordNumber("30",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 11){
+                            common_configMapper.dailyAddVirtualUserWordNumber("30",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber < ratio5){
-                        common_configMapper.dailyAddVirtualUserWordNumber("35",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 12){
+                            common_configMapper.dailyAddVirtualUserWordNumber("35",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber < ratio6){
-                        common_configMapper.dailyAddVirtualUserWordNumber("40",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 13){
+                            common_configMapper.dailyAddVirtualUserWordNumber("40",virtualUser.get(i).get("id").toString());
+                        }
                     }else if ((j+1)/countVirtualNumber <= ratio7){
-                        common_configMapper.dailyAddVirtualUserWordNumber("45",virtualUser.get(i).get("id").toString());
+                        if (CommonFunc.getNotTimeHour(new Date()) == 14){
+                            common_configMapper.dailyAddVirtualUserWordNumber("45",virtualUser.get(i).get("id").toString());
+                        }
                     }
                 }
             }

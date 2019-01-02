@@ -416,6 +416,14 @@ public class CommonFunc {
         return String.valueOf(date);
     }
 
+
+    //获取当前时间的小时
+    public static int getNotTimeHour(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
     //获取当月一号零点时间戳
     public static String getMonthOneDate(){
         Calendar calendar = Calendar.getInstance();

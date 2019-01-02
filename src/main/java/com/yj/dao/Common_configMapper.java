@@ -109,6 +109,9 @@ public interface Common_configMapper {
     //关闭模板消息(因为要关多一个状态就是预约提醒状态)
     int changeUserTemplateClose(@Param("id") String id);
 
+    //增加假的邀请的奖励金
+    int addVirtualInviteData(@Param("id") String id,@Param("invite_reward") String invite_reward);
+
     //置顶福利社
     int changeTopWelfareService(@Param("id") String id);
 

@@ -454,6 +454,8 @@ public class AdminServiceImpl implements IAdminService {
         int invite_success = 0;
         //第一轮先计算reward
         List<Map<Object,Object>> WordChallengeContestants = common_configMapper.showAllChallengeContestants(id);
+        //找出该挑战
+        Map<Object,Object> w_c =  common_configMapper.getWordChallengeById(id);
         for (int i = 0; i < WordChallengeContestants.size(); i++){
             //判断是否真实用户
             if (WordChallengeContestants.get(i).get("virtual").toString().equals("0")){
@@ -509,9 +511,31 @@ public class AdminServiceImpl implements IAdminService {
                 }
             }
 
-            //找一百个虚拟用户来增加假的挑战邀请数据
-//            List<Map<Object,Object>> virtual100User = common_configMapper.getTop100VirtualUserChallenge();
-
+            if (w_c.get("whether_settle_accounts").toString().equals("0")){
+                //找一百个虚拟用户来增加假的挑战邀请数据
+                List<Map<Object,Object>> virtual100User = common_configMapper.getTop100VirtualUserChallenge();
+                //循环找三十个
+                for (int j = 0; j < 30; j++){
+                    int number = (int)(0+Math.random()*(99+1));
+                    if (j < 3){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward));
+                    }else if (j < 10){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 2.0));
+                    }else if (j < 15){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 3.0));
+                    }else if (j < 20){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 4.0));
+                    }else if (j < 23){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 5.0));
+                    }else if (j < 26){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 6.0));
+                    }else if (j < 29){
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 7.0));
+                    }else{
+                        common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward * 8.0));
+                    }
+                }
+            }
 
             //成功率
             Double success_rate = success_people * 1.0 / total_real_people * 1.0;
