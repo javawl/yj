@@ -537,7 +537,7 @@ public class VariousServiceImpl implements IVariousService {
             try{
                 List<Map> wordChallengePacket = userMapper.getUserPlanDaysNumber(uid);
                 if (wordChallengePacket.get(0).get("whether_challenge_success").toString().equals("0")){
-                    return ServerResponse.createByErrorMessage("不可领取红包！");
+                    throw new Exception("不可领取红包！");
                 }
                 String redPacket = wordChallengePacket.get(0).get("challenge_red_packet").toString();
                 String now_time = String.valueOf((new Date()).getTime());
@@ -552,7 +552,9 @@ public class VariousServiceImpl implements IVariousService {
             }catch (Exception e){
                 transactionManager.rollback(status);
                 e.printStackTrace();
-                return ServerResponse.createByErrorMessage("更新出错！");
+                logger.error("领取红包异常",e.getStackTrace());
+                logger.error("领取红包异常",e);
+                return ServerResponse.createByErrorMessage(e.getMessage());
             }
         }
     }
