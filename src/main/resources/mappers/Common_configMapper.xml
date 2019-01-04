@@ -185,8 +185,8 @@
   </insert>
 
   <insert id="insertBill" parameterType="string">
-    INSERT INTO bill (user_id,statement,bill,set_time)
-    values (#{user_id},#{statement},#{bill},#{set_time})
+    INSERT INTO bill (user_id,statement,bill,set_time,with_draw_cash_id)
+    values (#{user_id},#{statement},#{bill},#{set_time},#{with_draw_cash_id})
   </insert>
 
   <insert id="insertWordChallengeInviteRelation" parameterType="string">
@@ -928,6 +928,12 @@
   <delete id="deleteFeeds" parameterType="string" >
     DELETE FROM feeds
     where id = #{id}
+  </delete>
+
+  <delete id="deleteBill" parameterType="string" >
+    DELETE FROM bill
+    where user_id = #{user_id}
+    AND with_draw_cash_id = #{with_draw_cash_id}
   </delete>
 
   <delete id="deleteTemplateMsg" parameterType="string" >

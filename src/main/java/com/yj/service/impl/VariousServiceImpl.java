@@ -546,7 +546,7 @@ public class VariousServiceImpl implements IVariousService {
                 //塞进钱包,并置零两个状态
                 common_configMapper.getWordChallengeRedPack(redPacket,"0",uid,"0");
                 //用户个人账单更新
-                common_configMapper.insertBill(uid,"第" + w_c.get("periods").toString() + "单词挑战成功获得红包",redPacket,now_time);
+                common_configMapper.insertBill(uid,"第" + w_c.get("periods").toString() + "单词挑战成功获得红包",redPacket,now_time,null);
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             }catch (Exception e){
@@ -592,7 +592,7 @@ public class VariousServiceImpl implements IVariousService {
                 //塞进钱包,并置零两个状态
                 common_configMapper.getWordChallengeInviteRedPack(redPacket,"0",uid,"0");
                 //用户个人账单更新
-                common_configMapper.insertBill(uid,"邀请参加单词挑战成功获得红包",redPacket,now_time);
+                common_configMapper.insertBill(uid,"邀请参加单词挑战成功获得红包",redPacket,now_time,null);
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             }catch (Exception e){

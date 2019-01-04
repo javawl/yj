@@ -354,6 +354,7 @@ public class AdminController {
         //隔离级别
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
+        String notTime = String.valueOf((new Date()).getTime());
         try{
             if (Info.get("whether_pay").toString().equals("0")){
                 if (myBill < withdrawMoney){
@@ -368,7 +369,9 @@ public class AdminController {
                 //查小姐姐微信
                 Map wx_sister = common_configMapper.getCommonConfig();
                 //发模板消息
-                Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,String.valueOf((new Date()).getTime()));
+                Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,notTime);
+                //插入明细
+                common_configMapper.insertBill(user_id,"提现成功","-"+String.valueOf(withdrawMoney),notTime,id);
 
                 if (info != null){
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
@@ -381,7 +384,7 @@ public class AdminController {
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("财务小姐姐已经成为为你提现啦~请问小可爱收到了吗~~","#ffffff"));
+                    list.add(new TemplateData("财务小姐姐已经成功为你提现啦~请问小可爱收到了吗~~","#ffffff"));
                     list.add(new TemplateData("如果没有收到，请及时联系我们的财务小姐姐微信："+wx_sister.get("withdraw_manager_wx") ,"#ffffff"));
                     wxMssVo.setParams(list);
                     CommonFunc.sendTemplateMessage(wxMssVo);
@@ -390,6 +393,8 @@ public class AdminController {
                 common_configMapper.changeWithDrawCashStatus("0",id);
                 //修改用户的钱包
                 common_configMapper.withDrawChangeUserBill(withdrawMoney,user_id);
+                //将明细删掉
+                common_configMapper.deleteBill(user_id,id);
             }else {
                 throw new Exception("提现状态不在0和1");
             }
@@ -433,9 +438,6 @@ public class AdminController {
         TransactionStatus status = transactionManager.getTransaction(def);
         try{
             if (Info.get("whether_pay").toString().equals("0")){
-                if (myBill < withdrawMoney){
-                    throw new Exception("用户余额不足");
-                }
                 common_configMapper.changeWithDrawCashStatus("2",id);
 
                 //获取accessToken
@@ -465,6 +467,8 @@ public class AdminController {
                 common_configMapper.changeWithDrawCashStatus("2",id);
                 //修改用户的钱包
                 common_configMapper.withDrawChangeUserBill(withdrawMoney,user_id);
+                //将明细删掉
+                common_configMapper.deleteBill(user_id,id);
                 //获取accessToken
                 AccessToken access_token = CommonFunc.getAccessToken();
                 //查小姐姐微信

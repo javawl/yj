@@ -142,6 +142,9 @@ public interface Common_configMapper {
     //删除feeds
     int deleteFeeds(@Param("id") String id);
 
+    //提现设为未处理删除明细
+    int deleteBill(@Param("user_id") String user_id,@Param("with_draw_cash_id") String with_draw_cash_id);
+
     //删除模板消息
     int deleteTemplateMsg(@Param("id") String id);
 
@@ -179,7 +182,7 @@ public interface Common_configMapper {
     int insertBank(@Param("description") String description,@Param("money") String money,@Param("set_time") String set_time);
 
     //插入明细
-    int insertBill(@Param("user_id") String user_id,@Param("statement") String statement,@Param("bill") String bill,@Param("set_time") String set_time);
+    int insertBill(@Param("user_id") String user_id,@Param("statement") String statement,@Param("bill") String bill,@Param("set_time") String set_time,@Param("with_draw_cash_id") String with_draw_cash_id);
 
     //建立单词挑战邀请关系
     int insertWordChallengeInviteRelation(@Param("user_id") String user_id,@Param("invited_user_id") String invited_user_id,@Param("word_challenge_id") String word_challenge_id,@Param("set_time") String set_tim);
