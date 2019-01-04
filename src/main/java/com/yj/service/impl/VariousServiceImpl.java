@@ -1002,7 +1002,7 @@ public class VariousServiceImpl implements IVariousService {
                     AccessToken access_token = CommonFunc.getAccessToken();
                     //给该用户发送
                     //查没过期的from_id
-                    Map<Object,Object> info = common_configMapper.getTmpInfo(uid,nowTime);
+                    Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,nowTime);
                     if (info != null){
                         common_configMapper.deleteTemplateMsg(info.get("id").toString());
                         //发送模板消息

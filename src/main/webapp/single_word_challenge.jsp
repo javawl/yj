@@ -119,7 +119,7 @@
                             '<td>'+lottery_draw['loser']+'</td>'+
                             '<td>'+lottery_draw['profit_loss']+'</td>'+
                             '<td>'+lottery_draw['final_confirm']+'</td>'+
-                            '<td><button style="margin-left: 5px;" onclick="settle_accounts('+"'"+id+"'"+')">再次结算</button><button style="margin-left: 5px;" onclick="final_confirm('+ "'"+id+"'"+')">最终确认</button></td>'+
+                            '<td><button style="margin-left: 5px;" onclick="settle_accounts()">再次结算</button><button style="margin-left: 5px;" onclick="final_confirm('+ "'"+id+"'"+')">最终确认</button></td>'+
                             '</tr>');
                     }
                 }
@@ -217,7 +217,7 @@
 </center>
 </body>
 <script>
-    function settle_accounts(id) {
+    function settle_accounts() {
         if (confirm("你确定要结算了？")){
             $.ajax({
                 url:url+"/admin/settle_accounts.do",
