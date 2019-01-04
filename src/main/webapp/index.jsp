@@ -8,6 +8,17 @@
         body{ margin: 0 auto; padding: 0; width: 100%;}
         h1{ margin-top: 3rem;}
     </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#wx_show_listen").mouseover(function(){
+                $("#wx_show").css("display","");
+            });
+
+            $("#wx_show_listen").mouseout(function(){
+                $("#wx_show").css("display","none");
+            });
+        });
+    </script>
     <%--<script type="text/javascript">--%>
         <%--var count = 0;--%>
 <%--//        var url = 'http://localhost:8088';--%>
@@ -245,67 +256,76 @@
         <%--}--%>
     <%--</script>--%>
 </head>
-<body>
-<center>
-    <%--<h1>单词详情页</h1>--%>
-    <%--<input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />--%>
-    <%--<table cellpadding="8" width="100%" border="1" cellspacing="0" id="special">--%>
-        <%--<tr>--%>
-            <%--<select style="float: right" id="select" onchange="change_type()">--%>
-            <%--</select>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-            <%--<td style="width: 4%;">单词id</td>--%>
-            <%--<td style="width: 4%;">单词</td>--%>
-            <%--<td style="width: 4%;">单词的扇贝意思</td>--%>
-            <%--<td style="width: 4%;">单词百词斩意思</td>--%>
-            <%--<td style="width: 4%;">单词美刀意思</td>--%>
-            <%--&lt;%&ndash;<td style="width: 4%;">单词英式音标（金山词霸）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td style="width: 4%;">单词英式发音（金山词霸）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td style="width: 4%;">单词美式音标（金山词霸）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td style="width: 4%;">单词美式发音（金山词霸）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td style="width: 4%;">单词英式音标（美刀）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td  style="width: 4%;">单词英式发音（美刀）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td  style="width: 4%;">单词美式音标（美刀）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td  style="width: 4%;">单词美式发音（美刀）</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td  style="width: 4%;">音标百词斩</td>&ndash;%&gt;--%>
-            <%--&lt;%&ndash;<td  style="width: 4%;">单词音频百词斩</td>&ndash;%&gt;--%>
-            <%--<td  style="width: 20%;">例句百词斩</td>--%>
-            <%--<td  style="width: 4%;">例句音频百词斩</td>--%>
-            <%--<td  style="width: 4%;">图片百词斩</td>--%>
-            <%--<td  style="width: 4%;">视频</td>--%>
-            <%--<td  style="width: 6%;">操作</td>--%>
-        <%--</tr>--%>
-    <%--</table>--%>
-    <%--<table id="page">--%>
-        <%--<!--<?php-->--%>
-        <%--<!--if ($page == 1){-->--%>
-        <%--<!--echo "<td><p>第一页</p></td>";-->--%>
-        <%--<!--}else{-->--%>
-        <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=1'>第一页</a></td>";-->--%>
-        <%--<!--}-->--%>
-        <%--<!--for ($i = 0; $i < $page_no; $i++){-->--%>
-        <%--<!--$no = $i + 1;-->--%>
-        <%--<!--if ($no == $page){-->--%>
-        <%--<!--echo "<td><p>".$no."</p></td>";-->--%>
-        <%--<!--}else{-->--%>
-        <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=".(string)$no."'>".$no."</a></td>";-->--%>
-        <%--<!--}-->--%>
-        <%--<!--}-->--%>
-        <%--<!--if ($page == $page_no){-->--%>
-        <%--<!--echo "<td><p>最后一页</p></td>";-->--%>
-        <%--<!--}else{-->--%>
-        <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=".$page_no."'>最后一页</a></td>";-->--%>
-        <%--<!--}-->--%>
-        <%--<!--?>-->--%>
-    <%--</table>--%>
-    <img style="width: 100%" src="https://file.ourbeibei.com/l_e/common/home_page.jpg">
-</center>
+<body style="height: 10816px;background:url('https://file.ourbeibei.com/l_e/common/home_page.jpg?id=1') no-repeat;background-size:cover">
+    <center>
+        <%--<h1>单词详情页</h1>--%>
+        <%--<input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />--%>
+        <%--<table cellpadding="8" width="100%" border="1" cellspacing="0" id="special">--%>
+            <%--<tr>--%>
+                <%--<select style="float: right" id="select" onchange="change_type()">--%>
+                <%--</select>--%>
+            <%--</tr>--%>
+            <%--<tr>--%>
+                <%--<td style="width: 4%;">单词id</td>--%>
+                <%--<td style="width: 4%;">单词</td>--%>
+                <%--<td style="width: 4%;">单词的扇贝意思</td>--%>
+                <%--<td style="width: 4%;">单词百词斩意思</td>--%>
+                <%--<td style="width: 4%;">单词美刀意思</td>--%>
+                <%--&lt;%&ndash;<td style="width: 4%;">单词英式音标（金山词霸）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td style="width: 4%;">单词英式发音（金山词霸）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td style="width: 4%;">单词美式音标（金山词霸）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td style="width: 4%;">单词美式发音（金山词霸）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td style="width: 4%;">单词英式音标（美刀）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td  style="width: 4%;">单词英式发音（美刀）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td  style="width: 4%;">单词美式音标（美刀）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td  style="width: 4%;">单词美式发音（美刀）</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td  style="width: 4%;">音标百词斩</td>&ndash;%&gt;--%>
+                <%--&lt;%&ndash;<td  style="width: 4%;">单词音频百词斩</td>&ndash;%&gt;--%>
+                <%--<td  style="width: 20%;">例句百词斩</td>--%>
+                <%--<td  style="width: 4%;">例句音频百词斩</td>--%>
+                <%--<td  style="width: 4%;">图片百词斩</td>--%>
+                <%--<td  style="width: 4%;">视频</td>--%>
+                <%--<td  style="width: 6%;">操作</td>--%>
+            <%--</tr>--%>
+        <%--</table>--%>
+        <%--<table id="page">--%>
+            <%--<!--<?php-->--%>
+            <%--<!--if ($page == 1){-->--%>
+            <%--<!--echo "<td><p>第一页</p></td>";-->--%>
+            <%--<!--}else{-->--%>
+            <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=1'>第一页</a></td>";-->--%>
+            <%--<!--}-->--%>
+            <%--<!--for ($i = 0; $i < $page_no; $i++){-->--%>
+            <%--<!--$no = $i + 1;-->--%>
+            <%--<!--if ($no == $page){-->--%>
+            <%--<!--echo "<td><p>".$no."</p></td>";-->--%>
+            <%--<!--}else{-->--%>
+            <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=".(string)$no."'>".$no."</a></td>";-->--%>
+            <%--<!--}-->--%>
+            <%--<!--}-->--%>
+            <%--<!--if ($page == $page_no){-->--%>
+            <%--<!--echo "<td><p>最后一页</p></td>";-->--%>
+            <%--<!--}else{-->--%>
+            <%--<!--echo "<td><a href='http://localhost/homework/show.php?page=".$page_no."'>最后一页</a></td>";-->--%>
+            <%--<!--}-->--%>
+            <%--<!--?>-->--%>
+        <%--</table>--%>
+        <div style="float: left; width: 170px; height: 200px; margin-top: 26%; margin-left: 23%;">
+            <img style="width: 170px; height: 48px;" src="https://file.ourbeibei.com/l_e/common/wx_button.png" id="wx_show_listen">
+            <div style="width: 170px;height: 150px; margin: 0; padding: 0;border: 0; display: none;" id="wx_show">
+                <div style="border-style: solid;margin-top: 10px;border-width: 0 10px 10px 10px;border-color: transparent transparent #000 transparent;width: 0;height: 0;"></div>
+                <img style="width: 140px;height: 140px; margin-top: 0;margin-left: 0;border:11px solid #000;" src="https://file.ourbeibei.com/l_e/common/wx_gzh_code.jpg">
+            </div>
+        </div>
+        <div style="float: left; width: 128px; height: 48px; margin-top: 26%; margin-left: 1%;">
+            <a href="https://www.zhihu.com"><img style="width: 128px; height: 48px;" src="https://file.ourbeibei.com/l_e/common/zhihu_button.png"></a>
+        </div>
+        <%--<div>--%>
+            <%--<img style="width: 100%" src="https://file.ourbeibei.com/l_e/common/home_page.jpg?id=1">--%>
+        <%--</div>--%>
+    </center>
 </body>
 <script>
-    function edit(id) {
-        window.location.href=url+'/update_page.jsp?id='+id;
-    }
     function del(word) {
         if (confirm("你确定要删除此单词？删除之后不可恢复！")){
             $.ajax({
