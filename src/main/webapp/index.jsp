@@ -313,8 +313,8 @@
         <div style="float: left; width: 170px; height: 200px; margin-top: 26%; margin-left: 23%;">
             <img style="width: 170px; height: 48px;" src="https://file.ourbeibei.com/l_e/common/wx_button.png" id="wx_show_listen">
             <div style="width: 170px;height: 150px; margin: 0; padding: 0;border: 0; display: none;" id="wx_show">
-                <div style="border-style: solid;margin-top: 10px;border-width: 0 10px 10px 10px;border-color: transparent transparent #000 transparent;width: 0;height: 0;"></div>
-                <img style="width: 140px;height: 140px; margin-top: 0;margin-left: 0;border:11px solid #000;" src="https://file.ourbeibei.com/l_e/common/wx_gzh_code.jpg">
+                <div style="border-style: solid;margin-top: 10px;border-width: 0 10px 10px 10px;border-color: transparent transparent #84e8e9 transparent;width: 0;height: 0;"></div>
+                <img style="width: 140px;height: 140px; margin-top: 0;margin-left: 0;border:11px solid #84e8e9;" src="https://file.ourbeibei.com/l_e/common/wx_gzh_code.jpg">
             </div>
         </div>
         <div style="float: left; width: 128px; height: 48px; margin-top: 26%; margin-left: 1%;">
