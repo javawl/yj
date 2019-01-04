@@ -516,7 +516,7 @@ public class AdminServiceImpl implements IAdminService {
                 List<Map<Object,Object>> virtual100User = common_configMapper.getTop100VirtualUserChallenge();
                 //循环找三十个
                 for (int j = 0; j < 30; j++){
-                    int number = (int)(0+Math.random()*(99+1));
+                    int number = (int)(0+Math.random()*(virtual100User.size() - 1 + 1));
                     if (j < 3){
                         common_configMapper.addVirtualInviteData(virtual100User.get(number).get("id").toString(),String.valueOf(reward));
                     }else if (j < 10){
@@ -583,7 +583,7 @@ public class AdminServiceImpl implements IAdminService {
                     if (Integer.valueOf(WordChallengeContestants.get(i).get("insist_day").toString()) >= 28){
                         //如果奖励金未领取的话划入我们的账户
                         List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(WordChallengeContestants.get(i).get("user_id").toString());
-                        if (Integer.valueOf(SelectPlan.get(0).get("challenge_red_packet").toString()) != 0){
+                        if ((int)(Double.valueOf(SelectPlan.get(0).get("challenge_red_packet").toString()) * 10) != 0){
                             common_configMapper.insertBank("id为" + WordChallengeContestants.get(i).get("user_id").toString() + "的用户未领取挑战金和奖励金",SelectPlan.get(0).get("challenge_red_packet").toString(),String.valueOf((new Date()).getTime()));
                         }
                         //挑战成功(把用户表状态清零在搞,在确认那一步)
@@ -591,7 +591,8 @@ public class AdminServiceImpl implements IAdminService {
                         //查看该人是否是别人邀请来的(把用户表状态累计)
                         Map<Object,Object> inviteInfo = common_configMapper.findUserWhetherInvited(WordChallengeContestants.get(i).get("word_challenge_id").toString(),WordChallengeContestants.get(i).get("user_id").toString());
                         if (inviteInfo != null){
-                            common_configMapper.makeInviteWordChallengeRedPacket("1",WordChallengeContestants.get(i).get("user_id").toString(),WordChallengeContestants.get(i).get("reward").toString(),WordChallengeContestants.get(i).get("reward").toString());
+                            //todo 注意reward有好几个不要搞乱了
+                            common_configMapper.makeInviteWordChallengeRedPacket("1",inviteInfo.get("invited_user_id").toString(),WordChallengeInfo.get("reward_each").toString(),WordChallengeContestants.get(i).get("reward").toString());
                         }
                     }else {
                         //失败的话在用户那里加入失败的记录
