@@ -59,6 +59,9 @@ public interface Common_configMapper {
     //用户领取邀请红包更新用户表
     int getWordChallengeInviteRedPack(@Param("bill") String bill,@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet);
 
+    //用户的挑战失败状态置空
+    int changeWordChallengeFailNormal(@Param("whether_challenge_fail") String whether_challenge_fail,@Param("id") String id);
+
     //在用户表把用户的邀请红包加上
     int makeInviteWordChallengeRedPacket(@Param("whether_invite_challenge_success") String whether_invite_challenge_success, @Param("id") String id, @Param("invite_challenge_red_packet") String invite_challenge_red_packet, @Param("invite_reward") String invite_reward);
 

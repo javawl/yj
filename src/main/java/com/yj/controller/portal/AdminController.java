@@ -1471,6 +1471,9 @@ public class AdminController {
                     list.add(new TemplateData("嘤嘤嘤，这期单词挑战差一丢就成功了呢~没关系！再来一次一定就成功了！" ,"#ffffff"));
                     wxMssVo.setParams(list);
                     CommonFunc.sendTemplateMessage(wxMssVo);
+
+                    //删除挑战失败的状态
+                    common_configMapper.changeWordChallengeFailNormal("0",all_user_fail.get(i).get("id").toString());
                 }
             }
         }catch (Exception e){

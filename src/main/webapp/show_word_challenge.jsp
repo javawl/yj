@@ -36,7 +36,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/show_word_challenge.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/show_word_challenge.do?page="+page+"&size="+size;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
