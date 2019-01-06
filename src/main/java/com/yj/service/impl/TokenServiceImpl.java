@@ -11,6 +11,8 @@ import com.yj.pojo.User;
 import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
 import com.yj.util.UrlUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -49,6 +51,8 @@ public class TokenServiceImpl implements ITokenService {
     @Autowired
     private ApplicationContext ctx;
 
+    private Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
+
     protected String code;
     protected String wxAppID;
     protected String wxAppSecret;
@@ -80,6 +84,7 @@ public class TokenServiceImpl implements ITokenService {
                     return ServerResponse.createBySuccess("成功！",token);
                 }catch (Exception e){
                     e.printStackTrace();
+                    logger.error("微信小程序登录异常",e.getStackTrace());
                     return ServerResponse.createByErrorMessage(e.getMessage());
                 }
             }
@@ -200,6 +205,7 @@ public class TokenServiceImpl implements ITokenService {
         } catch (Exception e) {
             transactionManager.rollback(status);
             e.printStackTrace();
+            logger.error("微信小程序登录异常",e.getStackTrace());
             throw new Exception(e.getMessage());
         }
     }
