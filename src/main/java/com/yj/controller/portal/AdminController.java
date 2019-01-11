@@ -1576,31 +1576,31 @@ public class AdminController {
                         if (CommonFunc.getNotTimeHour(new Date()) == 8){
                             //八点
                             //第一种情况
-                            common_configMapper.dailyAddVirtualUserWordNumber("10",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("10",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber < ratio2){
                         if (CommonFunc.getNotTimeHour(new Date()) == 9){
-                            common_configMapper.dailyAddVirtualUserWordNumber("15",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("15",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber < ratio3){
                         if (CommonFunc.getNotTimeHour(new Date()) == 10){
-                            common_configMapper.dailyAddVirtualUserWordNumber("25",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("25",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber < ratio4){
                         if (CommonFunc.getNotTimeHour(new Date()) == 11){
-                            common_configMapper.dailyAddVirtualUserWordNumber("30",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("30",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber < ratio5){
                         if (CommonFunc.getNotTimeHour(new Date()) == 12){
-                            common_configMapper.dailyAddVirtualUserWordNumber("35",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("35",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber < ratio6){
                         if (CommonFunc.getNotTimeHour(new Date()) == 13){
-                            common_configMapper.dailyAddVirtualUserWordNumber("40",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("40",virtualUser.get(j).get("id").toString());
                         }
                     }else if ((j+1)/countVirtualNumber <= ratio7){
                         if (CommonFunc.getNotTimeHour(new Date()) == 14){
-                            common_configMapper.dailyAddVirtualUserWordNumber("45",virtualUser.get(i).get("id").toString());
+                            common_configMapper.dailyAddVirtualUserWordNumber("45",virtualUser.get(j).get("id").toString());
                         }
                     }
                 }
