@@ -532,7 +532,7 @@
     WHERE `virtual_user`.status = 0
     AND lottery_draw_contestants.user_id = `virtual_user`.user_id
     AND lottery_draw_contestants.lottery_draw_id = #{lottery_draw_id}
-    LIMIT #{number}
+    order by rand() LIMIT #{number}
   </select>
 
 

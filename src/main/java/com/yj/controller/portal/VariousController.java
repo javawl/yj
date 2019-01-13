@@ -408,6 +408,13 @@ public class VariousController {
                     String uid = str_list[1];
                     //邀请用户id
                     String user_id = str_list[2];
+                    //判断是否报过名
+                    //报过名不能报(任意未结束一期)
+                    Map<Object,Object> word_challenge = common_configMapper.find_user_attend_challenge(now_time,uid);
+                    if (word_challenge != null){
+                        logger.error("微信支付成功，但是已经报过名了不可再报！");
+                        throw new Exception("微信支付成功，但是已经报过名了不可再报！");
+                    }
                     //插入参与数据库
                     common_configMapper.insertWordChallengeContestantsReal(uid,word_challenge_id,now_time);
                     //插入单词挑战总数据库
