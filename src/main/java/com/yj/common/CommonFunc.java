@@ -815,7 +815,8 @@ public class CommonFunc {
         Long long_one_day = Const.ONE_DAY_DATE / 1000L;
         Double one_day = long_one_day.doubleValue();
         int days = (int) Math.floor((end_d - begin_d) / one_day);
-        return days;
+        //要算上今天所以加一
+        return days + 1;
     }
 
     //验证传入数据是否为空
