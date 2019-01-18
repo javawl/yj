@@ -384,6 +384,14 @@
     LIMIT 0,3)
   </select>
 
+  <select id="homePageFirstGetChange" resultType="map" parameterType="int">
+    SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
+    FROM feeds,`user`
+    WHERE auther_id = `user`.id
+    ORDER BY feeds.set_time DESC
+    LIMIT #{start},6
+  </select>
+
 
   <select id="authorFeeds" resultType="map">
     SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id

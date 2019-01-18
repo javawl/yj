@@ -40,6 +40,20 @@ public class homeController {
         return iHomeService.home_page_info(request);
     }
 
+
+    /**
+     * 加载更多feeds流
+     * @param page
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "more_feeds.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map>> more_feeds(String page, HttpServletRequest request){
+        //调用service层
+        return iHomeService.more_feeds(page, request);
+    }
+
     /**
      * 喜欢和取消喜欢
      * @param id

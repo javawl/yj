@@ -171,7 +171,7 @@ public class HomeServiceImpl implements IHomeService {
                 }
 
                 //查出feeds信息并捡出有用的
-                List<Map> feeds = dictionaryMapper.homePageFirstGet();
+                List<Map> feeds = dictionaryMapper.homePageFirstGetChange(0);
                 List<Map> feeds_result = new ArrayList<Map>();
                 for(int i = 0; i < feeds.size(); i++){
                     Map m2 = feeds.get(i);
@@ -315,6 +315,72 @@ public class HomeServiceImpl implements IHomeService {
                 logger.error("查找信息有误",e.getStackTrace());
                 logger.error("查找信息有误",e);
                 return ServerResponse.createByErrorMessage("查找信息有误！");
+            }
+        }
+    }
+
+
+    public ServerResponse<List<Map>> more_feeds(String page, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        //创建map来装几条信息
+        Map<Object,Object> m1 = new HashMap<Object,Object>();
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            try {
+                //将页数和大小转化为limit(大小为6)
+                int start = Integer.valueOf(page) * 6;
+                //查出feeds信息并捡出有用的
+                List<Map> feeds = dictionaryMapper.homePageFirstGetChange(start);
+                List<Map> feeds_result = new ArrayList<Map>();
+                for(int i = 0; i < feeds.size(); i++){
+                    Map m2 = feeds.get(i);
+                    Map<String,Object> m3 = new HashMap<String,Object>();
+                    //当type为0是视频，为1是图片
+                    if (m2.get("cover_select").toString().equals("1")){
+                        m3.put("type",0);
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                    }else {
+                        m3.put("type",1);
+                        m3.put("pic",Const.FTP_PREFIX+m2.get("pic"));
+                        m3.put("video",Const.FTP_PREFIX+m2.get("video"));
+                    }
+                    //todo 是否喜欢
+                    Map is_favour = dictionaryMapper.findIsFavour(id,m2.get("id").toString());
+                    if (is_favour == null){
+                        m3.put("is_favour",0);
+                    }else {
+                        m3.put("is_favour",1);
+                    }
+                    m3.put("id",m2.get("id"));
+                    m3.put("title",m2.get("title"));
+                    m3.put("likes",m2.get("favours"));
+                    m3.put("comments",m2.get("comments"));
+                    m3.put("author_username",m2.get("username"));
+                    m3.put("author_id",m2.get("user_id"));
+                    if (m2.get("portrait")==null){
+                        m3.put("author_portrait",null);
+                    }else {
+                        m3.put("author_portrait",Const.FTP_PREFIX+m2.get("portrait"));
+                    }
+                    feeds_result.add(m3);
+                }
+                return ServerResponse.createBySuccess("成功!",feeds_result);
+            }catch (Exception e){
+                logger.error("更多feeds流出错",e.getStackTrace());
+                logger.error("更多feeds流出错",e);
+                return ServerResponse.createByErrorMessage("更多feeds流出错");
             }
         }
     }

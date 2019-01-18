@@ -15,6 +15,9 @@ public interface IHomeService {
 
     ServerResponse<JSONObject> home_page_info(HttpServletRequest request);
 
+    //更多feeds
+    ServerResponse<List<Map>> more_feeds(String page, HttpServletRequest request);
+
     //评论
     ServerResponse<String> comment_feeds(String id, String comment, HttpServletRequest request);
 

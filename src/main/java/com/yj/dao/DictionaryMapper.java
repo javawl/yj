@@ -29,6 +29,9 @@ public interface DictionaryMapper {
     //获取首页的feeds流的信息
     List<Map> homePageFirstGet();
 
+    //获取首页的feeds流的信息(只按发布时间获取)
+    List<Map> homePageFirstGetChange(@Param("start") int start);
+
     //获取作者页的feeds流的信息
     List<Map> authorFeeds(@Param("start") int start,@Param("size") int page,@Param("id") String id);
 
