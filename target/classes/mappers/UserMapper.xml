@@ -470,6 +470,13 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getHomePagePortraitRandom" resultType="map" parameterType="int">
+    SELECT portrait
+    FROM `user`
+    WHERE portrait like 'http%'
+    order by rand() limit #{size}
+  </select>
+
   <delete id="deleteTakePlans" parameterType="string" >
     delete from take_plans
     WHERE user_id = #{id}

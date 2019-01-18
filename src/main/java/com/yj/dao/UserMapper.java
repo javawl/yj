@@ -90,6 +90,9 @@ public interface UserMapper {
     //获取用户头像
     String getUserPortrait(@Param("id") String id);
 
+    //获取用户头像
+    List<Map<Object,Object>> getHomePagePortraitRandom(@Param("size") int size);
+
     //删除选择计划表
     int deleteTakePlans(@Param("id") String id, @Param("plan") String plan);
 

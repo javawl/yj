@@ -219,14 +219,13 @@ public class HomeServiceImpl implements IHomeService {
                 //随机抽取用户头像
                 //获取随机数最大值
                 int Max_id = dictionaryMapper.homePagePortraitMaxId();
-                List<Object> head_user_portrait = new ArrayList<>();
-                Random random = new Random();
-                for (int i=0;i<7;i++) {
-                    int user_id = (int)(Math.random()*(Max_id-7+1)+7);
-                    System.out.println(user_id);
-                    head_user_portrait.add(Const.FTP_PREFIX + userMapper.getUserPortrait(String.valueOf(user_id)));
+                //使用sql语句随机获取7个http开头的用户头像
+                List<Object> headUserPortraitArray = new ArrayList<>();
+                List<Map<Object,Object>> head_user_portrait = userMapper.getHomePagePortraitRandom(7);
+                for (int i=0;i<head_user_portrait.size();i++) {
+                    headUserPortraitArray.add(CommonFunc.judgePicPath(head_user_portrait.get(i).get("portrait").toString()));
                 }
-                m1.put("head_user_portrait",head_user_portrait);
+                m1.put("head_user_portrait",headUserPortraitArray);
                 //转json
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue));
 
