@@ -9,6 +9,13 @@ import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
+import com.yj.util.UrlUtil;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 
@@ -823,6 +832,80 @@ public class AdminController {
     @ResponseBody
     public ServerResponse delete_daily_pic(String id, HttpServletResponse response){
         return iAdminService.delete_daily_pic(id, response);
+    }
+
+
+    /**
+     * 给客户端获取小程序码
+     * @return
+     */
+    @RequestMapping(value = "qr_code_m_program.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Object> qr_code_m_program(String scene, String path, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            try{
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                Map<String, Object> params = new HashMap<>();
+                params.put("scene", scene);  //参数
+                params.put("page", path); //位置
+                params.put("width", 280);
+                params.put("is_hyaline", true);
+
+                CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+                HttpPost httpPost = new HttpPost("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+access_token.getAccessToken());  // 接口
+                httpPost.addHeader(HTTP.CONTENT_TYPE, "application/json");
+                String body = JSON.toJSONString(params);           //必须是json模式的 post
+                StringEntity entity;
+                entity = new StringEntity(body);
+                entity.setContentType("image/png");
+
+                httpPost.setEntity(entity);
+                HttpResponse response = httpClient.execute(httpPost);
+                InputStream inputStream = response.getEntity().getContent();
+                // 将获取流转为base64格式
+                String result = "";
+                byte[] data = null;
+                ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
+                byte[] buff = new byte[100];
+                int rc = 0;
+                while ((rc = inputStream.read(buff, 0, 100)) > 0) {
+                    swapStream.write(buff, 0, rc);
+                }
+                data = swapStream.toByteArray();
+
+                result = new String(Base64.getEncoder().encode(data));
+                return ServerResponse.createBySuccess("成功",result);
+//                JSONObject jsonObject = JSON.parseObject( UrlUtil.sendPost( WxConfig.qr_code_m_program ,requestUrlParam ));
+//                if (jsonObject.isEmpty()){
+//                    //判断抓取网页是否为空
+//                    return ServerResponse.createByErrorMessage("获取session_key及openID时异常，微信内部错误");
+//                }else {
+//                    Boolean Fail = jsonObject.containsKey("errcode");
+//                    if (Fail){
+//                        return ServerResponse.createByErrorCodeMessage(Integer.valueOf(jsonObject.get("errcode").toString()),jsonObject.get("errmsg").toString());
+//                    }else {
+//                        //没有报错
+//                        System.out.println(jsonObject);
+//                    }
+//                }
+            }catch (Exception e){
+                return ServerResponse.createByErrorMessage("非法操作"+e.getMessage());
+            }
+        }
     }
 
 
