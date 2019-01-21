@@ -1343,6 +1343,14 @@
     ORDER BY word
   </select>
 
+  <select id="countRecitingWords" resultType="string" parameterType="string">
+    SELECT count(word_id)
+    FROM reciting_words
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+    ORDER BY word
+  </select>
+
   <select id="welfareServiceOnlineNumber" resultType="int" parameterType="string">
     SELECT COUNT(id)
     FROM welfare_service
@@ -1459,6 +1467,14 @@
 
   <select id="selectMasteredWordsAll" resultType="map" parameterType="string">
     SELECT word_id as id,word,meaning
+    FROM mastered_words
+    WHERE plan = #{plan}
+    AND user_id = #{id}
+    ORDER BY word
+  </select>
+
+  <select id="countMasteredWords" resultType="string" parameterType="string">
+    SELECT count(word_id)
     FROM mastered_words
     WHERE plan = #{plan}
     AND user_id = #{id}

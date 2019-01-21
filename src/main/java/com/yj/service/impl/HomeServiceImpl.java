@@ -782,7 +782,7 @@ public class HomeServiceImpl implements IHomeService {
                     return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
                 }
 
-                return ServerResponse.createBySuccess("成功!",result);
+                return ServerResponse.createBySuccess(dictionaryMapper.countRecitingWords(plan,uid),result);
             }else{
                 //将页数和大小转化为limit
                 int start = (page_new - 1) * size_new;
@@ -793,7 +793,7 @@ public class HomeServiceImpl implements IHomeService {
                     return ServerResponse.createBySuccess("暂无已背单词",new ArrayList<Map>());
                 }
 
-                return ServerResponse.createBySuccess("成功!",result);
+                return ServerResponse.createBySuccess(dictionaryMapper.countRecitingWords(plan,uid),result);
             }
         }
     }
@@ -833,7 +833,7 @@ public class HomeServiceImpl implements IHomeService {
                 if (result == null){
                     return ServerResponse.createBySuccess("暂无未背单词",new ArrayList<Map>());
                 }
-                return ServerResponse.createBySuccess("成功!",result);
+                return ServerResponse.createBySuccess(dictionaryMapper.countMasteredWords(plan,uid),result);
             }else{
                 //将页数和大小转化为limit
                 int start = (page_new - 1) * size_new;
@@ -843,7 +843,7 @@ public class HomeServiceImpl implements IHomeService {
                 if (result == null){
                     return ServerResponse.createBySuccess("暂无已掌握单词",new ArrayList<Map>());
                 }
-                return ServerResponse.createBySuccess("成功!",result);
+                return ServerResponse.createBySuccess(dictionaryMapper.countMasteredWords(plan,uid),result);
             }
         }
     }

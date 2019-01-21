@@ -435,6 +435,9 @@ public interface DictionaryMapper {
     //已背单词(all)
     List<Map> selectRecitingWordsAll(@Param("plan") String plan, @Param("id") String id);
 
+    //已背单词总数
+    String countRecitingWords(@Param("plan") String plan, @Param("id") String id);
+
     //正在进行的福利社
     int welfareServiceOnlineNumber(@Param("time") String time);
 
@@ -461,6 +464,9 @@ public interface DictionaryMapper {
 
     //已掌握单词(all)
     List<Map> selectMasteredWordsAll(@Param("plan") String plan, @Param("id") String id);
+
+    //获取已掌握单词总数
+    String countMasteredWords(@Param("plan") String plan, @Param("id") String id);
 
     //视频浏览量+1
     int addViews(@Param("id") String id);

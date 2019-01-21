@@ -1208,7 +1208,7 @@ public class UserServiceImpl implements IUserService {
                 user_info_result.put("remaining_words",0);
             }
             user_info_result.put("user_id",id);
-            user_info_result.put("portrait", Const.FTP_PREFIX + user_information.get("portrait"));
+            user_info_result.put("portrait", CommonFunc.judgePicPath(user_information.get("portrait").toString()));
             user_info_result.put("gender",user_information.get("gender"));
             user_info_result.put("username",user_information.get("username"));
             user_info_result.put("personality_signature",user_information.get("personality_signature"));

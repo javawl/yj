@@ -792,6 +792,8 @@ public class AdminServiceImpl implements IAdminService {
         }catch (Exception e){
             transactionManager.rollback(status);
             e.printStackTrace();
+            logger.error("feeds上传异常",e.getStackTrace());
+            logger.error("feeds上传异常",e.getMessage());
             return ServerResponse.createByErrorMessage("更新出错！（太长了）");
         }
     }
