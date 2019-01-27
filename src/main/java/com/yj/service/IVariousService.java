@@ -79,4 +79,17 @@ public interface IVariousService {
 
     //我的邀请(单词挑战)
     ServerResponse<Map<Object,Object>> my_invite_word_challenge(HttpServletRequest request);
+
+
+    //阅读挑战报名页
+    ServerResponse<Map<Object,Object>> showReadClass(HttpServletRequest request);
+
+    //展现已选课程老师信息
+    ServerResponse<Map<Object,Object>> showSelectReadClassTeacher(HttpServletRequest request);
+
+    //展现书籍简介
+    ServerResponse<Map<Object,Object>> showReadClassBookIntroduction(String book_id, HttpServletRequest request);
+
+    //支付
+    ServerResponse<Map<String, Object>> readChallengePay(HttpServletRequest request);
 }

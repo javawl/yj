@@ -385,4 +385,28 @@ public interface Common_configMapper {
 
     //展示查看用户往期活动成功条数
     int find_user_whether_success_challenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    //这里是单词阅读的sql代码
+    //展示单词挑战首页
+    Map<Object,Object> showReadClass(@Param("now_time") String  now_time);
+
+    //展示某期下面的所有系列包括内部书籍信息
+    List<Map<Object,Object>> showReadClassSeries(@Param("read_class_id") String  read_class_id);
+
+    //展现用户报名的且未结束的那一期的系列和本期的信息
+    Map<Object,Object> showSelectBeginReadClassSeries(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
+    //根据系列展现老师
+    Map<Object,Object> showReadClassSeriesTeacher(@Param("series_id") String  series_id);
+
+    //根据书籍id查书籍信息
+    Map<Object,Object> showReadClassBookIntroduction(@Param("book_id") String  book_id);
+
+    //报名参与阅读
+    int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

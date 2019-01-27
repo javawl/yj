@@ -700,6 +700,69 @@
     AND word_challenge_contestants.insist_day >= 28
   </select>
 
+
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <!--这里是单词阅读的sql代码-->
+  <select id="showReadClass" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class
+    WHERE read_class.eroll_st &lt; #{now_time}
+    AND read_class.st > #{now_time}
+    ORDER BY read_class.st ASC
+    LIMIT 1
+  </select>
+
+  <select id="showReadClassSeries" resultType="map" parameterType="string">
+    SELECT tb2.*,read_class_book.*,read_class_book.`name` as book_name
+    FROM read_class_book,
+    (SELECT tb.name,tb.id as series_id,tb.word_number_need,read_class_series_book.book_id
+    FROM read_class_series_book,
+    (SELECT *
+    FROM read_class_series
+    WHERE read_class_series.read_class_id = #{read_class_id}) tb
+    WHERE read_class_series_book.series_id = tb.id) tb2
+    WHERE read_class_book.id = tb2.book_id
+  </select>
+
+  <select id="showSelectBeginReadClassSeries" resultType="map" parameterType="string">
+    SELECT tb2.*,read_class.*
+    FROM read_class,
+         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id
+          FROM read_class_series,
+               (SELECT series_id
+                FROM read_class_contestants
+                WHERE read_class_contestants.user_id = #{user_id}) tb
+          WHERE read_class_series.id = tb.series_id) tb2
+    WHERE read_class.id = tb2.read_class_id
+    AND read_class.eroll_st &lt; #{now_time}
+    AND et > #{now_time}
+    LIMIT 1
+  </select>
+
+  <select id="showReadClassSeriesTeacher" resultType="map" parameterType="string">
+    SELECT qr_code
+    FROM read_class_teacher
+    WHERE read_class_teacher.series_id = #{series_id}
+  </select>
+
+  <select id="showReadClassBookIntroduction" resultType="map" parameterType="string">
+    SELECT pic,`name`,author,introduction
+    FROM read_class_book
+    WHERE read_class_book.id = #{book_id}
+  </select>
+
+
+  <insert id="insertReadChallengeContestantsReal" parameterType="string">
+    INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`)
+    values (#{user_id},#{series_id},#{set_time},0,0)
+  </insert>
+
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+
+
   <update id="changeDailyFinishWork">
     UPDATE data_info
     set `daily_finish_work` = daily_finish_work + #{daily_finish_work}
