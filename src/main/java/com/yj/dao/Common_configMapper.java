@@ -399,6 +399,9 @@ public interface Common_configMapper {
     //展现用户报名的且未结束的那一期的系列和本期的信息
     Map<Object,Object> showSelectBeginReadClassSeries(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 
+    //展现用户报名的助力的且未结束的那一期的系列和本期的信息
+    Map<Object,Object> showSelectBeginReadClassSeriesHelp(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
     //根据系列展现老师
     Map<Object,Object> showReadClassSeriesTeacher(@Param("series_id") String  series_id);
 
@@ -407,6 +410,9 @@ public interface Common_configMapper {
 
     //报名参与阅读
     int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+
+    //报名助力参与阅读
+    int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

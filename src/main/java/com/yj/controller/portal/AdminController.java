@@ -862,7 +862,7 @@ public class AdminController {
                 params.put("scene", scene);  //参数
                 params.put("page", path); //位置
                 params.put("width", 280);
-                params.put("is_hyaline", true);
+                params.put("is_hyaline", false);
 
                 CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 

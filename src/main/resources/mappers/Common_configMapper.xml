@@ -740,6 +740,21 @@
     LIMIT 1
   </select>
 
+  <select id="showSelectBeginReadClassSeriesHelp" resultType="map" parameterType="string">
+    SELECT tb2.*,read_class.*
+    FROM read_class,
+         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id
+          FROM read_class_series,
+               (SELECT series_id
+                FROM read_class_help_sign_up
+                WHERE read_class_help_sign_up.user_id = #{user_id}) tb
+          WHERE read_class_series.id = tb.series_id) tb2
+    WHERE read_class.id = tb2.read_class_id
+    AND read_class.eroll_st &lt; #{now_time}
+    AND et > #{now_time}
+    LIMIT 1
+  </select>
+
   <select id="showReadClassSeriesTeacher" resultType="map" parameterType="string">
     SELECT qr_code
     FROM read_class_teacher
@@ -756,6 +771,12 @@
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`)
     values (#{user_id},#{series_id},#{set_time},0,0)
+  </insert>
+
+
+  <insert id="insertReadChallengeContestantsHelp" parameterType="string">
+    INSERT INTO read_class_help_sign_up (user_id,series_id,set_time)
+    values (#{user_id},#{series_id},#{set_time})
   </insert>
 
 

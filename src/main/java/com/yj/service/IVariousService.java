@@ -92,4 +92,7 @@ public interface IVariousService {
 
     //支付
     ServerResponse<Map<String, Object>> readChallengePay(HttpServletRequest request);
+
+    //助力支付
+    ServerResponse<Map<String, Object>> readChallengeHelpPay(HttpServletRequest request);
 }
