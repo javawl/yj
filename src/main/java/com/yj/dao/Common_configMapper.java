@@ -202,6 +202,9 @@ public interface Common_configMapper {
     //插入模板消息的form_id
     int insertTemplateFormId(@Param("user_id") String user_id,@Param("wechat") String wechat,@Param("form_id") String form_id,@Param("set_time") String set_time);
 
+    //记录支付
+    int insertPayRecord(@Param("user_id") String user_id,@Param("type") String type,@Param("set_time") String set_time);
+
     //后台获取每日的那些信息（DAU等）
     List<Map> getDailyAdminInfo(@Param("start") int start, @Param("size") int size);
 

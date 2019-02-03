@@ -1240,6 +1240,8 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
+                //这里先记录一下用户的支付情况
+                common_configMapper.insertPayRecord(uid,"1",now_time);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);

@@ -204,6 +204,11 @@
     values (#{user_id},#{wechat},#{form_id},#{set_time})
   </insert>
 
+  <insert id="insertPayRecord" parameterType="string">
+    INSERT INTO pay_record (user_id,`type`,set_time)
+    values (#{user_id},#{type},#{set_time})
+  </insert>
+
   <select id="getDailyAdminInfo" resultType="map">
     SELECT  *
     FROM `data_info`
