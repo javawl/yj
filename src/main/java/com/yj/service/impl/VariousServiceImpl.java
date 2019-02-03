@@ -1483,6 +1483,7 @@ public class VariousServiceImpl implements IVariousService {
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(book_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -1506,11 +1507,12 @@ public class VariousServiceImpl implements IVariousService {
      * 发起阅读活动微信支付
      * @param request  request
      */
-    public ServerResponse<Map<String, Object>> readChallengePay(HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> readChallengePay(String series_id, HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(series_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -1536,10 +1538,15 @@ public class VariousServiceImpl implements IVariousService {
             if (readClass == null){
                 return ServerResponse.createByErrorMessage("没有可报名的阅读！");
             }
-            String readClassId = readClass.get("id").toString();
-            String st = readClass.get("st").toString();
+            //判断该系列属于的阅读的时间
+            Map<Object,Object> selectReadClass = common_configMapper.showSeriesReadClass(series_id);
+            String eroll_st = selectReadClass.get("eroll_st").toString();
+            String st = selectReadClass.get("st").toString();
             if (Long.valueOf(st) <= Long.valueOf(now_time)){
                 return ServerResponse.createByErrorMessage("阅读已开始不可报名！");
+            }
+            if (Long.valueOf(eroll_st) > Long.valueOf(now_time)){
+                return ServerResponse.createByErrorMessage("阅读尚未到报名时间");
             }
 
             //生成的随机字符串
@@ -1556,7 +1563,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", readClassId + "_" + uid + "_" + "_" + now_time);//商户订单号
+            packageParams.put("out_trade_no", series_id + "_" + uid + "_" + "_" + now_time);//商户订单号
             packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.read_notify_url);//支付成功后的回调地址
@@ -1578,7 +1585,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + WxPayConfig.read_notify_url + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
-                    + "<out_trade_no>" + readClassId + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
+                    + "<out_trade_no>" + series_id + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
@@ -1632,11 +1639,12 @@ public class VariousServiceImpl implements IVariousService {
      * 发起阅读活动微信支付(需要助力的支付)
      * @param request  request
      */
-    public ServerResponse<Map<String, Object>> readChallengeHelpPay(HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> readChallengeHelpPay(String series_id, HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
+            add(series_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -1662,10 +1670,15 @@ public class VariousServiceImpl implements IVariousService {
             if (readClass == null){
                 return ServerResponse.createByErrorMessage("没有可报名的阅读！");
             }
-            String readClassId = readClass.get("id").toString();
-            String st = readClass.get("st").toString();
+            //判断该系列属于的阅读的时间
+            Map<Object,Object> selectReadClass = common_configMapper.showSeriesReadClass(series_id);
+            String st = selectReadClass.get("st").toString();
             if (Long.valueOf(st) <= Long.valueOf(now_time)){
                 return ServerResponse.createByErrorMessage("阅读已开始不可报名！");
+            }
+            String eroll_st = selectReadClass.get("eroll_st").toString();
+            if (Long.valueOf(eroll_st) > Long.valueOf(now_time)){
+                return ServerResponse.createByErrorMessage("阅读尚未到报名时间");
             }
 
             //生成的随机字符串
@@ -1682,7 +1695,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", readClassId + "_" + uid + "_" + "_" + now_time);//商户订单号
+            packageParams.put("out_trade_no", series_id + "_" + uid + "_" + "_" + now_time);//商户订单号
             packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.read_help_pay_notify);//支付成功后的回调地址
@@ -1704,7 +1717,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + WxPayConfig.read_help_pay_notify + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
-                    + "<out_trade_no>" + readClassId + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
+                    + "<out_trade_no>" + series_id + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
@@ -1741,6 +1754,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("appid", WxConfig.wx_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
                 response.put("user_id", uid);
+                response.put("series_id", series_id);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -1750,6 +1764,77 @@ public class VariousServiceImpl implements IVariousService {
             logger.error("支付失败",e.getStackTrace());
             logger.error("支付失败",e);
             return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+
+    /**
+     * 助力阅读
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request) {
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>() {{
+            add(token);
+            add(user_id);
+            add(series_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request, token);
+        if (uid == null) {
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
+        }else {
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
+            //判断该系列属于的阅读的时间
+            Map<Object,Object> selectReadClass = common_configMapper.showSeriesReadClass(series_id);
+            String eroll_st = selectReadClass.get("eroll_st").toString();
+            if (Long.valueOf(eroll_st) > Long.valueOf(now_time)){
+                return ServerResponse.createByErrorMessage("阅读尚未到报名时间");
+            }
+            String st = selectReadClass.get("st").toString();
+            if (Long.valueOf(st) <= Long.valueOf(now_time)){
+                return ServerResponse.createByErrorMessage("阅读已开始不可报名！");
+            }
+            //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
+            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid,series_id);
+            if (check == null){
+                return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
+            }
+            String helpId = check.get("id").toString();
+            //先查助力了几次
+            List<Map<Object,Object>> countTimes = common_configMapper.countReadChallengeHelpAttend(uid, helpId, uid);
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                int times = countTimes.size();
+                if (times >= 2){
+                    //已经两次了，第三次如果成功就成功了
+                    //插入表中
+                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid);
+                    //将报名加入正式的表中
+                    //插入参与数据库
+                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
+                }else{
+                    //插入表中
+                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid);
+                }
+                return ServerResponse.createBySuccessMessage("成功！");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("阅读报名助力异常",e.getStackTrace());
+                logger.error("阅读报名助力失败",e);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("助力失败！");
+            }
         }
     }
 }

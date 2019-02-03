@@ -761,18 +761,55 @@
     WHERE read_class_teacher.series_id = #{series_id}
   </select>
 
+  <select id="showSeriesReadClass" resultType="map" parameterType="string">
+    SELECT  read_class.*,tb.*
+    FROM read_class,
+    (SELECT `name` as series, read_class_id, word_number_need, id as series_id
+    FROM read_class_series
+    WHERE read_class_series.id = #{series_id}) tb
+    WHERE read_class.id = tb.read_class_id
+  </select>
+
   <select id="showReadClassBookIntroduction" resultType="map" parameterType="string">
     SELECT pic,`name`,author,introduction
     FROM read_class_book
     WHERE read_class_book.id = #{book_id}
   </select>
 
+  <select id="checkReadChallengeHelpAttend" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_help_sign_up
+    WHERE read_class_help_sign_up.series_id = #{series_id}
+    AND read_class_help_sign_up.user_id = #{user_id}
+    AND is_effective = 0
+    ORDER BY set_time DESC
+    LIMIT 1
+  </select>
+
+  <select id="selectSeriesIdByHelpId" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_help_sign_up
+    WHERE id = #{id}
+  </select>
+
+  <select id="countReadChallengeHelpAttend" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_help
+    WHERE read_class_help.help_sign_up_id = #{help_sign_up_id}
+    AND read_class_help.user_id = #{user_id}
+    AND read_class_help.helper_id = #{helper_id}
+    LIMIT 1
+  </select>
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`)
     values (#{user_id},#{series_id},#{set_time},0,0)
   </insert>
 
+  <insert id="insertReadChallengeHelp" parameterType="string">
+    INSERT INTO read_class_help (user_id,help_sign_up_id,helper_id)
+    values (#{user_id},#{help_sign_up_id},#{helper_id})
+  </insert>
 
   <insert id="insertReadChallengeContestantsHelp" parameterType="string">
     INSERT INTO read_class_help_sign_up (user_id,series_id,set_time)

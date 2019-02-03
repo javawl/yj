@@ -534,9 +534,9 @@ public class VariousController {
      */
     @RequestMapping(value = "readChallengePay.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Map<String, Object>> readChallengePay(HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> readChallengePay(String series_id, HttpServletRequest request){
         //调用service层
-        return iVariousService.readChallengePay(request);
+        return iVariousService.readChallengePay(series_id, request);
     }
 
     /**
@@ -582,7 +582,7 @@ public class VariousController {
                     /**此处添加自己的业务逻辑代码start**/
                     String[] str_list = out_trade_no.split("_");
                     String now_time = String.valueOf((new Date()).getTime());
-                    String read_challenge_id = str_list[0];
+                    String series_id = str_list[0];
                     //获取用户id
                     String uid = str_list[1];
                     //判断是否报过名
@@ -593,7 +593,7 @@ public class VariousController {
                         throw new Exception("微信支付成功，但是已经报过名了不可再报！");
                     }
                     //插入参与数据库
-                    common_configMapper.insertReadChallengeContestantsReal(uid,read_challenge_id,now_time);
+                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
 //                    //插入单词挑战总数据库
 //                    common_configMapper.changeWordChallengeEnroll(word_challenge_id);
 //                    if (!user_id.equals("no")){
@@ -669,9 +669,9 @@ public class VariousController {
      */
     @RequestMapping(value = "readChallengeHelpPay.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<Map<String, Object>> readChallengeHelpPay(HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> readChallengeHelpPay(String series_id, HttpServletRequest request){
         //调用service层
-        return iVariousService.readChallengeHelpPay(request);
+        return iVariousService.readChallengeHelpPay(series_id, request);
     }
 
     /**
@@ -717,7 +717,7 @@ public class VariousController {
                     /**此处添加自己的业务逻辑代码start**/
                     String[] str_list = out_trade_no.split("_");
                     String now_time = String.valueOf((new Date()).getTime());
-                    String read_challenge_id = str_list[0];
+                    String series_id = str_list[0];
                     //获取用户id
                     String uid = str_list[1];
                     //判断是否报过名
@@ -734,7 +734,7 @@ public class VariousController {
                         throw new Exception("微信支付成功，但是已经报过名了不可再报！");
                     }
                     //插入参与数据库
-                    common_configMapper.insertReadChallengeContestantsHelp(uid,read_challenge_id,now_time);
+                    common_configMapper.insertReadChallengeContestantsHelp(uid,series_id,now_time);
 //                    //插入单词挑战总数据库
 //                    common_configMapper.changeWordChallengeEnroll(word_challenge_id);
 //                    if (!user_id.equals("no")){
@@ -800,5 +800,16 @@ public class VariousController {
             out.flush();
             out.close();
         }
+    }
+
+
+    /**
+     * 用户点击助力按钮
+     */
+    @RequestMapping(value="helpReadClass.do")
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.helpReadClass(series_id, user_id, request);
     }
 }

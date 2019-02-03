@@ -405,11 +405,26 @@ public interface Common_configMapper {
     //根据系列展现老师
     Map<Object,Object> showReadClassSeriesTeacher(@Param("series_id") String  series_id);
 
+    //根据系列展现期数
+    Map<Object,Object> showSeriesReadClass(@Param("series_id") String  series_id);
+
     //根据书籍id查书籍信息
     Map<Object,Object> showReadClassBookIntroduction(@Param("book_id") String  book_id);
 
+    //根据书籍id查书籍信息
+    Map<Object,Object> checkReadChallengeHelpAttend(@Param("user_id") String  user_id, @Param("series_id") String  series_id);
+
+    //根据助力id找到用户想加的series
+    Map<Object,Object> selectSeriesIdByHelpId(@Param("id") String  id);
+
+    //计算有几个人助力了
+    List<Map<Object,Object>> countReadChallengeHelpAttend(@Param("user_id") String  user_id, @Param("help_sign_up_id") String  help_sign_up_id, @Param("helper_id") String  helper_id);
+
     //报名参与阅读
     int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+
+    //助力表插入
+    int insertReadChallengeHelp(@Param("user_id") String user_id,@Param("help_sign_up_id") String help_sign_up_id,@Param("helper_id") String helper_id);
 
     //报名助力参与阅读
     int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);

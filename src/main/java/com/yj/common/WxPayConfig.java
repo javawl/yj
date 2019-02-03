@@ -6,7 +6,7 @@ public class WxPayConfig {
     //微信支付的商户密钥
     public static final String key = "Beibeibeidanci12Beibeibeidanci12";
     //支付成功后的服务器回调url
-    public static final String notify_url = "https://www.ourbeibei.com:8080/various/wxPayNotify.do";
+    public static final String notify_url = "https://www.ourbeibei.com/various/wxPayNotify.do";
     //阅读支付成功后的服务器回调url
     public static final String read_notify_url = "http://123.207.85.37:8080/various/readPayNotify.do";
     //阅读支付成功后的服务器回调url

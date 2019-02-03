@@ -91,8 +91,11 @@ public interface IVariousService {
     ServerResponse<Map<Object,Object>> showReadClassBookIntroduction(String book_id, HttpServletRequest request);
 
     //支付
-    ServerResponse<Map<String, Object>> readChallengePay(HttpServletRequest request);
+    ServerResponse<Map<String, Object>> readChallengePay(String series_id, HttpServletRequest request);
 
     //助力支付
-    ServerResponse<Map<String, Object>> readChallengeHelpPay(HttpServletRequest request);
+    ServerResponse<Map<String, Object>> readChallengeHelpPay(String series_id, HttpServletRequest request);
+
+    //助力
+    ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request);
 }
