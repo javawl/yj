@@ -1839,4 +1839,29 @@ public class VariousServiceImpl implements IVariousService {
             }
         }
     }
+
+
+//    //获取阅读的三个头像和series_id
+//    public ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request){
+//        String token = request.getHeader("token");
+//        //验证参数是否为空
+//        List<Object> l1 = new ArrayList<Object>(){{
+//            add(token);
+//        }};
+//        String CheckNull = CommonFunc.CheckNull(l1);
+//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+//        //验证token
+//        String uid = CommonFunc.CheckToken(request,token);
+//        if (uid == null){
+//            //未找到
+//            return ServerResponse.createByErrorMessage("身份认证错误！");
+//        }else{
+//            //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
+//            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid,series_id);
+//            if (check == null){
+//                return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
+//            }
+//            return ServerResponse.createBySuccess("成功！", result);
+//        }
+//    }
 }

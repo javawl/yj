@@ -8,4 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IFileService {
 
     String upload(MultipartFile file, String path, String removePath);
+
+
+    String upload_uncompressed(MultipartFile file, String path, String removePath);
 }

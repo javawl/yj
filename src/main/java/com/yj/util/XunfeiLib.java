@@ -43,6 +43,7 @@ public class XunfeiLib  {
      * 返回合成监视器
      * @return
      */
+//    //——————————————————————————————————到时候注释掉
 //    public static SynthesizeToUriListener getSynthesize(){
 //        return new SynthesizeToUriListener() {
 //            //progress为合成进度0~100

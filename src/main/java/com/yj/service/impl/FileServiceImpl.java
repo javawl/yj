@@ -57,4 +57,36 @@ public class FileServiceImpl implements IFileService {
         }
         return targetFile.getName();
     }
+
+    //无压缩的
+    public String upload_uncompressed(MultipartFile file, String path, String removePath){
+        String fileName = file.getOriginalFilename();
+        //扩展名
+        String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String uploadFileName = UUID.randomUUID().toString()+"."+fileExtensionName;
+        logger.info("开始上传文件，上传文件的文件名:{}，上传的路径:{}，新文件名:{}",fileName,path,uploadFileName);
+
+        File fileDir = new File(path);
+        if (!fileDir.exists()){
+            fileDir.setWritable(true);
+            fileDir.mkdirs();
+        }
+        File targetFile = new File(path,uploadFileName);
+        logger.info(targetFile.toString());
+        try {
+            //上传文件
+            file.transferTo(targetFile);
+
+            //todo 将文件传到ftp服务器上
+            FTPUtill.uploadFile(Lists.newArrayList(targetFile),removePath);
+
+            //todo 上传完之后，删除upload下面的文件
+            targetFile.delete();
+        } catch (IOException e) {
+            logger.error("上传文件异常",e);
+            System.out.println(e);
+            return null;
+        }
+        return targetFile.getName();
+    }
 }
