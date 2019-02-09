@@ -840,6 +840,12 @@
     WHERE id = #{id}
   </update>
 
+  <update id="updateWordSentenceAudioByWord" parameterType="string">
+    UPDATE `dictionary` SET
+    `sentence_audio`= #{audio}
+    WHERE word = #{word}
+  </update>
+
   <update id="updateLearnedWord">
     UPDATE `take_plans` SET
     `learned_word_number`= learned_word_number + #{learned_word_number}
@@ -1415,7 +1421,7 @@
   </select>
 
   <select id="selectAllWord" resultType="map" parameterType="string">
-    SELECT id
+    SELECT id,sentence
     FROM dictionary
     WHERE word = #{word}
   </select>

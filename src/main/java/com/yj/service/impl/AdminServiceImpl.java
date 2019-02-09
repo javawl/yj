@@ -1033,4 +1033,56 @@ public class AdminServiceImpl implements IAdminService {
         return ServerResponse.createBySuccessMessage("成功");
     }
 
+
+    @Override
+    public ServerResponse<String> change_special_mp3( HttpServletResponse response, HttpServletRequest request) throws Exception{
+
+        File file = new File("E:/change.xls");
+        String[][] result = CommonFunc.getData(file, 0);
+        int rowLength = result.length;
+        for(int i=0;i<rowLength;i++) {
+            for(int j=0;j<result[i].length;j++) {
+                if (!result[i][j].trim().isEmpty()){
+                    result[i][j] = result[i][j].trim();
+                    System.out.print(result[i][j]+"\t\t");
+                    List<Map> dic_info = dictionaryMapper.selectAllWord(result[i][j]);
+                    if (dic_info.size() == 0) continue;
+                    String sentence = dic_info.get(0).get("sentence").toString();
+                    if (sentence.length() == 0){
+                        continue;
+                    }
+                    String uploadFileName = make_voice(sentence,response,request);
+                    uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
+                    //判断文件存不存在
+                    Boolean is_exist = existHttpPath(Const.FTP_PREFIX + uploadFileName);
+                    if (is_exist){
+                        dictionaryMapper.updateWordSentenceAudioByWord(result[i][j],uploadFileName);
+                    }
+                }
+            }
+            System.out.println();
+        }
+
+//        for (int j = 0; j < 24; j++){
+//            List<Map> word_list = dictionaryMapper.getWordByType(0,6000,19+j);
+////        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
+//            for (int i = 0; i < word_list.size(); i++){
+//                String id = word_list.get(i).get("id").toString();
+//                String sentence = word_list.get(i).get("sentence").toString();
+//                if (sentence.length() == 0){
+//                    continue;
+//                }
+//                String uploadFileName = make_voice(sentence,response,request);
+//                uploadFileName = "update_word/word_sentence_audio/" +uploadFileName;
+//                //判断文件存不存在
+//                Boolean is_exist = existHttpPath(Const.FTP_PREFIX + uploadFileName);
+//                if (is_exist){
+//                    dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
+//                }
+//            }
+//        }
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
 }

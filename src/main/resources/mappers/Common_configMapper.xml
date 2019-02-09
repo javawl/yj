@@ -784,8 +784,7 @@
   <select id="checkReadChallengeHelpAttend" resultType="map" parameterType="string">
     SELECT *
     FROM read_class_help_sign_up
-    WHERE read_class_help_sign_up.series_id = #{series_id}
-    AND read_class_help_sign_up.user_id = #{user_id}
+    WHERE read_class_help_sign_up.user_id = #{user_id}
     AND is_effective = 0
     ORDER BY set_time DESC
     LIMIT 1
@@ -797,13 +796,46 @@
     WHERE id = #{id}
   </select>
 
-  <select id="countReadChallengeHelpAttend" resultType="map" parameterType="string">
+  <select id="getUserLastClockReadChapterAndBookInfo" resultType="map" parameterType="string">
+    SELECT read_class_book.*,tb.*
+    FROM read_class_book,
+    (SELECT book_id,chapter_id,set_time
+    FROM read_class_clock_in
+    WHERE series_id = #{series_id}
+    AND user_id = #{user_id}) tb
+    WHERE read_class_book.id = tb.book_id
+    ORDER BY tb.set_time DESC
+  </select>
+
+  <select id="getSeriesBookAndChapter" resultType="map" parameterType="string">
+    SELECT read_class_chapter.*,tb.*,read_class_chapter.order as chapter_order
+    FROM read_class_chapter,
+    (SELECT book_id,`order`
+    FROM read_class_series_book
+    WHERE series_id = #{series_id}
+    ORDER BY `order`) tb
+    WHERE tb.book_id = read_class_chapter.book_id
+  </select>
+
+  <select id="getReadClassHelper" resultType="map" parameterType="string">
+    SELECT username,portrait
+    FROM `user`,
+    (SELECT *
+    FROM read_class_help
+    WHERE read_class_help.help_sign_up_id = #{help_sign_up_id}) tb
+    WHERE `user`.id = tb.helper_id
+  </select>
+
+  <select id="getReadClassHelperInfo" resultType="map" parameterType="string">
     SELECT *
     FROM read_class_help
     WHERE read_class_help.help_sign_up_id = #{help_sign_up_id}
-    AND read_class_help.user_id = #{user_id}
-    AND read_class_help.helper_id = #{helper_id}
-    LIMIT 1
+  </select>
+
+  <select id="getChapterInfoByChapterId" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_chapter
+    WHERE read_class_chapter.id = #{chapter_id}
   </select>
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">

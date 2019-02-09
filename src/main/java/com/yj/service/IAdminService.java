@@ -21,6 +21,8 @@ public interface IAdminService {
 
     ServerResponse<String> change_mp3( HttpServletResponse response, HttpServletRequest request);
 
+    ServerResponse<String> change_special_mp3( HttpServletResponse response, HttpServletRequest request) throws Exception;
+
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
     ServerResponse delete_feeds(String id, HttpServletResponse response);

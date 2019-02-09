@@ -98,4 +98,7 @@ public interface IVariousService {
 
     //助力
     ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request);
+
+    //已经助力缴费，获取邀请好友助力页面信息
+    ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request);
 }

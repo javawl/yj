@@ -70,7 +70,6 @@ public class HomeServiceImpl implements IHomeService {
                 Object insist_days = SelectPlan.get(0).get("insist_day");
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
-                Long during_time = (new Date().getTime() - Const.INIT_STUDY_TIME)/1000;
                 //立个flag返回用户是否有计划，0代表没有
                 int flag = 0;
                 //取我的计划的单词数
@@ -84,6 +83,15 @@ public class HomeServiceImpl implements IHomeService {
                     insist_days = 0;
                     word_number  = 0;
                     learned_word = 0;
+                    Long during_time = (new Date().getTime() - Const.INIT_STUDY_TIME)/1000;
+                    //计算有多少人背单词
+                    int all_people = Const.INIT_STUDY_PEOPLE;
+                    int ii = 0;
+                    while (ii < during_time){
+                        all_people += 3;
+                        ii+=2000;
+                    }
+                    m1.put("study_people",all_people);
                 }else {
                     word_number = Integer.parseInt(userMapper.getPlanWordsNumberByPlan(plan.toString()));
                     String learned_word_result = dictionaryMapper.getLearnedWordNumber(plan.toString(),id);
@@ -208,17 +216,8 @@ public class HomeServiceImpl implements IHomeService {
                 //将feeds流六条信息加进去
                 m1.put("feeds",feeds_result);
 
-                //计算有多少人背单词
-                int all_people = Const.INIT_STUDY_PEOPLE;
-                int ii = 0;
-                while (ii < during_time){
-                    all_people += 3;
-                    ii+=2000;
-                }
-                m1.put("study_people",all_people);
+
                 //随机抽取用户头像
-                //获取随机数最大值
-                int Max_id = dictionaryMapper.homePagePortraitMaxId();
                 //使用sql语句随机获取7个http开头的用户头像
                 List<Object> headUserPortraitArray = new ArrayList<>();
                 List<Map<Object,Object>> head_user_portrait = userMapper.getHomePagePortraitRandom(7);
@@ -229,23 +228,18 @@ public class HomeServiceImpl implements IHomeService {
                 //转json
                 JSONObject json = JSON.parseObject(JSON.toJSONString(m1, SerializerFeature.WriteMapNullValue));
 
-                //事务
-                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
-                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-                //隔离级别
-                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-                TransactionStatus status = transactionManager.getTransaction(def);
-                try {
-                    //在这里更新那些后台需要查看的数据（app日启动次数，dau）
-                    //计算上次登录时间有没有比今日零点大
-                    //获取当天0点时间戳
-                    String zero = CommonFunc.getZeroDate();
-                    //获取当月一号零点的时间戳
-                    String Month_one = CommonFunc.getMonthOneDate();
-                    //先判断当天有没有数据，有的话更新
-                    Map is_exist = userMapper.getDailyDataInfo(one);
-                    //注册当天不更新上次登录时间
-                    if (SelectPlan.get(0).get("last_login") == null && !CommonFunc.wheatherInADay(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()))){
+
+                //在这里更新那些后台需要查看的数据（app日启动次数，dau）
+                //计算上次登录时间有没有比今日零点大
+                //获取当天0点时间戳
+                String zero = CommonFunc.getZeroDate();
+                //获取当月一号零点的时间戳
+                String Month_one = CommonFunc.getMonthOneDate();
+                //先判断当天有没有数据，有的话更新
+                Map is_exist = userMapper.getDailyDataInfo(one);
+                //注册当天不更新上次登录时间
+                if (SelectPlan.get(0).get("last_login") == null){
+                    if (!CommonFunc.wheatherInADay(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()))){
                         //这种情况注册当天的登录
                         //注册当天不算dau
                         if (is_exist == null){
@@ -253,61 +247,53 @@ public class HomeServiceImpl implements IHomeService {
                         }else {
                             common_config.changeDauAndTimes(1,0,one);
                         }
-                    }else if (SelectPlan.get(0).get("last_login") == null && CommonFunc.wheatherInADay(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()))){
-                        //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
-                        common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
-                        if (is_exist == null){
-                            common_config.insertDataInfo(1,1,one, Month_one);
-                        }else {
-                            common_config.changeDauAndTimes(1,1,one);
-                        }
-                        common_config.changeMAU(1, Month_one);
-                    }else if (Long.valueOf(SelectPlan.get(0).get("last_login").toString()) < Long.valueOf(zero)){
-                        //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
-                        common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
-                        if (is_exist == null){
-                            common_config.insertDataInfo(1,1,one, Month_one);
-                        }else {
-                            common_config.changeDauAndTimes(1,1,one);
-                        }
-                        common_config.changeMAU(1, Month_one);
                     }else {
+                        //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
+                        common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
                         if (is_exist == null){
-                            common_config.insertDataInfo(1,0,one, Month_one);
+                            common_config.insertDataInfo(1,1,one, Month_one);
                         }else {
-                            common_config.changeDauAndTimes(1,0,one);
+                            common_config.changeDauAndTimes(1,1,one);
                         }
+                        common_config.changeMAU(1, Month_one);
                     }
-
-                    if (Integer.valueOf(SelectPlan.get(0).get("retention_flag").toString()) == 0){
-                        int decide = CommonFunc.retentionRank(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()));
-                        //获取注册那天零点多一秒的信息
-                        String register_one = CommonFunc.getRegisterTimeOne(SelectPlan.get(0).get("register_time").toString());
-                        if (decide == 1){
-                            //第二天
-                            //找出注册那天的0点多一秒
-                            //直接把数据加在那里因为有日增
-                            //不用判空因为添加注册额时候一定有了
-                            common_config.changeRetention(1,1,1,register_one);
-                            common_config.changeRetentionFlag(id,1);
-                        }else if (decide == 2){
-                            //七天内
-                            common_config.changeRetention(0,1,1,register_one);
-                            common_config.changeRetentionFlag(id,1);
-                        }else if (decide == 3){
-                            //一月内
-                            common_config.changeRetention(0,0,1,register_one);
-                            common_config.changeRetentionFlag(id,1);
-                        }
+                }else if (Long.valueOf(SelectPlan.get(0).get("last_login").toString()) < Long.valueOf(zero)){
+                    //这种情况就是今天第一次登录，那么要dau+1并更新上次登录时间
+                    common_config.changeLastLogin(id,String.valueOf((new Date()).getTime()));
+                    if (is_exist == null){
+                        common_config.insertDataInfo(1,1,one, Month_one);
+                    }else {
+                        common_config.changeDauAndTimes(1,1,one);
                     }
+                    common_config.changeMAU(1, Month_one);
+                }else {
+                    if (is_exist == null){
+                        common_config.insertDataInfo(1,0,one, Month_one);
+                    }else {
+                        common_config.changeDauAndTimes(1,0,one);
+                    }
+                }
 
-                    transactionManager.commit(status);
-                } catch (Exception e) {
-                    transactionManager.rollback(status);
-                    logger.error("首页获取失败",e.getStackTrace());
-                    logger.error("首页获取失败",e);
-                    e.printStackTrace();
-                    return ServerResponse.createByErrorMessage("获取失败！");
+                if (Integer.valueOf(SelectPlan.get(0).get("retention_flag").toString()) == 0){
+                    int decide = CommonFunc.retentionRank(SelectPlan.get(0).get("register_time").toString(),String.valueOf((new Date()).getTime()));
+                    //获取注册那天零点多一秒的信息
+                    String register_one = CommonFunc.getRegisterTimeOne(SelectPlan.get(0).get("register_time").toString());
+                    if (decide == 1){
+                        //第二天
+                        //找出注册那天的0点多一秒
+                        //直接把数据加在那里因为有日增
+                        //不用判空因为添加注册额时候一定有了
+                        common_config.changeRetention(1,1,1,register_one);
+                        common_config.changeRetentionFlag(id,1);
+                    }else if (decide == 2){
+                        //七天内
+                        common_config.changeRetention(0,1,1,register_one);
+                        common_config.changeRetentionFlag(id,1);
+                    }else if (decide == 3){
+                        //一月内
+                        common_config.changeRetention(0,0,1,register_one);
+                        common_config.changeRetentionFlag(id,1);
+                    }
                 }
                 return ServerResponse.createBySuccess("成功!",json);
             }catch (Exception e){

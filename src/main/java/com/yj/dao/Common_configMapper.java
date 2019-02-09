@@ -415,13 +415,25 @@ public interface Common_configMapper {
     Map<Object,Object> showReadClassBookIntroduction(@Param("book_id") String  book_id);
 
     //根据书籍id查书籍信息
-    Map<Object,Object> checkReadChallengeHelpAttend(@Param("user_id") String  user_id, @Param("series_id") String  series_id);
+    Map<Object,Object> checkReadChallengeHelpAttend(@Param("user_id") String  user_id);
 
     //根据助力id找到用户想加的series
     Map<Object,Object> selectSeriesIdByHelpId(@Param("id") String  id);
 
+    //根据助力id找到用户想加的series
+    List<Map<Object,Object>> getUserLastClockReadChapterAndBookInfo(@Param("series_id") String  series_id,@Param("user_id") String user_id);
+
+    //根据助力id找到用户想加的series
+    List<Map<Object,Object>> getSeriesBookAndChapter(@Param("series_id") String  series_id);
+
+    //得到助力者的id
+    List<Map<Object,Object>> getReadClassHelper(@Param("help_sign_up_id") String  help_sign_up_id);
+
     //计算有几个人助力了
-    List<Map<Object,Object>> countReadChallengeHelpAttend(@Param("user_id") String  user_id, @Param("help_sign_up_id") String  help_sign_up_id, @Param("helper_id") String  helper_id);
+    List<Map<Object,Object>> getReadClassHelperInfo(@Param("help_sign_up_id") String  help_sign_up_id);
+
+    //根据章节id获取章节信息
+    Map<Object,Object> getChapterInfoByChapterId(@Param("chapter_id") String  chapter_id);
 
     //报名参与阅读
     int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);

@@ -99,15 +99,105 @@ public class VariousServiceImpl implements IVariousService {
             }
             result.put("welfare_service", welfare_service);
 
+            //-------------------------------------------下面是阅读挑战部分-------------------------------------------------
             //查出并判断是否有报名
-            String now_time_stamp = String.valueOf((new Date()).getTime());
-            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time_stamp,id);
+            int readFlag = 0;
+            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,id);
             if (selectBeginningReadClass == null){
                 result.put("is_reading", 0);
             }else {
-                result.put("is_reading", 1);
+                //判断是否开始
+                if (Long.valueOf(selectBeginningReadClass.get("st").toString()) > Long.valueOf(now_time)){
+                    //当前时间小于开始时间，未开始
+                    result.put("is_reading", 1);
+                    //计算还有多少天
+                    int restDay = CommonFunc.count_interval_days(now_time,selectBeginningReadClass.get("st").toString());
+                    result.put("rest_day", restDay);
+                    readFlag = 1;
+                }else {
+                    result.put("is_reading", 2);
+                    readFlag = 2;
+                    //-----------------------------------------------把书和章节按顺序铺开放到map里---------------------------------------------------
+                    //已经开始的话要把阅读到当前的书给展现出来
+                    //先把这个series的书和里面的章节按照顺序拿出来
+                    Map<Object,List<Map<Object,Object>>> bookChapter = new HashMap<>();
+                    List<Map<Object,Object>> seriesBooks = common_configMapper.getSeriesBookAndChapter(selectBeginningReadClass.get("series_id").toString());
+//                    for (int jj = 0; jj < seriesBooks.size(); jj++){
+//                        if (bookChapter.containsKey(seriesBooks.get(jj).get("book_id").toString())){
+//                            bookChapter.get(seriesBooks.get(jj).get("book_id").toString()).add(seriesBooks.get(jj));
+//                        }else {
+//                            List<Map<Object,Object>> tmp = new ArrayList<>();
+//                            tmp.add(seriesBooks.get(jj));
+//                            bookChapter.put(seriesBooks.get(jj).get("book_id").toString(),tmp);
+//                        }
+//                    }
+                    //计算开始到现在的天数
+                    int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
+                    if (seriesBooks.size() < beginDay){
+                        return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+                    }
+                    Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
+                    System.out.println(bookChapter);
+                    Map<Object,Object> needToReadBookInfo = new HashMap<>();
+                    Map<Object,Object> oneBook = common_configMapper.showReadClassBookIntroduction(needToReedBookChapter.get("book_id").toString());
+                    needToReadBookInfo.put("book_name", oneBook.get("name").toString());
+                    needToReadBookInfo.put("chapter_order", needToReedBookChapter.get("chapter_order").toString());
+                    result.put("need_to_read_book", needToReadBookInfo);
+                    //--------------------------------------------------------------------------------------------------
+                    //把书籍信息装到一个map
+                    Map<Object,Object> bookInfo = new HashMap<>();
+                    //找出用户最近打卡的一章的书籍并计算用户打卡的总章数
+                    List<Map<Object,Object>> userClockInChapter = common_configMapper.getUserLastClockReadChapterAndBookInfo(selectBeginningReadClass.get("series_id").toString(),id);
+                    //总天数
+                    int allDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(),selectBeginningReadClass.get("et").toString());
+                    result.put("read_class_day", allDay);
+                    result.put("user_read_chapter", userClockInChapter.size());
+                    result.put("need_to_read_chapter", allDay);
+                    if (userClockInChapter.size()>=1){
+                        //找出最新打卡的那一章
+                        Map<Object,Object>lastClockIn = userClockInChapter.get(0);
+                        bookInfo.put("book_name", lastClockIn.get("name").toString());
+                        bookInfo.put("book_pic", CommonFunc.judgePicPath(lastClockIn.get("pic").toString()));
+                        //更具章节id获取章节号
+                        Map<Object,Object> ChapterInfo = common_configMapper.getChapterInfoByChapterId(lastClockIn.get("chapter_id").toString());
+                        bookInfo.put("chapter_order", ChapterInfo.get("order").toString());
+                    }else {
+                        //如果一次卡都没打的话就给第一本书的第一张
+                        //根据书籍id查书籍信息
+                        Map<Object,Object> aBook = common_configMapper.showReadClassBookIntroduction(seriesBooks.get(0).get("book_id").toString());
+                        bookInfo.put("book_name", aBook.get("name"));
+                        bookInfo.put("book_pic", CommonFunc.judgePicPath(aBook.get("pic").toString()));
+                        bookInfo.put("chapter_order", "1");
+                    }
+                    result.put("readBookInfo", bookInfo);
+                }
             }
-
+            //找出未开始的期数的最近的开始时间
+            Map<Object,Object> readClass = common_configMapper.showReadClass(now_time);
+            if (readClass == null){
+                //没有可报名阅读报名人数填零
+                result.put("enrollment", 0);
+            }else {
+                int number = Integer.valueOf(readClass.get("enrollment").toString()) + Integer.valueOf(readClass.get("virtual_number").toString());
+                if (readFlag == 0){
+                    //没人报名才呈现递增
+                    //计算有多少人报名
+                    int all_people = 0;
+                    Long ii = 0L;
+                    Long during = (new Date()).getTime() - Long.valueOf(readClass.get("set_time").toString());
+                    while (ii < during){
+                        if (all_people + 3 > number){
+                            all_people = number;
+                            break;
+                        }
+                        all_people += 3;
+                        ii+=7200000;
+                    }
+                    result.put("enrollment", all_people);
+                }else {
+                    result.put("enrollment", number);
+                }
+            }
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(result, SerializerFeature.WriteMapNullValue));
             return ServerResponse.createBySuccess("成功",json);
@@ -1803,13 +1893,13 @@ public class VariousServiceImpl implements IVariousService {
                 return ServerResponse.createByErrorMessage("阅读已开始不可报名！");
             }
             //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
-            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid,series_id);
+            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid);
             if (check == null){
                 return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
             }
             String helpId = check.get("id").toString();
             //先查助力了几次
-            List<Map<Object,Object>> countTimes = common_configMapper.countReadChallengeHelpAttend(uid, helpId, uid);
+            List<Map<Object,Object>> countTimes = common_configMapper.getReadClassHelperInfo(helpId);
             //事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -1841,27 +1931,35 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
-//    //获取阅读的三个头像和series_id
-//    public ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request){
-//        String token = request.getHeader("token");
-//        //验证参数是否为空
-//        List<Object> l1 = new ArrayList<Object>(){{
-//            add(token);
-//        }};
-//        String CheckNull = CommonFunc.CheckNull(l1);
-//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-//        //验证token
-//        String uid = CommonFunc.CheckToken(request,token);
-//        if (uid == null){
-//            //未找到
-//            return ServerResponse.createByErrorMessage("身份认证错误！");
-//        }else{
-//            //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
-//            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid,series_id);
-//            if (check == null){
-//                return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
-//            }
-//            return ServerResponse.createBySuccess("成功！", result);
-//        }
-//    }
+    //获取阅读的三个头像和series_id
+    public ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
+            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid);
+            if (check == null){
+                return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
+            }
+            //拿到助力的头像
+            List<Map<Object,Object>> info = common_configMapper.getReadClassHelper(check.get("id").toString());
+            for (int i = 0; i < info.size(); i++){
+                info.get(i).put("portrait", CommonFunc.judgePicPath(info.get(i).get("portrait").toString()));
+            }
+            Map<Object,Object> result = new HashMap<>();
+            result.put("series_id", check.get("series_id").toString());
+            result.put("user_info", info);
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
 }

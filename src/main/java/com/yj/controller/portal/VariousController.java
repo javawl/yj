@@ -812,4 +812,15 @@ public class VariousController {
         //调用service层
         return iVariousService.helpReadClass(series_id, user_id, request);
     }
+
+
+    /**
+     * 已经助力缴费，获取邀请好友助力页面信息
+     */
+    @RequestMapping(value="get_read_class_help_info.do")
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request){
+        //调用service层
+        return iVariousService.get_read_class_help_info(request);
+    }
 }

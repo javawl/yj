@@ -373,6 +373,9 @@ public interface DictionaryMapper {
     //后台更新音频
     int updateWordSentenceAudio(@Param("id") String id,@Param("audio") String audio);
 
+    //后台更新音频
+    int updateWordSentenceAudioByWord(@Param("word") String word,@Param("audio") String audio);
+
     //更新已背单词数
     int updateLearnedWord(@Param("learned_word_number") int learned_word_number,@Param("id") String id,@Param("plan") String plan);
 

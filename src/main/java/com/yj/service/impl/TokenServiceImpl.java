@@ -85,6 +85,7 @@ public class TokenServiceImpl implements ITokenService {
                 }catch (Exception e){
                     e.printStackTrace();
                     logger.error("微信小程序登录异常",e.getStackTrace());
+                    logger.error(e.getMessage(),e);
                     return ServerResponse.createByErrorMessage(e.getMessage());
                 }
             }
@@ -186,10 +187,7 @@ public class TokenServiceImpl implements ITokenService {
                     }
                 }else{
                     //有的話加一
-                    int update_result = userMapper.updateDataDailyAddUser(one);
-                    if (update_result != 1){
-                        throw new Exception();
-                    }
+                    userMapper.updateDataDailyAddUser(one);
                 }
             }else {
                 //有的话直接给个id
@@ -205,7 +203,8 @@ public class TokenServiceImpl implements ITokenService {
         } catch (Exception e) {
             transactionManager.rollback(status);
             e.printStackTrace();
-            logger.error("微信小程序登录异常",e.getStackTrace());
+            logger.error("微信小程序登录异常1",e.getStackTrace());
+            logger.error(e.getMessage(),e);
             throw new Exception(e.getMessage());
         }
     }

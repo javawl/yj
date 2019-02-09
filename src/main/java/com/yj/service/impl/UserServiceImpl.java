@@ -232,10 +232,7 @@ public class UserServiceImpl implements IUserService {
                         }
                     }else{
                         //有的話加一
-                        int update_result = userMapper.updateDataDailyAddUser(one);
-                        if (update_result != 1){
-                            throw new Exception();
-                        }
+                        userMapper.updateDataDailyAddUser(one);
                     }
 
                     transactionManager.commit(status);

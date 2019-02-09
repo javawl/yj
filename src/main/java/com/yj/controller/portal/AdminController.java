@@ -2109,6 +2109,17 @@ public class AdminController {
 
 
     /**
+     * 合成音频
+     * @return
+     */
+    @RequestMapping(value = "change_special_mp3.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> change_special_mp3(HttpServletResponse response, HttpServletRequest request) throws Exception{
+        return iAdminService.change_special_mp3(response,request);
+    }
+
+
+    /**
      * 后台管理得到feeds信息
      * @param page
      * @param size
