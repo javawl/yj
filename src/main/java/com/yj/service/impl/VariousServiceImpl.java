@@ -23,6 +23,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.jws.Oneway;
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -135,7 +136,32 @@ public class VariousServiceImpl implements IVariousService {
                     Map<Object,Object> oneBook = common_configMapper.showReadClassBookIntroduction(needToReedBookChapter.get("book_id").toString());
                     needToReadBookInfo.put("book_name", oneBook.get("name").toString());
                     needToReadBookInfo.put("chapter_order", needToReedBookChapter.get("chapter_order").toString());
+                    String needChapterId = needToReedBookChapter.get("id").toString();
+                    String needBookId = needToReedBookChapter.get("book_id").toString();
+                    //查看今天需要读的有没有读
+                    if (common_configMapper.checkReadClassClockIn(selectBeginningReadClass.get("series_id").toString(), needBookId, id, needChapterId) == null){
+                        //今日未打卡
+                        result.put("level", 0);
+                    }else {
+                        //今日已打卡
+                        result.put("level", 1);
+                    }
+                    //获取用户红包状态
+                    Map<Object, Object> redPacketStatus = common_configMapper.getReadClassRedPacket(id);
+                    //获取第二天0点的时间
+                    String nextDayTime = CommonFunc.getNextDate0();
+                    if (redPacketStatus.get("read_class_red_packet_time") == null){
+                        //时间为空
+                        result.put("read_class_red_packet", "0");
+                    }else {
+                        if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
+                            result.put("read_class_red_packet", "0");
+                        }else {
+                            result.put("read_class_red_packet", redPacketStatus.get("read_class_red_packet").toString());
+                        }
+                    }
                     result.put("need_to_read_book", needToReadBookInfo);
+                    //查看当前章
                     //--------------------------------------------------------------------------------------------------
                     //把书籍信息装到一个map
                     Map<Object,Object> bookInfo = new HashMap<>();
@@ -1997,6 +2023,8 @@ public class VariousServiceImpl implements IVariousService {
                             }
                             //已读
                             endSeriesBooks.get(jjj).put("is_able",2);
+                            endSeriesBooks.get(jjj).put("mp3", CommonFunc.judgePicPath(endSeriesBooks.get(jjj).get("mp3").toString()));
+                            endSeriesBooks.get(jjj).put("pic", CommonFunc.judgePicPath(endSeriesBooks.get(jjj).get("pic").toString()));
                             if (bookChapter.containsKey(endSeriesBooks.get(jjj).get("book_id").toString())){
                                 bookChapter.get(endSeriesBooks.get(jjj).get("book_id").toString()).add(endSeriesBooks.get(jjj));
                             }else {
@@ -2034,6 +2062,8 @@ public class VariousServiceImpl implements IVariousService {
                     if (tmpChapter.containsKey(seriesBooks.get(jjj).get("id").toString())){
                         seriesBooks.get(jjj).put("is_able",2);
                     }
+                    seriesBooks.get(jjj).put("pic", CommonFunc.judgePicPath(seriesBooks.get(jjj).get("pic").toString()));
+                    seriesBooks.get(jjj).put("mp3", CommonFunc.judgePicPath(seriesBooks.get(jjj).get("mp3").toString()));
                     if (bookChapter.containsKey(seriesBooks.get(jjj).get("book_id").toString())){
                         bookChapter.get(seriesBooks.get(jjj).get("book_id").toString()).add(seriesBooks.get(jjj));
                     }else {
@@ -2047,6 +2077,8 @@ public class VariousServiceImpl implements IVariousService {
                     for (int iii = 0; iii < endReadClass.size(); iii++){
                         List<Map<Object,Object>> endSeriesBooks = common_configMapper.getSeriesBookAndChapter(endReadClass.get(iii).get("series_id").toString());
                         for (int jjj = 0; jjj < endReadClass.size(); jjj++){
+                            endSeriesBooks.get(jjj).put("mp3", CommonFunc.judgePicPath(endSeriesBooks.get(jjj).get("mp3").toString()));
+                            endSeriesBooks.get(jjj).put("pic", CommonFunc.judgePicPath(endSeriesBooks.get(jjj).get("pic").toString()));
                             //已读
                             endSeriesBooks.get(jjj).put("is_able",2);
                             if (bookChapter.containsKey(endSeriesBooks.get(jjj).get("book_id").toString())){
@@ -2199,13 +2231,12 @@ public class VariousServiceImpl implements IVariousService {
 
 
     //根据书id获取新单词
-    public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, String chapter_id, HttpServletRequest request){
+    public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
             add(book_id);
-            add(chapter_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -2216,7 +2247,7 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             //获取某个章节的新单词
-            List<Map<Object,Object>> chapterNewWord = common_configMapper.getBookNewWord(chapter_id,book_id,uid);
+            List<Map<Object,Object>> chapterNewWord = common_configMapper.getBookNewWord(book_id,uid);
             for (int i = 0; i < chapterNewWord.size(); i++){
                 chapterNewWord.get(i).put("symbol_mp3", CommonFunc.judgePicPath(chapterNewWord.get(i).get("symbol_mp3").toString()));
             }

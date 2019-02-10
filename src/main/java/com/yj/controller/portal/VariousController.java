@@ -823,4 +823,60 @@ public class VariousController {
         //调用service层
         return iVariousService.get_read_class_help_info(request);
     }
+
+
+
+    /**
+     * 获取该书籍下面的几个书籍和章节
+     */
+    @RequestMapping(value="showNowReadClassBookChapter.do")
+    @ResponseBody
+    public ServerResponse<Map<Object,List<Map<Object,Object>>>> showNowReadClassBookChapter(HttpServletRequest request){
+        //调用service层
+        return iVariousService.showNowReadClassBookChapter(request);
+    }
+
+
+    /**
+     * 阅读挑战打卡领红包
+     */
+    @RequestMapping(value="readClassClockIn.do")
+    @ResponseBody
+    public ServerResponse<List<List<Object>>> readClassClockIn(String series_id, String book_id, String chapter_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.readClassClockIn(series_id,book_id, chapter_id,request);
+    }
+
+
+    /**
+     * 根据书id和章节id获取内容
+     */
+    @RequestMapping(value="getBookChapterInner.do")
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> getBookChapterInner(String book_id, String chapter_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.getBookChapterInner(book_id, chapter_id,request);
+    }
+
+
+    /**
+     * 根据书id和章节id获取新单词
+     */
+    @RequestMapping(value="getBookChapterNewWord.do")
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> getBookChapterNewWord(String book_id, String chapter_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.getBookChapterNewWord(book_id, chapter_id,request);
+    }
+
+
+    /**
+     * 根据书id获取新单词
+     */
+    @RequestMapping(value="getBookNewWord.do")
+    @ResponseBody
+    public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.getBookNewWord(book_id,request);
+    }
 }

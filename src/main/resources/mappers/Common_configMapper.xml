@@ -829,13 +829,16 @@
   </select>
 
   <select id="getSeriesBookAndChapter" resultType="map" parameterType="string">
-    SELECT read_class_chapter.*,tb.*,read_class_chapter.order as chapter_order
-    FROM read_class_chapter,
-    (SELECT book_id,`order`
-    FROM read_class_series_book
-    WHERE series_id = #{series_id}
-    ORDER BY `order`) tb
-    WHERE tb.book_id = read_class_chapter.book_id
+    SELECT read_class_book.`name` as book_name,pic,author,tb2.*
+    FROM read_class_book,
+         (SELECT read_class_chapter.*,tb.*,read_class_chapter.`order` as chapter_order
+          FROM read_class_chapter,
+               (SELECT book_id as b_id,`order` as book_order
+                FROM read_class_series_book
+                WHERE series_id = #{series_id}
+                ORDER BY `book_order`) tb
+          WHERE tb.b_id = read_class_chapter.book_id) tb2
+    WHERE tb2.b_id = read_class_book.id
   </select>
 
   <select id="getReadClassHelper" resultType="map" parameterType="string">
@@ -867,15 +870,17 @@
   </select>
 
   <select id="getBookNewWord" resultType="map" parameterType="string">
-    SELECT word,mean,symbol_mp3,symbol
+    SELECT `order`,tb2.*
+    FROM read_class_chapter,
+    (SELECT word,mean,symbol_mp3,symbol,tb.*
     FROM read_class_new_word,
       (SELECT chapter_id,book_id
       FROM read_class_clock_in
-      WHERE read_class_clock_in.chapter_id = #{chapter_id}
-      AND read_class_clock_in.book_id = #{book_id}
+      WHERE read_class_clock_in.book_id = #{book_id}
       AND user_id = #{user_id}) tb
-    WHERE read_class_new_word.chapter_id = read_class_clock_in.chapter_id
-    AND read_class_new_word.book_id = read_class_clock_in.book_id
+    WHERE read_class_new_word.`chapter_id` =  tb.`chapter_id`
+    AND read_class_new_word.book_id =  tb.book_id) tb2
+    WHERE tb2.chapter_id = read_class_chapter.id
   </select>
 
   <select id="getChapterInner" resultType="map" parameterType="string">
@@ -891,6 +896,12 @@
     AND book_id = #{book_id}
     AND user_id = #{user_id}
     AND chapter_id = #{chapter_id}
+  </select>
+
+  <select id="getReadClassRedPacket" resultType="map" parameterType="string">
+    SELECT read_class_red_packet,read_class_red_packet_time
+    FROM `user`
+    WHERE id = #{user_id}
   </select>
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">

@@ -447,11 +447,14 @@ public interface Common_configMapper {
     //检查是否打过卡
     Map<Object,Object> checkReadClassClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id);
 
+    //获取用户红包状态
+    Map<Object,Object> getReadClassRedPacket(@Param("user_id") String user_id);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 
     //用户和书获取书的新单词
-    List<Map<Object,Object>> getBookNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id,@Param("user_id") String  user_id);
+    List<Map<Object,Object>> getBookNewWord(@Param("book_id") String  book_id,@Param("user_id") String  user_id);
 
     //报名参与阅读
     int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
