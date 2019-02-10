@@ -479,7 +479,7 @@ public class AdminServiceImpl implements IAdminService {
         //营收
         Double profit_loss = aggregate_amount;
         //计算reward
-        Double reward = CommonFunc.calculateWordChallengeReward(success_people + virtual_people,aggregate_amount);
+        Double reward = CommonFunc.calculateWordChallengeReward(success_people, virtual_people,aggregate_amount);
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
