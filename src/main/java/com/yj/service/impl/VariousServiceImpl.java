@@ -3,6 +3,7 @@ package com.yj.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Maps;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
@@ -113,6 +114,7 @@ public class VariousServiceImpl implements IVariousService {
                     //计算还有多少天
                     int restDay = CommonFunc.count_interval_days(now_time,selectBeginningReadClass.get("st").toString());
                     result.put("rest_day", restDay);
+                    result.put("series_id", selectBeginningReadClass.get("series_id").toString());
                     readFlag = 1;
                 }else {
                     result.put("is_reading", 2);
@@ -122,15 +124,6 @@ public class VariousServiceImpl implements IVariousService {
                     //先把这个series的书和里面的章节按照顺序拿出来
                     Map<Object,List<Map<Object,Object>>> bookChapter = new HashMap<>();
                     List<Map<Object,Object>> seriesBooks = common_configMapper.getSeriesBookAndChapter(selectBeginningReadClass.get("series_id").toString());
-//                    for (int jj = 0; jj < seriesBooks.size(); jj++){
-//                        if (bookChapter.containsKey(seriesBooks.get(jj).get("book_id").toString())){
-//                            bookChapter.get(seriesBooks.get(jj).get("book_id").toString()).add(seriesBooks.get(jj));
-//                        }else {
-//                            List<Map<Object,Object>> tmp = new ArrayList<>();
-//                            tmp.add(seriesBooks.get(jj));
-//                            bookChapter.put(seriesBooks.get(jj).get("book_id").toString(),tmp);
-//                        }
-//                    }
                     //计算开始到现在的天数
                     int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
                     if (seriesBooks.size() < beginDay){
@@ -170,6 +163,7 @@ public class VariousServiceImpl implements IVariousService {
                         bookInfo.put("chapter_order", "1");
                     }
                     result.put("readBookInfo", bookInfo);
+                    result.put("series_id", selectBeginningReadClass.get("series_id").toString());
                 }
             }
             //找出未开始的期数的最近的开始时间
@@ -1960,6 +1954,287 @@ public class VariousServiceImpl implements IVariousService {
             result.put("series_id", check.get("series_id").toString());
             result.put("user_info", info);
             return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
+
+    //获取该书籍下面的几个书籍和章节
+    public ServerResponse<Map<Object,List<Map<Object,Object>>>> showNowReadClassBookChapter(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //-----------------------------------------------把书和章节按顺序铺开放到map里---------------------------------------------------
+            String now_time = String.valueOf(new Date().getTime());
+            Map<Object,List<Map<Object,Object>>> bookChapter = Maps.newLinkedHashMap();
+            List<Map<Object,Object>> endReadClass = common_configMapper.showSelectEndReadClassSeries(now_time,uid);
+            Map<Object,Object> beginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
+            if (beginningReadClass != null){
+                //已经开始的话要把阅读到当前的书给展现出来
+                //先把这个series的书和里面的章节按照顺序拿出来
+                Map<Object,Object> bookTmp = new HashMap<>();
+                List<Map<Object,Object>> seriesBooks = common_configMapper.getSeriesBookAndChapter(beginningReadClass.get("series_id").toString());
+                for (int jj = 0; jj < seriesBooks.size(); jj++){
+                    if (!bookTmp.containsKey(seriesBooks.get(jj).get("book_id").toString())){
+                        bookTmp.put(seriesBooks.get(jj).get("book_id").toString(), "1");
+                    }
+                }
+                if (endReadClass != null){
+                    for (int iii = 0; iii < endReadClass.size(); iii++){
+                        List<Map<Object,Object>> endSeriesBooks = common_configMapper.getSeriesBookAndChapter(endReadClass.get(iii).get("series_id").toString());
+                        for (int jjj = 0; jjj < endReadClass.size(); jjj++){
+                            if (bookTmp.containsKey(endSeriesBooks.get(jjj).get("book_id").toString())){
+                                continue;
+                            }
+                            //已读
+                            endSeriesBooks.get(jjj).put("is_able",2);
+                            if (bookChapter.containsKey(endSeriesBooks.get(jjj).get("book_id").toString())){
+                                bookChapter.get(endSeriesBooks.get(jjj).get("book_id").toString()).add(endSeriesBooks.get(jjj));
+                            }else {
+                                List<Map<Object,Object>> tmp_list = new ArrayList<>();
+                                tmp_list.add(endSeriesBooks.get(jjj));
+                                bookChapter.put(endSeriesBooks.get(jjj).get("book_id").toString(), tmp_list);
+                            }
+                        }
+                    }
+                }
+                //计算开始到现在的天数
+                int beginDay = CommonFunc.count_interval_days(beginningReadClass.get("st").toString(), now_time);
+                if (seriesBooks.size() < beginDay){
+                    return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+                }
+                for (int jj = 0; jj < seriesBooks.size(); jj++){
+                    if (jj < beginDay){
+                        //可读
+                        seriesBooks.get(jj).put("is_able",1);
+                    }else {
+                        //不可读
+                        seriesBooks.get(jj).put("is_able",0);
+                    }
+                }
+                //找出用户最近打卡的一章的书籍并计算用户打卡的总章数
+                List<Map<Object,Object>> userClockInChapter = common_configMapper.getUserLastClockReadChapterAndBookInfo(beginningReadClass.get("series_id").toString(),uid);
+                Map<Object,Object> tmpChapter = new HashMap<>();
+                //将用户打卡的章节id独立出来
+                for (int kkk = 0; kkk < userClockInChapter.size(); kkk++){
+                    if (!tmpChapter.containsKey(userClockInChapter.get(kkk).get("chapter_id").toString())){
+                        tmpChapter.put(userClockInChapter.get(kkk).get("chapter_id").toString(), "1");
+                    }
+                }
+                for (int jjj = 0; jjj < seriesBooks.size(); jjj++){
+                    if (tmpChapter.containsKey(seriesBooks.get(jjj).get("id").toString())){
+                        seriesBooks.get(jjj).put("is_able",2);
+                    }
+                    if (bookChapter.containsKey(seriesBooks.get(jjj).get("book_id").toString())){
+                        bookChapter.get(seriesBooks.get(jjj).get("book_id").toString()).add(seriesBooks.get(jjj));
+                    }else {
+                        List<Map<Object,Object>> tmp_list = new ArrayList<>();
+                        tmp_list.add(seriesBooks.get(jjj));
+                        bookChapter.put(seriesBooks.get(jjj).get("book_id").toString(), tmp_list);
+                    }
+                }
+            }else {
+                if (endReadClass != null){
+                    for (int iii = 0; iii < endReadClass.size(); iii++){
+                        List<Map<Object,Object>> endSeriesBooks = common_configMapper.getSeriesBookAndChapter(endReadClass.get(iii).get("series_id").toString());
+                        for (int jjj = 0; jjj < endReadClass.size(); jjj++){
+                            //已读
+                            endSeriesBooks.get(jjj).put("is_able",2);
+                            if (bookChapter.containsKey(endSeriesBooks.get(jjj).get("book_id").toString())){
+                                bookChapter.get(endSeriesBooks.get(jjj).get("book_id").toString()).add(endSeriesBooks.get(jjj));
+                            }else {
+                                List<Map<Object,Object>> tmp_list = new ArrayList<>();
+                                tmp_list.add(endSeriesBooks.get(jjj));
+                                bookChapter.put(endSeriesBooks.get(jjj).get("book_id").toString(), tmp_list);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return ServerResponse.createBySuccess("成功！", bookChapter);
+        }
+    }
+
+
+    //阅读挑战打卡领红包
+    public ServerResponse<List<List<Object>>> readClassClockIn(String series_id, String book_id, String chapter_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(series_id);
+            add(book_id);
+            add(chapter_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) == null){
+                return ServerResponse.createByErrorMessage("该章节打过卡了，不可重复！");
+            }
+            String now_time = String.valueOf(new Date().getTime());
+            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
+            if (selectBeginningReadClass == null){
+                return ServerResponse.createByErrorMessage("未报名！");
+            }
+            //判断传入章节是否和今日虚读章节一致
+            List<Map<Object,Object>> seriesBooks = common_configMapper.getSeriesBookAndChapter(selectBeginningReadClass.get("series_id").toString());
+            //计算开始到现在的天数
+            int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
+            if (seriesBooks.size() < beginDay){
+                return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+            }
+            Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
+            String needChapterId = needToReedBookChapter.get("id").toString();
+            String needBookId = needToReedBookChapter.get("book_id").toString();
+            if (!needChapterId.equals(chapter_id)){
+                return ServerResponse.createByErrorMessage("传入章节和应读章节不一致");
+            }
+            if (!needBookId.equals(book_id)){
+                return ServerResponse.createByErrorMessage("传入书籍和应读书籍不一致");
+            }
+            //判断是报的99还是59
+            double total = 0.0;
+            Map<Object,Object> contestants = common_configMapper.selectReadClassContestants(selectBeginningReadClass.get("series_id").toString(),uid);
+            if (Integer.valueOf(contestants.get("whether_help").toString()) == 1){
+                //59的
+                total = 59.9;
+            }else {
+                total = 99.9;
+            }
+            //总天数
+            int allDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(),selectBeginningReadClass.get("et").toString());
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                //拿去打卡
+                common_configMapper.insertReadChallengeClockIn(series_id, book_id, uid, chapter_id, now_time);
+                //更新坚持天数
+                common_configMapper.changeReadClassInsistDay(series_id,uid);
+                //更新用户红包
+                common_configMapper.changeReadClassRedPacket(String.valueOf(total/Double.valueOf(String.valueOf(allDay))),now_time,uid);
+                return ServerResponse.createBySuccessMessage("成功！");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("阅读挑战打卡失败",e.getStackTrace());
+                logger.error("阅读挑战打卡失败",e);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("阅读挑战打卡失败！");
+            }
+        }
+    }
+
+
+    //根据书id和章节id获取内容
+    public ServerResponse<Map<Object,Object>> getBookChapterInner(String book_id, String chapter_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(book_id);
+            add(chapter_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            List<Map<Object,Object>> chapterInner = common_configMapper.getChapterInner(chapter_id);
+            Map<Object,Object> chapterInfo = common_configMapper.getChapterInfoByChapterId(chapter_id);
+            Map<Object,Object> result = new HashMap<>();
+            result.put("chapterMP3", CommonFunc.judgePicPath(chapterInfo.get("mp3").toString()));
+            result.put("chapterInner", chapterInner);
+            return ServerResponse.createBySuccess("成功！",result);
+        }
+    }
+
+
+    //根据书id和章节id获取新单词
+    public ServerResponse<List<Map<Object,Object>>> getBookChapterNewWord(String book_id, String chapter_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(book_id);
+            add(chapter_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //获取某个章节的新单词
+            List<Map<Object,Object>> chapterNewWord = common_configMapper.getChapterNewWord(chapter_id,book_id);
+            for (int i = 0; i < chapterNewWord.size(); i++){
+                chapterNewWord.get(i).put("symbol_mp3", CommonFunc.judgePicPath(chapterNewWord.get(i).get("symbol_mp3").toString()));
+            }
+            return ServerResponse.createBySuccess("成功！",chapterNewWord);
+        }
+    }
+
+
+    //根据书id获取新单词
+    public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, String chapter_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(book_id);
+            add(chapter_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //获取某个章节的新单词
+            List<Map<Object,Object>> chapterNewWord = common_configMapper.getBookNewWord(chapter_id,book_id,uid);
+            for (int i = 0; i < chapterNewWord.size(); i++){
+                chapterNewWord.get(i).put("symbol_mp3", CommonFunc.judgePicPath(chapterNewWord.get(i).get("symbol_mp3").toString()));
+            }
+            String flag_id = "";
+            int flag = -1;
+            List<List<Object>> result = new ArrayList<>();
+            for (int jj = 0; jj < chapterNewWord.size(); jj++){
+                if (flag_id.equals(chapterNewWord.get(jj).get("chapter_id").toString())){
+                    result.get(flag).add(chapterNewWord.get(jj));
+                }else {
+                    List<Object> tmp = new ArrayList<>();
+                    tmp.add(chapterNewWord.get(jj));
+                    result.add(tmp);
+                    flag_id = chapterNewWord.get(jj).get("chapter_id").toString();
+                    flag += 1;
+                }
+            }
+            return ServerResponse.createBySuccess("成功！",result);
         }
     }
 }

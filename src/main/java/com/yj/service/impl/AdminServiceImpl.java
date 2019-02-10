@@ -448,6 +448,8 @@ public class AdminServiceImpl implements IAdminService {
         int success_people = 0;
         //总的真实用户数
         int total_real_people = 0;
+        //虚拟用户数
+        int virtual_people = 0;
         //失败人数
         int loser = 0;
         //邀请成功数
@@ -468,6 +470,8 @@ public class AdminServiceImpl implements IAdminService {
                 }else {
                     loser += 1;
                 }
+            }else {
+                virtual_people += 1;
             }
         }
         //总金额
@@ -475,7 +479,7 @@ public class AdminServiceImpl implements IAdminService {
         //营收
         Double profit_loss = aggregate_amount;
         //计算reward
-        Double reward = CommonFunc.calculateWordChallengeReward(success_people,aggregate_amount);
+        Double reward = CommonFunc.calculateWordChallengeReward(success_people + virtual_people,aggregate_amount);
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();

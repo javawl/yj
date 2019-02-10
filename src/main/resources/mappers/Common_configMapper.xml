@@ -745,6 +745,19 @@
     LIMIT 1
   </select>
 
+  <select id="showSelectEndReadClassSeries" resultType="map" parameterType="string">
+    SELECT tb2.*,read_class.*
+    FROM read_class,
+         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id
+          FROM read_class_series,
+               (SELECT series_id
+                FROM read_class_contestants
+                WHERE read_class_contestants.user_id = #{user_id}) tb
+          WHERE read_class_series.id = tb.series_id) tb2
+    WHERE read_class.id = tb2.read_class_id
+    AND et &lt; #{now_time}
+  </select>
+
   <select id="showSelectBeginReadClassSeriesHelp" resultType="map" parameterType="string">
     SELECT tb2.*,read_class.*
     FROM read_class,
@@ -764,6 +777,14 @@
     SELECT qr_code
     FROM read_class_teacher
     WHERE read_class_teacher.series_id = #{series_id}
+  </select>
+
+
+  <select id="selectReadClassContestants" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_contestants
+    WHERE read_class_contestants.series_id = #{series_id}
+    AND read_class_contestants.user_id = #{user_id}
   </select>
 
   <select id="showSeriesReadClass" resultType="map" parameterType="string">
@@ -838,9 +859,43 @@
     WHERE read_class_chapter.id = #{chapter_id}
   </select>
 
+  <select id="getChapterNewWord" resultType="map" parameterType="string">
+    SELECT word,mean,symbol_mp3,symbol
+    FROM read_class_new_word
+    WHERE read_class_new_word.chapter_id = #{chapter_id}
+    AND read_class_new_word.book_id = #{book_id}
+  </select>
+
+  <select id="getBookNewWord" resultType="map" parameterType="string">
+    SELECT word,mean,symbol_mp3,symbol
+    FROM read_class_new_word,
+      (SELECT chapter_id,book_id
+      FROM read_class_clock_in
+      WHERE read_class_clock_in.chapter_id = #{chapter_id}
+      AND read_class_clock_in.book_id = #{book_id}
+      AND user_id = #{user_id}) tb
+    WHERE read_class_new_word.chapter_id = read_class_clock_in.chapter_id
+    AND read_class_new_word.book_id = read_class_clock_in.book_id
+  </select>
+
+  <select id="getChapterInner" resultType="map" parameterType="string">
+    SELECT en,cn,`order`
+    FROM read_class_chapter_inner
+    WHERE read_class_chapter_inner.chapter_id = #{chapter_id}
+  </select>
+
+  <select id="checkReadClassClockIn" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_clock_in
+    WHERE series_id = #{series_id}
+    AND book_id = #{book_id}
+    AND user_id = #{user_id}
+    AND chapter_id = #{chapter_id}
+  </select>
+
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
-    INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`)
-    values (#{user_id},#{series_id},#{set_time},0,0)
+    INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`,`whether_help`)
+    values (#{user_id},#{series_id},#{set_time},0,0,1)
   </insert>
 
   <insert id="insertReadChallengeHelp" parameterType="string">
@@ -853,6 +908,25 @@
     values (#{user_id},#{series_id},#{set_time})
   </insert>
 
+
+  <insert id="insertReadChallengeClockIn" parameterType="string">
+    INSERT INTO read_class_clock_in (series_id,book_id,user_id,chapter_id,set_time)
+    values (#{series_id},#{book_id},#{user_id},#{chapter_id},#{set_time})
+  </insert>
+
+  <update id="changeReadClassInsistDay">
+    UPDATE read_class_contestants
+    set `insist_day` = insist_day + 1
+    WHERE read_class_contestants.series_id = #{series_id}
+    AND read_class_contestants.user_id = #{user_id}
+  </update>
+
+  <update id="changeReadClassRedPacket">
+    UPDATE `user`
+    set `read_class_red_packet` = #{read_class_red_packet},
+        `read_class_red_packet_time` = #{read_class_red_packet_time}
+    WHERE id = #{user_id}
+  </update>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 

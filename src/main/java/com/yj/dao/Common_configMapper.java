@@ -402,11 +402,17 @@ public interface Common_configMapper {
     //展现用户报名的且未结束的那一期的系列和本期的信息
     Map<Object,Object> showSelectBeginReadClassSeries(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 
+    //展现用户报名的并且结束的那些
+    List<Map<Object,Object>> showSelectEndReadClassSeries(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
     //展现用户报名的助力的且未结束的那一期的系列和本期的信息
     Map<Object,Object> showSelectBeginReadClassSeriesHelp(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 
     //根据系列展现老师
     Map<Object,Object> showReadClassSeriesTeacher(@Param("series_id") String  series_id);
+
+    //搜索参加阅读挑战的报名情况
+    Map<Object,Object> selectReadClassContestants(@Param("series_id") String  series_id,@Param("user_id") String  user_id);
 
     //根据系列展现期数
     Map<Object,Object> showSeriesReadClass(@Param("series_id") String  series_id);
@@ -435,6 +441,18 @@ public interface Common_configMapper {
     //根据章节id获取章节信息
     Map<Object,Object> getChapterInfoByChapterId(@Param("chapter_id") String  chapter_id);
 
+    //根据章节id获取章节内容
+    List<Map<Object,Object>> getChapterInner(@Param("chapter_id") String  chapter_id);
+
+    //检查是否打过卡
+    Map<Object,Object> checkReadClassClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id);
+
+    //根据章节id获取新单词内容
+    List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
+
+    //用户和书获取书的新单词
+    List<Map<Object,Object>> getBookNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id,@Param("user_id") String  user_id);
+
     //报名参与阅读
     int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
 
@@ -443,6 +461,15 @@ public interface Common_configMapper {
 
     //报名助力参与阅读
     int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+
+    //插入打卡阅读
+    int insertReadChallengeClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id,@Param("set_time") String set_time);
+
+    //修改日完成任务次数阅读挑战打卡天数
+    int changeReadClassInsistDay(@Param("series_id") String series_id, @Param("user_id") String user_id);
+
+    //把红包状态更新给用户
+    int changeReadClassRedPacket(@Param("read_class_red_packet") String read_class_red_packet,@Param("read_class_red_packet_time") String read_class_red_packet_time,@Param("user_id") String user_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
