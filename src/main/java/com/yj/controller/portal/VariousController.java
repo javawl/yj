@@ -827,7 +827,7 @@ public class VariousController {
 
 
     /**
-     * 获取该书籍下面的几个书籍和章节
+     * 查看书单
      */
     @RequestMapping(value="showNowReadClassBookChapter.do")
     @ResponseBody
@@ -860,6 +860,17 @@ public class VariousController {
 
 
     /**
+     * 阅读挑战打卡不领红包
+     */
+    @RequestMapping(value="readClassClockInWithOutRedPacket.do")
+    @ResponseBody
+    public ServerResponse<List<List<Object>>> readClassClockInWithOutRedPacket(String series_id, String book_id, String chapter_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.readClassClockInWithOutRedPacket(series_id, book_id, chapter_id,request);
+    }
+
+
+    /**
      * 根据书id和章节id获取新单词
      */
     @RequestMapping(value="getBookChapterNewWord.do")
@@ -878,5 +889,16 @@ public class VariousController {
     public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, HttpServletRequest request){
         //调用service层
         return iVariousService.getBookNewWord(book_id,request);
+    }
+
+
+    /**
+     * 领取阅读挑战的红包
+     */
+    @RequestMapping(value="getReadClassRedPacket.do")
+    @ResponseBody
+    public ServerResponse<String> getReadClassRedPacket(HttpServletRequest request){
+        //调用service层
+        return iVariousService.getReadClassRedPacket(request);
     }
 }

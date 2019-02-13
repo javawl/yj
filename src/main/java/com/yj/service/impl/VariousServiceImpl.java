@@ -135,9 +135,12 @@ public class VariousServiceImpl implements IVariousService {
                     Map<Object,Object> needToReadBookInfo = new HashMap<>();
                     Map<Object,Object> oneBook = common_configMapper.showReadClassBookIntroduction(needToReedBookChapter.get("book_id").toString());
                     needToReadBookInfo.put("book_name", oneBook.get("name").toString());
+                    needToReadBookInfo.put("book_id", needToReedBookChapter.get("book_id").toString());
                     needToReadBookInfo.put("chapter_order", needToReedBookChapter.get("chapter_order").toString());
                     String needChapterId = needToReedBookChapter.get("id").toString();
                     String needBookId = needToReedBookChapter.get("book_id").toString();
+                    needToReadBookInfo.put("book_id", needBookId);
+                    needToReadBookInfo.put("chapter_id", needChapterId);
                     //查看今天需要读的有没有读
                     if (common_configMapper.checkReadClassClockIn(selectBeginningReadClass.get("series_id").toString(), needBookId, id, needChapterId) == null){
                         //今日未打卡
@@ -2159,11 +2162,11 @@ public class VariousServiceImpl implements IVariousService {
             TransactionStatus status = transactionManager.getTransaction(def);
             try {
                 //拿去打卡
-                common_configMapper.insertReadChallengeClockIn(series_id, book_id, uid, chapter_id, now_time);
+                common_configMapper.insertReadChallengeClockIn(selectBeginningReadClass.get("series_id").toString(), book_id, uid, chapter_id, now_time);
                 //更新坚持天数
-                common_configMapper.changeReadClassInsistDay(series_id,uid);
+                common_configMapper.changeReadClassInsistDay(selectBeginningReadClass.get("series_id").toString(),uid);
                 //更新用户红包
-                common_configMapper.changeReadClassRedPacket(String.valueOf(total/Double.valueOf(String.valueOf(allDay))),now_time,uid);
+                common_configMapper.changeReadClassRedPacket(String.valueOf(total/Double.valueOf(String.valueOf(allDay))),now_time,uid, book_id, chapter_id, selectBeginningReadClass.get("series_id").toString());
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
                 transactionManager.rollback(status);
@@ -2171,6 +2174,64 @@ public class VariousServiceImpl implements IVariousService {
                 logger.error("阅读挑战打卡失败",e);
                 e.printStackTrace();
                 return ServerResponse.createByErrorMessage("阅读挑战打卡失败！");
+            }
+        }
+    }
+
+
+    //阅读挑战打卡不领红包
+    public ServerResponse<List<List<Object>>> readClassClockInWithOutRedPacket(String series_id, String book_id, String chapter_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(series_id);
+            add(book_id);
+            add(chapter_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) == null){
+                return ServerResponse.createByErrorMessage("该章节打过卡了，不可重复！");
+            }
+            String now_time = String.valueOf(new Date().getTime());
+            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
+            if (selectBeginningReadClass == null){
+                return ServerResponse.createByErrorMessage("未报名！");
+            }
+            //判断传入章节是否和今日虚读章节一致
+            List<Map<Object,Object>> seriesBooks = common_configMapper.getSeriesBookAndChapter(selectBeginningReadClass.get("series_id").toString());
+            //计算开始到现在的天数
+            int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
+            if (seriesBooks.size() < beginDay){
+                return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+            }
+            Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
+            String needChapterId = needToReedBookChapter.get("id").toString();
+            if (!needChapterId.equals(chapter_id)){
+                return ServerResponse.createByErrorMessage("传入章节和应读章节一致，请使用领红包");
+            }
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                //拿去打卡
+                common_configMapper.insertReadChallengeClockIn(selectBeginningReadClass.get("series_id").toString(), book_id, uid, chapter_id, now_time);
+                return ServerResponse.createBySuccessMessage("成功！");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("阅读挑战不领红包打卡失败",e.getStackTrace());
+                logger.error("阅读挑战不领红包打卡失败",e);
+                return ServerResponse.createByErrorMessage("阅读挑战不领红包打卡失败！");
             }
         }
     }
@@ -2196,7 +2257,11 @@ public class VariousServiceImpl implements IVariousService {
             List<Map<Object,Object>> chapterInner = common_configMapper.getChapterInner(chapter_id);
             Map<Object,Object> chapterInfo = common_configMapper.getChapterInfoByChapterId(chapter_id);
             Map<Object,Object> result = new HashMap<>();
-            result.put("chapterMP3", CommonFunc.judgePicPath(chapterInfo.get("mp3").toString()));
+            if (chapterInfo.get("mp3") == null){
+                result.put("chapterMP3", null);
+            }else {
+                result.put("chapterMP3", CommonFunc.judgePicPath(chapterInfo.get("mp3").toString()));
+            }
             result.put("chapterInner", chapterInner);
             return ServerResponse.createBySuccess("成功！",result);
         }
@@ -2266,6 +2331,65 @@ public class VariousServiceImpl implements IVariousService {
                 }
             }
             return ServerResponse.createBySuccess("成功！",result);
+        }
+    }
+
+
+    //领取阅读挑战的红包
+    public ServerResponse<String> getReadClassRedPacket(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //未确认，先确认
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try{
+                //当前时间戳
+                String now_time = String.valueOf(new Date().getTime());
+                //获取用户红包状态
+                Map<Object, Object> redPacketStatus = common_configMapper.getReadClassRedPacket(uid);
+                //获取第二天0点的时间
+                String nextDayTime = CommonFunc.getNextDate0();
+                if (redPacketStatus.get("read_class_red_packet_time") == null){
+                    //时间为空
+                    return ServerResponse.createByErrorMessage("未在领取时间内！");
+                }else {
+                    if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
+                        return ServerResponse.createByErrorMessage("红包领取时间已过！");
+                    }
+                }
+                String redPacket = redPacketStatus.get("read_class_red_packet").toString();
+                //获取用户打卡的那个series_id
+                String read_class_red_packet_series_id = redPacketStatus.get("read_class_red_packet_series_id").toString();
+                Map<Object, Object> ReadClassSeries = common_configMapper.showSeriesReadClass(read_class_red_packet_series_id);
+                //获取他成功的那阅读挑战章节数
+                Map<Object,Object> r_c = common_configMapper.getBookInfoAndChapterInfoByChapterId(redPacketStatus.get("read_class_red_packet_chapter_id").toString());
+                //塞进钱包,并置零两个状态
+                common_configMapper.getReadClassRedPack(redPacket,uid,"0");
+                //用户个人账单更新
+                common_configMapper.insertBill(uid,"第" + ReadClassSeries.get("periods").toString() + "期阅读挑战 书籍 " + r_c.get("book_name").toString() + " 章节 " + r_c.get("chapter_name").toString() + "打卡成功成功获得红包",redPacket,now_time,null);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                transactionManager.rollback(status);
+                logger.error("领取阅读红包异常",e.getStackTrace());
+                logger.error("领取阅读红包异常",e);
+                return ServerResponse.createByErrorMessage(e.getMessage());
+            }
         }
     }
 }

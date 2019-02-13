@@ -450,6 +450,9 @@ public interface Common_configMapper {
     //获取用户红包状态
     Map<Object,Object> getReadClassRedPacket(@Param("user_id") String user_id);
 
+    //根据章节获取书籍和章节的信息
+    Map<Object,Object> getBookInfoAndChapterInfoByChapterId(@Param("chapter_id") String chapter_id);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 
@@ -472,7 +475,10 @@ public interface Common_configMapper {
     int changeReadClassInsistDay(@Param("series_id") String series_id, @Param("user_id") String user_id);
 
     //把红包状态更新给用户
-    int changeReadClassRedPacket(@Param("read_class_red_packet") String read_class_red_packet,@Param("read_class_red_packet_time") String read_class_red_packet_time,@Param("user_id") String user_id);
+    int changeReadClassRedPacket(@Param("read_class_red_packet") String read_class_red_packet,@Param("read_class_red_packet_time") String read_class_red_packet_time,@Param("user_id") String user_id,@Param("read_class_red_packet_book_id") String read_class_red_packet_book_id,@Param("read_class_red_packet_chapter_id") String read_class_red_packet_chapter_id,@Param("read_class_red_packet_series_id") String read_class_red_packet_series_id);
+
+    //用户领取红包更新用户表
+    int getReadClassRedPack(@Param("bill") String bill, @Param("id") String id, @Param("read_class_red_packet") String read_class_red_packet);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

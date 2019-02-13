@@ -899,9 +899,16 @@
   </select>
 
   <select id="getReadClassRedPacket" resultType="map" parameterType="string">
-    SELECT read_class_red_packet,read_class_red_packet_time
+    SELECT read_class_red_packet,read_class_red_packet_time,read_class_red_packet_book_id,read_class_red_packet_chapter_id,read_class_red_packet_series_id
     FROM `user`
     WHERE id = #{user_id}
+  </select>
+
+  <select id="getBookInfoAndChapterInfoByChapterId" resultType="map" parameterType="string">
+    SELECT `read_class_book`.name as book_name,`read_class_chapter`.name as chapter_name
+    FROM `read_class_book`,`read_class_chapter`
+    WHERE `read_class_chapter`.id = #{chapter_id}
+    AND `read_class_chapter`.book_id = `read_class_book`.id
   </select>
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
@@ -935,8 +942,22 @@
   <update id="changeReadClassRedPacket">
     UPDATE `user`
     set `read_class_red_packet` = #{read_class_red_packet},
-        `read_class_red_packet_time` = #{read_class_red_packet_time}
+        `read_class_red_packet_time` = #{read_class_red_packet_time},
+        `read_class_red_packet_book_id` = #{read_class_red_packet_book_id},
+        `read_class_red_packet_series_id` = #{read_class_red_packet_series_id},
+        `read_class_red_packet_chapter_id` = #{read_class_red_packet_chapter_id}
     WHERE id = #{user_id}
+  </update>
+
+  <update id="getReadClassRedPack">
+    UPDATE `user`
+    set `bill` = `bill` + #{bill},
+        `read_class_red_packet_book_id` = null,
+        `read_class_red_packet_chapter_id` = null,
+        `read_class_red_packet_time` = null,
+        `read_class_red_packet_series_id` = null,
+        `read_class_red_packet` = #{read_class_red_packet}
+    WHERE id = #{id}
   </update>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->

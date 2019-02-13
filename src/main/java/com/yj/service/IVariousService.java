@@ -102,11 +102,14 @@ public interface IVariousService {
     //已经助力缴费，获取邀请好友助力页面信息
     ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request);
 
-    //获取该书籍下面的几个书籍和章节
+    //查看书单
     ServerResponse<Map<Object,List<Map<Object,Object>>>> showNowReadClassBookChapter(HttpServletRequest request);
 
     //阅读挑战打卡领红包
     ServerResponse <List<List<Object>>> readClassClockIn(String series_id, String book_id, String chapter_id, HttpServletRequest request);
+
+    //阅读挑战打卡不领红包
+    ServerResponse<List<List<Object>>> readClassClockInWithOutRedPacket(String series_id, String book_id, String chapter_id, HttpServletRequest request);
 
     //根据书id和章节id获取内容
     ServerResponse<Map<Object,Object>> getBookChapterInner(String book_id, String chapter_id, HttpServletRequest request);
@@ -116,4 +119,7 @@ public interface IVariousService {
 
     //根据书id获取新单词
     ServerResponse<List<List<Object>>> getBookNewWord(String book_id, HttpServletRequest request);
+
+    //领取阅读挑战的红包
+    ServerResponse<String> getReadClassRedPacket(HttpServletRequest request);
 }
