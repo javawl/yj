@@ -296,6 +296,36 @@ public class AdminController {
 
 
     /**
+     * 展示书籍信息
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showReadClassBook.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassBook(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取阅读书籍信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookAll(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("pic",CommonFunc.judgePicPath(Info.get(i).get("pic").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countWelfareService(),Info);
+    }
+
+
+    /**
      * 展示提现条目
      * @param page
      * @param size

@@ -453,6 +453,9 @@ public interface Common_configMapper {
     //根据章节获取书籍和章节的信息
     Map<Object,Object> getBookInfoAndChapterInfoByChapterId(@Param("chapter_id") String chapter_id);
 
+    //后台取出所有阅读书籍
+    List<Map<Object,Object>> readClassBookAll(@Param("start") int start,@Param("size") int size);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 

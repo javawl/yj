@@ -831,7 +831,7 @@
   <select id="getSeriesBookAndChapter" resultType="map" parameterType="string">
     SELECT read_class_book.`name` as book_name,pic,author,tb2.*
     FROM read_class_book,
-         (SELECT read_class_chapter.*,tb.*,read_class_chapter.`order` as chapter_order
+         (SELECT read_class_chapter.*,tb.*,read_class_chapter.`order` as chapter_order,read_class_chapter.id as chapter_id
           FROM read_class_chapter,
                (SELECT book_id as b_id,`order` as book_order
                 FROM read_class_series_book
@@ -909,6 +909,18 @@
     FROM `read_class_book`,`read_class_chapter`
     WHERE `read_class_chapter`.id = #{chapter_id}
     AND `read_class_chapter`.book_id = `read_class_book`.id
+  </select>
+
+  <select id="readClassBookAll" resultType="map">
+    SELECT tb.*,tb2.*
+    FROM
+    (SELECT count(*) as chapter_number,book_id
+    FROM read_class_chapter
+    GROUP BY book_id) tb,
+    (SELECT *
+    FROM read_class_book
+    LIMIT #{start},#{size}) tb2
+    WHERE tb.book_id = tb2.id
   </select>
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">

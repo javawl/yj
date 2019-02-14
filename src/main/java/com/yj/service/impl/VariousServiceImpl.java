@@ -183,6 +183,8 @@ public class VariousServiceImpl implements IVariousService {
                         //更具章节id获取章节号
                         Map<Object,Object> ChapterInfo = common_configMapper.getChapterInfoByChapterId(lastClockIn.get("chapter_id").toString());
                         bookInfo.put("chapter_order", ChapterInfo.get("order").toString());
+                        bookInfo.put("chapter_id", lastClockIn.get("chapter_id").toString());
+                        bookInfo.put("book_id", lastClockIn.get("book_id").toString());
                     }else {
                         //如果一次卡都没打的话就给第一本书的第一张
                         //根据书籍id查书籍信息
@@ -190,6 +192,8 @@ public class VariousServiceImpl implements IVariousService {
                         bookInfo.put("book_name", aBook.get("name"));
                         bookInfo.put("book_pic", CommonFunc.judgePicPath(aBook.get("pic").toString()));
                         bookInfo.put("chapter_order", "1");
+                        bookInfo.put("book_id", seriesBooks.get(0).get("book_id").toString());
+                        bookInfo.put("chapter_id", seriesBooks.get(0).get("chapter_id").toString());
                     }
                     result.put("readBookInfo", bookInfo);
                     result.put("series_id", selectBeginningReadClass.get("series_id").toString());
