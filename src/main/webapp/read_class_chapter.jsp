@@ -34,66 +34,32 @@
         var r = window.location.search.substr(1).match(reg);
         if(r!=null)return  unescape(r[2]); return null;
     }
-    var page = parseInt(GetQueryString("page"));
-    var type = parseInt(GetQueryString("type"));
-    var size = 15;
-    var all_url = url+"/admin/showReadClassBook.do?page="+page+"&size="+size+"&type="+type;
+    var book_id = parseInt(GetQueryString("id"));
+    var all_url = url+"/admin/showReadClassBookChapter.do?id="+book_id;
     $(document).ready(function(){
+        $("#add_new").attr('href',"add_read_class_chapter.jsp?id="+book_id);
         $.ajax({
             url:all_url,
             type:'GET',
             dataType:'json',
             success:function (result) {
                 var data = result["data"];
-                count += parseInt(result["msg"]);
-                //计算页数
-                var page_no = Math.ceil(count / size);
-                if (page == 1){
-                    $("#page").append('<td><p>第一页</p></td>');
-                }else{
-                    $("#page").append('<td><a href="'+url+'/show_welfare_service.jsp?page=1&size='+size+'">第一页</a></td>');
-                }
-                var ff = 0;
-                var f = 0;
-                if (page > 4){
-                    f += page - 4;
-                }
-                if (f != 0){
-                    $("#page").append('<td><p>....</p></td>');
-                }
-                for(var z = f; z < page_no; z++){
-                    var no = z + 1;
-                    if (no == page){
-                        $("#page").append('<td><p>'+no+'</p></td>');
-                    }else {
-                        $("#page").append('<td><a href="'+url+'/show_welfare_service.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
-                    }
-                    if (ff == 8)break;
-                    ff++;
-                }
-                if (ff != 8){
-                    $("#page").append('<td><p>....</p></td>');
-                }
-                if (page == page_no){
-                    $("#page").append('<td><p>最后一页</p></td>');
-                }else{
-                    $("#page").append('<td><a href="'+url+'/show_welfare_service.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
-                }
                 for(var i = 0; i < data.length; i++){
                     var string2;
-                    if (data[i]['pic']==''){
+                    if (data[i]['mp3']==''){
                         string2 = '此资源为空'
                     }else {
-                        string2 = '<img style="max-width: 550px; max-height: 550px;" src="'+data[i]['pic']+'">';
+                        string2 = '<audio src="'+data[i]['mp3']+'" controls="controls"></audio>';
                     }
                     $("#daily_data").append('<tr>'+
                         '<td>'+data[i]['id']+'</td>'+
                         '<td>'+data[i]['name']+'</td>'+
-                        '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['introduction']+'</td>'+
+                        '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['order']+'</td>'+
                         '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
-                        '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><button style="margin-left: 5px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">查看章节</button></td>'+
+                        // '<td>'+string2+'</td>'+
+                        // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
+                        // '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td><button style="margin-left: 5px;" onclick="check_chapter_inner('+"'"+data[i]['id']+"'"+')">查看内容</button><button style="margin-left: 5px;" onclick="check_chapter_new_word('+"'"+data[i]['id']+"'"+')">查看新单词</button><button style="margin-left: 5px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -120,7 +86,7 @@
         formData.append('upload_file', $('#pic')[0].files[0]);
         formData.append('id', pic_id);
         $.ajax({
-            url:url+"/admin/uploadReadClassPic.do",
+            url:url+"/admin/uploadReadClassMP3.do",
             type:'POST',
             data:formData,
             dataType:'json',
@@ -152,7 +118,7 @@
             flag_id = id;
             var input_id = "book_introduction" + id;
             $("#introduction"+id).empty();
-            $("#introduction"+id).append('简介：<input id='+ input_id + ' type="text"><br><button onclick="upload_sent('+"'"+id+"'"+')">提交</button>');
+            $("#introduction"+id).append('章节号：<input id='+ input_id + ' type="text"><br><button onclick="upload_sent('+"'"+id+"'"+')">提交</button>');
         }
     }
     // 修改简介(上传)
@@ -163,7 +129,7 @@
             data:{
                 inner: document.getElementById("book_introduction" + id).value,
                 id: id,
-                type: "introduction"
+                type: "chapter_order"
             },
             dataType:'json',
             async: false,
@@ -207,7 +173,7 @@
             data:{
                 inner: document.getElementById("book_author" + id).value,
                 id: id,
-                type: "author"
+                type: "chapter_order"
             },
             dataType:'json',
             async: false,
@@ -233,30 +199,26 @@
 </script>
 <body>
 <center>
-    <h1>阅读书籍</h1>
+    <h1>章节</h1>
     <input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />
     <br>
     <table cellpadding="6" width="87%" border="1" cellspacing="0" id="daily_data">
-        <%--<tr>--%>
-            <%--<td style="border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;">--%>
-                <%--<button style="float: right" id="select">--%>
-                    <%--<a href="add_welfare_service.jsp">新增</a>--%>
-                <%--</button>--%>
-            <%--</td>--%>
-        <%--</tr>--%>
+        <tr>
+        <td style="border-right: 0;"></td>
+        <td style="border-left: 0;border-right: 0;"></td>
+        <td style="border-left: 0;border-right: 0;"></td>
+        <td style="border-left: 0;border-right: 0;"></td>
+        <td style="border-left: 0;">
+        <button style="float: right" id="select">
+        <a href="" id="add_new">新增</a>
+        </button>
+        </td>
+        </tr>
         <tr>
             <td>序号</td>
             <td>书籍名称</td>
-            <td>书籍简介</td>
-            <td>书籍图片</td>
-            <td>书籍作者</td>
-            <td>章节数</td>
+            <td>章节号(比如1代表章节一)</td>
+            <td>章节的MP3</td>
             <td>操作</td>
         </tr>
     </table>
@@ -265,8 +227,11 @@
 </center>
 </body>
 <script>
-    function check_chapter(id) {
-        window.location.href = "read_class_chapter.jsp?id="+id;
+    function check_chapter_inner(id) {
+        window.location.href = "read_class_chapter_inner.jsp?id="+id;
+    }
+    function check_chapter_new_word(id) {
+        window.location.href = "read_class_chapter_new_word.jsp?id="+id+"&book_id="+book_id;
     }
 </script>
 </html>

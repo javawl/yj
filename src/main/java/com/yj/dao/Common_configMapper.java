@@ -456,6 +456,15 @@ public interface Common_configMapper {
     //后台取出所有阅读书籍
     List<Map<Object,Object>> readClassBookAll(@Param("start") int start,@Param("size") int size);
 
+    //后台根据书籍id获取章节
+    List<Map<Object,Object>> readClassBookChapterAll(@Param("book_id") String book_id);
+
+    //后台根据章节id获取内容
+    List<Map<Object,Object>> readClassBookChapterInnerAll(@Param("chapter_id") String chapter_id);
+
+    //后台根据章节id获取新单词
+    List<Map<Object,Object>> readClassBookChapterNewWordAll(@Param("chapter_id") String chapter_id);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 
@@ -474,6 +483,9 @@ public interface Common_configMapper {
     //插入打卡阅读
     int insertReadChallengeClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id,@Param("set_time") String set_time);
 
+    //插入章节的新单词
+    int insertReadChallengeNewWord(@Param("word") String word,@Param("mean") String mean,@Param("symbol") String symbol,@Param("symbol_mp3") String symbol_mp3,@Param("book_id") String book_id,@Param("chapter_id") String chapter_id);
+
     //修改日完成任务次数阅读挑战打卡天数
     int changeReadClassInsistDay(@Param("series_id") String series_id, @Param("user_id") String user_id);
 
@@ -482,6 +494,33 @@ public interface Common_configMapper {
 
     //用户领取红包更新用户表
     int getReadClassRedPack(@Param("bill") String bill, @Param("id") String id, @Param("read_class_red_packet") String read_class_red_packet);
+
+    //更新书本简介
+    int updateReadClassBookIntroduction(@Param("id") String id, @Param("introduction") String introduction);
+
+    //更新书本作者
+    int updateReadClassBookAuthor(@Param("id") String id, @Param("author") String author);
+
+    //更新章节序号作者
+    int updateReadClassBookChapterOrder(@Param("id") String id, @Param("order") String order);
+
+    //更新书本封面
+    int updateReadBookPic(@Param("id") String id, @Param("pic") String pic);
+
+    //更新章节音频
+    int updateReadBookMP3(@Param("id") String id, @Param("mp3") String mp3);
+
+    //删除新单词
+    int deleteReadClassChapterNewWord(@Param("id") String id);
+
+    //删除新单词
+    int deleteChapterNewWord(@Param("chapter_id") String chapter_id);
+
+    //删除章节内容
+    int deleteChapterInner(@Param("chapter_id") String chapter_id);
+
+    //删除章节本身表
+    int deleteChapter(@Param("id") String id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

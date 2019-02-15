@@ -294,37 +294,6 @@ public class AdminController {
         return ServerResponse.createBySuccess(dictionaryMapper.countWelfareService(),Info);
     }
 
-
-    /**
-     * 展示书籍信息
-     * @param page
-     * @param size
-     * @param request
-     * @return
-     */
-    @RequestMapping(value = "showReadClassBook.do", method = RequestMethod.GET)
-    @ResponseBody
-    public ServerResponse<List<Map<Object,Object>>> showReadClassBook(String page,String size,HttpServletRequest request){
-        //验证参数是否为空
-        List<Object> l1 = new ArrayList<Object>(){{
-            add(page);
-            add(size);
-        }};
-        String CheckNull = CommonFunc.CheckNull(l1);
-        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-        //将页数和大小转化为limit
-        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
-        //获取阅读书籍信息
-        List<Map<Object,Object>> Info = common_configMapper.readClassBookAll(start,Integer.valueOf(size));
-
-        for(int i = 0; i < Info.size(); i++){
-            Info.get(i).put("pic",CommonFunc.judgePicPath(Info.get(i).get("pic").toString()));
-        }
-
-        return ServerResponse.createBySuccess(dictionaryMapper.countWelfareService(),Info);
-    }
-
-
     /**
      * 展示提现条目
      * @param page
@@ -2198,4 +2167,268 @@ public class AdminController {
         }
         return null;
     }
+
+
+    //-----------------------------------------------------1.2后台----------------------------------------------------------
+
+    /**
+     * 更新阅读挑战书籍信息
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_class_book_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_class_book_info(String id,String type,String inner, HttpServletResponse response){
+        if (type.equals("introduction")){
+            common_configMapper.updateReadClassBookIntroduction(id,inner);
+        }
+        if (type.equals("author")){
+            common_configMapper.updateReadClassBookAuthor(id,inner);
+        }
+
+        if (type.equals("chapter_order")){
+            common_configMapper.updateReadClassBookChapterOrder(id,inner);
+        }
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 上传书籍封面
+     * @param file
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadReadClassPic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadReadClassPic(@RequestParam(value = "upload_file",required = false) MultipartFile file, String id, HttpServletResponse response, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload(file,path,"l_e/read_class/book_pic");
+        String url = "read_class/book_pic/"+name;
+        //存到数据库
+        int result = common_configMapper.updateReadBookPic(id,url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url);
+    }
+
+
+    /**
+     * 上传书籍章节音频
+     * @param file
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadReadClassMP3.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadReadClassMP3(@RequestParam(value = "upload_file",required = false) MultipartFile file, String id, HttpServletResponse response, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload_uncompressed(file,path,"l_e/read_class/mp3");
+        String url = "read_class/mp3/"+name;
+        //存到数据库
+        int result = common_configMapper.updateReadBookMP3(id,url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url);
+    }
+
+
+    /**
+     * 展示书籍信息
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showReadClassBook.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassBook(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取阅读书籍信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookAll(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("pic",CommonFunc.judgePicPath(Info.get(i).get("pic").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBook(),Info);
+    }
+
+
+    /**
+     * 展示书籍的章节信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showReadClassBookChapter.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassBookChapter(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读书籍的章节信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookChapterAll(id);
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("mp3",CommonFunc.judgePicPath(Info.get(i).get("mp3").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
+    /**
+     * 展示书籍的章节内容信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showReadClassBookChapterInner.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassBookChapterInner(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读书籍的章节内容信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookChapterInnerAll(id);
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
+    /**
+     * 展示书籍的章节新单词信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showReadClassBookChapterNewWord.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassBookChapterNewWord(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读书籍的章节新单词
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookChapterNewWordAll(id);
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("symbol_mp3",CommonFunc.judgePicPath(Info.get(i).get("symbol_mp3").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
+    /**
+     * 删除章节下的新单词
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReadClassBookChapterNewWord.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteReadClassBookChapterNewWord(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //删除新单词
+
+        int delResult = common_configMapper.deleteReadClassChapterNewWord(id);
+        if (delResult == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 删除章节
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReadClassBookChapter.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteReadClassBookChapter(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除章节内容
+            common_configMapper.deleteChapterInner(id);
+            //删除新单词
+            common_configMapper.deleteChapterNewWord(id);
+            //删除章节
+            int result = common_configMapper.deleteChapter(id);
+            if (result == 0){
+                throw new Exception();
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    @RequestMapping(value = "upload_read_class_new_word.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_read_class_new_word(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String word,String mean, String symbol, String book_id, String chapter_id, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //mp3
+            String name1 = iFileService.upload_uncompressed(portrait,path,"l_e/read_class/mp3");
+            String url1 = "read_class/mp3/"+name1;
+            //存到数据库
+            int result = common_configMapper.insertReadChallengeNewWord(word,mean,symbol,url1,book_id,chapter_id);
+            if (result != 1){
+                throw new Exception();
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+    //-----------------------------------------------------1.2后台(下闭合线)----------------------------------------------------------
 }

@@ -923,6 +923,25 @@
     WHERE tb.book_id = tb2.id
   </select>
 
+  <select id="readClassBookChapterAll" resultType="map">
+    SELECT *
+    FROM read_class_chapter
+    WHERE read_class_chapter.book_id = #{book_id}
+  </select>
+
+  <select id="readClassBookChapterInnerAll" resultType="map">
+    SELECT *
+    FROM read_class_chapter_inner
+    WHERE read_class_chapter_inner.chapter_id = #{chapter_id}
+    ORDER BY `order`
+  </select>
+
+  <select id="readClassBookChapterNewWordAll" resultType="map">
+    SELECT *
+    FROM read_class_new_word
+    WHERE read_class_new_word.chapter_id = #{chapter_id}
+  </select>
+
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`,`whether_help`)
     values (#{user_id},#{series_id},#{set_time},0,0,1)
@@ -944,6 +963,11 @@
     values (#{series_id},#{book_id},#{user_id},#{chapter_id},#{set_time})
   </insert>
 
+  <insert id="insertReadChallengeNewWord" parameterType="string">
+    INSERT INTO read_class_new_word (word,mean,symbol,symbol_mp3,book_id,chapter_id)
+    values (#{word},#{mean},#{symbol},#{symbol_mp3},#{book_id},#{chapter_id})
+  </insert>
+
   <update id="changeReadClassInsistDay">
     UPDATE read_class_contestants
     set `insist_day` = insist_day + 1
@@ -951,7 +975,7 @@
     AND read_class_contestants.user_id = #{user_id}
   </update>
 
-  <update id="changeReadClassRedPacket">
+    <update id="changeReadClassRedPacket">
     UPDATE `user`
     set `read_class_red_packet` = #{read_class_red_packet},
         `read_class_red_packet_time` = #{read_class_red_packet_time},
@@ -959,9 +983,9 @@
         `read_class_red_packet_series_id` = #{read_class_red_packet_series_id},
         `read_class_red_packet_chapter_id` = #{read_class_red_packet_chapter_id}
     WHERE id = #{user_id}
-  </update>
+    </update>
 
-  <update id="getReadClassRedPack">
+    <update id="getReadClassRedPack">
     UPDATE `user`
     set `bill` = `bill` + #{bill},
         `read_class_red_packet_book_id` = null,
@@ -970,7 +994,58 @@
         `read_class_red_packet_series_id` = null,
         `read_class_red_packet` = #{read_class_red_packet}
     WHERE id = #{id}
-  </update>
+    </update>
+
+
+    <update id="updateReadClassBookIntroduction" parameterType="string">
+        UPDATE `read_class_book` SET
+        `introduction`=#{introduction}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassBookAuthor" parameterType="string">
+        UPDATE `read_class_book` SET
+            `author`=#{author}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassBookChapterOrder" parameterType="string">
+        UPDATE `read_class_chapter` SET
+            `order`=#{order}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadBookPic" parameterType="string">
+        UPDATE `read_class_book` SET
+            `pic`= #{pic}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadBookMP3" parameterType="string">
+        UPDATE `read_class_chapter` SET
+            `mp3`= #{mp3}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteReadClassChapterNewWord" parameterType="string" >
+        DELETE FROM `read_class_new_word`
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteChapterNewWord" parameterType="string" >
+        DELETE FROM `read_class_new_word`
+        WHERE chapter_id = #{chapter_id}
+    </delete>
+
+    <delete id="deleteChapterInner" parameterType="string" >
+        DELETE FROM `read_class_chapter_inner`
+        WHERE chapter_id = #{chapter_id}
+    </delete>
+
+    <delete id="deleteChapter" parameterType="string" >
+        DELETE FROM `read_class_chapter`
+        WHERE id = #{id}
+    </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 

@@ -1152,6 +1152,16 @@
     FROM welfare_service
   </select>
 
+  <select id="countReadClassBook" resultType="string">
+    SELECT count(id)
+    FROM read_class_book
+  </select>
+
+  <select id="countReadClassBookChapter" resultType="string">
+    SELECT count(id)
+    FROM read_class_chapter
+  </select>
+
 
   <select id="countWithDrawCash" resultType="string">
     SELECT count(id)

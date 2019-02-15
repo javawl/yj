@@ -338,6 +338,12 @@ public interface DictionaryMapper {
     String countWelfareService();
 
     //后台
+    String countReadClassBook();
+
+    //后台
+    String countReadClassBookChapter();
+
+    //后台
     String countWithDrawCash();
 
     //后台
