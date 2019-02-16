@@ -2220,7 +2220,7 @@ public class VariousServiceImpl implements IVariousService {
             }
             Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
             String needChapterId = needToReedBookChapter.get("id").toString();
-            if (!needChapterId.equals(chapter_id)){
+            if (needChapterId.equals(chapter_id)){
                 return ServerResponse.createByErrorMessage("传入章节和应读章节一致，请使用领红包");
             }
             //事务
