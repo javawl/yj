@@ -1619,7 +1619,6 @@ public class HomeServiceImpl implements IHomeService {
                     //每日计划单词数
                     int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
                     Map<String,String> notCoverList = new HashMap<>();
-                    logger.error("上传单词开始");
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
                         String word_id = job.get("id").toString();
@@ -1627,11 +1626,11 @@ public class HomeServiceImpl implements IHomeService {
                         String level = job.get("level").toString();
                         String word = job.get("word").toString();
                         //判断不重复
-                        if (notCoverList.containsKey(word)){
+                        if (notCoverList.containsKey(word_id)){
                             logger.error("上传单词出现重复单词");
                             continue;
                         }else {
-                            notCoverList.put(word, "1");
+                            notCoverList.put(word_id, "1");
                         }
                         String meaning = job.get("meaning").toString();
                         //判断是否掌握
@@ -1639,13 +1638,11 @@ public class HomeServiceImpl implements IHomeService {
                             String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
                             if (selectMaster == null){
                                 //删除已背单词
-                                logger.error("状态一：" + word_id);
                                 int deleteMaster = dictionaryMapper.deleteRecitingWord(word_id,id,plan,word);
                                 if (deleteMaster == 0){
                                     //删不了说明没有，是点pass进来的背单词数加一
                                     learned_word+=1;
                                 }
-                                logger.error("状态二：" + word_id);
                                 int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
                                 if (resultMaster == 0){
                                     throw new Exception();
@@ -1655,13 +1652,11 @@ public class HomeServiceImpl implements IHomeService {
                             String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
                             if (selectReciting == null){
                                 learned_word+=1;
-                                logger.error("状态三：" + word_id);
                                 int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning);
                                 if (resultReciting == 0){
                                     throw new Exception();
                                 }
                             }else {
-                                logger.error("状态四：" + word_id);
                                 int resultReciting = dictionaryMapper.updateRecitingWord(word_id,id,right_time,plan,word,level);
                                 if (resultReciting == 0){
                                     throw new Exception();
