@@ -361,6 +361,7 @@
     SELECT id
     FROM `user`
     WHERE wechat = #{openid}
+    LIMIT 1
   </select>
 
   <select id="getOpenId" resultType="string" parameterType="string">

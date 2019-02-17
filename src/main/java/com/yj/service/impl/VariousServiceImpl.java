@@ -2125,7 +2125,7 @@ public class VariousServiceImpl implements IVariousService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) == null){
+            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) != null){
                 return ServerResponse.createByErrorMessage("该章节打过卡了，不可重复！");
             }
             String now_time = String.valueOf(new Date().getTime());
@@ -2173,6 +2173,7 @@ public class VariousServiceImpl implements IVariousService {
                 common_configMapper.changeReadClassInsistDay(selectBeginningReadClass.get("series_id").toString(),uid);
                 //更新用户红包
                 common_configMapper.changeReadClassRedPacket(String.valueOf(total/Double.valueOf(String.valueOf(allDay))),now_time,uid, book_id, chapter_id, selectBeginningReadClass.get("series_id").toString());
+                transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
                 transactionManager.rollback(status);
@@ -2203,7 +2204,7 @@ public class VariousServiceImpl implements IVariousService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) == null){
+            if (common_configMapper.checkReadClassClockIn(series_id, book_id, uid, chapter_id) != null){
                 return ServerResponse.createByErrorMessage("该章节打过卡了，不可重复！");
             }
             String now_time = String.valueOf(new Date().getTime());
@@ -2232,6 +2233,7 @@ public class VariousServiceImpl implements IVariousService {
             try {
                 //拿去打卡
                 common_configMapper.insertReadChallengeClockIn(selectBeginningReadClass.get("series_id").toString(), book_id, uid, chapter_id, now_time);
+                transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
                 transactionManager.rollback(status);

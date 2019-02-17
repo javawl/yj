@@ -1738,6 +1738,7 @@ public class HomeServiceImpl implements IHomeService {
                 transactionManager.rollback(status);
                 logger.error("上传单词异常",e.getStackTrace());
                 logger.error("上传单词异常",e);
+                logger.error(word_list);
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
         }

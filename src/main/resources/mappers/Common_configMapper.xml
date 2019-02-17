@@ -820,12 +820,12 @@
   <select id="getUserLastClockReadChapterAndBookInfo" resultType="map" parameterType="string">
     SELECT read_class_book.*,tb.*
     FROM read_class_book,
-    (SELECT book_id,chapter_id,set_time
+    (SELECT book_id,chapter_id,set_time,id as tb_id
     FROM read_class_clock_in
     WHERE series_id = #{series_id}
     AND user_id = #{user_id}) tb
     WHERE read_class_book.id = tb.book_id
-    ORDER BY tb.set_time DESC
+    ORDER BY tb.set_time DESC,tb.tb_id DESC
   </select>
 
   <select id="getSeriesBookAndChapter" resultType="map" parameterType="string">
