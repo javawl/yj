@@ -170,6 +170,7 @@ public class VariousServiceImpl implements IVariousService {
                     //--------------------------------------------------------------------------------------------------
                     //把书籍信息装到一个map
                     Map<Object,Object> bookInfo = new HashMap<>();
+                    Map<Object,Object> nextBookInfo = new HashMap<>();
                     //找出用户最近打卡的一章的书籍并计算用户打卡的总章数
                     List<Map<Object,Object>> userClockInChapter = common_configMapper.getUserLastClockReadChapterAndBookInfo(selectBeginningReadClass.get("series_id").toString(),id);
                     //总天数
@@ -187,6 +188,26 @@ public class VariousServiceImpl implements IVariousService {
                         bookInfo.put("chapter_order", ChapterInfo.get("order").toString());
                         bookInfo.put("chapter_id", lastClockIn.get("chapter_id").toString());
                         bookInfo.put("book_id", lastClockIn.get("book_id").toString());
+                        //在这里查看一下下一章要看的章节和书籍号
+                        boolean flag_exist = false;
+                        for (int k = 0; k < seriesBooks.size(); k++){
+                            if (lastClockIn.get("chapter_id").toString().equals(seriesBooks.get(k).get("chapter_id").toString())){
+                                flag_exist = true;
+                                if ((k+1) >= seriesBooks.size()){
+                                    //没有下一章了
+                                    nextBookInfo.put("chapter_id", null);
+                                    nextBookInfo.put("book_id", null);
+                                }else {
+                                    nextBookInfo.put("chapter_id", seriesBooks.get(k + 1).get("chapter_id").toString());
+                                    nextBookInfo.put("book_id", seriesBooks.get(k + 1).get("book_id").toString());
+                                }
+                            }
+                        }
+                        if (!flag_exist){
+                            //没有匹配到
+                            nextBookInfo.put("chapter_id", null);
+                            nextBookInfo.put("book_id", null);
+                        }
                     }else {
                         //如果一次卡都没打的话就给第一本书的第一张
                         //根据书籍id查书籍信息
@@ -196,8 +217,17 @@ public class VariousServiceImpl implements IVariousService {
                         bookInfo.put("chapter_order", "1");
                         bookInfo.put("book_id", seriesBooks.get(0).get("book_id").toString());
                         bookInfo.put("chapter_id", seriesBooks.get(0).get("chapter_id").toString());
+                        //在这里查看一下下一章要看的章节和书籍号
+                        if (seriesBooks.size() <= 1){
+                            nextBookInfo.put("chapter_id", null);
+                            nextBookInfo.put("book_id", null);
+                        }else {
+                            nextBookInfo.put("chapter_id", seriesBooks.get(1).get("book_id").toString());
+                            nextBookInfo.put("book_id", seriesBooks.get(1).get("chapter_id").toString());
+                        }
                     }
                     result.put("readBookInfo", bookInfo);
+                    result.put("nextChapterInfo", nextBookInfo);
                     result.put("series_id", selectBeginningReadClass.get("series_id").toString());
                 }
             }
