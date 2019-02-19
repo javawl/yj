@@ -1621,6 +1621,9 @@ public class VariousServiceImpl implements IVariousService {
                 result.put("et", CommonFunc.getFormatTime(Long.valueOf(selectBeginningReadClass.get("et").toString()),"yyyy-MM-dd HH:mm:ss"));
                 //去找老师的二维码
                 Map<Object,Object> showReadClassSeriesTeacher = common_configMapper.showReadClassSeriesTeacher(selectBeginningReadClass.get("series_id").toString());
+                if (showReadClassSeriesTeacher == null){
+                    return ServerResponse.createByErrorMessage("该系列没有老师！");
+                }
                 result.put("qr_code", CommonFunc.judgePicPath(showReadClassSeriesTeacher.get("qr_code").toString()));
             }
 

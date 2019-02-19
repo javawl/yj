@@ -1349,6 +1349,36 @@ public class HomeServiceImpl implements IHomeService {
                 return ServerResponse.createByErrorMessage("未找到该计划！");
             }
             int number = Integer.valueOf(numberResult.get("plan_words_number").toString());
+            //查看用户状态并决定需要提供的新学单词数
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+
+            //查看坚持天数表中有没有数据
+            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
+            if (getInsistDay != null) {
+                //取出今天已背的
+                int today_learned_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
+                //取出状态
+                int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
+                //计算总的
+                if (is_correct == 0 || is_correct == 1) {
+                    //完成任务
+                    if (today_learned_number >= number) {
+                        number = 0;
+                    } else {
+                        number -= today_learned_number;
+                    }
+                } else{
+                    //用户需要完成第二次任务
+                    if (is_correct == 2){
+                        if (today_learned_number >= (2 * number)) {
+                            number = 0;
+                        } else {
+                            number = (number * 2) - today_learned_number;
+                        }
+                    }
+                }
+            }
             String dictionary_type = dictionaryMapper.selectPlanType(plan);
             //获取新单词(获取上面number条
             List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id,dictionary_type);
@@ -1408,11 +1438,6 @@ public class HomeServiceImpl implements IHomeService {
 
             List<Map> old_list = new ArrayList<>();
             //这里要做一个判断，如果今天已经背过第一轮之后，只给新单词不给旧单词
-            //获取当天0点多一秒时间戳
-            String one = CommonFunc.getOneDate();
-
-            //查看坚持天数表中有没有数据
-            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
             //做个flag,1代表是再来XX个
             int flag_old_word = 0;
             if (getInsistDay != null){
@@ -1612,12 +1637,14 @@ public class HomeServiceImpl implements IHomeService {
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
             try {
                 if(word_list_json.size()>0){
+                    //今日已学单词，从表中查出来
                     int learned_word = 0;
                     //获取用户的计划
                     Map user_info = userMapper.getUserPlanNumber(id);
                     String plan = user_info.get("my_plan").toString();
                     //每日计划单词数
                     int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
+                    //防重复
                     Map<String,String> notCoverList = new HashMap<>();
                     for(int i=0;i<word_list_json.size();i++){
                         net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
@@ -1652,7 +1679,7 @@ public class HomeServiceImpl implements IHomeService {
                             String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
                             if (selectReciting == null){
                                 learned_word+=1;
-                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning);
+                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning, right_time);
                                 if (resultReciting == 0){
                                     throw new Exception();
                                 }
