@@ -1540,11 +1540,64 @@ public class VariousServiceImpl implements IVariousService {
 
             Map<Object,Object> result = new HashMap<>();
             if (readClass == null){
+                //因为没有可报名的阅读，所以给一个预约的
+                Map<Object,Object> readClassReserved = common_configMapper.showReadClassReserved(now_time_stamp);
+                Map<Object,Object> resultReserved = new HashMap<>();
+                if (readClassReserved == null){
+                    return ServerResponse.createBySuccess("成功！", resultReserved);
+                }
+                resultReserved.put("periods", readClassReserved.get("periods"));
+                resultReserved.put("st", CommonFunc.getFormatTime(Long.valueOf(readClassReserved.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+                resultReserved.put("et", CommonFunc.getFormatTime(Long.valueOf(readClassReserved.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+                resultReserved.put("type", "reserved");
+                Long during = (new Date()).getTime() - Long.valueOf(readClassReserved.get("set_time").toString());
+                //将该期的系列全部展示出来
+                List<Map<Object,Object>> series = common_configMapper.showReadClassSeries(readClassReserved.get("id").toString());
+                //把所有的系列分出来
+                List<List<Map<Object,Object>>> allSeriesReserved = new ArrayList<>();
+                //记录id
+                String flag_id = "";
+                //记录下标
+                int flag_index = -1;
+                for (int i = 0; i < series.size(); i++){
+                    series.get(i).put("pic",CommonFunc.judgePicPath(series.get(i).get("pic").toString()));
+                    //判断是否和flag一致
+                    if (series.get(i).get("book_id").toString().equals(flag_id)){
+                        //该系列放入一本书
+                        allSeriesReserved.get(flag_index).add(series.get(i));
+                    }else {
+                        //添加新的flag
+                        flag_index += 1;
+                        flag_id = series.get(i).get("book_id").toString();
+                        //初始化
+                        List<Map<Object,Object>> tmp = new ArrayList<>();
+                        allSeriesReserved.add(tmp);
+                        //该系列放入一本书
+                        allSeriesReserved.get(flag_index).add(series.get(i));
+                    }
+                }
+                //计算有多少人预约
+                //查找真实预约人数
+                int reservedReadNumber = common_configMapper.countReadClassReserved(readClassReserved.get("id").toString());
+                int number = Integer.valueOf(readClassReserved.get("virtual_number_reserved").toString()) + reservedReadNumber;
+                int all_peopleReserved = 0;
+                Long ii = 0L;
+                while (ii < during){
+                    if (all_peopleReserved + 3 > number){
+                        all_peopleReserved = number;
+                        break;
+                    }
+                    all_peopleReserved += 3;
+                    ii+=7200000;
+                }
+                resultReserved.put("people", all_peopleReserved);
+                resultReserved.put("series", allSeriesReserved);
                 return ServerResponse.createBySuccess("成功！", result);
             }
             result.put("st", CommonFunc.getFormatTime(Long.valueOf(readClass.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
             result.put("et", CommonFunc.getFormatTime(Long.valueOf(readClass.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
             result.put("periods", readClass.get("periods"));
+            result.put("type", "formal");
             Long during = (new Date()).getTime() - Long.valueOf(readClass.get("set_time").toString());
             //将该期的系列全部展示出来
             List<Map<Object,Object>> series = common_configMapper.showReadClassSeries(readClass.get("id").toString());
@@ -1652,6 +1705,77 @@ public class VariousServiceImpl implements IVariousService {
             if (selectBeginningReadClass == null) return ServerResponse.createByErrorMessage("传入书籍标识有误！");
 
             return ServerResponse.createBySuccess("成功！", selectBeginningReadClass);
+        }
+    }
+
+    //预约阅读挑战
+    public ServerResponse<Map<Object,Object>> reservedReadClass(String series_id, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(series_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                String now_time = String.valueOf((new Date()).getTime());
+                Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
+                if (selectBeginningReadClass != null){
+                    throw new Exception("已经报过名了不可预约！");
+                }
+                //报过名不能报(任意未结束一期)
+                Map<Object,Object> selectHelpReadClass = common_configMapper.showSelectBeginReadClassSeriesHelp(now_time,uid);
+                if (selectHelpReadClass != null){
+                    throw new Exception("已经报过名了不可预约！");
+                }
+                //预约
+                common_configMapper.insertReadChallengeReserved(uid,series_id,now_time);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("预约成功！");
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("预约阅读挑战失败",e.getStackTrace());
+                logger.error("预约阅读挑战失败",e);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("预约失败！");
+            }
+        }
+    }
+
+
+    //报名页介绍页的往期人的评论图片
+    public ServerResponse<List<Map<Object,Object>>> showReadClassIntroductionPic(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            List<Map<Object,Object>> result = common_configMapper.showReadClassIntroductionPic();
+            for (int i = 0; i < result.size(); i++){
+                result.get(i).put("pic", CommonFunc.judgePicPath(result.get(i).get("pic").toString()));
+            }
+            return ServerResponse.createBySuccess("成功！", result);
         }
     }
 

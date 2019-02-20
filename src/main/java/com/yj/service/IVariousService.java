@@ -90,6 +90,12 @@ public interface IVariousService {
     //展现书籍简介
     ServerResponse<Map<Object,Object>> showReadClassBookIntroduction(String book_id, HttpServletRequest request);
 
+    //预约阅读挑战
+    ServerResponse<Map<Object,Object>> reservedReadClass(String series_id, HttpServletRequest request);
+
+    //报名页介绍页的往期人的评论图片
+    ServerResponse<List<Map<Object,Object>>> showReadClassIntroductionPic(HttpServletRequest request);
+
     //支付
     ServerResponse<Map<String, Object>> readChallengePay(String series_id, HttpServletRequest request);
 

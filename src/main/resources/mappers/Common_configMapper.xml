@@ -708,7 +708,7 @@
 
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
-  <!--这里是单词阅读的sql代码-->
+  <!--这里是阅读挑战的sql代码-->
   <select id="showReadClass" resultType="map" parameterType="string">
     SELECT *
     FROM read_class
@@ -716,6 +716,20 @@
     AND read_class.st > #{now_time}
     ORDER BY read_class.st ASC
     LIMIT 1
+  </select>
+
+  <select id="showReadClassReserved" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class
+    WHERE read_class.eroll_st > #{now_time}
+    ORDER BY read_class.eroll_st ASC
+    LIMIT 1
+  </select>
+
+  <select id="countReadClassReserved" resultType="int" parameterType="string">
+    SELECT count(id)
+    FROM read_class_reserved
+    WHERE read_class_id = #{read_class_id}
   </select>
 
   <select id="showReadClassSeries" resultType="map" parameterType="string">
@@ -936,6 +950,11 @@
     ORDER BY `order`
   </select>
 
+  <select id="showReadClassIntroductionPic" resultType="map">
+    SELECT *
+    FROM read_class_introduction_pic
+  </select>
+
   <select id="readClassBookChapterNewWordAll" resultType="map">
     SELECT *
     FROM read_class_new_word
@@ -954,6 +973,11 @@
 
   <insert id="insertReadChallengeContestantsHelp" parameterType="string">
     INSERT INTO read_class_help_sign_up (user_id,series_id,set_time)
+    values (#{user_id},#{series_id},#{set_time})
+  </insert>
+
+  <insert id="insertReadChallengeReserved" parameterType="string">
+    INSERT INTO read_class_reserved (user_id,series_id,set_time)
     values (#{user_id},#{series_id},#{set_time})
   </insert>
 

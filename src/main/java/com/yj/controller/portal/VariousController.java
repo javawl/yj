@@ -528,6 +528,32 @@ public class VariousController {
 
 
     /**
+     * 预约阅读挑战
+     * @param request         req
+     * @return                成功
+     */
+    @RequestMapping(value = "reservedReadClass.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> reservedReadClass(String series_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.reservedReadClass(series_id, request);
+    }
+
+
+    /**
+     * 报名页介绍页的往期人的评论图片
+     * @param request         req
+     * @return                成功
+     */
+    @RequestMapping(value = "showReadClassIntroductionPic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassIntroductionPic(HttpServletRequest request){
+        //调用service层
+        return iVariousService.showReadClassIntroductionPic(request);
+    }
+
+
+    /**
      * 支付
      * @param request         req
      * @return                成功

@@ -396,6 +396,12 @@ public interface Common_configMapper {
     //展示单词挑战首页
     Map<Object,Object> showReadClass(@Param("now_time") String  now_time);
 
+    //展示单词挑战预约的信息
+    Map<Object,Object> showReadClassReserved(@Param("now_time") String  now_time);
+
+    //计算单词挑战真实人数
+    int countReadClassReserved(@Param("read_class_id") String  read_class_id);
+
     //展示某期下面的所有系列包括内部书籍信息
     List<Map<Object,Object>> showReadClassSeries(@Param("read_class_id") String  read_class_id);
 
@@ -462,6 +468,9 @@ public interface Common_configMapper {
     //后台根据章节id获取内容
     List<Map<Object,Object>> readClassBookChapterInnerAll(@Param("chapter_id") String chapter_id);
 
+    //报名页介绍页的往期人的评论图片
+    List<Map<Object,Object>> showReadClassIntroductionPic();
+
     //后台根据章节id获取新单词
     List<Map<Object,Object>> readClassBookChapterNewWordAll(@Param("chapter_id") String chapter_id);
 
@@ -479,6 +488,9 @@ public interface Common_configMapper {
 
     //报名助力参与阅读
     int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+
+    //预约阅读
+    int insertReadChallengeReserved(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
 
     //插入打卡阅读
     int insertReadChallengeClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id,@Param("set_time") String set_time);
