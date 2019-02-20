@@ -102,6 +102,9 @@ public interface IVariousService {
     //助力支付
     ServerResponse<Map<String, Object>> readChallengeHelpPay(String series_id, HttpServletRequest request);
 
+    //助力支付第二次
+    ServerResponse<Map<String, Object>> readChallengeHelpPaySecond(HttpServletRequest request);
+
     //助力
     ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request);
 

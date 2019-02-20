@@ -474,6 +474,9 @@ public interface Common_configMapper {
     //后台根据章节id获取新单词
     List<Map<Object,Object>> readClassBookChapterNewWordAll(@Param("chapter_id") String chapter_id);
 
+    //查看用户是否预定过
+    Map<Object,Object> checkExistReserved(@Param("user_id") String user_id);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 
@@ -500,6 +503,9 @@ public interface Common_configMapper {
 
     //修改日完成任务次数阅读挑战打卡天数
     int changeReadClassInsistDay(@Param("series_id") String series_id, @Param("user_id") String user_id);
+
+    //修改助力状态
+    int changeReadClassHelpStatus(@Param("is_effective") String is_effective, @Param("user_id") String user_id);
 
     //把红包状态更新给用户
     int changeReadClassRedPacket(@Param("read_class_red_packet") String read_class_red_packet,@Param("read_class_red_packet_time") String read_class_red_packet_time,@Param("user_id") String user_id,@Param("read_class_red_packet_book_id") String read_class_red_packet_book_id,@Param("read_class_red_packet_chapter_id") String read_class_red_packet_chapter_id,@Param("read_class_red_packet_series_id") String read_class_red_packet_series_id);

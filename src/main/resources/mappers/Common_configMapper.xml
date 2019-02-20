@@ -955,6 +955,13 @@
     FROM read_class_introduction_pic
   </select>
 
+  <select id="checkExistReserved" resultType="map">
+    SELECT *
+    FROM read_class_reserved
+    WHERE user_id = #{user_id}
+    LIMIT 1
+  </select>
+
   <select id="readClassBookChapterNewWordAll" resultType="map">
     SELECT *
     FROM read_class_new_word
@@ -997,6 +1004,14 @@
     set `insist_day` = insist_day + 1
     WHERE read_class_contestants.series_id = #{series_id}
     AND read_class_contestants.user_id = #{user_id}
+  </update>
+
+
+  <update id="changeReadClassHelpStatus">
+    UPDATE read_class_help_sign_up
+    set `is_effective` = #{is_effective}
+    WHERE read_class_help_sign_up.user_id = #{user_id}
+    AND is_effective = 0
   </update>
 
     <update id="changeReadClassRedPacket">
