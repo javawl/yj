@@ -1716,18 +1716,19 @@ public class VariousServiceImpl implements IVariousService {
             //根据书籍id查书籍信息
             Map<Object,Object> selectBeginningReadClass = common_configMapper.showReadClassBookIntroduction(book_id);
             if (selectBeginningReadClass == null) return ServerResponse.createByErrorMessage("传入书籍标识有误！");
+            selectBeginningReadClass.put("pic", CommonFunc.judgePicPath(selectBeginningReadClass.get("pic").toString()));
 
             return ServerResponse.createBySuccess("成功！", selectBeginningReadClass);
         }
     }
 
     //预约阅读挑战
-    public ServerResponse<Map<Object,Object>> reservedReadClass(String series_id, HttpServletRequest request){
+    public ServerResponse<Map<Object,Object>> reservedReadClass(String read_class_id, HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
-            add(series_id);
+            add(read_class_id);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
@@ -1758,7 +1759,7 @@ public class VariousServiceImpl implements IVariousService {
                     throw new Exception("已经预约过了不可再预约！");
                 }
                 //预约
-                common_configMapper.insertReadChallengeReserved(uid,series_id,now_time);
+                common_configMapper.insertReadChallengeReserved(uid,read_class_id,now_time);
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("预约成功！");
             } catch (Exception e) {

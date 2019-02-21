@@ -502,7 +502,7 @@ public interface Common_configMapper {
     int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
 
     //预约阅读
-    int insertReadChallengeReserved(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+    int insertReadChallengeReserved(@Param("user_id") String user_id,@Param("read_class_id") String read_class_id,@Param("set_time") String set_time);
 
     //插入阅读章节
     int insertReadClassChapter(@Param("name") String name,@Param("order") String order,@Param("book_id") String book_id,@Param("mp3") String mp3);
@@ -539,6 +539,12 @@ public interface Common_configMapper {
 
     //更新章节序号作者
     int updateReadClassBookChapterOrder(@Param("id") String id, @Param("order") String order);
+
+    //更新阅读挑战的虚拟报名数
+    int updateReadClassVirtualReservedNumber(@Param("id") String id, @Param("virtual_number_reserved") String virtual_number_reserved);
+
+    //更新阅读挑战的虚拟数
+    int updateReadClassVirtualNumber(@Param("id") String id, @Param("virtual_number") String virtual_number);
 
     //更新书本封面
     int updateReadBookPic(@Param("id") String id, @Param("pic") String pic);

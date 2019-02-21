@@ -1003,8 +1003,8 @@
   </insert>
 
   <insert id="insertReadChallengeReserved" parameterType="string">
-    INSERT INTO read_class_reserved (user_id,series_id,set_time)
-    values (#{user_id},#{series_id},#{set_time})
+    INSERT INTO read_class_reserved (user_id,read_class_id,set_time)
+    values (#{user_id},#{read_class_id},#{set_time})
   </insert>
 
 
@@ -1087,6 +1087,18 @@
     <update id="updateReadClassBookChapterOrder" parameterType="string">
         UPDATE `read_class_chapter` SET
             `order`=#{order}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassVirtualReservedNumber" parameterType="string">
+        UPDATE `read_class` SET
+            `virtual_number_reserved`=#{virtual_number_reserved}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassVirtualNumber" parameterType="string">
+        UPDATE `read_class` SET
+            `virtual_number`=#{virtual_number}
         WHERE id = #{id}
     </update>
 

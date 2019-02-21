@@ -629,6 +629,7 @@ public class AdminController {
             Info.get(i).put("eroll_st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("eroll_st").toString()),"yyyy/MM/dd HH:mm:ss"));
             Info.get(i).put("st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
             Info.get(i).put("et",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("reserved_number", common_configMapper.countReadClassReserved(Info.get(i).get("id").toString()));
         }
 
         return ServerResponse.createBySuccess(dictionaryMapper.countWordChallenge(),Info);
@@ -2235,6 +2236,35 @@ public class AdminController {
 
         return ServerResponse.createBySuccessMessage("成功");
     }
+
+
+    /**
+     * 更新阅读挑战虚拟预约数
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_class_reserved_number.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_class_reserved_number(String id, String inner, HttpServletResponse response){
+        common_configMapper.updateReadClassVirtualReservedNumber(id,inner);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 更新阅读挑战虚拟数
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_class_virtual_number.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_class_virtual_number(String id, String inner, HttpServletResponse response){
+        common_configMapper.updateReadClassVirtualNumber(id,inner);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
 
 
     /**
