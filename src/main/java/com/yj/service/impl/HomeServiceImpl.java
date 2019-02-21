@@ -1738,7 +1738,10 @@ public class HomeServiceImpl implements IHomeService {
                         //立个flag
                         int flag = 0;
                         //计算总的
-                        if ((today_learned_number + learned_word) >= plan_words_number && is_correct == 0){
+                        logger.error("水爷"+String.valueOf(today_learned_number + learned_word));
+                        logger.error(String.valueOf(today_learned_number));
+                        logger.error(String.valueOf(is_correct));
+                        if (((today_learned_number + learned_word) >= plan_words_number )&& is_correct == 0){
                             //完成任务
                             int updateResult = dictionaryMapper.changeInsistDayStatus(1,learned_word,plan,one,id);
                             if (updateResult == 0){
