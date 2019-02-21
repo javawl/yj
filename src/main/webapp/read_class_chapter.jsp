@@ -59,7 +59,7 @@
                         // '<td>'+string2+'</td>'+
                         // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
                         // '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><button style="margin-left: 5px;" onclick="check_chapter_inner('+"'"+data[i]['id']+"'"+')">查看内容</button><button style="margin-left: 5px;" onclick="check_chapter_new_word('+"'"+data[i]['id']+"'"+')">查看新单词</button><button style="margin-left: 5px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td><button style="margin-left: 5px;" onclick="check_chapter_inner('+"'"+data[i]['id']+"'"+')">查看内容</button><button style="margin-left: 5px;" onclick="check_chapter_new_word('+"'"+data[i]['id']+"'"+')">查看新单词</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -232,6 +232,32 @@
     }
     function check_chapter_new_word(id) {
         window.location.href = "read_class_chapter_new_word.jsp?id="+id+"&book_id="+book_id;
+    }
+    function del(id) {
+        if (confirm("你确定要删除？删除之后不可恢复！")){
+            $.ajax({
+                url:url+"/admin/deleteReadClassBookChapter.do",
+                type:'POST',
+                data:{
+                    id:id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
     }
 </script>
 </html>

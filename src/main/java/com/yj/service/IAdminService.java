@@ -29,6 +29,9 @@ public interface IAdminService {
 
     ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file, String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request );
 
+    //上传阅读挑战章节
+    ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String book_id, HttpServletResponse response, HttpServletRequest request );
+
     ServerResponse<List<Map>> feeds_info(String page, String size, HttpServletRequest request);
 
     ServerResponse<Map> show_admin_data(String page,String size,HttpServletRequest request);

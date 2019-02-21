@@ -620,36 +620,11 @@ public class VariousController {
                     }
                     //插入参与数据库
                     common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
-//                    //插入单词挑战总数据库
-//                    common_configMapper.changeWordChallengeEnroll(word_challenge_id);
-//                    if (!user_id.equals("no")){
-//                        if (!CommonFunc.isInteger(user_id)){
-//                            logger.error("传入user_id非法！");
-//                        }
-//                        //通过邀请进来的
-//                        common_configMapper.insertWordChallengeInviteRelation(uid,user_id,word_challenge_id,now_time);
-//                        //获取accessToken
-//                        AccessToken access_token = CommonFunc.getAccessToken();
-//                        //给该用户发送
-//                        //查没过期的from_id
-//                        Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,now_time);
-//                        if (info != null){
-//                            common_configMapper.deleteTemplateMsg(info.get("id").toString());
-//                            //发送模板消息
-//                            WxMssVo wxMssVo = new WxMssVo();
-//                            wxMssVo.setTemplate_id(Const.TMP_ID_INVITEE);
-//                            wxMssVo.setAccess_token(access_token.getAccessToken());
-//                            wxMssVo.setTouser(info.get("wechat").toString());
-//                            wxMssVo.setPage(Const.INVITE_DETAIL_PATH);
-//                            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-//                            wxMssVo.setForm_id(info.get("form_id").toString());
-//                            List<TemplateData> list = new ArrayList<>();
-//                            list.add(new TemplateData("30天单词挑战","#ffffff"));
-//                            list.add(new TemplateData("咦~好像有人接受了你的挑战邀请，点击查看是哪个小可爱~","#ffffff"));
-//                            wxMssVo.setParams(list);
-//                            CommonFunc.sendTemplateMessage(wxMssVo);
-//                        }
-//                    }
+                    //将报名人数加一
+                    String readClassId = common_configMapper.getReadClassSeriesById(series_id).get("read_class_id").toString();
+                    common_configMapper.changeReadClassEnrollment(readClassId);
+
+
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
@@ -868,6 +843,9 @@ public class VariousController {
                     common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
                     //将助力状态改为失效
                     common_configMapper.changeReadClassHelpStatus("1", uid);
+                    //将报名人数加一
+                    String readClassId = common_configMapper.getReadClassSeriesById(series_id).get("read_class_id").toString();
+                    common_configMapper.changeReadClassEnrollment(readClassId);
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

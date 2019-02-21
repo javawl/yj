@@ -1492,6 +1492,7 @@ public class HomeServiceImpl implements IHomeService {
             Map<Object,Object> result_list = new HashMap<>();
             result_list.put("new_list", new_list);
             result_list.put("old_list", old_list);
+            result_list.put("plan_number", numberResult.get("plan_words_number"));
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(result_list, SerializerFeature.WriteMapNullValue));
 
@@ -1734,6 +1735,8 @@ public class HomeServiceImpl implements IHomeService {
                         int today_learned_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
                         //取出状态
                         int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
+                        //立个flag
+                        int flag = 0;
                         //计算总的
                         if ((today_learned_number + learned_word) >= plan_words_number && is_correct == 0){
                             //完成任务
@@ -1747,11 +1750,20 @@ public class HomeServiceImpl implements IHomeService {
                             if (updateUserResult == 0){
                                 throw new Exception();
                             }
+                            flag = 1;
                         }
                         //没完成不变
                         if ((today_learned_number + learned_word) >= (2 * plan_words_number) && is_correct == 2){
                             //完成双倍任务
                             int updateResult = dictionaryMapper.changeInsistDayStatus(3,learned_word,plan,one,id);
+                            if (updateResult == 0){
+                                throw new Exception();
+                            }
+                            flag = 1;
+                        }
+
+                        if (flag == 0){
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(is_correct,learned_word,plan,one,id);
                             if (updateResult == 0){
                                 throw new Exception();
                             }

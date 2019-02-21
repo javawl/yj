@@ -114,7 +114,7 @@ public class VariousServiceImpl implements IVariousService {
                     result.put("is_reading", 1);
                     //计算还有多少天
                     int restDay = CommonFunc.count_interval_days(now_time,selectBeginningReadClass.get("st").toString());
-                    result.put("rest_day", restDay);
+                    result.put("rest_day", restDay - 1);
                     result.put("series_id", selectBeginningReadClass.get("series_id").toString());
                     readFlag = 1;
                 }else {

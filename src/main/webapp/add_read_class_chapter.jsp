@@ -53,16 +53,14 @@
     </table>
 </div>
 <div id="inner">
-    <h2>第1段文字</h2>
+    <h2>第1段文字(别搞太长！！！)</h2>
     <%--<div id="div1" class="text">--%>
         <%--<p>第1段文字</p>--%>
     <%--</div>--%>
-    <textarea></textarea>
+    英文：<textarea id="en1" style="width: 700px; height: 70px;"></textarea><br> 中文：<textarea id="cn1" style="width: 700px; height: 70px;"></textarea>
 </div>
 <div>
-    <button id="add_pic">添加一张图片</button>
     <button id="add_text">添加一段文字</button>
-    <button id="submit">获取html</button>
     <button id="btn1">提交</button>
 </div>
 <div id="special">
@@ -80,74 +78,43 @@
 <script type="text/javascript" src="<%=root_url %>"></script>
 <script type="text/javascript">
     var flag = 1;
-    var editor = new Array()
-    var E = window.wangEditor;
-
-    editor[1] = new E('#div1');
-    editor[1].create();
-    document.getElementById('submit').addEventListener('click', function () {
-        alert(editor[1].txt.html());
-    }, false);
+    // 获取get参数的方法
+    function GetQueryString(name)
+    {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return  unescape(r[2]); return null;
+    }
+    var book_id = parseInt(GetQueryString("id"));
     document.getElementById('btn1').addEventListener('click', function () {
-        var select = $('input[name=select]:checked').val();
         var title = $('input[name=title]').val();
-        var kind = $('input[name=kind]').val();
-        var author = $("#author option:selected").val();
-        if(select == undefined){
-            alert("请选择封面的格式！");
-            return;
-        }
+        var order = $('input[name=order]').val();
         if (typeof($('#pic')[0].files[0]) == "undefined"){
-            alert("请选择封面图,不能为空！");
-            return;
-        }
-        if (select == "0" && typeof($('#video_file')[0].files[0]) == "undefined") {
-            alert("请选择视频,不能为空！");
+            alert("请选择音频,不能为空！");
             return;
         }
         // 读取 html
         var result = [];
         //建立图片数组
-        var files_order = [];
         var formData = new FormData();
-        for(var ii = 0; ii < flag; ii++){
-            if (editor[ii+1] != undefined){
-                //文本
-                alert(ii+1);
-                var single_json = {
-                    "inner": editor[ii+1].txt.html(),
-                    "order": ii+1
-                };
-                result.push(single_json);
-            }else {
-                //图片
-                //获取id
-                var pic_id = "#pic"+(ii+1).toString();
-                formData.append('file', $(pic_id)[0].files[0]);
-
-                //这里加一个order的数组
-                var single_order = {
-                    "order": ii+1
-                };
-                files_order.push(single_order);
-
-            }
+        for(var ii = 1; ii <= flag; ii++){
+            //文本
+            alert(ii+1);
+            var single_json = {
+                "en": $("#en"+ii).val(),
+                "cn": $("#cn"+ii).val(),
+                "order": ii+1
+            };
+            result.push(single_json);
         }
 
         formData.append('pic', $('#pic')[0].files[0]);
-        if (select == "0"){
-            formData.append('video_file', $('#video_file')[0].files[0]);
-        }else {
-            formData.append('video_file', null);
-        }
         formData.append('title', title);
-        formData.append('select', select);
-        formData.append('kind', kind);
-        formData.append('author', author);
+        formData.append('order', order);
+        formData.append('book_id', book_id);
         formData.append('sentence', JSON.stringify(result));
-        formData.append('files_order', JSON.stringify(files_order));
         $.ajax({
-            url:url+"/admin/upload_feeds_sentences.do",
+            url:url+"/admin/upload_read_class_chapter.do",
             type:'POST',
             data:formData,
             dataType:'json',
@@ -172,16 +139,7 @@
         flag++;
         var div_name = "#div"+flag;
         //添加div
-        $("#inner").append('<h2>第'+flag+'段文字（不超过800字，超过部分请新开一段）</h2> <div id="div'+flag+'" class="text"> <p>第'+flag+'段文字</p></div>');
-        //添加js
-        editor[flag] = new E(div_name);
-        editor[flag].create();
-    }, false);
-    document.getElementById('add_pic').addEventListener('click', function () {
-        flag++;
-        var div_name = "#div"+flag;
-        //添加div
-        $("#inner").append('<h2>上传需要插入的图片</h2> <input style="margin-bottom: 25px;" id="pic'+flag+'" type="file">');
+        $("#inner").append('<h2>第'+flag+'段文字(嗯？别搞太长！！！)</h2> 英文：<textarea id="en'+flag+'"  style="width: 700px; height: 70px;"></textarea><br> 中文：<textarea id="cn'+flag+'" style="width: 700px; height: 70px;"></textarea>');
     }, false);
 </script>
 </body>

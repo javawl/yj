@@ -804,6 +804,53 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
+    //上传阅读挑战章节
+    public ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String book_id, HttpServletResponse response, HttpServletRequest request ){
+        //将sentence转换成json
+        net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //先插入标题和封面图那些
+            //上传mp3
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //用无压缩的
+            String name1 = iFileService.upload_uncompressed(pic,path,"l_e/read_class/mp3");
+            String mp3_url = "read_class/mp3/"+name1;
+
+            //这里插入一下
+            int insertResult = common_configMapper.insertReadClassChapter(title, order, book_id, mp3_url);
+            if (insertResult == 0){
+                throw new Exception("insertReadClassChapter出错");
+            }
+            //查出插入的chapter_id
+            String chapterId = common_configMapper.getInsertChapterId(mp3_url).get("id").toString();
+
+            if(sentence_json.size()>0){
+                for(int i=0;i<sentence_json.size();i++){
+                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
+                    String en = job.get("en").toString();
+                    String cn = job.get("cn").toString();
+                    String order_inner = job.get("order").toString();
+                    common_configMapper.insertReadClassChapterInner(en,cn,order_inner, chapterId);
+                }
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            logger.error("阅读章节上传异常",e.getStackTrace());
+            logger.error("阅读章节上传异常",e.getMessage());
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
     public String  make_voice(String sentence,HttpServletResponse response, HttpServletRequest request){
 
 //        //合成监听器

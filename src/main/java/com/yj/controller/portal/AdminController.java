@@ -604,6 +604,36 @@ public class AdminController {
         return ServerResponse.createBySuccess(dictionaryMapper.countWordChallenge(),Info);
     }
 
+    /**
+     * 展示多条阅读挑战
+     * @param page  页号
+     * @param size  页大小
+     * @return
+     */
+    @RequestMapping(value = "show_read_class.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_read_class(String page,String size){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取抽奖信息
+        List<Map<Object,Object>> Info = common_configMapper.showReadClassAdmin(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("eroll_st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("eroll_st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("et",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countWordChallenge(),Info);
+    }
+
 
     /**
      * 置顶福利社
@@ -1708,6 +1738,19 @@ public class AdminController {
     @ResponseBody
     public ServerResponse upload_feeds_sentences(String files_order,@RequestParam(value = "file",required = false) MultipartFile[] files,@RequestParam(value = "pic",required = false) MultipartFile pic,@RequestParam(value = "video_file",required = false) MultipartFile video_file,String title,String select,String kind,String author,String sentence, HttpServletResponse response, HttpServletRequest request ){
         return iAdminService.upload_feeds_sentences(files_order,files,pic,video_file, title, select, kind, author,sentence, response,request);
+    }
+
+
+    /**
+     * 上传feeds流的段子
+     * @param sentence
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "upload_read_class_chapter.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse upload_read_class_chapter(@RequestParam(value = "pic",required = false) MultipartFile pic,String title,String order,String sentence, String book_id,HttpServletResponse response, HttpServletRequest request ){
+        return iAdminService.upload_read_class_chapter(pic,title,order,sentence, book_id, response,request);
     }
 
 

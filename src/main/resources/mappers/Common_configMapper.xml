@@ -810,6 +810,12 @@
     WHERE read_class.id = tb.read_class_id
   </select>
 
+  <select id="getReadClassSeriesById" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_series
+    WHERE read_class_series.id = #{series_id}
+  </select>
+
   <select id="showReadClassBookIntroduction" resultType="map" parameterType="string">
     SELECT pic,`name`,author,introduction
     FROM read_class_book
@@ -943,6 +949,19 @@
     WHERE read_class_chapter.book_id = #{book_id}
   </select>
 
+  <select id="getInsertChapterId" resultType="map">
+    SELECT *
+    FROM read_class_chapter
+    WHERE read_class_chapter.mp3 = #{mp3}
+  </select>
+
+  <select id="showReadClassAdmin" resultType="map">
+    SELECT *
+    FROM `read_class`
+    ORDER BY et DESC
+    LIMIT #{start},#{size}
+  </select>
+
   <select id="readClassBookChapterInnerAll" resultType="map">
     SELECT *
     FROM read_class_chapter_inner
@@ -989,6 +1008,16 @@
   </insert>
 
 
+  <insert id="insertReadClassChapter" parameterType="string">
+    INSERT INTO read_class_chapter (`name`,`order`,book_id,mp3)
+    values (#{name},#{order},#{book_id},#{mp3})
+  </insert>
+
+  <insert id="insertReadClassChapterInner" parameterType="string">
+    INSERT INTO read_class_chapter_inner (`en`,`cn`,`order`,chapter_id)
+    values (#{en},#{cn},#{order},#{chapter_id})
+  </insert>
+
   <insert id="insertReadChallengeClockIn" parameterType="string">
     INSERT INTO read_class_clock_in (series_id,book_id,user_id,chapter_id,set_time)
     values (#{series_id},#{book_id},#{user_id},#{chapter_id},#{set_time})
@@ -998,6 +1027,13 @@
     INSERT INTO read_class_new_word (word,mean,symbol,symbol_mp3,book_id,chapter_id)
     values (#{word},#{mean},#{symbol},#{symbol_mp3},#{book_id},#{chapter_id})
   </insert>
+
+  <update id="changeReadClassEnrollment">
+    UPDATE read_class
+    set `enrollment` = enrollment + 1
+    WHERE read_class.id = #{read_class_id}
+  </update>
+
 
   <update id="changeReadClassInsistDay">
     UPDATE read_class_contestants
