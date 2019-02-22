@@ -851,6 +851,46 @@ public class AdminServiceImpl implements IAdminService {
     }
 
 
+    //上传阅读挑战系列的书籍
+    public ServerResponse upload_read_class_series_book(String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
+        //将sentence转换成json
+        net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String nowTime = String.valueOf((new Date()).getTime());
+            //这里插入一下
+            int insertResult = common_configMapper.insertReadClassSeriesBook(title, word_need_number, class_id, nowTime);
+            if (insertResult == 0){
+                throw new Exception("insertReadClassSeriesBook出错");
+            }
+            //查出插入的series_id
+            String series_id = common_configMapper.getInsertSeriesId(nowTime).get("id").toString();
+
+            if(sentence_json.size()>0){
+                for(int i=0;i<sentence_json.size();i++){
+                    net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
+                    String book_id = job.get("book_id").toString();
+                    String order = job.get("order").toString();
+                    common_configMapper.insertReadClassSeriesInner(series_id,book_id,order);
+                }
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            logger.error("阅读系列书籍上传异常",e.getStackTrace());
+            logger.error("阅读系列书籍上传异常",e.getMessage());
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
     public String  make_voice(String sentence,HttpServletResponse response, HttpServletRequest request){
 
 //        //合成监听器

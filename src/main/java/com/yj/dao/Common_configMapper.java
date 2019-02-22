@@ -465,11 +465,20 @@ public interface Common_configMapper {
     //后台取出所有阅读书籍
     List<Map<Object,Object>> readClassBookAll(@Param("start") int start,@Param("size") int size);
 
+    //后台取出系列所有阅读书籍
+    List<Map<Object,Object>> readClassBookSeries( @Param("series_id") String series_id);
+
     //后台根据书籍id获取章节
     List<Map<Object,Object>> readClassBookChapterAll(@Param("book_id") String book_id);
 
+    //后台根据书籍id获取系列
+    List<Map<Object,Object>> readClassSeries(@Param("read_class_id") String read_class_id);
+
     //获取新插入的章节id
     Map<Object,Object> getInsertChapterId(@Param("mp3") String mp3);
+
+    //获取新插入的系列id
+    Map<Object,Object> getInsertSeriesId(@Param("set_time") String set_time);
 
     //后台取出需要的阅读挑战
     List<Map<Object,Object>> showReadClassAdmin(@Param("start") int start,@Param("size") int size);
@@ -507,11 +516,20 @@ public interface Common_configMapper {
     //插入阅读章节
     int insertReadClassChapter(@Param("name") String name,@Param("order") String order,@Param("book_id") String book_id,@Param("mp3") String mp3);
 
+    //插入阅读系列书籍
+    int insertReadClassSeriesBook(@Param("name") String name,@Param("word_number_need") String word_number_need,@Param("read_class_id") String read_class_id,@Param("set_time") String set_time);
+
     //插入阅读章节内容
     int insertReadClassChapterInner(@Param("en") String en,@Param("cn") String cn,@Param("order") String order,@Param("chapter_id") String chapter_id);
 
+    //插入阅读系列书籍
+    int insertReadClassSeriesInner(@Param("series_id") String en,@Param("book_id") String cn,@Param("order") String order);
+
     //插入打卡阅读
     int insertReadChallengeClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id,@Param("set_time") String set_time);
+
+    //后台插入阅读挑战
+    int insertReadChallenge(@Param("eroll_st") String eroll_st,@Param("st") String st,@Param("et") String et,@Param("virtual_number") String virtual_number,@Param("virtual_number_reserved") String virtual_number_reserved,@Param("set_time") String set_time);
 
     //插入章节的新单词
     int insertReadChallengeNewWord(@Param("word") String word,@Param("mean") String mean,@Param("symbol") String symbol,@Param("symbol_mp3") String symbol_mp3,@Param("book_id") String book_id,@Param("chapter_id") String chapter_id);
@@ -533,6 +551,12 @@ public interface Common_configMapper {
 
     //更新书本简介
     int updateReadClassBookIntroduction(@Param("id") String id, @Param("introduction") String introduction);
+
+    //更新系列词汇量
+    int updateReadClassWordNumberNeed(@Param("id") String id, @Param("word_number_need") String word_number_need);
+
+    //更新系列名字
+    int updateReadClassSeriesName(@Param("id") String id, @Param("name") String name);
 
     //更新书本作者
     int updateReadClassBookAuthor(@Param("id") String id, @Param("author") String author);

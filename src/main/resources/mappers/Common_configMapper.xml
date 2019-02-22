@@ -943,16 +943,43 @@
     WHERE tb.book_id = tb2.id
   </select>
 
+  <select id="readClassBookSeries" resultType="map">
+    SELECT tb3.*
+    FROM read_class_series_book,
+         (SELECT tb.*,tb2.*
+          FROM
+            (SELECT count(*) as chapter_number,book_id
+             FROM read_class_chapter
+             GROUP BY book_id) tb,
+            (SELECT *
+             FROM read_class_book) tb2
+          WHERE tb.book_id = tb2.id) tb3
+    WHERE read_class_series_book.series_id = #{series_id}
+    AND read_class_series_book.book_id = tb3.book_id
+  </select>
+
   <select id="readClassBookChapterAll" resultType="map">
     SELECT *
     FROM read_class_chapter
     WHERE read_class_chapter.book_id = #{book_id}
   </select>
 
+  <select id="readClassSeries" resultType="map">
+    SELECT *
+    FROM read_class_series
+    WHERE read_class_series.read_class_id = #{read_class_id}
+  </select>
+
   <select id="getInsertChapterId" resultType="map">
     SELECT *
     FROM read_class_chapter
     WHERE read_class_chapter.mp3 = #{mp3}
+  </select>
+
+  <select id="getInsertSeriesId" resultType="map">
+    SELECT *
+    FROM read_class_series
+    WHERE read_class_series.set_time = #{set_time}
   </select>
 
   <select id="showReadClassAdmin" resultType="map">
@@ -1013,14 +1040,29 @@
     values (#{name},#{order},#{book_id},#{mp3})
   </insert>
 
+  <insert id="insertReadClassSeriesBook" parameterType="string">
+    INSERT INTO read_class_series (`name`,`word_number_need`,`read_class_id`,set_time)
+    values (#{name},#{word_number_need},#{read_class_id},#{set_time})
+  </insert>
+
   <insert id="insertReadClassChapterInner" parameterType="string">
     INSERT INTO read_class_chapter_inner (`en`,`cn`,`order`,chapter_id)
     values (#{en},#{cn},#{order},#{chapter_id})
   </insert>
 
+  <insert id="insertReadClassSeriesInner" parameterType="string">
+    INSERT INTO read_class_series_book (`series_id`,`book_id`,`order`)
+    values (#{series_id},#{book_id},#{order})
+  </insert>
+
   <insert id="insertReadChallengeClockIn" parameterType="string">
     INSERT INTO read_class_clock_in (series_id,book_id,user_id,chapter_id,set_time)
     values (#{series_id},#{book_id},#{user_id},#{chapter_id},#{set_time})
+  </insert>
+
+  <insert id="insertReadChallenge" parameterType="string">
+    INSERT INTO read_class (eroll_st, st, et, virtual_number, virtual_number_reserved, set_time, periods)
+    values (#{eroll_st}, #{st}, #{et}, #{virtual_number}, #{virtual_number_reserved}, #{set_time}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM read_class) tb),0)+1)
   </insert>
 
   <insert id="insertReadChallengeNewWord" parameterType="string">
@@ -1075,6 +1117,18 @@
     <update id="updateReadClassBookIntroduction" parameterType="string">
         UPDATE `read_class_book` SET
         `introduction`=#{introduction}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassWordNumberNeed" parameterType="string">
+        UPDATE `read_class_series` SET
+        `word_number_need`=#{word_number_need}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReadClassSeriesName" parameterType="string">
+        UPDATE `read_class_series` SET
+        `name`=#{name}
         WHERE id = #{id}
     </update>
 

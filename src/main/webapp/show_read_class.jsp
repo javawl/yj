@@ -53,7 +53,7 @@
     // 修改虚拟预约用户数(上传)
     function upload_exist_sent(id) {
         $.ajax({
-            url:url+"/admin/updateReadClassVirtualReservedNumber.do",
+            url:url+"/admin/update_class_reserved_number.do",
             type:'POST',
             data:{
                 inner: document.getElementById("reserved_number" + id).value,
@@ -209,7 +209,7 @@
             <td style="border-left: 0;border-right: 0;">
             </td>
             <td style="border-left: 0;">
-                <button style="float: right"><a href="add_word_challenge.jsp">新建</a></button>
+                <button style="float: right"><a href="add_read_class.jsp">新建</a></button>
             </td>
         </tr>
         <tr>
@@ -232,7 +232,7 @@
 </body>
 <script>
     function single(id) {
-        window.location.href = "single_word_challenge.jsp?id="+id;
+        window.location.href = "show_read_class_series.jsp?id="+id;
     }
     function del(id) {
         if (confirm("你确定要删除？")){

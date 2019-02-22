@@ -36,8 +36,9 @@
     }
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
+    var series_id = parseInt(GetQueryString("id"));
     var size = 15;
-    var all_url = url+"/admin/showReadClassBook.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/admin/showReadClassSeriesBook.do?&id="+series_id;
     $(document).ready(function(){
         $.ajax({
             url:all_url,
@@ -45,40 +46,6 @@
             dataType:'json',
             success:function (result) {
                 var data = result["data"];
-                count += parseInt(result["msg"]);
-                //计算页数
-                var page_no = Math.ceil(count / size);
-                if (page == 1){
-                    $("#page").append('<td><p>第一页</p></td>');
-                }else{
-                    $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page=1&size='+size+'">第一页</a></td>');
-                }
-                var ff = 0;
-                var f = 0;
-                if (page > 4){
-                    f += page - 4;
-                }
-                if (f != 0){
-                    $("#page").append('<td><p>....</p></td>');
-                }
-                for(var z = f; z < page_no; z++){
-                    var no = z + 1;
-                    if (no == page){
-                        $("#page").append('<td><p>'+no+'</p></td>');
-                    }else {
-                        $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
-                    }
-                    if (ff == 8)break;
-                    ff++;
-                }
-                if (ff != 8){
-                    $("#page").append('<td><p>....</p></td>');
-                }
-                if (page == page_no){
-                    $("#page").append('<td><p>最后一页</p></td>');
-                }else{
-                    $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
-                }
                 for(var i = 0; i < data.length; i++){
                     var string2;
                     if (data[i]['pic']==''){
@@ -89,11 +56,13 @@
                     $("#daily_data").append('<tr>'+
                         '<td>'+data[i]['id']+'</td>'+
                         '<td>'+data[i]['name']+'</td>'+
-                        '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['introduction']+'</td>'+
-                        '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
-                        '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
+                        // '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['introduction']+'</td>'+
+                        '<td>'+data[i]['introduction']+'</td>'+
+                        // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
+                        '<td>'+string2+'</td>'+
+                        // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
+                        '<td>'+data[i]['author']+'</div></td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><button style="margin-left: 5px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">查看章节</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -238,17 +207,17 @@
     <br>
     <table cellpadding="6" width="87%" border="1" cellspacing="0" id="daily_data">
         <%--<tr>--%>
-            <%--<td style="border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;border-right: 0;"></td>--%>
-            <%--<td style="border-left: 0;">--%>
-                <%--<button style="float: right" id="select">--%>
-                    <%--<a href="add_welfare_service.jsp">新增</a>--%>
-                <%--</button>--%>
-            <%--</td>--%>
+        <%--<td style="border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;border-right: 0;"></td>--%>
+        <%--<td style="border-left: 0;">--%>
+        <%--<button style="float: right" id="select">--%>
+        <%--<a href="add_welfare_service.jsp">新增</a>--%>
+        <%--</button>--%>
+        <%--</td>--%>
         <%--</tr>--%>
         <tr>
             <td>序号</td>
@@ -257,7 +226,6 @@
             <td>书籍图片</td>
             <td>书籍作者</td>
             <td>章节数</td>
-            <td>操作</td>
         </tr>
     </table>
     <table id="page">

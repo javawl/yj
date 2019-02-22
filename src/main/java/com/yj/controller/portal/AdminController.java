@@ -1743,7 +1743,7 @@ public class AdminController {
 
 
     /**
-     * 上传feeds流的段子
+     * 上传阅读挑战章节
      * @param sentence
      * @param response
      * @return
@@ -1752,6 +1752,19 @@ public class AdminController {
     @ResponseBody
     public ServerResponse upload_read_class_chapter(@RequestParam(value = "pic",required = false) MultipartFile pic,String title,String order,String sentence, String book_id,HttpServletResponse response, HttpServletRequest request ){
         return iAdminService.upload_read_class_chapter(pic,title,order,sentence, book_id, response,request);
+    }
+
+
+    /**
+     * 上传阅读挑战系列的书籍
+     * @param sentence
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "upload_read_class_series_book.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse upload_read_class_series_book(String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
+        return iAdminService.upload_read_class_series_book(title ,word_need_number, sentence, class_id, response,request);
     }
 
 
@@ -1962,6 +1975,53 @@ public class AdminController {
             for (int i = 0; i < all_virtual_user.size(); i++){
                 String user_id = all_virtual_user.get(i).get("user_id").toString();
                 common_configMapper.insertWordChallengeContestants(user_id,challenge_id,now_time,"1");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 上传阅读挑战
+     * @param reserved   虚拟预约人数
+     * @param st       开始时间  格式  xxxx-xx-xx
+     * @param et       结束时间  格式如上
+     * @param virtual  需要参与挑战的虚拟用户数
+     * @param enroll_st  报名开始时间
+     * @return         string
+     */
+    @RequestMapping(value = "upload_read_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_read_challenge(String enroll_st, String st, String et, String virtual, String reserved, HttpServletRequest request){
+        String st_str;
+        String et_str;
+        String enroll_st_str;
+        try {
+            //获取时间错
+            enroll_st_str =  CommonFunc.date2TimeStamp(enroll_st+" 00:00:01");
+            st_str =  CommonFunc.date2TimeStamp(st+" 00:00:01");
+            et_str =  CommonFunc.date2TimeStamp(et+" 23:59:59");
+        }catch (ParseException e){
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("传入日期有误");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String now_time = String.valueOf((new Date()).getTime());
+            //存到数据库
+            int result = common_configMapper.insertReadChallenge(enroll_st_str, st_str, et_str, virtual, reserved, now_time);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
             }
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
@@ -2239,6 +2299,25 @@ public class AdminController {
 
 
     /**
+     * 更新阅读挑战书籍信息
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_class_series_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_class_series_info(String id,String type,String inner, HttpServletResponse response){
+        if (type.equals("introduction")){
+            common_configMapper.updateReadClassWordNumberNeed(id,inner);
+        }
+        if (type.equals("name")){
+            common_configMapper.updateReadClassSeriesName(id,inner);
+        }
+
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+    /**
      * 更新阅读挑战虚拟预约数
      * @param response
      * @return
@@ -2342,6 +2421,31 @@ public class AdminController {
 
 
     /**
+     * 展示书籍信息
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showReadClassSeriesBook.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassSeriesBook(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读书籍信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassBookSeries(id);
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("pic",CommonFunc.judgePicPath(Info.get(i).get("pic").toString()));
+        }
+
+        return ServerResponse.createBySuccess("成功！", Info);
+    }
+
+
+    /**
      * 展示书籍的章节信息
      * @param id
      * @return
@@ -2360,6 +2464,30 @@ public class AdminController {
         for(int i = 0; i < Info.size(); i++){
             Info.get(i).put("mp3",CommonFunc.judgePicPath(Info.get(i).get("mp3").toString()));
         }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
+    /**
+     * 展示阅读挑战的系列信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showReadClassSeries.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassSeries(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读系列信息
+        List<Map<Object,Object>> Info = common_configMapper.readClassSeries(id);
+//        for(int i = 0; i < Info.size(); i++){
+//            Info.get(i).put("mp3",CommonFunc.judgePicPath(Info.get(i).get("mp3").toString()));
+//        }
 
         return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
     }
