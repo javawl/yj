@@ -110,8 +110,13 @@ public class VariousServiceImpl implements IVariousService {
             }else {
                 //判断是否开始
                 if (Long.valueOf(selectBeginningReadClass.get("st").toString()) > Long.valueOf(now_time)){
-                    //当前时间小于开始时间，未开始
-                    result.put("is_reading", 1);
+                    if (selectBeginningReadClass.get("whether_help").toString().equals("1")){
+                        //助力进入的，未开始状态
+                        result.put("is_reading", 3);
+                    }else {
+                        //当前时间小于开始时间，未开始
+                        result.put("is_reading", 1);
+                    }
                     //计算还有多少天
                     int restDay = CommonFunc.count_interval_days(now_time,selectBeginningReadClass.get("st").toString());
                     result.put("rest_day", restDay - 1);

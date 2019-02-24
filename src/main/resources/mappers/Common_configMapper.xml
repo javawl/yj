@@ -749,7 +749,7 @@
     FROM read_class,
          (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id
           FROM read_class_series,
-               (SELECT series_id
+               (SELECT series_id,whether_help
                 FROM read_class_contestants
                 WHERE read_class_contestants.user_id = #{user_id}) tb
           WHERE read_class_series.id = tb.series_id) tb2
