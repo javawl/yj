@@ -2250,15 +2250,15 @@ public class VariousServiceImpl implements IVariousService {
                 if (times >= 2){
                     //已经两次了，第三次如果成功就成功了
                     //插入表中
-                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid);
-                    //将报名加入正式的表中
-                    //插入参与数据库
-                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
+                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid, now_time);
+                    //将报名加入正式的表中(因为机制改为原本就在报名表中，所以不用加)
+//                    //插入参与数据库
+//                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time, "1");
                     //将助力状态改为失效
                     common_configMapper.changeReadClassHelpStatus("1", uid);
                 }else{
                     //插入表中
-                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid);
+                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid, now_time);
                 }
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {

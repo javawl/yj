@@ -502,10 +502,10 @@ public interface Common_configMapper {
     List<Map<Object,Object>> getBookNewWord(@Param("book_id") String  book_id,@Param("user_id") String  user_id);
 
     //报名参与阅读
-    int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
+    int insertReadChallengeContestantsReal(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time,@Param("whether_help") String whether_help);
 
     //助力表插入
-    int insertReadChallengeHelp(@Param("user_id") String user_id,@Param("help_sign_up_id") String help_sign_up_id,@Param("helper_id") String helper_id);
+    int insertReadChallengeHelp(@Param("user_id") String user_id,@Param("help_sign_up_id") String help_sign_up_id,@Param("helper_id") String helper_id,@Param("set_time") String set_time);
 
     //报名助力参与阅读
     int insertReadChallengeContestantsHelp(@Param("user_id") String user_id,@Param("series_id") String series_id,@Param("set_time") String set_time);
@@ -536,6 +536,9 @@ public interface Common_configMapper {
 
     //阅读挑战报名人数
     int changeReadClassEnrollment(@Param("read_class_id") String read_class_id);
+
+    //修改报名的是否是助力报名状态
+    int changeReadClassContestantsWhetherHelp(@Param("whether_help") String whether_help, @Param("series_id") String series_id, @Param("user_id") String user_id);
 
     //修改日完成任务次数阅读挑战打卡天数
     int changeReadClassInsistDay(@Param("series_id") String series_id, @Param("user_id") String user_id);

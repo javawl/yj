@@ -1016,12 +1016,12 @@
 
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`,`whether_help`)
-    values (#{user_id},#{series_id},#{set_time},0,0,1)
+    values (#{user_id},#{series_id},#{set_time},0,0,#{whether_help})
   </insert>
 
   <insert id="insertReadChallengeHelp" parameterType="string">
-    INSERT INTO read_class_help (user_id,help_sign_up_id,helper_id)
-    values (#{user_id},#{help_sign_up_id},#{helper_id})
+    INSERT INTO read_class_help (user_id,help_sign_up_id,helper_id,set_time)
+    values (#{user_id},#{help_sign_up_id},#{helper_id},#{set_time})
   </insert>
 
   <insert id="insertReadChallengeContestantsHelp" parameterType="string">
@@ -1074,6 +1074,14 @@
     UPDATE read_class
     set `enrollment` = enrollment + 1
     WHERE read_class.id = #{read_class_id}
+  </update>
+
+
+  <update id="changeReadClassContestantsWhetherHelp">
+    UPDATE read_class_contestants
+    set `whether_help` = #{whether_help}
+    WHERE series_id = #{series_id}
+    AND user_id = #{user_id}
   </update>
 
 

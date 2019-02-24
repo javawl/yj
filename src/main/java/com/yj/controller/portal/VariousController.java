@@ -619,7 +619,7 @@ public class VariousController {
                         throw new Exception("微信支付成功，但是已经报过名了不可再报！");
                     }
                     //插入参与数据库
-                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
+                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time, "0");
                     //将报名人数加一
                     String readClassId = common_configMapper.getReadClassSeriesById(series_id).get("read_class_id").toString();
                     common_configMapper.changeReadClassEnrollment(readClassId);
@@ -736,6 +736,11 @@ public class VariousController {
                     }
                     //插入参与数据库
                     common_configMapper.insertReadChallengeContestantsHelp(uid,series_id,now_time);
+                    //不管有没有助力，都直接加入数据库
+                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time, "1");
+                    //将报名人数加一
+                    String readClassId = common_configMapper.getReadClassSeriesById(series_id).get("read_class_id").toString();
+                    common_configMapper.changeReadClassEnrollment(readClassId);
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
@@ -839,13 +844,10 @@ public class VariousController {
                         logger.error("微信支付成功，但是已经报过名了不可再报！");
                         throw new Exception("微信支付成功，但是已经报过名了不可再报！");
                     }
-                    //插入参与数据库
-                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time);
+                    //将数据库改成0状态
+                    common_configMapper.changeReadClassContestantsWhetherHelp("0", series_id, uid);
                     //将助力状态改为失效
                     common_configMapper.changeReadClassHelpStatus("1", uid);
-                    //将报名人数加一
-                    String readClassId = common_configMapper.getReadClassSeriesById(series_id).get("read_class_id").toString();
-                    common_configMapper.changeReadClassEnrollment(readClassId);
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
