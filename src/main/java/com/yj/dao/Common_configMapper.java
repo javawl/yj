@@ -432,6 +432,9 @@ public interface Common_configMapper {
     //根据书籍id查书籍信息
     Map<Object,Object> checkReadChallengeHelpAttend(@Param("user_id") String  user_id);
 
+    //更严谨的查助力情况
+    Map<Object,Object> checkReadChallengeHelpAttendSeries(@Param("user_id") String  user_id, @Param("series_id") String  series_id);
+
     //根据助力id找到用户想加的series
     Map<Object,Object> selectSeriesIdByHelpId(@Param("id") String  id);
 

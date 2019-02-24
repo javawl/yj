@@ -831,6 +831,16 @@
     LIMIT 1
   </select>
 
+  <select id="checkReadChallengeHelpAttendSeries" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_help_sign_up
+    WHERE read_class_help_sign_up.user_id = #{user_id}
+    AND is_effective = 0
+    AND series_id = #{series_id}
+    ORDER BY set_time DESC
+    LIMIT 1
+  </select>
+
   <select id="selectSeriesIdByHelpId" resultType="map" parameterType="string">
     SELECT *
     FROM read_class_help_sign_up

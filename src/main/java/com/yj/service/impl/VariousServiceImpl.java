@@ -113,6 +113,12 @@ public class VariousServiceImpl implements IVariousService {
                     if (selectBeginningReadClass.get("whether_help").toString().equals("1")){
                         //助力进入的，未开始状态
                         result.put("is_reading", 3);
+                        //判断是否报名助力
+                        if (common_configMapper.checkReadChallengeHelpAttendSeries(id ,selectBeginningReadClass.get("series_id").toString()) != null){
+                            result.put("is_help_pay", "yes");
+                        }else {
+                            result.put("is_help_pay", "no");
+                        }
                     }else {
                         //当前时间小于开始时间，未开始
                         result.put("is_reading", 1);
@@ -214,21 +220,22 @@ public class VariousServiceImpl implements IVariousService {
                             nextBookInfo.put("book_id", null);
                         }
                     }else {
-                        //如果一次卡都没打的话就给第一本书的第一张
+                        //如果一次卡都没打的话就给null
                         //根据书籍id查书籍信息
-                        Map<Object,Object> aBook = common_configMapper.showReadClassBookIntroduction(seriesBooks.get(0).get("book_id").toString());
-                        bookInfo.put("book_name", aBook.get("name"));
-                        bookInfo.put("book_pic", CommonFunc.judgePicPath(aBook.get("pic").toString()));
-                        bookInfo.put("chapter_order", "1");
-                        bookInfo.put("book_id", seriesBooks.get(0).get("book_id").toString());
-                        bookInfo.put("chapter_id", seriesBooks.get(0).get("chapter_id").toString());
+//                        Map<Object,Object> aBook = common_configMapper.showReadClassBookIntroduction(seriesBooks.get(0).get("book_id").toString());
+                        bookInfo.put("book_name", null);
+                        bookInfo.put("book_pic", null);
+                        bookInfo.put("chapter_order", null);
+                        bookInfo.put("book_id", null);
+                        bookInfo.put("chapter_id", null);
                         //在这里查看一下下一章要看的章节和书籍号
-                        if (seriesBooks.size() <= 1){
+                        if (seriesBooks.size() <= 0){
                             nextBookInfo.put("chapter_id", null);
                             nextBookInfo.put("book_id", null);
                         }else {
-                            nextBookInfo.put("chapter_id", seriesBooks.get(1).get("book_id").toString());
-                            nextBookInfo.put("book_id", seriesBooks.get(1).get("chapter_id").toString());
+                            //一次没读下一章应该是第一章
+                            nextBookInfo.put("chapter_id", seriesBooks.get(0).get("chapter_id").toString());
+                            nextBookInfo.put("book_id", seriesBooks.get(0).get("book_id").toString());
                         }
                     }
                     result.put("readBookInfo", bookInfo);
@@ -263,12 +270,6 @@ public class VariousServiceImpl implements IVariousService {
                 }
             }
 
-            //判断是否报名助力
-            if (common_configMapper.checkReadChallengeHelpAttend(id) != null){
-                result.put("is_help_pay", "yes");
-            }else {
-                result.put("is_help_pay", "no");
-            }
             //判断是否有预定
             if (common_configMapper.checkExistReserved(id) != null){
                 result.put("is_reserved", "yes");
