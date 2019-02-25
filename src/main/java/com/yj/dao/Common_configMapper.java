@@ -477,6 +477,9 @@ public interface Common_configMapper {
     //后台根据书籍id获取系列
     List<Map<Object,Object>> readClassSeries(@Param("read_class_id") String read_class_id);
 
+    //后台根据期数id获取参与者
+    List<Map<Object,Object>> readClassSeriesUser(@Param("read_class_id") String read_class_id);
+
     //获取新插入的章节id
     Map<Object,Object> getInsertChapterId(@Param("mp3") String mp3);
 
@@ -497,6 +500,9 @@ public interface Common_configMapper {
 
     //查看用户是否预定过
     Map<Object,Object> checkExistReserved(@Param("user_id") String user_id);
+
+    //查出某期下的所有系列
+    List<Map<Object,Object>> getReadClassSeriesByReadClassId(@Param("read_class_id") String read_class_id);
 
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
@@ -521,6 +527,9 @@ public interface Common_configMapper {
 
     //插入阅读系列书籍
     int insertReadClassSeriesBook(@Param("name") String name,@Param("word_number_need") String word_number_need,@Param("read_class_id") String read_class_id,@Param("set_time") String set_time);
+
+    //插入老师
+    int insertReadClassSeriesTeacher(@Param("qr_code") String qr_code,@Param("series_id") String series_id);
 
     //插入阅读章节内容
     int insertReadClassChapterInner(@Param("en") String en,@Param("cn") String cn,@Param("order") String order,@Param("chapter_id") String chapter_id);
@@ -584,6 +593,27 @@ public interface Common_configMapper {
 
     //删除新单词
     int deleteReadClassChapterNewWord(@Param("id") String id);
+
+    //删除系列
+    int deleteReadClassSeries(@Param("id") String id);
+
+    //删除系列下的书
+    int deleteReadClassSeriesBook(@Param("series_id") String series_id);
+
+    //删除系列下的老师
+    int deleteReadClassSeriesTeacher(@Param("series_id") String series_id);
+
+    //删除系列下打卡
+    int deleteReadClassClockIn(@Param("series_id") String series_id);
+
+    //删除系列下参与者
+    int deleteReadClassContestants(@Param("series_id") String series_id);
+
+    //删除系列下助力
+    int deleteReadClassSignUp(@Param("series_id") String series_id);
+
+    //删除阅读的一期
+    int deleteReadClass(@Param("id") String id);
 
     //删除新单词
     int deleteChapterNewWord(@Param("chapter_id") String chapter_id);

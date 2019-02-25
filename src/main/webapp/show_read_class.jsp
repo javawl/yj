@@ -177,7 +177,7 @@
                         '<td style="width: 4%;">'+data[i]['reserved_number']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['enrollment']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['profit_loss']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button>(若删除，参加该期的的所有用户记录也会删除)</td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -236,28 +236,30 @@
     }
     function del(id) {
         if (confirm("你确定要删除？")){
-            // $.ajax({
-            //     url:url+"/admin/delete_lottery_draw.do",
-            //     type:'POST',
-            //     data:{
-            //         id:id
-            //     },
-            //     dataType:'json',
-            //     success:function (result) {
-            //         var code = result['code'];
-            //         var msg = result['msg'];
-            //         if (code != 200){
-            //             alert(msg);
-            //         }else {
-            //             alert(msg);
-            //             history.go(0);
-            //         }
-            //     },
-            //     error:function (result) {
-            //         console.log(result);
-            //         alert("服务器出错！");
-            //     }
-            // });
+            if (confirm("若删除，参加该期的的所有用户记录也会删除，你确定要删除？")){
+                $.ajax({
+                    url:url+"/admin/deleteReadClass.do",
+                    type:'POST',
+                    data:{
+                        id:id
+                    },
+                    dataType:'json',
+                    success:function (result) {
+                        var code = result['code'];
+                        var msg = result['msg'];
+                        if (code != 200){
+                            alert(msg);
+                        }else {
+                            alert(msg);
+                            history.go(0);
+                        }
+                    },
+                    error:function (result) {
+                        console.log(result);
+                        alert("服务器出错！");
+                    }
+                });
+            }
         }
     }
 </script>

@@ -27,12 +27,12 @@
     //        if (url1 == url || url1 == url+'/'){
     //            window.location.href=url+"/show_daily_pic.jsp?page=1&size=15"
     //        }
-    // 获取get参数的方法
     function GetQueryString(name)
     {
         var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
         var r = window.location.search.substr(1).match(reg);
         if(r!=null)return  unescape(r[2]); return null;
+        // 获取get参数的方法
     }
     var class_id = parseInt(GetQueryString("id"));
     var all_url = url+"/admin/showReadClassSeries.do?id="+class_id;
@@ -58,12 +58,46 @@
                         // '<td>'+string2+'</td>'+
                         // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
                         // '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><button style="margin-left: 5px;" onclick="check_series_book('+"'"+data[i]['id']+"'"+')">查看书籍</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td><button style="margin-left: 5px;" onclick="check_series_book('+"'"+data[i]['id']+"'"+')">查看书籍</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button>(注意有用户报名的系列不要删,否则有bug)</td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
 //                    alert(result[0]);
 //                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+        $.ajax({
+            url: url+"/admin/showReadClassSeriesUser.do?id="+class_id,
+            type:'GET',
+            dataType:'json',
+            success:function (result) {
+                var data = result["data"];
+                for(var i = 0; i < data.length; i++){
+                    var string1;
+                    var string2;
+                    if (data[i]['portrait']==''){
+                        string2 = '此资源为空'
+                    }else {
+                        string2 = '<img style="max-width: 50px; max-height: 50px;" src="'+data[i]['portrait']+'">';
+                    }
+                    if (data[i]['whether_help']=='0'){
+                        string1 = "99.9"
+                    }else {
+                        string1 = "59.9"
+                    }
+                    $("#author_info").append('<tr>'+
+                        '<td style="width: 4%;">'+string2+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['username']+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['name']+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['insist_day']+'</td>'+
+                        '<td style="width: 4%;">'+string1+'</td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="user_info('+"'"+data[i]['user_id']+"',"+ "'"+data[i]['series_id']+"'"+')">查看</button></td>'+
+                        '</tr>');
+                }
             },
             error:function (result) {
                 console.log(result);
@@ -182,6 +216,18 @@
             <td>操作</td>
         </tr>
     </table>
+    <h1>阅读挑战参与用户</h1>
+    <br>
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="author_info">
+        <tr>
+            <td>头像</td>
+            <td>昵称</td>
+            <td>系列名</td>
+            <td>坚持天数</td>
+            <td>总金额</td>
+            <td>操作</td>
+        </tr>
+    </table>
     <table id="page">
     </table>
 </center>
@@ -194,30 +240,30 @@
         window.location.href = "read_class_chapter_new_word.jsp?id="+id+"&book_id="+book_id;
     }
     function del(id) {
-        // if (confirm("你确定要删除？删除之后不可恢复！")){
-        //     $.ajax({
-        //         url:url+"/admin/deleteReadClassBookChapter.do",
-        //         type:'POST',
-        //         data:{
-        //             id:id
-        //         },
-        //         dataType:'json',
-        //         success:function (result) {
-        //             var code = result['code'];
-        //             var msg = result['msg'];
-        //             if (code != 200){
-        //                 alert(msg);
-        //             }else {
-        //                 alert(msg);
-        //                 history.go(0);
-        //             }
-        //         },
-        //         error:function (result) {
-        //             console.log(result);
-        //             alert("服务器出错！");
-        //         }
-        //     });
-        // }
+        if (confirm("你确定要删除？删除之后不可恢复！")){
+            $.ajax({
+                url:url+"/admin/deleteReadClassSeries.do",
+                type:'POST',
+                data:{
+                    id:id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
     }
 </script>
 </html>

@@ -852,7 +852,7 @@ public class AdminServiceImpl implements IAdminService {
 
 
     //上传阅读挑战系列的书籍
-    public ServerResponse upload_read_class_series_book(String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
+    public ServerResponse upload_read_class_series_book(MultipartFile pic, String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
         //将sentence转换成json
         net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
         //事务
@@ -862,6 +862,11 @@ public class AdminServiceImpl implements IAdminService {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         TransactionStatus status = transactionManager.getTransaction(def);
         try{
+            //上传老师二维码
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //压缩
+            String name1 = iFileService.upload(pic,path,"l_e/read_class/mp3");
+            String qr_code_url = "read_class/mp3/"+name1;
             String nowTime = String.valueOf((new Date()).getTime());
             //这里插入一下
             int insertResult = common_configMapper.insertReadClassSeriesBook(title, word_need_number, class_id, nowTime);
@@ -879,6 +884,8 @@ public class AdminServiceImpl implements IAdminService {
                     common_configMapper.insertReadClassSeriesInner(series_id,book_id,order);
                 }
             }
+            //插入老师
+            common_configMapper.insertReadClassSeriesTeacher(qr_code_url,series_id);
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){

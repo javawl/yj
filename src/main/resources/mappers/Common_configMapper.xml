@@ -980,6 +980,18 @@
     WHERE read_class_series.read_class_id = #{read_class_id}
   </select>
 
+  <select id="readClassSeriesUser" resultType="map">
+    SELECT `user`.username,`user`.portrait,tb2.*
+    FROM `user`,
+         (SELECT read_class_contestants.user_id,read_class_contestants.whether_help,read_class_contestants.insist_day,tb.*
+         FROM read_class_contestants,
+              (SELECT `id` as series_id,`name`
+              FROM read_class_series
+              WHERE read_class_series.read_class_id = #{read_class_id}) tb
+         WHERE tb.series_id = read_class_contestants.series_id) tb2
+    WHERE tb2.user_id = `user`.id
+  </select>
+
   <select id="getInsertChapterId" resultType="map">
     SELECT *
     FROM read_class_chapter
@@ -1018,6 +1030,12 @@
     LIMIT 1
   </select>
 
+  <select id="getReadClassSeriesByReadClassId" resultType="map">
+    SELECT *
+    FROM read_class_series
+    WHERE read_class_id = #{read_class_id}
+  </select>
+
   <select id="readClassBookChapterNewWordAll" resultType="map">
     SELECT *
     FROM read_class_new_word
@@ -1053,6 +1071,11 @@
   <insert id="insertReadClassSeriesBook" parameterType="string">
     INSERT INTO read_class_series (`name`,`word_number_need`,`read_class_id`,set_time)
     values (#{name},#{word_number_need},#{read_class_id},#{set_time})
+  </insert>
+
+  <insert id="insertReadClassSeriesTeacher" parameterType="string">
+    INSERT INTO read_class_teacher (`qr_code`,`series_id`)
+    values (#{qr_code},#{series_id})
   </insert>
 
   <insert id="insertReadClassChapterInner" parameterType="string">
@@ -1189,6 +1212,41 @@
     <delete id="deleteReadClassChapterNewWord" parameterType="string" >
         DELETE FROM `read_class_new_word`
         WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteReadClassSeries" parameterType="string" >
+        DELETE FROM `read_class_series`
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteReadClassSeriesBook" parameterType="string" >
+        DELETE FROM `read_class_series_book`
+        WHERE series_id = #{series_id}
+    </delete>
+
+    <delete id="deleteReadClassSeriesTeacher" parameterType="string" >
+        DELETE FROM `read_class_teacher`
+        WHERE series_id = #{series_id}
+    </delete>
+
+    <delete id="deleteReadClassClockIn" parameterType="string" >
+        DELETE FROM `read_class_clock_in`
+        WHERE series_id = #{series_id}
+    </delete>
+
+    <delete id="deleteReadClassContestants" parameterType="string" >
+        DELETE FROM `read_class_contestants`
+        WHERE series_id = #{series_id}
+    </delete>
+
+    <delete id="deleteReadClassSignUp" parameterType="string" >
+        DELETE FROM `read_class_help_sign_up`
+        WHERE series_id = #{series_id}
+    </delete>
+
+    <delete id="deleteReadClass" parameterType="string" >
+        DELETE FROM `read_class`
+        WHERE `id` = #{id}
     </delete>
 
     <delete id="deleteChapterNewWord" parameterType="string" >

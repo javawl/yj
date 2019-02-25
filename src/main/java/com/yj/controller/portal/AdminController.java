@@ -1763,8 +1763,8 @@ public class AdminController {
      */
     @RequestMapping(value = "upload_read_class_series_book.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse upload_read_class_series_book(String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
-        return iAdminService.upload_read_class_series_book(title ,word_need_number, sentence, class_id, response,request);
+    public ServerResponse upload_read_class_series_book(@RequestParam(value = "pic",required = false) MultipartFile pic,String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request ){
+        return iAdminService.upload_read_class_series_book(pic, title ,word_need_number, sentence, class_id, response,request);
     }
 
 
@@ -2494,6 +2494,30 @@ public class AdminController {
 
 
     /**
+     * 展示阅读挑战的参与用户
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showReadClassSeriesUser.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassSeriesUser(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读参与者
+        List<Map<Object,Object>> Info = common_configMapper.readClassSeriesUser(id);
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("portrait",CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
+    /**
      * 展示书籍的章节内容信息
      * @param id
      * @return
@@ -2560,6 +2584,99 @@ public class AdminController {
         }
 
         return ServerResponse.createBySuccessMessage("成功");
+    }
+
+    /**
+     * 删除阅读下的系列
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReadClassSeries.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteReadClassSeries(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除系列
+            int delResult = common_configMapper.deleteReadClassSeries(id);
+            if (delResult == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            common_configMapper.deleteReadClassSeriesBook(id);
+            common_configMapper.deleteReadClassSeriesTeacher(id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+
+    }
+
+
+    /**
+     * 删除阅读期数
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReadClass.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteReadClass(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //查出系列
+            List<Map<Object,Object>> allReadClassSeries = common_configMapper.getReadClassSeriesByReadClassId(id);
+            for (int i = 0; i < allReadClassSeries.size(); i++){
+                String series_id = allReadClassSeries.get(i).get("id").toString();
+                //删除书籍关系
+                common_configMapper.deleteReadClassSeriesBook(series_id);
+                //删除老师
+                common_configMapper.deleteReadClassSeriesTeacher(series_id);
+                //删除系列下打卡
+                common_configMapper.deleteReadClassClockIn(series_id);
+                //删除系列下参与者
+                common_configMapper.deleteReadClassContestants(series_id);
+                //删除系列下助力
+                common_configMapper.deleteReadClassSignUp(series_id);
+                //删除系列
+                common_configMapper.deleteReadClassSeries(series_id);
+            }
+
+            int delResult = common_configMapper.deleteReadClass(id);
+            if (delResult == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+
     }
 
 

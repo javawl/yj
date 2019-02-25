@@ -33,7 +33,7 @@ public interface IAdminService {
     ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String book_id, HttpServletResponse response, HttpServletRequest request );
 
     //上传阅读挑战系列的书籍
-    ServerResponse upload_read_class_series_book(String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request );
+    ServerResponse upload_read_class_series_book(MultipartFile pic, String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request );
 
     ServerResponse<List<Map>> feeds_info(String page, String size, HttpServletRequest request);
 

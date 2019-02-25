@@ -47,6 +47,10 @@
             <td>词汇量：</td>
             <td><input id="word_need_number" name="word_need_number" type="text"></td>
         </tr>
+        <tr>
+            <td>指导老师二维码图片：</td>
+            <td><input id="pic" name="pic" type="file"></td>
+        </tr>
     </table>
 </div>
 <div id="inner">
@@ -87,6 +91,10 @@
     document.getElementById('btn1').addEventListener('click', function () {
         var title = $('input[name=title]').val();
         var word_need_number = $('input[name=word_need_number]').val();
+        if (typeof($('#pic')[0].files[0]) == "undefined"){
+            alert("请选择老师二维码,不能为空！");
+            return;
+        }
         // 读取 html
         var result = [];
         //建立图片数组
@@ -101,6 +109,7 @@
             result.push(single_json);
         }
 
+        formData.append('pic', $('#pic')[0].files[0]);
         formData.append('title', title);
         formData.append('word_need_number', word_need_number);
         formData.append('class_id', class_id);

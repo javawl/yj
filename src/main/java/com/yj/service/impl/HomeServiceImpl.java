@@ -1752,8 +1752,7 @@ public class HomeServiceImpl implements IHomeService {
                             }
                             flag = 1;
                         }
-                        //没完成不变
-                        if ((today_learned_number + learned_word) >= (2 * plan_words_number) && is_correct == 2){
+                        if (((today_learned_number + learned_word) >= (2 * plan_words_number)) && is_correct == 2){
                             //完成双倍任务
                             int updateResult = dictionaryMapper.changeInsistDayStatus(3,learned_word,plan,one,id);
                             if (updateResult == 0){
@@ -1763,6 +1762,7 @@ public class HomeServiceImpl implements IHomeService {
                         }
 
                         if (flag == 0){
+                            //没完成不变
                             int updateResult = dictionaryMapper.changeInsistDayStatus(is_correct,learned_word,plan,one,id);
                             if (updateResult == 0){
                                 throw new Exception();
@@ -1817,7 +1817,12 @@ public class HomeServiceImpl implements IHomeService {
                 return ServerResponse.createByErrorMessage("您已经打过卡了！");
             }
             if (is_correct == 0){
-                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+                //每日计划单词数
+                int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
+                int today_word_number = Integer.valueOf(getInsistDay.get("is_correct").toString());
+                if (plan_words_number > today_word_number){
+                    return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+                }
             }
             //开启事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
