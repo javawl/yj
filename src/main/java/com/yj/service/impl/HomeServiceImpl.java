@@ -1819,7 +1819,7 @@ public class HomeServiceImpl implements IHomeService {
             if (is_correct == 0){
                 //每日计划单词数
                 int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
-                int today_word_number = Integer.valueOf(getInsistDay.get("is_correct").toString());
+                int today_word_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
                 if (plan_words_number > today_word_number){
                     return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
                 }
