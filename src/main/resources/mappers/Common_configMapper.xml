@@ -753,7 +753,7 @@
   <select id="showSelectBeginReadClassSeries" resultType="map" parameterType="string">
     SELECT tb2.*,read_class.*
     FROM read_class,
-         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id
+         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id,tb.whether_help
           FROM read_class_series,
                (SELECT series_id,whether_help
                 FROM read_class_contestants
