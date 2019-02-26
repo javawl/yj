@@ -49,7 +49,11 @@ public interface IAdminService {
 
     ServerResponse<Map<Object,Object>> show_word_challenge_info(String id,HttpServletRequest request);
 
+    ServerResponse<Map<Object,Object>> show_read_challenge_info(String id,HttpServletRequest request);
+
     ServerResponse<String> settle_accounts(String id,HttpServletRequest request);
+
+    ServerResponse<String> settle_accounts_read_class(String id,HttpServletRequest request);
 
     ServerResponse<String> final_confirm(String id,HttpServletRequest request);
 }

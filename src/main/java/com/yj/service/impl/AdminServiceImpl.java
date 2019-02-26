@@ -436,6 +436,36 @@ public class AdminServiceImpl implements IAdminService {
         return ServerResponse.createBySuccess("成功！",result);
     }
 
+
+    //展示单个阅读挑战详情
+    public ServerResponse<Map<Object,Object>> show_read_challenge_info(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        Map<Object,Object> ReadChallengeInfo = common_configMapper.showReadClassById(id);
+        //判断状态是否结束
+        if ((new Date()).getTime() <= Long.valueOf(ReadChallengeInfo.get("et").toString())){
+            //未结束
+            ReadChallengeInfo.put("whether_finish", "0");
+        }else {
+            //已结束
+            ReadChallengeInfo.put("whether_finish", "1");
+        }
+        ReadChallengeInfo.put("st", CommonFunc.getFormatTime(Long.valueOf(ReadChallengeInfo.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+        ReadChallengeInfo.put("et", CommonFunc.getFormatTime(Long.valueOf(ReadChallengeInfo.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        ReadChallengeInfo.put("success_rate", Double.valueOf(ReadChallengeInfo.get("success_rate").toString()) * 100 + "%");
+//        if (ReadChallengeInfo.get("final_confirm").toString().equals("0")){
+//            ReadChallengeInfo.put("final_confirm", "尚未确认");
+//        }else {
+//            ReadChallengeInfo.put("final_confirm", "已确认");
+//        }
+
+        return ServerResponse.createBySuccess("成功！",ReadChallengeInfo);
+    }
+
     //结算账单
     public ServerResponse<String> settle_accounts(String id,HttpServletRequest request){
         //验证参数是否为空
@@ -544,6 +574,84 @@ public class AdminServiceImpl implements IAdminService {
             //成功率
             Double success_rate = success_people * 1.0 / total_real_people * 1.0;
             common_configMapper.settleAccounts(String.valueOf(aggregate_amount),String.valueOf(profit_loss),String.valueOf(success_people),String.valueOf(success_rate),String.valueOf(reward),String.valueOf(loser),String.valueOf(invite_success),"1",id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    //结算阅读挑战账单
+    public ServerResponse<String> settle_accounts_read_class(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //成功人数
+        int success_people = 0;
+        //总的真实用户数
+        int total_real_people = 0;
+        //失败人数
+        int loser = 0;
+        //总金额
+        Double aggregate_amount = 0.0;
+        //用户赢走的总金额
+        Double userWinAmount = 0.0;
+        Map<Object,Object> r_c = common_configMapper.showReadClassById(id);
+        //计算时长
+        //总天数
+        int allDay = CommonFunc.count_interval_days(r_c.get("st").toString(),r_c.get("et").toString());
+        //获取所有的系列
+        List<Map<Object,Object>> ReadClassSeries = common_configMapper.readClassSeries(id);
+        for (int i = 0; i < ReadClassSeries.size(); i++){
+            String s_id = ReadClassSeries.get(i).get("id").toString();
+            //第一轮先计算reward
+            List<Map<Object,Object>> ReadChallengeContestants = common_configMapper.showAllReadClassContestants(s_id);
+            for (int j = 0; j < ReadChallengeContestants.size(); j++){
+                //判断是否真实用户
+                if (ReadChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                    //真实用户
+                    total_real_people += 1;
+                    //判断是否成功
+                    if (Integer.valueOf(ReadChallengeContestants.get(i).get("insist_day").toString()) >= allDay){
+                        //挑战成功
+                        success_people += 1;
+                    }else {
+                        loser += 1;
+                    }
+                }
+                Double userFee;
+                if (ReadChallengeContestants.get(i).get("whether_help").toString().equals("0")){
+                    //99
+                    //用户报名金额
+                    userFee = 99.9;
+                }else {
+                    //用户报名金额
+                    userFee = 59.9;
+                }
+                //把每个用户的坚持都算一遍
+                aggregate_amount += userFee;
+                userWinAmount = userWinAmount + (Double.valueOf(ReadChallengeContestants.get(i).get("insist_day").toString()) * (userFee / Double.valueOf(String.valueOf(allDay))));
+            }
+        }
+
+        //营收
+        Double profit_loss = aggregate_amount - userWinAmount;
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //成功率
+            Double success_rate = success_people * 1.0 / total_real_people * 1.0;
+            common_configMapper.settleAccountsReadClass(String.valueOf(aggregate_amount),String.valueOf(profit_loss),String.valueOf(success_people),String.valueOf(success_rate),String.valueOf(loser),id);
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){

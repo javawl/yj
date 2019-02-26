@@ -718,6 +718,12 @@
     LIMIT 1
   </select>
 
+  <select id="showReadClassById" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class
+    WHERE id = #{id}
+  </select>
+
   <select id="showReadClassReserved" resultType="map" parameterType="string">
     SELECT *
     FROM read_class
@@ -799,6 +805,12 @@
     FROM read_class_contestants
     WHERE read_class_contestants.series_id = #{series_id}
     AND read_class_contestants.user_id = #{user_id}
+  </select>
+
+  <select id="showAllReadClassContestants" resultType="map">
+    SELECT *
+    FROM `read_class_contestants`
+    WHERE series_id = #{series_id}
   </select>
 
   <select id="showSeriesReadClass" resultType="map" parameterType="string">
@@ -1036,6 +1048,17 @@
     WHERE read_class_id = #{read_class_id}
   </select>
 
+  <select id="showReadClassUserClockIn" resultType="map">
+    SELECT `user`.username,`user`.portrait,tb.*
+    FROM `user`,
+    (SELECT *
+    FROM `read_class_clock_in`
+    WHERE series_id = #{series_id}
+    AND user_id = #{user_id}) tb
+    WHERE `user`.id = tb.user_id
+    ORDER BY set_time DESC
+  </select>
+
   <select id="readClassBookChapterNewWordAll" resultType="map">
     SELECT *
     FROM read_class_new_word
@@ -1202,6 +1225,16 @@
             `pic`= #{pic}
         WHERE id = #{id}
     </update>
+
+  <update id="settleAccountsReadClass">
+    UPDATE `read_class`
+    set `aggregate_amount` = #{aggregate_amount},
+        `profit_loss` = #{profit_loss},
+        `success_people` = #{success_people},
+        `success_rate` = #{success_rate},
+        `loser` = #{loser}
+    WHERE id = #{id}
+  </update>
 
     <update id="updateReadBookMP3" parameterType="string">
         UPDATE `read_class_chapter` SET

@@ -104,7 +104,50 @@
                 alert("服务器出错！");
             }
         });
+        $.ajax({
+            url:url+"/admin/show_read_challenge_info.do?id="+class_id,
+            type:'POST',
+            data:{
+                id:class_id
+            },
+            dataType:'json',
+            success:function (result) {
+                var lottery_draw = result["data"];4
+                if (lottery_draw['whether_finish'] == '0'){
+                    //没结束
+                    $("#this_challenge_info").css("display",'none')
+                    $("#remind").empty()
+                    $("#remind").append("<h3>阅读挑战未到结束时间不可清算</h3>")
+                }else {
+                    //已结束
+                    if (lottery_draw['whether_settle_accounts'] == '0'){
+                        //未清算过
+                        $("#this_challenge_info").css("display",'none')
+                    }else {
+                        $("#remind").empty()
+                        $("#this_challenge_info").css("display",'')
+                        $("#this_challenge_info").append('<tr>'+
+                            '<td>'+lottery_draw['aggregate_amount']+'</td>'+
+                            '<td>'+lottery_draw['success_people']+'</td>'+
+                            '<td>'+lottery_draw['success_rate']+'</td>'+
+                            '<td>'+lottery_draw['reward_each']+'</td>'+
+                            '<td>'+lottery_draw['loser']+'</td>'+
+                            '<td>'+lottery_draw['profit_loss']+'</td>'+
+                            // '<td>'+lottery_draw['final_confirm']+'</td>'+
+                            '<td><button style="margin-left: 5px;" onclick="settle_accounts()">结算</button>' +
+                            // '<button style="margin-left: 5px;" onclick="final_confirm('+ "'"+id+"'"+')">最终确认</button>' +
+                            '</td>'+
+                            '</tr>');
+                    }
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
     });
+
     //--------------------------------------------------------------------
     // 修改词汇量(添加输入框)
     //判断是否有输入框
@@ -228,11 +271,53 @@
             <td>操作</td>
         </tr>
     </table>
+    <h1>本期阅读挑战详情和结算</h1>
+    <br>
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">
+        <tr>
+            <td>总金额(资金池)</td>
+            <td>成功挑战用户数</td>
+            <td>成功率</td>
+            <td>奖励金金额/人</td>
+            <td>挑战失败用户数</td>
+            <td>最后营收</td>
+            <%--<td>是否最终确认</td>--%>
+            <td>操作</td>
+        </tr>
+    </table>
+    <div id="remind">
+    </div>
     <table id="page">
     </table>
 </center>
 </body>
 <script>
+    function settle_accounts() {
+        if (confirm("你确定要结算了？")){
+            $.ajax({
+                url:url+"/admin/settle_accounts_read_class.do",
+                type:'POST',
+                data:{
+                    id:class_id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
+    }
     function check_series_book(id) {
         window.location.href = "read_series_book.jsp?id="+id;
     }
@@ -264,6 +349,9 @@
                 }
             });
         }
+    }
+    function user_info(user_id,series_id) {
+        window.location.href = "show_read_class_series_userInfo.jsp?user_id="+user_id+"&series_id="+series_id;
     }
 </script>
 </html>

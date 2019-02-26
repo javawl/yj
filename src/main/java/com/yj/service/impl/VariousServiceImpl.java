@@ -1629,13 +1629,13 @@ public class VariousServiceImpl implements IVariousService {
             for (int i = 0; i < series.size(); i++){
                 series.get(i).put("pic",CommonFunc.judgePicPath(series.get(i).get("pic").toString()));
                 //判断是否和flag一致
-                if (series.get(i).get("book_id").toString().equals(flag_id)){
+                if (series.get(i).get("series_id").toString().equals(flag_id)){
                     //该系列放入一本书
                     allSeries.get(flag_index).add(series.get(i));
                 }else {
                     //添加新的flag
                     flag_index += 1;
-                    flag_id = series.get(i).get("book_id").toString();
+                    flag_id = series.get(i).get("series_id").toString();
                     //初始化
                     List<Map<Object,Object>> tmp = new ArrayList<>();
                     allSeries.add(tmp);

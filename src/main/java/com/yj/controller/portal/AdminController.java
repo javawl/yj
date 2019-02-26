@@ -2748,5 +2748,64 @@ public class AdminController {
         }
     }
 
+
+    /**
+     * 展示用户在该系列打卡情况
+     * @param user_id 用户id
+     * @param series_id 系列id
+     * @return  List
+     */
+    @RequestMapping(value = "show_read_class_series_userInfo.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_read_class_series_userInfo(String user_id,String series_id){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(user_id);
+            add(series_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取用户在该系列打卡情况
+        List<Map<Object,Object>> Info = common_configMapper.showReadClassUserClockIn(series_id,user_id);
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("set_time",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("set_time").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("portrait", CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+            //查出系列名字章节号和书名
+            String chapter_id = Info.get(i).get("chapter_id").toString();
+            Map<Object,Object> bookAndChapterInfo = common_configMapper.getBookInfoAndChapterInfoByChapterId(chapter_id);
+            Info.get(i).put("book_name", bookAndChapterInfo.get("book_name").toString());
+            Info.get(i).put("chapter_name", bookAndChapterInfo.get("chapter_name").toString());
+
+        }
+
+        return ServerResponse.createBySuccess("成功",Info);
+    }
+
+
+    /**
+     * 展示单个阅读挑战详情
+     * @param id           阅读挑战id
+     * @param request      request
+     * @return             Map
+     */
+    @RequestMapping(value = "show_read_challenge_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_read_challenge_info(String id,HttpServletRequest request){
+        return iAdminService.show_read_challenge_info(id, request);
+    }
+
+    /**
+     * 结算阅读挑战
+     * @param id           阅读挑战id
+     * @param request      request
+     * @return             string
+     */
+    @RequestMapping(value = "settle_accounts_read_class.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> settle_accounts_read_class(String id,HttpServletRequest request){
+        return iAdminService.settle_accounts_read_class(id, request);
+    }
+
     //-----------------------------------------------------1.2后台(下闭合线)----------------------------------------------------------
 }

@@ -396,6 +396,9 @@ public interface Common_configMapper {
     //展示单词挑战首页
     Map<Object,Object> showReadClass(@Param("now_time") String  now_time);
 
+    //展示单条阅读挑战
+    Map<Object,Object> showReadClassById(@Param("id") String  id);
+
     //展示单词挑战预约的信息
     Map<Object,Object> showReadClassReserved(@Param("now_time") String  now_time);
 
@@ -419,6 +422,9 @@ public interface Common_configMapper {
 
     //搜索参加阅读挑战的报名情况
     Map<Object,Object> selectReadClassContestants(@Param("series_id") String  series_id,@Param("user_id") String  user_id);
+
+    //参加阅读挑战的报名情况
+    List<Map<Object,Object>> showAllReadClassContestants(@Param("series_id") String  series_id);
 
     //根据系列展现期数
     Map<Object,Object> showSeriesReadClass(@Param("series_id") String  series_id);
@@ -504,6 +510,9 @@ public interface Common_configMapper {
     //查出某期下的所有系列
     List<Map<Object,Object>> getReadClassSeriesByReadClassId(@Param("read_class_id") String read_class_id);
 
+    //查出用户在某系列下的打卡情况
+    List<Map<Object,Object>> showReadClassUserClockIn(@Param("series_id") String series_id,@Param("user_id") String user_id);
+
     //根据章节id获取新单词内容
     List<Map<Object,Object>> getChapterNewWord(@Param("chapter_id") String  chapter_id,@Param("book_id") String  book_id);
 
@@ -587,6 +596,10 @@ public interface Common_configMapper {
 
     //更新书本封面
     int updateReadBookPic(@Param("id") String id, @Param("pic") String pic);
+
+    //结算阅读挑战表
+    int settleAccountsReadClass(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,
+                                @Param("success_rate") String success_rate, @Param("loser") String loser, @Param("id") String id);
 
     //更新章节音频
     int updateReadBookMP3(@Param("id") String id, @Param("mp3") String mp3);
