@@ -498,6 +498,9 @@ public interface Common_configMapper {
     //后台根据章节id获取内容
     List<Map<Object,Object>> readClassBookChapterInnerAll(@Param("chapter_id") String chapter_id);
 
+    //后台根据章节id获取内容
+    Map<Object,Object> readClassBookChapterOne(@Param("id") String id);
+
     //报名页介绍页的往期人的评论图片
     List<Map<Object,Object>> showReadClassIntroductionPic();
 
@@ -554,6 +557,9 @@ public interface Common_configMapper {
 
     //插入章节的新单词
     int insertReadChallengeNewWord(@Param("word") String word,@Param("mean") String mean,@Param("symbol") String symbol,@Param("symbol_mp3") String symbol_mp3,@Param("book_id") String book_id,@Param("chapter_id") String chapter_id);
+
+    //插入报名页介绍页的往期人的评论图片
+    int insertReadChallengeIntroductionPic(@Param("pic") String pic,@Param("order") String order);
 
     //阅读挑战报名人数
     int changeReadClassEnrollment(@Param("read_class_id") String read_class_id);
@@ -636,6 +642,9 @@ public interface Common_configMapper {
 
     //删除章节本身表
     int deleteChapter(@Param("id") String id);
+
+    //删除报名页介绍页的往期人的评论图片
+    int deleteReadClassIntroductionPic(@Param("id") String id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

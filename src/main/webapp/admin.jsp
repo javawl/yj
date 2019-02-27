@@ -52,6 +52,7 @@
                 <p onclick="change_src('show_withdraw_cash.jsp?page=1&size=15')">提现申请</p>
                 <p onclick="change_src('read_class_book.jsp?page=1&size=15')">阅读书籍</p>
                 <p onclick="change_src('show_read_class.jsp?page=1&size=15')">阅读挑战</p>
+                <p onclick="change_src('show_read_class_introduction_pic.jsp?page=1&size=15')">阅读报名页往期评论</p>
             </center>
         </div>
         <div class="main">

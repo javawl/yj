@@ -913,7 +913,7 @@ public class AdminServiceImpl implements IAdminService {
 
 
     //上传阅读挑战章节
-    public ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String book_id, HttpServletResponse response, HttpServletRequest request ){
+    public ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String type,String book_id, HttpServletResponse response, HttpServletRequest request ){
         //将sentence转换成json
         net.sf.json.JSONArray sentence_json = net.sf.json.JSONArray.fromObject(sentence);
         //事务
@@ -941,10 +941,18 @@ public class AdminServiceImpl implements IAdminService {
             if(sentence_json.size()>0){
                 for(int i=0;i<sentence_json.size();i++){
                     net.sf.json.JSONObject job = sentence_json.getJSONObject(i);
-                    String en = job.get("en").toString();
-                    String cn = job.get("cn").toString();
-                    String order_inner = job.get("order").toString();
-                    common_configMapper.insertReadClassChapterInner(en,cn,order_inner, chapterId);
+                    if (type.equals("input")){
+                        String en = job.get("en").toString();
+                        String cn = job.get("cn").toString();
+                        String order_inner = job.get("order").toString();
+                        common_configMapper.insertReadClassChapterInner(en,cn,order_inner, chapterId);
+                    }else if (type.equals("order")){
+                        String sent_order = job.get("sent_order").toString();
+                        //查出来
+                        Map<Object,Object> innerOne = common_configMapper.readClassBookChapterOne(sent_order);
+                        String order_inner = job.get("order").toString();
+                        common_configMapper.insertReadClassChapterInner(innerOne.get("en").toString(),innerOne.get("cn").toString(),order_inner, chapterId);
+                    }
                 }
             }
             transactionManager.commit(status);

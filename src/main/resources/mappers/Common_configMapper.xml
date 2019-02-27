@@ -1030,9 +1030,16 @@
     ORDER BY `order`
   </select>
 
+  <select id="readClassBookChapterOne" resultType="map">
+    SELECT *
+    FROM read_class_chapter_inner
+    WHERE read_class_chapter_inner.id = #{id}
+  </select>
+
   <select id="showReadClassIntroductionPic" resultType="map">
     SELECT *
     FROM read_class_introduction_pic
+    ORDER BY `order`
   </select>
 
   <select id="checkExistReserved" resultType="map">
@@ -1124,6 +1131,11 @@
   <insert id="insertReadChallengeNewWord" parameterType="string">
     INSERT INTO read_class_new_word (word,mean,symbol,symbol_mp3,book_id,chapter_id)
     values (#{word},#{mean},#{symbol},#{symbol_mp3},#{book_id},#{chapter_id})
+  </insert>
+
+  <insert id="insertReadChallengeIntroductionPic" parameterType="string">
+    INSERT INTO read_class_introduction_pic (pic,`order`)
+    values (#{pic},#{order})
   </insert>
 
   <update id="changeReadClassEnrollment">
@@ -1294,6 +1306,11 @@
 
     <delete id="deleteChapter" parameterType="string" >
         DELETE FROM `read_class_chapter`
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteReadClassIntroductionPic" parameterType="string" >
+        DELETE FROM `read_class_introduction_pic`
         WHERE id = #{id}
     </delete>
 

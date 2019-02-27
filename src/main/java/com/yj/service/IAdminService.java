@@ -30,7 +30,7 @@ public interface IAdminService {
     ServerResponse upload_feeds_sentences(String files_order,MultipartFile[] files,MultipartFile pic,MultipartFile video_file, String title, String select, String kind, String author, String sentence, HttpServletResponse response, HttpServletRequest request );
 
     //上传阅读挑战章节
-    ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String book_id, HttpServletResponse response, HttpServletRequest request );
+    ServerResponse upload_read_class_chapter(MultipartFile pic,String title, String order,String sentence,String type,String book_id, HttpServletResponse response, HttpServletRequest request );
 
     //上传阅读挑战系列的书籍
     ServerResponse upload_read_class_series_book(MultipartFile pic, String title, String word_need_number,String sentence,String class_id,HttpServletResponse response, HttpServletRequest request );

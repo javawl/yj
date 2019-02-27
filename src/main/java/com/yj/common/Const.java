@@ -10,8 +10,8 @@ public class Const {
     public static final String FORGET_PASSWORD_SALT = "forget_password_salt";   //忘记密码生成token的加密盐
     public static final String LOGIN_SALT = "login_salt";               //密码的加密盐
     public static final String TOKEN_LOGIN_SALT = "token_login_salt";   //用户token的加密盐
-    public static final String DOMAIN_NAME = "http://localhost:8088";   //域名
-//    public static final String DOMAIN_NAME = "http://47.107.62.22:8080";   //域名
+//    public static final String DOMAIN_NAME = "http://localhost:8088";   //域名
+    public static final String DOMAIN_NAME = "http://47.107.62.22:8080";   //域名
 //    public static final String DOMAIN_NAME = "http://123.207.85.37:8080";   //域名
     public static final String FTP_PREFIX = "http://47.107.62.22/l_e/";   //文件服务器域名前缀
     public static final String TMP_ID1 = "qJ2eNCoVi2gL2cXa3UP0nBfaeJ3pGPHrLAtsaWFSyv0";   //第一条提醒的tmp_id
@@ -28,7 +28,7 @@ public class Const {
     public static final String TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND = "yjT1cESf9MwS_1NJXRoyMgk4BGxMgVjGUxczxXeotQI";   //单词挑战成功提醒
     public static final String TMP_CHALLENGE_FAIL = "G67GOTfOcX2FAJpIcpLuA5bmV8B3pD3jckAptE_qb1g";   //单词挑战失败提醒
     public static final String DRAW_RESULT_PATH = "page/home/pages/prize/prize_result";   //抽奖结果的路径
-    public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/InvitationRank/InvitationRank";   //邀请详情页
+    public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页
     public static final String WX_HOME_PATH = "page/tabBar/home/home";   //home的路径
     public static final String WX_MEDALLION_PATH = "page/tabBar/home/home?method=medallion_success";   //免死金牌成功的路径
     public static final String WX_MEDALLION_SHOW_PATH = "page/tabBar/home/home?method=medallion_show";   //展示免死金牌的路径

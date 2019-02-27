@@ -1750,8 +1750,8 @@ public class AdminController {
      */
     @RequestMapping(value = "upload_read_class_chapter.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse upload_read_class_chapter(@RequestParam(value = "pic",required = false) MultipartFile pic,String title,String order,String sentence, String book_id,HttpServletResponse response, HttpServletRequest request ){
-        return iAdminService.upload_read_class_chapter(pic,title,order,sentence, book_id, response,request);
+    public ServerResponse upload_read_class_chapter(@RequestParam(value = "pic",required = false) MultipartFile pic,String title,String order,String sentence,String type, String book_id,HttpServletResponse response, HttpServletRequest request ){
+        return iAdminService.upload_read_class_chapter(pic,title,order,sentence, type, book_id, response,request);
     }
 
 
@@ -2563,6 +2563,28 @@ public class AdminController {
 
 
     /**
+     * 报名页介绍页的往期人的评论图片
+     * @return
+     */
+    @RequestMapping(value = "showReadClassIntroductionPic.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showReadClassIntroductionPic(HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取报名页介绍页的往期人的评论图片
+        List<Map<Object,Object>> Info = common_configMapper.showReadClassIntroductionPic();
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("pic",CommonFunc.judgePicPath(Info.get(i).get("pic").toString()));
+        }
+
+        return ServerResponse.createBySuccess("成功",Info);
+    }
+
+
+    /**
      * 删除章节下的新单词
      * @param id
      * @return
@@ -2720,6 +2742,28 @@ public class AdminController {
     }
 
 
+
+    /**
+     * 删除报名页介绍页的往期人的评论图片
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteReadClassIntroductionPic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteReadClassIntroductionPic(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //删除报名页介绍页的往期人的评论图片
+        common_configMapper.deleteReadClassIntroductionPic(id);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
     @RequestMapping(value = "upload_read_class_new_word.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> upload_read_class_new_word(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String word,String mean, String symbol, String book_id, String chapter_id, HttpServletResponse response, HttpServletRequest request){
@@ -2746,6 +2790,19 @@ public class AdminController {
             e.printStackTrace();
             return ServerResponse.createByErrorMessage("更新出错！");
         }
+    }
+
+
+    @RequestMapping(value = "upload_read_class_introduction_pic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_read_class_introduction_pic(@RequestParam(value = "pic",required = false) MultipartFile pic, String order, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        //mp3
+        String name1 = iFileService.upload(pic,path,"l_e/read_class/mp3");
+        String url1 = "read_class/mp3/"+name1;
+        //存到数据库
+        common_configMapper.insertReadChallengeIntroductionPic(url1,order);
+        return ServerResponse.createBySuccess("成功",url1);
     }
 
 
