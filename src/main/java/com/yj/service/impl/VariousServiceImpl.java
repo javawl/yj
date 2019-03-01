@@ -1867,7 +1867,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", series_id + "_" + uid + "_" + "_" + now_time);//商户订单号
-            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "9990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.read_notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -1890,7 +1890,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + series_id + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "9990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -1999,7 +1999,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", series_id + "_" + uid + "_" + "_" + now_time);//商户订单号
-            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "5990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.read_help_pay_notify);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -2022,7 +2022,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + series_id + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "5990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -2135,7 +2135,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", series_id + "_" + uid + "_" + "_" + now_time);//商户订单号
-            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "4990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.read_help_pay_notify_second);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -2158,7 +2158,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + series_id + "_" + uid + "_" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "4990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
