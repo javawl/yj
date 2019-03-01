@@ -362,6 +362,7 @@
     FROM take_plans
     WHERE plan = #{plan}
     AND user_id = #{user_id}
+    LIMIT 1
   </select>
 
   <select id="homePagePortraitMaxId" resultType="int">

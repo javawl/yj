@@ -555,6 +555,7 @@
     SELECT my_plan,plan_days,plan_words_number,insist_day
     FROM user
     WHERE id = #{id}
+    LIMIT 1
   </select>
   <update id="decide_plan_days" parameterType="string">
     UPDATE user

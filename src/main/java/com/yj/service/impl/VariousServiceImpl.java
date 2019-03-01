@@ -1613,7 +1613,7 @@ public class VariousServiceImpl implements IVariousService {
                 }
                 resultReserved.put("people", all_peopleReserved);
                 resultReserved.put("series", allSeriesReserved);
-                return ServerResponse.createBySuccess("成功！", result);
+                return ServerResponse.createBySuccess("成功！", resultReserved);
             }
             result.put("st", CommonFunc.getFormatTime(Long.valueOf(readClass.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
             result.put("et", CommonFunc.getFormatTime(Long.valueOf(readClass.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));

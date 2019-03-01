@@ -1340,14 +1340,14 @@ public class HomeServiceImpl implements IHomeService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
-            //获取用户选择的计划
-            String plan = userMapper.getUserSelectPlan(id);
             //首先先获取自己背的单词里面的每日背单词数
             //找到该用户所选择的计划的总单词数
             Map numberResult = userMapper.getUserPlanNumber(id);
             if (numberResult == null){
                 return ServerResponse.createByErrorMessage("未找到该计划！");
             }
+            //获取用户选择的计划
+            String plan = numberResult.get("my_plan").toString();
             int number = Integer.valueOf(numberResult.get("plan_words_number").toString());
             //查看用户状态并决定需要提供的新学单词数
             //获取当天0点多一秒时间戳
@@ -1379,73 +1379,23 @@ public class HomeServiceImpl implements IHomeService {
                     }
                 }
             }
-            String dictionary_type = dictionaryMapper.selectPlanType(plan);
-            //获取新单词(获取上面number条
-            List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id,dictionary_type);
+            Map<Object,Object> result_list = new HashMap<>();
+            if (number == 0){
+                //用一个Map装这个结果
+                List<Map> new_list = new ArrayList<>();
+                List<Map> old_list = new ArrayList<>();
+                result_list.put("new_list", new_list);
+                result_list.put("old_list", old_list);
+                result_list.put("plan_number", numberResult.get("plan_words_number"));
+            }else {
+                String dictionary_type = dictionaryMapper.selectPlanType(plan);
+                //获取新单词(获取上面number条
+                List<Map> new_list_word = dictionaryMapper.getNewWord(number,plan,id,dictionary_type);
 
-            //格式化
-            List<Map> word = new_list_word;
-            List<Map> new_list = new ArrayList<>();
+                //格式化
+                List<Map> word = new_list_word;
+                List<Map> new_list = new ArrayList<>();
 
-            for (int iiii = 0; iiii < word.size(); iiii++){
-                //新建一个map
-                Map<Object,Object> mm = new HashMap<Object,Object>();
-                mm.put("word",word.get(iiii).get("word"));
-                //判断是否有意思，没有的话换一个意思
-                if (word.get(iiii).get("real_meaning") != null){
-                    mm.put("meaning",word.get(iiii).get("real_meaning"));
-                }else {
-                    if(word.get(iiii).get("meaning_Mumbler") != null) {
-                        mm.put("meaning",word.get(iiii).get("meaning_Mumbler"));
-                    }else {
-                        mm.put("meaning",word.get(iiii).get("meaning"));
-                    }
-                }
-                //音标音频
-                if (word.get(iiii).get("phonetic_symbol_en_Mumbler") != null){
-                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en_Mumbler"));
-                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en_Mumbler"));
-                }else {
-                    mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en"));
-                    mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en"));
-                }
-                if (word.get(iiii).get("phonetic_symbol_us_Mumbler") != null){
-                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us_Mumbler"));
-                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us_Mumbler"));
-                }else {
-                    mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us"));
-                    mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us"));
-                }
-                mm.put("id",word.get(iiii).get("id"));
-                mm.put("sentence",word.get(iiii).get("sentence"));
-                mm.put("sentence_cn",word.get(iiii).get("sentence_cn"));
-                mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
-                mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
-                mm.put("phrase",word.get(iiii).get("phrase"));
-                mm.put("paraphrase",word.get(iiii).get("paraphrase"));
-                mm.put("synonym",word.get(iiii).get("synonym"));
-                new_list.add(mm);
-            }
-
-
-            //计算两天、两周、一个月前的时间
-            Long last_two_day = (new Date()).getTime() - Const.TWO_DAY;
-            Long last_two_week = (new Date()).getTime() - Const.TWO_WEEK;
-            Long last_month = (new Date()).getTime() - Const.HOT_RECOMMENDATIONS;
-            //获取要复习的旧单词
-            List<Map> old_list_word = dictionaryMapper.getOldWord(plan,id,String.valueOf(last_two_day),String.valueOf(last_two_week),String.valueOf(last_month));
-            word = old_list_word;
-
-            List<Map> old_list = new ArrayList<>();
-            //这里要做一个判断，如果今天已经背过第一轮之后，只给新单词不给旧单词
-            //做个flag,1代表是再来XX个
-            int flag_old_word = 0;
-            if (getInsistDay != null){
-                if (Integer.valueOf(getInsistDay.get("is_correct").toString()) == 2 || Integer.valueOf(getInsistDay.get("is_correct").toString()) == 1){
-                    flag_old_word = 1;
-                }
-            }
-            if (flag_old_word == 0){
                 for (int iiii = 0; iiii < word.size(); iiii++){
                     //新建一个map
                     Map<Object,Object> mm = new HashMap<Object,Object>();
@@ -1475,7 +1425,6 @@ public class HomeServiceImpl implements IHomeService {
                         mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us"));
                         mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us"));
                     }
-                    mm.put("level",word.get(iiii).get("level"));
                     mm.put("id",word.get(iiii).get("id"));
                     mm.put("sentence",word.get(iiii).get("sentence"));
                     mm.put("sentence_cn",word.get(iiii).get("sentence_cn"));
@@ -1484,15 +1433,76 @@ public class HomeServiceImpl implements IHomeService {
                     mm.put("phrase",word.get(iiii).get("phrase"));
                     mm.put("paraphrase",word.get(iiii).get("paraphrase"));
                     mm.put("synonym",word.get(iiii).get("synonym"));
-                    old_list.add(mm);
+                    new_list.add(mm);
                 }
+
+
+                //计算两天、两周、一个月前的时间
+                Long last_two_day = (new Date()).getTime() - Const.TWO_DAY;
+                Long last_two_week = (new Date()).getTime() - Const.TWO_WEEK;
+                Long last_month = (new Date()).getTime() - Const.HOT_RECOMMENDATIONS;
+                //获取要复习的旧单词
+                List<Map> old_list_word = dictionaryMapper.getOldWord(plan,id,String.valueOf(last_two_day),String.valueOf(last_two_week),String.valueOf(last_month));
+                word = old_list_word;
+
+                List<Map> old_list = new ArrayList<>();
+                //这里要做一个判断，如果今天已经背过第一轮之后，只给新单词不给旧单词
+                //做个flag,1代表是再来XX个
+                int flag_old_word = 0;
+                if (getInsistDay != null){
+                    if (Integer.valueOf(getInsistDay.get("is_correct").toString()) == 2 || Integer.valueOf(getInsistDay.get("is_correct").toString()) == 1){
+                        flag_old_word = 1;
+                    }
+                }
+                if (flag_old_word == 0){
+                    for (int iiii = 0; iiii < word.size(); iiii++){
+                        //新建一个map
+                        Map<Object,Object> mm = new HashMap<Object,Object>();
+                        mm.put("word",word.get(iiii).get("word"));
+                        //判断是否有意思，没有的话换一个意思
+                        if (word.get(iiii).get("real_meaning") != null){
+                            mm.put("meaning",word.get(iiii).get("real_meaning"));
+                        }else {
+                            if(word.get(iiii).get("meaning_Mumbler") != null) {
+                                mm.put("meaning",word.get(iiii).get("meaning_Mumbler"));
+                            }else {
+                                mm.put("meaning",word.get(iiii).get("meaning"));
+                            }
+                        }
+                        //音标音频
+                        if (word.get(iiii).get("phonetic_symbol_en_Mumbler") != null){
+                            mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en_Mumbler"));
+                            mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en_Mumbler"));
+                        }else {
+                            mm.put("phonetic_symbol_en",word.get(iiii).get("phonetic_symbol_en"));
+                            mm.put("pronunciation_en",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_en"));
+                        }
+                        if (word.get(iiii).get("phonetic_symbol_us_Mumbler") != null){
+                            mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us_Mumbler"));
+                            mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us_Mumbler"));
+                        }else {
+                            mm.put("phonetic_symbol_us",word.get(iiii).get("phonetic_symbol_us"));
+                            mm.put("pronunciation_us",Const.FTP_PREFIX + word.get(iiii).get("pronunciation_us"));
+                        }
+                        mm.put("level",word.get(iiii).get("level"));
+                        mm.put("id",word.get(iiii).get("id"));
+                        mm.put("sentence",word.get(iiii).get("sentence"));
+                        mm.put("sentence_cn",word.get(iiii).get("sentence_cn"));
+                        mm.put("sentence_audio",Const.FTP_PREFIX + word.get(iiii).get("sentence_audio"));
+                        mm.put("pic",Const.FTP_PREFIX + word.get(iiii).get("pic"));
+                        mm.put("phrase",word.get(iiii).get("phrase"));
+                        mm.put("paraphrase",word.get(iiii).get("paraphrase"));
+                        mm.put("synonym",word.get(iiii).get("synonym"));
+                        old_list.add(mm);
+                    }
+                }
+
+                //用一个Map装这个结果
+                result_list.put("new_list", new_list);
+                result_list.put("old_list", old_list);
+                result_list.put("plan_number", numberResult.get("plan_words_number"));
             }
 
-            //用一个Map装这个结果
-            Map<Object,Object> result_list = new HashMap<>();
-            result_list.put("new_list", new_list);
-            result_list.put("old_list", old_list);
-            result_list.put("plan_number", numberResult.get("plan_words_number"));
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(result_list, SerializerFeature.WriteMapNullValue));
 

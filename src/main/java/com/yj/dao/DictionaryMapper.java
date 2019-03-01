@@ -20,7 +20,7 @@ public interface DictionaryMapper {
     int updateByPrimaryKey(Dictionary record);
 
     //下面是自己加的
-//获取用户已背单词数
+    //获取用户已背单词数
     String getLearnedWordNumber(@Param("plan") String plan,@Param("user_id") String user_id);
 
     //获取首页抽取头像随机数最大值
