@@ -1826,14 +1826,15 @@ public class HomeServiceImpl implements IHomeService {
             if (is_correct >= 2){
                 return ServerResponse.createByErrorMessage("您已经打过卡了！");
             }
-            if (is_correct == 0){
-                //每日计划单词数
-                int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
-                int today_word_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
-                if (plan_words_number > today_word_number){
-                    return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
-                }
-            }
+            //应急万能打卡
+//            if (is_correct == 0){
+//                //每日计划单词数
+//                int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
+//                int today_word_number = Integer.valueOf(getInsistDay.get("today_word_number").toString());
+//                if (plan_words_number > today_word_number){
+//                    return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+//                }
+//            }
             //开启事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
