@@ -1583,13 +1583,13 @@ public class VariousServiceImpl implements IVariousService {
                 for (int i = 0; i < series.size(); i++){
                     series.get(i).put("pic",CommonFunc.judgePicPath(series.get(i).get("pic").toString()));
                     //判断是否和flag一致
-                    if (series.get(i).get("book_id").toString().equals(flag_id)){
+                    if (series.get(i).get("series_id").toString().equals(flag_id)){
                         //该系列放入一本书
                         allSeriesReserved.get(flag_index).add(series.get(i));
                     }else {
                         //添加新的flag
                         flag_index += 1;
-                        flag_id = series.get(i).get("book_id").toString();
+                        flag_id = series.get(i).get("series_id").toString();
                         //初始化
                         List<Map<Object,Object>> tmp = new ArrayList<>();
                         allSeriesReserved.add(tmp);
@@ -2642,6 +2642,12 @@ public class VariousServiceImpl implements IVariousService {
             //获取某个章节的新单词
             List<Map<Object,Object>> chapterNewWord = common_configMapper.getBookNewWord(book_id,uid);
             for (int i = 0; i < chapterNewWord.size(); i++){
+                String symbol = chapterNewWord.get(i).get("symbol").toString();
+                String replace_regex = "&#.*?;";
+                Pattern pp = Pattern.compile(replace_regex);
+                Matcher mm = pp.matcher(symbol);
+                symbol = mm.replaceAll("");
+                chapterNewWord.get(i).put("symbol", symbol);
                 chapterNewWord.get(i).put("symbol_mp3", CommonFunc.judgePicPath(chapterNewWord.get(i).get("symbol_mp3").toString()));
             }
             String flag_id = "";
