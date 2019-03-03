@@ -465,6 +465,9 @@ public interface Common_configMapper {
     //检查是否打过卡
     Map<Object,Object> checkReadClassClockIn(@Param("series_id") String series_id,@Param("book_id") String book_id,@Param("user_id") String user_id,@Param("chapter_id") String chapter_id);
 
+    //判断用户今天是否打卡
+    Map<Object,Object> checkReadClassUserClockIn(@Param("series_id") String series_id,@Param("user_id") String user_id);
+
     //获取用户红包状态
     Map<Object,Object> getReadClassRedPacket(@Param("user_id") String user_id);
 
@@ -512,6 +515,21 @@ public interface Common_configMapper {
 
     //查出某期下的所有系列
     List<Map<Object,Object>> getReadClassSeriesByReadClassId(@Param("read_class_id") String read_class_id);
+
+    //查当前正再阅读挑战的用户
+    List<Map<Object,Object>> getInBeginningReadClassUser(@Param("now_time") String now_time);
+
+    //获取没领红包的用户
+    List<Map<Object,Object>> getAllForgetReadClassUsers();
+
+    //获取未完成助力的用户
+    List<Map<Object,Object>> getUnfinishedReadClassHelp(@Param("now_time") String now_time);
+
+    //获取预约用户且该期没有给用户发送过推送
+    List<Map<Object,Object>> getAllReservedUser(@Param("read_class_id") String read_class_id);
+
+    //获取可报名的一期
+    Map<Object,Object> getCanEnrollReadClass(@Param("now_time") String now_time);
 
     //查出用户在某系列下的打卡情况
     List<Map<Object,Object>> showReadClassUserClockIn(@Param("series_id") String series_id,@Param("user_id") String user_id);
@@ -645,6 +663,9 @@ public interface Common_configMapper {
 
     //删除报名页介绍页的往期人的评论图片
     int deleteReadClassIntroductionPic(@Param("id") String id);
+
+    //删除预约
+    int deleteReadClassReserved(@Param("user_id") String user_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

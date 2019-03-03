@@ -167,16 +167,17 @@ public class VariousServiceImpl implements IVariousService {
                     //获取用户红包状态
                     Map<Object, Object> redPacketStatus = common_configMapper.getReadClassRedPacket(id);
                     //获取第二天0点的时间
-                    String nextDayTime = CommonFunc.getNextDate0();
+//                    String nextDayTime = CommonFunc.getNextDate0();
                     if (redPacketStatus.get("read_class_red_packet_time") == null){
                         //时间为空
                         result.put("read_class_red_packet", "0");
                     }else {
-                        if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
-                            result.put("read_class_red_packet", "0");
-                        }else {
-                            result.put("read_class_red_packet", redPacketStatus.get("read_class_red_packet").toString());
-                        }
+//                        if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
+//                            result.put("read_class_red_packet", "0");
+//                        }else {
+//                            result.put("read_class_red_packet", redPacketStatus.get("read_class_red_packet").toString());
+//                        }
+                        result.put("read_class_red_packet", redPacketStatus.get("read_class_red_packet").toString());
                     }
                     result.put("need_to_read_book", needToReadBookInfo);
                     //查看当前章
@@ -249,7 +250,7 @@ public class VariousServiceImpl implements IVariousService {
             Map<Object,Object> readClass = common_configMapper.showReadClass(now_time);
             if (readClass == null){
                 //没有可报名阅读报名人数填零
-                result.put("enrollment", 0);
+                result.put("enrollment", -1);
             }else {
                 int number = Integer.valueOf(readClass.get("enrollment").toString()) + Integer.valueOf(readClass.get("virtual_number").toString());
                 if (readFlag == 0){
@@ -1924,6 +1925,8 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
+                //将预约的信息给删掉
+                common_configMapper.deleteReadClassReserved(uid);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -2058,6 +2061,9 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("signType", WxPayConfig.SIGNTYPE);
                 response.put("user_id", uid);
                 response.put("series_id", series_id);
+
+                //将预约的信息给删掉
+                common_configMapper.deleteReadClassReserved(uid);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -2264,6 +2270,28 @@ public class VariousServiceImpl implements IVariousService {
 //                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time, "1");
                     //将助力状态改为失效
                     common_configMapper.changeReadClassHelpStatus("1", uid);
+                    //发服务通知
+                    //获取accessToken
+                    AccessToken access_token = CommonFunc.getAccessToken();
+                    //查没过期的from_id
+                    Map<Object,Object> info = common_configMapper.getTmpInfo(helpId,String.valueOf((new Date()).getTime()));
+
+                    if (info != null){
+                        common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                        //发送模板消息
+                        WxMssVo wxMssVo = new WxMssVo();
+                        wxMssVo.setTemplate_id(Const.TMP_HELP_THREE_TIMES_SUCCESS);
+                        wxMssVo.setTouser(info.get("wechat").toString());
+                        wxMssVo.setPage(Const.WX_READ_CHALLENGE_TEACHER);
+                        wxMssVo.setAccess_token(access_token.getAccessToken());
+                        wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                        wxMssVo.setForm_id(info.get("form_id").toString());
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("恭喜你完成了助力啦~棒棒哒，快来见见老师吧！！","#ffffff"));
+                        list.add(new TemplateData("优惠报名阅读挑战！" ,"#ffffff"));
+                        wxMssVo.setParams(list);
+                        CommonFunc.sendTemplateMessage(wxMssVo);
+                    }
                 }else{
                     //插入表中
                     common_configMapper.insertReadChallengeHelp(uid,helpId,uid, now_time);

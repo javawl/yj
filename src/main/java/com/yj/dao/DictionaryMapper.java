@@ -89,6 +89,9 @@ public interface DictionaryMapper {
     //取出打卡信息
     Map getInsistDayMessage(@Param("user_id") String user_id,@Param("plan") String plan,@Param("time") String time);
 
+    //判断今天是否打卡
+    Map<Object,Object> checkInsistDayMessage(@Param("user_id") String user_id,@Param("time") String time);
+
     //取出回复评论的
     Map getLikeOfFeedsReplyComment(@Param("id") String id);
 

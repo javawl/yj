@@ -878,9 +878,10 @@
                (SELECT book_id as b_id,`order` as book_order
                 FROM read_class_series_book
                 WHERE series_id = #{series_id}
-                ORDER BY `book_order`) tb
+                ) tb
           WHERE tb.b_id = read_class_chapter.book_id) tb2
     WHERE tb2.b_id = read_class_book.id
+    ORDER BY `book_order`,`chapter_order`
   </select>
 
   <select id="getReadClassHelper" resultType="map" parameterType="string">
@@ -938,6 +939,14 @@
     AND book_id = #{book_id}
     AND user_id = #{user_id}
     AND chapter_id = #{chapter_id}
+  </select>
+
+  <select id="checkReadClassUserClockIn" resultType="map" parameterType="string">
+    SELECT *
+    FROM read_class_clock_in
+    WHERE series_id = #{series_id}
+    AND user_id = #{user_id}
+    LIMIT 1
   </select>
 
   <select id="getReadClassRedPacket" resultType="map" parameterType="string">
@@ -1054,6 +1063,56 @@
     FROM read_class_series
     WHERE read_class_id = #{read_class_id}
   </select>
+
+  <select id="getInBeginningReadClassUser" resultType="map" parameterType="string">
+    SELECT read_class_contestants.user_id,tb2.periods,tb2.series_id
+    FROM read_class_contestants,
+    (SELECT read_class_series.id as series_id,tb.periods
+    FROM `read_class_series`,(SELECT id,periods
+                                       FROM `read_class`
+                                       WHERE `read_class`.st &lt; #{now_time}
+                                         AND `read_class`.et > #{now_time}) tb
+    WHERE `read_class_series`.read_class_id = tb.id) tb2
+    WHERE read_class_contestants.series_id = tb2.series_id
+  </select>
+
+  <select id="getAllForgetReadClassUsers" resultType="map" parameterType="string">
+    SELECT id as user_id,read_class_red_packet
+    FROM `user`
+    WHERE `user`.read_class_red_packet > 0
+  </select>
+
+
+  <select id="getUnfinishedReadClassHelp" resultType="map" parameterType="string">
+    SELECT read_class_help_sign_up.user_id, read_class_help_sign_up.id
+    FROM read_class_help_sign_up,
+         (SELECT read_class_series.id as series_id
+          FROM `read_class_series`,(SELECT id
+                                    FROM `read_class`
+                                    WHERE `read_class`.eroll_st &lt; #{now_time}
+                                    AND `read_class`.st > #{now_time}) tb
+          WHERE `read_class_series`.read_class_id = tb.id) tb2
+    WHERE read_class_help_sign_up.series_id = tb2.series_id
+    AND read_class_help_sign_up.is_effective = 0
+  </select>
+
+
+  <select id="getAllReservedUser" resultType="map" parameterType="string">
+    SELECT user_id
+    FROM read_class_reserved
+    WHERE read_class_reserved.last_remind_read_class != #{read_class_id}
+    OR read_class_reserved.last_remind_read_class is null
+  </select>
+
+
+  <select id="getCanEnrollReadClass" resultType="map" parameterType="string">
+    SELECT id
+    FROM `read_class`
+    WHERE `read_class`.eroll_st &lt; #{now_time}
+    AND `read_class`.st > #{now_time}
+    LIMIT 1
+  </select>
+
 
   <select id="showReadClassUserClockIn" resultType="map">
     SELECT `user`.username,`user`.portrait,tb.*
@@ -1312,6 +1371,11 @@
     <delete id="deleteReadClassIntroductionPic" parameterType="string" >
         DELETE FROM `read_class_introduction_pic`
         WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteReadClassReserved" parameterType="string" >
+        DELETE FROM `read_class_reserved`
+        WHERE user_id = #{user_id}
     </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->

@@ -1371,7 +1371,17 @@ public class AdminController {
             String nowTime = String.valueOf((new Date()).getTime());
             String endTime = String.valueOf(Long.valueOf(nowTime) + Const.ONE_DAY_DATE);
             List<Map<Object,Object>> all_user =  common_configMapper.getWordChallengeBeginRemind(nowTime,endTime);
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
             for(int i = 0; i < all_user.size(); i++){
+                //判断卡过卡不发
+                Map<Object,Object> clock = dictionaryMapper.checkInsistDayMessage(all_user.get(i).get("user_id").toString(), one);
+                if (clock != null){
+                    if (Integer.valueOf(clock.get("is_correct").toString()) >= 2){
+                        continue;
+                    }
+                }
+
                 //查没过期的from_id
                 Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
 
@@ -1548,7 +1558,7 @@ public class AdminController {
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
                     //发送模板消息
                     WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
+                    wxMssVo.setTemplate_id(Const.TMP_ID_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
                     wxMssVo.setTouser(info.get("wechat").toString());
                     wxMssVo.setPage(Const.WX_CHALLENGE_SUCCESS_RED_PACKET);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
@@ -1573,7 +1583,7 @@ public class AdminController {
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
                     //发送模板消息
                     WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_FAIL);
+                    wxMssVo.setTemplate_id(Const.TMP_ID_CHALLENGE_FAIL);
                     wxMssVo.setTouser(info.get("wechat").toString());
                     wxMssVo.setPage(Const.WX_CHALLENGE_SIGNUP);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
@@ -1624,7 +1634,7 @@ public class AdminController {
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
                     //发送模板消息
                     WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
+                    wxMssVo.setTemplate_id(Const.TMP_ID_CHALLENGE_SUCCESS_RED_PACKET_REMIND);
                     wxMssVo.setTouser(info.get("wechat").toString());
                     wxMssVo.setPage(Const.WX_CHALLENGE_INVITE_RED_PACKET);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
@@ -1727,6 +1737,205 @@ public class AdminController {
             return "error";
         }
     }
+
+
+
+    /**
+     * 阅读挑战每日提醒
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "read_class_daily_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String read_class_daily_remind(String token, HttpServletResponse response){
+        if (!token.equals("read_class_daily_remind")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            List<Map<Object,Object>> all_user =  common_configMapper.getInBeginningReadClassUser(nowTime);
+            for(int i = 0; i < all_user.size(); i++){
+                //判断是否打卡过
+                if (common_configMapper.checkReadClassUserClockIn(all_user.get(i).get("series_id").toString(),all_user.get(i).get("user_id").toString()) == null){
+                    continue;
+                }
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_REMIND);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("英语阅读","#ffffff"));
+                    list.add(new TemplateData("Hi，你好鸭~今日阅读内容已经出炉啦，你阅读了吗~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("阅读挑战每日提醒异常",e.getStackTrace());
+            logger.error("阅读挑战每日提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+
+    /**
+     * 红包领取提醒
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "read_class_red_packet_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String read_class_red_packet_remind(String token, HttpServletResponse response){
+        if (!token.equals("read_class_red_packet_remind")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllForgetReadClassUsers();
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_READ_CLASS_RED_PACKET_REMIND);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("昨日阅读任务已完成","#ffffff"));
+                    list.add(new TemplateData("一个阅读大红包","#ffffff"));
+                    list.add(new TemplateData("快点击领取红包吧！再不领取背呗私吞了噢~~" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("红包领取提醒异常",e.getStackTrace());
+            logger.error("红包领取提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 助力未完成提醒
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "read_class_help_unfinished_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String read_class_help_unfinished_remind(String token, HttpServletResponse response){
+        if (!token.equals("read_class_help_unfinished_remind")){
+            return "false";
+        }
+        try{
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            List<Map<Object,Object>> all_user =  common_configMapper.getUnfinishedReadClassHelp(nowTime);
+            for(int i = 0; i < all_user.size(); i++){
+                //判断是否是不满三次
+                String helpId = all_user.get(i).get("id").toString();
+                //先查助力了几次
+                List<Map<Object,Object>> countTimes = common_configMapper.getReadClassHelperInfo(helpId);
+                int times = countTimes.size();
+                if (times < 3){
+                    //查没过期的from_id
+                    Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),nowTime);
+                    if (info != null){
+                        common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                        //发送模板消息
+                        WxMssVo wxMssVo = new WxMssVo();
+                        wxMssVo.setTemplate_id(Const.TMP_ID_READ_CLASS_UNFINISH_HELP);
+                        wxMssVo.setTouser(info.get("wechat").toString());
+                        wxMssVo.setPage(Const.WX_READ_CLASS_HELP_PATH);
+                        wxMssVo.setAccess_token(access_token.getAccessToken());
+                        wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                        wxMssVo.setForm_id(info.get("form_id").toString());
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("亲爱的~你的助力还没完成噢~~快快助力与其他小伙伴集合吧","#ffffff"));
+                        list.add(new TemplateData("好友助力优惠报名阅读挑战" ,"#ffffff"));
+                        wxMssVo.setParams(list);
+                        CommonFunc.sendTemplateMessage(wxMssVo);
+                    }
+                }
+            }
+        }catch (Exception e){
+            logger.error("助力未完成提醒异常",e.getStackTrace());
+            logger.error("助力未完成提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 阅读挑战预约提醒
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "read_class_reserved_remind.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String read_class_reserved_remind(String token, HttpServletResponse response){
+        if (!token.equals("read_class_reserved_remind")){
+            return "false";
+        }
+        try{
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            //获取一期可报名的阅读
+            Map<Object,Object> canEnroll = common_configMapper.getCanEnrollReadClass(nowTime);
+            if (canEnroll == null) return "false";
+            List<Map<Object,Object>> all_user =  common_configMapper.getAllReservedUser(canEnroll.get("id").toString());
+            for(int i = 0; i < all_user.size(); i++){
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),nowTime);
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_READ_CLASS_RESERVED);
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("你预约的课程已经接受报名啦~机不可失噢~~","#ffffff"));
+                    list.add(new TemplateData("背呗英语阅读" ,"#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                }
+            }
+        }catch (Exception e){
+            logger.error("阅读挑战预约提醒异常",e.getStackTrace());
+            logger.error("阅读挑战预约提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
 
 
     /**
