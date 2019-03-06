@@ -668,4 +668,26 @@ public interface Common_configMapper {
     int deleteReadClassReserved(@Param("user_id") String user_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>微信公众号运营活动>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    //后台取出需要的万元挑战
+    List<Map<Object,Object>> showWechatPlatformChallenge(@Param("start") int start,@Param("size") int size);
+
+    //获取新建单次挑战id
+    String getWechatPlatformChallengeId(@Param("time") String time);
+
+    //获取所有单次挑战的虚拟用户id
+    List<Map<Object,Object>> getAllVirtualUserWechatPlatformChallenge(@Param("number") int number);
+
+    //记录挑战的虚拟用户数
+    int changeWechatPlatformChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
+
+    //后台插入万元挑战
+    int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
+
+    //打卡参与单词挑战
+    int insertWechatPlatformChallengeContestants(@Param("user_id") String user_id,@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

@@ -53,6 +53,7 @@
                 <p onclick="change_src('read_class_book.jsp?page=1&size=15')">阅读书籍</p>
                 <p onclick="change_src('show_read_class.jsp?page=1&size=15')">阅读挑战</p>
                 <p onclick="change_src('show_read_class_introduction_pic.jsp?page=1&size=15')">阅读报名页往期评论</p>
+                <p onclick="change_src('ten_thousand_yuan_challenge.jsp?page=1&size=15')">万元挑战（运营）</p>
             </center>
         </div>
         <div class="main">

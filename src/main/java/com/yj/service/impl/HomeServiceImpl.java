@@ -1728,7 +1728,7 @@ public class HomeServiceImpl implements IHomeService {
                             if (insertResult == 0){
                                 throw new Exception();
                             }
-                            common_config.changeDailyFinishWork(1,one);
+//                            common_config.changeDailyFinishWork(1,one);
                             //todo 用户表坚持天数增加
                             int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
                             if (updateUserResult == 0){
@@ -1754,7 +1754,7 @@ public class HomeServiceImpl implements IHomeService {
                             if (updateResult == 0){
                                 throw new Exception();
                             }
-                            common_config.changeDailyFinishWork(1,one);
+//                            common_config.changeDailyFinishWork(1,one);
                             //todo 用户表坚持天数增加
                             int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
                             if (updateUserResult == 0){
@@ -1850,6 +1850,9 @@ public class HomeServiceImpl implements IHomeService {
                 if (updateResult == 0){
                     throw new Exception();
                 }
+
+                //打卡天数加一
+                common_config.changeDailyFinishWork(1,one);
 
                 //如果是微信用户的话加进抽奖名单
                 if (token.length() > 32){

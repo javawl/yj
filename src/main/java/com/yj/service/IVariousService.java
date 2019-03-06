@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.ServerResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -131,4 +132,7 @@ public interface IVariousService {
 
     //领取阅读挑战的红包
     ServerResponse<String> getReadClassRedPacket(HttpServletRequest request);
+
+    //微信公众号首次验证消息的确来自微信服务器
+    void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response);
 }

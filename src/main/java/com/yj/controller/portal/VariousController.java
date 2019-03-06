@@ -889,7 +889,7 @@ public class VariousController {
     /**
      * 用户点击助力按钮
      */
-    @RequestMapping(value="helpReadClass.do")
+    @RequestMapping(value="helpReadClass.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map<String, Object>> helpReadClass(String series_id, String user_id, HttpServletRequest request){
         //调用service层
@@ -900,7 +900,7 @@ public class VariousController {
     /**
      * 已经助力缴费，获取邀请好友助力页面信息
      */
-    @RequestMapping(value="get_read_class_help_info.do")
+    @RequestMapping(value="get_read_class_help_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map<Object,Object>> get_read_class_help_info(HttpServletRequest request){
         //调用service层
@@ -912,7 +912,7 @@ public class VariousController {
     /**
      * 查看书单
      */
-    @RequestMapping(value="showNowReadClassBookChapter.do")
+    @RequestMapping(value="showNowReadClassBookChapter.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map<Object,List<Map<Object,Object>>>> showNowReadClassBookChapter(HttpServletRequest request){
         //调用service层
@@ -923,7 +923,7 @@ public class VariousController {
     /**
      * 阅读挑战打卡领红包
      */
-    @RequestMapping(value="readClassClockIn.do")
+    @RequestMapping(value="readClassClockIn.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<List<List<Object>>> readClassClockIn(String series_id, String book_id, String chapter_id, HttpServletRequest request){
         //调用service层
@@ -934,7 +934,7 @@ public class VariousController {
     /**
      * 根据书id和章节id获取内容
      */
-    @RequestMapping(value="getBookChapterInner.do")
+    @RequestMapping(value="getBookChapterInner.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map<Object,Object>> getBookChapterInner(String book_id, String chapter_id, HttpServletRequest request){
         //调用service层
@@ -945,7 +945,7 @@ public class VariousController {
     /**
      * 阅读挑战打卡不领红包
      */
-    @RequestMapping(value="readClassClockInWithOutRedPacket.do")
+    @RequestMapping(value="readClassClockInWithOutRedPacket.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<List<List<Object>>> readClassClockInWithOutRedPacket(String series_id, String book_id, String chapter_id, HttpServletRequest request){
         //调用service层
@@ -956,7 +956,7 @@ public class VariousController {
     /**
      * 根据书id和章节id获取新单词
      */
-    @RequestMapping(value="getBookChapterNewWord.do")
+    @RequestMapping(value="getBookChapterNewWord.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<List<Map<Object,Object>>> getBookChapterNewWord(String book_id, String chapter_id, HttpServletRequest request){
         //调用service层
@@ -967,7 +967,7 @@ public class VariousController {
     /**
      * 根据书id获取新单词
      */
-    @RequestMapping(value="getBookNewWord.do")
+    @RequestMapping(value="getBookNewWord.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<List<List<Object>>> getBookNewWord(String book_id, HttpServletRequest request){
         //调用service层
@@ -978,10 +978,29 @@ public class VariousController {
     /**
      * 领取阅读挑战的红包
      */
-    @RequestMapping(value="getReadClassRedPacket.do")
+    @RequestMapping(value="getReadClassRedPacket.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> getReadClassRedPacket(HttpServletRequest request){
         //调用service层
         return iVariousService.getReadClassRedPacket(request);
     }
+
+
+    //------------------------------------------------------------------------------------------------------
+    //---------------------------------------微信公众号------------------------------------------------------
+    //首次验证消息的确来自微信服务器
+
+
+    /**
+     * 微信公众号首次验证消息的确来自微信服务器
+     */
+    @RequestMapping(value="checkWechatPlatform.do", method = RequestMethod.GET)
+    @ResponseBody
+    public void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response){
+        //调用service层
+        iVariousService.checkWechatPlatform(signature, timestamp, nonce, echostr, response);
+    }
+
+
+    //------------------------------------------------------------------------------------------------------
 }

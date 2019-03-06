@@ -358,6 +358,9 @@ public interface DictionaryMapper {
     //后台
     String countWordChallenge();
 
+
+    String countWechatPlatformChallenge();
+
     //后台
     List<Map> selectAdminVideo(@Param("id") String id);
 

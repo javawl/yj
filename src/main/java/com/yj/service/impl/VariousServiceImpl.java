@@ -11,6 +11,8 @@ import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
 import com.yj.util.IpUtils;
 import com.yj.util.PayUtils;
+import com.yj.util.WechatPlatformUtil;
+import org.apache.http.HttpResponse;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
@@ -29,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.KeyStore;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -2725,15 +2729,16 @@ public class VariousServiceImpl implements IVariousService {
                 //获取用户红包状态
                 Map<Object, Object> redPacketStatus = common_configMapper.getReadClassRedPacket(uid);
                 //获取第二天0点的时间
-                String nextDayTime = CommonFunc.getNextDate0();
+//                String nextDayTime = CommonFunc.getNextDate0();
                 if (redPacketStatus.get("read_class_red_packet_time") == null){
                     //时间为空
                     return ServerResponse.createByErrorMessage("未在领取时间内！");
-                }else {
-                    if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
-                        return ServerResponse.createByErrorMessage("红包领取时间已过！");
-                    }
                 }
+//                else {
+//                    if (Long.valueOf(nextDayTime) < Long.valueOf(now_time)){
+//                        return ServerResponse.createByErrorMessage("红包领取时间已过！");
+//                    }
+//                }
                 String redPacket = redPacketStatus.get("read_class_red_packet").toString();
                 //获取用户打卡的那个series_id
                 String read_class_red_packet_series_id = redPacketStatus.get("read_class_red_packet_series_id").toString();
@@ -2754,4 +2759,23 @@ public class VariousServiceImpl implements IVariousService {
             }
         }
     }
+
+
+    //------------------------------------------------------------------------------------------------------
+    //---------------------------------------微信公众号------------------------------------------------------
+    //首次验证消息的确来自微信服务器
+    public void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response){
+        PrintWriter print;
+        // 通过检验signature对请求进行校验，若校验成功则原样返回echostr，表示接入成功，否则接入失败
+        if (signature != null && WechatPlatformUtil.checkSignature(signature, timestamp, nonce)) {
+            try {
+                print = response.getWriter();
+                print.write(echostr);
+                print.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    //------------------------------------------------------------------------------------------------------
 }

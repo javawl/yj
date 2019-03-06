@@ -1379,6 +1379,45 @@
     </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>微信公众号运营活动>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+  <select id="showWechatPlatformChallenge" resultType="map">
+    SELECT *
+    FROM `wechat_platform_challenge`
+    ORDER BY et DESC
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="getWechatPlatformChallengeId" resultType="string">
+    SELECT  id
+    FROM `wechat_platform_challenge`
+    WHERE set_time = #{time}
+  </select>
+
+  <select id="getAllVirtualUserWechatPlatformChallenge" resultType="map" parameterType="int">
+    SELECT user_id
+    FROM `virtual_user_wechat_platform_challenge`
+    order by rand() limit #{number}
+  </select>
+
+  <update id="changeWechatPlatformChallengeVirtualNumber">
+    UPDATE `wechat_platform_challenge`
+    set `virtual_number` = #{virtual_number}
+    WHERE id = #{id}
+  </update>
+
+  <insert id="insertWechatPlatformChallenge" parameterType="string">
+    INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
+    values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM word_challenge) tb),0)+1)
+  </insert>
+
+  <insert id="insertWechatPlatformChallengeContestants" parameterType="string">
+    INSERT INTO wechat_platform_challenge_contestants (user_id,wechat_platform_challenge_id,set_time,`virtual`,`insist_day`)
+    values (#{user_id},#{wechat_platform_challenge_id},#{set_time},#{virtual},30)
+  </insert>
+
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
 
 

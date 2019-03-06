@@ -1192,6 +1192,11 @@
     FROM `word_challenge`
   </select>
 
+  <select id="countWechatPlatformChallenge" resultType="string">
+    SELECT count(id)
+    FROM `wechat_platform_challenge`
+  </select>
+
   <select id="selectAdminVideo" resultType="map" parameterType="string">
     SELECT *
     FROM word_video_information

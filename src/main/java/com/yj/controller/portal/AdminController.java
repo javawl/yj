@@ -3074,4 +3074,95 @@ public class AdminController {
     }
 
     //-----------------------------------------------------1.2后台(下闭合线)----------------------------------------------------------
+
+
+    //-----------------------------------------------------微信公众号运营活动----------------------------------------------------------
+    /**
+     * 展示公众号的运营活动
+     * @param page 页数
+     * @param size 页大小
+     * @return  List
+     */
+    @RequestMapping(value = "show_wechat_platform_challenge.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_wechat_platform_challenge(String page,String size){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取万元挑战
+        List<Map<Object,Object>> Info = common_configMapper.showWechatPlatformChallenge(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("et",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countWechatPlatformChallenge(),Info);
+    }
+
+
+    /**
+     * 上传微信公众号万元挑战
+     * @param people   挑战人数
+     * @param st       开始时间  格式  xxxx-xx-xx
+     * @param et       结束时间  格式如上
+//     * @param virtual  需要参与挑战的虚拟用户数
+     * @param request  request
+     * @return         string
+     */
+    @RequestMapping(value = "upload_ten_thousand_yuan_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_ten_thousand_yuan_challenge(String people, String st, String et, HttpServletRequest request){
+        String st_str;
+        String et_str;
+        try {
+            //获取时间错
+            st_str =  CommonFunc.date2TimeStamp(st+" 00:00:01");
+            et_str =  CommonFunc.date2TimeStamp(et+" 23:59:59");
+        }catch (ParseException e){
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("传入日期有误");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String now_time = String.valueOf((new Date()).getTime());
+            //存到数据库
+            int result = common_configMapper.insertWechatPlatformChallenge(st_str, et_str, people, now_time, "200");
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            //将新插的id找出来
+            String challenge_id = common_configMapper.getWechatPlatformChallengeId(now_time);
+
+            //将所有的虚拟用户加进抽奖
+            List<Map<Object,Object>> all_virtual_user = common_configMapper.getAllVirtualUserWechatPlatformChallenge(Integer.valueOf("200"));
+            //记录单词挑战的虚拟用户数
+            int real_virtual_user_number = all_virtual_user.size();
+            common_configMapper.changeWechatPlatformChallengeVirtualNumber(challenge_id, real_virtual_user_number);
+            for (int i = 0; i < all_virtual_user.size(); i++){
+                String user_id = all_virtual_user.get(i).get("user_id").toString();
+                common_configMapper.insertWechatPlatformChallengeContestants(user_id,challenge_id,now_time,"1");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+    //-----------------------------------------------------微信公众号运营活动（下闭合线）----------------------------------------------------------
 }

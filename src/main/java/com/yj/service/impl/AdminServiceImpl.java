@@ -1205,8 +1205,8 @@ public class AdminServiceImpl implements IAdminService {
 //            }
 //        }
 
-        for (int j = 0; j < 24; j++){
-            List<Map> word_list = dictionaryMapper.getWordByType(0,6000,19+j);
+//        for (int j = 0; j < 24; j++){
+            List<Map> word_list = dictionaryMapper.getWordByType(0,10000,76);
 //        List<Map> word_list = dictionaryMapper.getWordByType(400,400,1);
             for (int i = 0; i < word_list.size(); i++){
                 String id = word_list.get(i).get("id").toString();
@@ -1222,7 +1222,7 @@ public class AdminServiceImpl implements IAdminService {
                     dictionaryMapper.updateWordSentenceAudio(id,uploadFileName);
                 }
             }
-        }
+//        }
 
 //        List<Map> w_list = dictionaryMapper.getWordByType(0,6000,4);
 //        for (int j = 0; j < w_list.size(); j++){
