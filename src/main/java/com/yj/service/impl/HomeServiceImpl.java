@@ -67,7 +67,7 @@ public class HomeServiceImpl implements IHomeService {
             try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
-                Object insist_days = SelectPlan.get(0).get("insist_day");
+                Object insist_days = SelectPlan.get(0).get("clock_day");
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
                 //立个flag返回用户是否有计划，0代表没有
@@ -1729,11 +1729,7 @@ public class HomeServiceImpl implements IHomeService {
                                 throw new Exception();
                             }
 //                            common_config.changeDailyFinishWork(1,one);
-                            //todo 用户表坚持天数增加
-                            int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
-                            if (updateUserResult == 0){
-                                throw new Exception();
-                            }
+
                         }else {
                             int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,0);
                             if (insertResult == 0){
@@ -1755,11 +1751,6 @@ public class HomeServiceImpl implements IHomeService {
                                 throw new Exception();
                             }
 //                            common_config.changeDailyFinishWork(1,one);
-                            //todo 用户表坚持天数增加
-                            int updateUserResult = dictionaryMapper.changeUserInsistDayStatus(id);
-                            if (updateUserResult == 0){
-                                throw new Exception();
-                            }
                             flag = 1;
                         }
                         if (((today_learned_number + learned_word) >= (2 * plan_words_number)) && is_correct == 2){
@@ -1842,6 +1833,12 @@ public class HomeServiceImpl implements IHomeService {
                 //todo 用户表打卡天数增加
                 int updateUserResult = dictionaryMapper.changeUserClockDayStatus(id);
                 if (updateUserResult == 0){
+                    throw new Exception();
+                }
+
+                //todo 用户表坚持天数增加
+                int updateUserClockResult = dictionaryMapper.changeUserInsistDayStatus(id);
+                if (updateUserClockResult == 0){
                     throw new Exception();
                 }
 
