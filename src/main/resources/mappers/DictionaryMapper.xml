@@ -1301,7 +1301,7 @@
   </select>
 
   <insert id="insertMasteredWord" parameterType="string">
-    INSERT DELAYED INTO mastered_words (word_id, user_id, set_time, plan, word, meaning,real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word},#{meaning},#{meaning})
+    INSERT INTO mastered_words (word_id, user_id, set_time, plan, word, meaning,real_meaning) values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word},#{meaning},#{meaning})
   </insert>
 
   <insert id="insertNewWord2MasteredWord" parameterType="string">
@@ -1328,7 +1328,7 @@
   </delete>
 
   <insert id="insertRecitingWord" parameterType="string">
-    INSERT DELAYED INTO reciting_words (word_id, user_id, set_time, plan, word, meaning, real_meaning, register_time)
+    INSERT INTO reciting_words (word_id, user_id, set_time, plan, word, meaning, real_meaning, register_time)
     values (#{word_id}, #{user_id}, #{right_time}, #{plan}, #{word}, #{meaning}, #{meaning}, #{register_time})
   </insert>
 
