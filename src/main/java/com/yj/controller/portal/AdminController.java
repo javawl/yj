@@ -3164,5 +3164,30 @@ public class AdminController {
         }
     }
 
+
+    /**
+     * 展示公众号挑战的参与用户
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showWechatPlatformChallengeUser.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showWechatPlatformChallengeUser(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取阅读参与者
+        List<Map<Object,Object>> Info = common_configMapper.readClassSeriesUser(id);
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("portrait",CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClassBookChapter(),Info);
+    }
+
+
     //-----------------------------------------------------微信公众号运营活动（下闭合线）----------------------------------------------------------
 }

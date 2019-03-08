@@ -54,7 +54,7 @@
             formData.append('people', $("#people").val());
             // formData.append('virtual', $("#virtual").val());
             $.ajax({
-                url:url+"/admin/upload_word_challenge.do",
+                url:url+"/admin/upload_ten_thousand_yuan_challenge.do",
                 type:'POST',
                 data:formData,
                 dataType:'json',

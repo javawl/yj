@@ -1408,7 +1408,7 @@
 
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
-    values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM word_challenge) tb),0)+1)
+    values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM wechat_platform_challenge) tb),0)+1)
   </insert>
 
   <insert id="insertWechatPlatformChallengeContestants" parameterType="string">

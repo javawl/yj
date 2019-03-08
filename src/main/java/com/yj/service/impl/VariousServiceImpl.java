@@ -2251,9 +2251,9 @@ public class VariousServiceImpl implements IVariousService {
                 return ServerResponse.createByErrorMessage("阅读已开始不可报名！");
             }
             //判断是否已经交过59报名了(确认机制)(要找最新的那一个，因为用户有可能反复交59一个阅读)(还要有效)
-            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid);
+            Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(user_id);
             if (check == null){
-                return ServerResponse.createByErrorMessage("该用户未支付助力的金额，不可助力");
+                return ServerResponse.createByErrorMessage("助力已结束!");
             }
             String helpId = check.get("id").toString();
             //先查助力了几次
@@ -2269,12 +2269,12 @@ public class VariousServiceImpl implements IVariousService {
                 if (times >= 2){
                     //已经两次了，第三次如果成功就成功了
                     //插入表中
-                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid, now_time);
+                    common_configMapper.insertReadChallengeHelp(user_id,helpId,uid, now_time);
                     //将报名加入正式的表中(因为机制改为原本就在报名表中，所以不用加)
 //                    //插入参与数据库
 //                    common_configMapper.insertReadChallengeContestantsReal(uid,series_id,now_time, "1");
                     //将助力状态改为失效
-                    common_configMapper.changeReadClassHelpStatus("1", uid);
+                    common_configMapper.changeReadClassHelpStatus("1", user_id);
                     //发服务通知
                     //获取accessToken
                     AccessToken access_token = CommonFunc.getAccessToken();
@@ -2299,7 +2299,7 @@ public class VariousServiceImpl implements IVariousService {
                     }
                 }else{
                     //插入表中
-                    common_configMapper.insertReadChallengeHelp(uid,helpId,uid, now_time);
+                    common_configMapper.insertReadChallengeHelp(user_id,helpId,uid, now_time);
                 }
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
