@@ -1374,7 +1374,10 @@ public class HomeServiceImpl implements IHomeService {
                         if (today_learned_number >= (2 * number)) {
                             number = 0;
                         } else {
-                            number = (number * 2) - today_learned_number;
+                            //有可能第一次没传完，就开了第二次的背单词
+                            if (today_learned_number >= number) {
+                                number = (number * 2) - today_learned_number;
+                            }
                         }
                     }
                 }
@@ -1876,6 +1879,39 @@ public class HomeServiceImpl implements IHomeService {
                 logger.error("打卡异常",e);
                 return ServerResponse.createByErrorMessage("更新出错！");
             }
+        }
+    }
+
+
+    //第二次打卡
+    public ServerResponse<String> second_clock_in(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+
+        //验证token
+        CommonFunc func = new CommonFunc();
+        String id = func.getCookieValueBykey(request,token);
+        if (id == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //获取用户的计划
+            Map user_info = userMapper.getUserPlanNumber(id);
+            String plan = user_info.get("my_plan").toString();
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //查看坚持天数表中有没有数据
+            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id, plan, one);
+            if (getInsistDay == null) {
+                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+            }
+            dictionaryMapper.updateInsistDay(id, plan, one, 3);
+            return ServerResponse.createBySuccessMessage("成功");
         }
     }
 

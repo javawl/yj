@@ -283,6 +283,7 @@ public class VariousServiceImpl implements IVariousService {
             }else {
                 result.put("is_reserved", "no");
             }
+            result.put("user_id", id);
             //转json
             JSONObject json = JSON.parseObject(JSON.toJSONString(result, SerializerFeature.WriteMapNullValue));
             return ServerResponse.createBySuccess("成功",json);

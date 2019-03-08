@@ -349,6 +349,19 @@ public class homeController {
 
 
     /**
+     * 第二次打卡
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "second_clock_in.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> second_clock_in(HttpServletRequest request){
+        //调用service层
+        return iHomeService.second_clock_in(request);
+    }
+
+
+    /**
      * 纠错
      * @param word_id
      * @param type
