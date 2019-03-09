@@ -2301,6 +2301,7 @@ public class VariousServiceImpl implements IVariousService {
                     //插入表中
                     common_configMapper.insertReadChallengeHelp(user_id,helpId,uid, now_time);
                 }
+                transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功！");
             } catch (Exception e) {
                 transactionManager.rollback(status);
