@@ -67,7 +67,12 @@ public class HomeServiceImpl implements IHomeService {
             try {
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
-                Object insist_days = SelectPlan.get(0).get("clock_day");
+                Object insist_days;
+                if (Integer.valueOf(SelectPlan.get(0).get("clock_day").toString()) > Integer.valueOf(SelectPlan.get(0).get("insist_day").toString())){
+                    insist_days = SelectPlan.get(0).get("clock_day");
+                }else {
+                    insist_days = SelectPlan.get(0).get("insist_day");
+                }
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
                 //立个flag返回用户是否有计划，0代表没有
