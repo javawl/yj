@@ -1131,6 +1131,14 @@
     WHERE read_class_new_word.chapter_id = #{chapter_id}
   </select>
 
+  <select id="findIsReadClassHelp" resultType="map">
+    SELECT *
+    FROM read_class_help
+    WHERE read_class_help.user_id = #{user_id}
+    AND help_sign_up_id = #{help_sign_up_id}
+    AND helper_id = #{helper_id}
+  </select>
+
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`,`whether_help`)
     values (#{user_id},#{series_id},#{set_time},0,0,#{whether_help})

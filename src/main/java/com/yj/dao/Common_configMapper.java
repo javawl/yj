@@ -510,6 +510,9 @@ public interface Common_configMapper {
     //后台根据章节id获取新单词
     List<Map<Object,Object>> readClassBookChapterNewWordAll(@Param("chapter_id") String chapter_id);
 
+    //查看是否助力过
+    Map<Object,Object> findIsReadClassHelp(@Param("user_id") String user_id,@Param("help_sign_up_id") String help_sign_up_id,@Param("helper_id") String helper_id);
+
     //查看用户是否预定过
     Map<Object,Object> checkExistReserved(@Param("user_id") String user_id);
 

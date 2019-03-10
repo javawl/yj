@@ -117,13 +117,18 @@ public class VariousServiceImpl implements IVariousService {
                 //判断是否开始
                 if (Long.valueOf(selectBeginningReadClass.get("st").toString()) > Long.valueOf(now_time)){
                     if (selectBeginningReadClass.get("whether_help").toString().equals("1")){
-                        //助力进入的，未开始状态
-                        result.put("is_reading", 3);
-                        //判断是否报名助力
-                        if (common_configMapper.checkReadChallengeHelpAttendSeries(id ,selectBeginningReadClass.get("series_id").toString()) != null){
-                            result.put("is_help_pay", "yes");
+                        if (common_configMapper.checkReadChallengeHelpAttend(id) != null){
+                            //助力进入的，未开始状态
+                            result.put("is_reading", 3);
+                            //判断是否报名助力
+                            if (common_configMapper.checkReadChallengeHelpAttendSeries(id ,selectBeginningReadClass.get("series_id").toString()) != null){
+                                result.put("is_help_pay", "yes");
+                            }else {
+                                result.put("is_help_pay", "no");
+                            }
                         }else {
-                            result.put("is_help_pay", "no");
+                            //助力已完成
+                            result.put("is_reading", 1);
                         }
                     }else {
                         //当前时间小于开始时间，未开始
@@ -2256,6 +2261,9 @@ public class VariousServiceImpl implements IVariousService {
                 return ServerResponse.createByErrorMessage("助力已结束!");
             }
             String helpId = check.get("id").toString();
+            if (common_configMapper.findIsReadClassHelp(user_id,helpId,uid) != null){
+                return ServerResponse.createByErrorMessage("助力过不可重复助力!");
+            }
             //先查助力了几次
             List<Map<Object,Object>> countTimes = common_configMapper.getReadClassHelperInfo(helpId);
             //事务
