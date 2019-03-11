@@ -117,6 +117,9 @@ public interface UserMapper {
     //修改个人信息
     int update_username_portrait(@Param("id") String id, @Param("portrait") String portrait, @Param("username") String username);
 
+    //修改个人信息
+    int update_username_portrait_unionid(@Param("id") String id, @Param("portrait") String portrait, @Param("username") String username, @Param("unionid") String unionid);
+
     //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
@@ -157,6 +160,9 @@ public interface UserMapper {
 
     //取出后台查看数据的是否存在
     Map getDailyDataInfo(@Param("time") String time);
+
+    //找出那些公众号上有unionid但是小程序上没有的用户
+    Map<Object,Object> getNewWechatPlatform(@Param("unionid") String unionid);
 
     //获取打卡历史记录
     List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);

@@ -2787,5 +2787,61 @@ public class VariousServiceImpl implements IVariousService {
             }
         }
     }
+
+
+    //添加unionid
+    public ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(portrait);
+            add(username);
+            add(unionid);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //未确认，先确认
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try{
+                //先找是否有unionid为这个并且wechat显示为WechatPlatform
+                Map<Object,Object> newWechatPlatformUser = userMapper.getNewWechatPlatform(unionid);
+                if (newWechatPlatformUser == null){
+                    //没有的话，直接插
+                    userMapper.update_username_portrait_unionid(uid, portrait, username, unionid);
+                }else {
+                    //有的话做一下合并
+                    String newUserId = newWechatPlatformUser.get("id").toString();
+                    //todo 将公众号的记录的id全部转成当前的uid完成账号合并
+
+
+
+
+
+
+                    //插入unionid
+                    userMapper.update_username_portrait_unionid(uid, portrait, username, unionid);
+                }
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                transactionManager.rollback(status);
+                logger.error("设置unionid异常",e.getStackTrace());
+                logger.error("设置unionid异常",e);
+                return ServerResponse.createByErrorMessage(e.getMessage());
+            }
+        }
+    }
     //------------------------------------------------------------------------------------------------------
 }

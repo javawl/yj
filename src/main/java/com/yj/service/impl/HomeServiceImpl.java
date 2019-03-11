@@ -75,6 +75,7 @@ public class HomeServiceImpl implements IHomeService {
                 }
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
+                Object unionid = SelectPlan.get(0).get("unionid");
                 //立个flag返回用户是否有计划，0代表没有
                 int flag = 0;
                 //取我的计划的单词数
@@ -122,6 +123,16 @@ public class HomeServiceImpl implements IHomeService {
                         m1.put("level",0);
                     }else {
                         m1.put("level",Integer.valueOf(getInsistDay.get("is_correct").toString()));
+                    }
+                }
+                //todo 判断用户是否有unionid
+                if (unionid == null){
+                    m1.put("unionid","no");
+                }else {
+                    if (unionid.toString().length() <= 0){
+                        m1.put("unionid","no");
+                    }else {
+                        m1.put("unionid","yes");
                     }
                 }
                 m1.put("flag",flag);

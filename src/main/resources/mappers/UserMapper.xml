@@ -492,7 +492,7 @@
     WHERE plans.id = tb.plan_id
   </select>
   <select id="getUserPlanDaysNumber" resultType="map" parameterType="string">
-    SELECT my_plan,plan_days,plan_words_number,insist_day,clock_day,last_login,register_time,retention_flag,whether_reminder,whether_template,whether_challenge_success,challenge_red_packet,whether_invite_challenge_success,invite_challenge_red_packet,challenge_success_id
+    SELECT my_plan,plan_days,plan_words_number,insist_day,clock_day,last_login,register_time,retention_flag,whether_reminder,unionid,whether_template,whether_challenge_success,challenge_red_packet,whether_invite_challenge_success,invite_challenge_red_packet,challenge_success_id
     FROM user
     WHERE id = #{id}
   </select>
@@ -540,6 +540,14 @@
     SELECT id,daily_add_user
     FROM data_info
     WHERE set_time = #{time}
+    LIMIT 1
+  </select>
+
+  <select id="getNewWechatPlatform" resultType="map" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE `unionid` = #{unionid}
+    AND `wechat` = 'WechatPlatform'
     LIMIT 1
   </select>
 
@@ -595,6 +603,14 @@
     UPDATE `user`
     set portrait = #{portrait},
     username = #{username}
+    WHERE id = #{id}
+  </update>
+
+  <update id="update_username_portrait_unionid" parameterType="string">
+    UPDATE `user`
+    set portrait = #{portrait},
+    username = #{username},
+    `unionid` = #{unionid}
     WHERE id = #{id}
   </update>
 

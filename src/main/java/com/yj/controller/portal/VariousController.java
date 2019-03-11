@@ -1002,5 +1002,16 @@ public class VariousController {
     }
 
 
+    /**
+     * 添加unionid
+     */
+    @RequestMapping(value="setUserUnionId.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request){
+        //调用service层
+        return iVariousService.setUserUnionId(portrait, username, unionid, request);
+    }
+
+
     //------------------------------------------------------------------------------------------------------
 }
