@@ -213,6 +213,7 @@ public class TokenServiceImpl implements ITokenService {
                                 sex = "1";
                             }
                             String headimgurl = newJsonObject.get("headimgurl").toString();
+                            logger.error(JSONObject.toJSONString(newJsonObject));
                             String unionid = newJsonObject.get("unionid").toString();
                             //查一下是否有过unionid
                             //先找是否有unionid
