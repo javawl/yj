@@ -138,4 +138,7 @@ public interface IVariousService {
 
     //添加unionid
     ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request);
+
+    //微信公众平台运营活动报名页
+    ServerResponse<Map<Object,Object>> wxPlatformApplicationPage(HttpServletRequest request);
 }

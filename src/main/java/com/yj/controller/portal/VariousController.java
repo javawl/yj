@@ -1028,6 +1028,16 @@ public class VariousController {
         return iTokenService.setWxPlatformUserUnionId(code, request, session);
     }
 
+    /**
+     * 微信公众号运营活动报名页
+     */
+    @RequestMapping(value="wxPlatformApplicationPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> wxPlatformApplicationPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformApplicationPage(request);
+    }
+
 
     //------------------------------------------------------------------------------------------------------
 }
