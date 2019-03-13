@@ -364,6 +364,19 @@
     LIMIT 1
   </select>
 
+  <select id="isExistWxPlatformOpenid" resultType="string" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE wechat_platform_openid = #{wechat_platform_openid}
+    LIMIT 1
+  </select>
+
+  <select id="findUnionIdById" resultType="string" parameterType="string">
+    SELECT unionid
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
   <select id="getOpenId" resultType="string" parameterType="string">
     SELECT wechat
     FROM `user`
@@ -551,6 +564,21 @@
     LIMIT 1
   </select>
 
+  <select id="getExistUnionid" resultType="map" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE `unionid` = #{unionid}
+    LIMIT 1
+  </select>
+
+  <select id="getUserIdByTimeStampOpenId" resultType="map" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE `wechat_platform_openid` = #{wechat_platform_openid}
+    AND `register_time` = #{register_time}
+    LIMIT 1
+  </select>
+
   <select id="getUserAllInsistDay" resultType="map" parameterType="string">
     SELECT *
     FROM `insist_day`
@@ -581,6 +609,16 @@
   <update id="change_open_status">
     UPDATE `user`
     set whether_open = #{number}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="wxPlatformSetUnionId" parameterType="string">
+    UPDATE `user`
+    set gender = #{gender},
+        username = #{username},
+        portrait = #{portrait},
+        unionid = #{unionid}
     WHERE id = #{id}
   </update>
 
@@ -621,6 +659,11 @@
     plan_words_number = #{daily_word_number}
     WHERE id = #{id}
   </update>
+
+  <insert id="addUser" parameterType="string">
+    INSERT INTO `user` (username, portrait, gender, wechat_platform_openid, register_time, plan_days, plan_words_number, insist_day, whether_open, clock_day, wechat)
+    values (#{username}, #{portrait}, #{gender}, #{wechat_platform_openid}, #{register_time}, 0, 0, 0, 1, 0, 'WechatPlatform')
+  </insert>
 
   <insert id="decide_plan_all" parameterType="string">
     INSERT INTO take_plans (plan, user_id, plan_id, days, daily_word_number)
@@ -675,4 +718,11 @@
     #{registerTime,jdbcType=VARCHAR}, #{lastLogin,jdbcType=VARCHAR}, #{insistDay,jdbcType=INTEGER},
     #{whetherOpen,jdbcType=INTEGER}, #{clockDay,jdbcType=INTEGER})
   </insert>
+
+  <delete id="deleteUser" parameterType="string" >
+    delete from `user`
+    WHERE id = #{id}
+  </delete>
+
+
 </mapper>

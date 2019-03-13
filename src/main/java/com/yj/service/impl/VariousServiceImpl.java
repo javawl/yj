@@ -2843,5 +2843,133 @@ public class VariousServiceImpl implements IVariousService {
             }
         }
     }
+
+
+    //微信公众号报名页
+    public ServerResponse<Map<Object,Object>> wxPlatformApplicationPage(HttpServletRequest request){
+//        String token = request.getHeader("token");
+//        //验证参数是否为空
+//        List<Object> l1 = new ArrayList<Object>(){{
+//            add(token);
+//        }};
+//        String CheckNull = CommonFunc.CheckNull(l1);
+//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+//        //验证token
+//        String uid = CommonFunc.CheckToken(request,token);
+//        if (uid == null){
+//            //未找到
+//            return ServerResponse.createByErrorMessage("身份认证错误！");
+//        }else{
+//            //展示单词挑战首页数据
+//            String now_time_stamp = String.valueOf((new Date()).getTime());
+//
+//            //找出未开始的期数的最近的开始时间
+//            Map<Object,Object> wxPlatformChallenge = common_configMapper.showWxPlatformChallenge(now_time_stamp);
+//
+//            Map<Object,Object> result = new HashMap<>();
+//            if (wxPlatformChallenge == null){
+//                //因为没有可报名的阅读，所以给一个预约的
+//                Map<Object,Object> wxPlatformChallengeReserved = common_configMapper.showWxPlatformChallengeReserved(now_time_stamp);
+//                Map<Object,Object> resultReserved = new HashMap<>();
+//                if (wxPlatformChallengeReserved == null){
+//                    return ServerResponse.createBySuccess("成功！", resultReserved);
+//                }
+//                resultReserved.put("periods", wxPlatformChallengeReserved.get("periods"));
+//                resultReserved.put("st", CommonFunc.getFormatTime(Long.valueOf(wxPlatformChallengeReserved.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+//                resultReserved.put("et", CommonFunc.getFormatTime(Long.valueOf(wxPlatformChallengeReserved.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+//                resultReserved.put("type", "reserved");
+//                Long during = (new Date()).getTime() - Long.valueOf(wxPlatformChallengeReserved.get("set_time").toString());
+//                //将该期的系列全部展示出来
+//                List<Map<Object,Object>> series = common_configMapper.showReadClassSeries(wxPlatformChallengeReserved.get("id").toString());
+//                //把所有的系列分出来
+//                List<List<Map<Object,Object>>> allSeriesReserved = new ArrayList<>();
+//                //记录id
+//                String flag_id = "";
+//                //记录下标
+//                int flag_index = -1;
+//                for (int i = 0; i < series.size(); i++){
+//                    series.get(i).put("pic",CommonFunc.judgePicPath(series.get(i).get("pic").toString()));
+//                    //判断是否和flag一致
+//                    if (series.get(i).get("series_id").toString().equals(flag_id)){
+//                        //该系列放入一本书
+//                        allSeriesReserved.get(flag_index).add(series.get(i));
+//                    }else {
+//                        //添加新的flag
+//                        flag_index += 1;
+//                        flag_id = series.get(i).get("series_id").toString();
+//                        //初始化
+//                        List<Map<Object,Object>> tmp = new ArrayList<>();
+//                        allSeriesReserved.add(tmp);
+//                        //该系列放入一本书
+//                        allSeriesReserved.get(flag_index).add(series.get(i));
+//                    }
+//                }
+//                //计算有多少人预约
+//                //查找真实预约人数
+//                int reservedReadNumber = common_configMapper.countReadClassReserved(readClassReserved.get("id").toString());
+//                int number = Integer.valueOf(readClassReserved.get("virtual_number_reserved").toString()) + reservedReadNumber;
+//                int all_peopleReserved = 0;
+//                Long ii = 0L;
+//                while (ii < during){
+//                    if (all_peopleReserved + 3 > number){
+//                        all_peopleReserved = number;
+//                        break;
+//                    }
+//                    all_peopleReserved += 3;
+//                    ii+=7200000;
+//                }
+//                resultReserved.put("people", all_peopleReserved);
+//                resultReserved.put("series", allSeriesReserved);
+//                return ServerResponse.createBySuccess("成功！", resultReserved);
+//            }
+//            result.put("st", CommonFunc.getFormatTime(Long.valueOf(readClass.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+//            result.put("et", CommonFunc.getFormatTime(Long.valueOf(readClass.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+//            result.put("periods", readClass.get("periods"));
+//            result.put("type", "formal");
+//            Long during = (new Date()).getTime() - Long.valueOf(readClass.get("set_time").toString());
+//            //将该期的系列全部展示出来
+//            List<Map<Object,Object>> series = common_configMapper.showReadClassSeries(readClass.get("id").toString());
+//            //把所有的系列分出来
+//            List<List<Map<Object,Object>>> allSeries = new ArrayList<>();
+//            //记录id
+//            String flag_id = "";
+//            //记录下标
+//            int flag_index = -1;
+//            for (int i = 0; i < series.size(); i++){
+//                series.get(i).put("pic",CommonFunc.judgePicPath(series.get(i).get("pic").toString()));
+//                //判断是否和flag一致
+//                if (series.get(i).get("series_id").toString().equals(flag_id)){
+//                    //该系列放入一本书
+//                    allSeries.get(flag_index).add(series.get(i));
+//                }else {
+//                    //添加新的flag
+//                    flag_index += 1;
+//                    flag_id = series.get(i).get("series_id").toString();
+//                    //初始化
+//                    List<Map<Object,Object>> tmp = new ArrayList<>();
+//                    allSeries.add(tmp);
+//                    //该系列放入一本书
+//                    allSeries.get(flag_index).add(series.get(i));
+//                }
+//            }
+//            //计算有多少人报名
+//            int number = Integer.valueOf(readClass.get("enrollment").toString()) + Integer.valueOf(readClass.get("virtual_number").toString());
+//            int all_people = 0;
+//            Long ii = 0L;
+//            while (ii < during){
+//                if (all_people + 3 > number){
+//                    all_people = number;
+//                    break;
+//                }
+//                all_people += 3;
+//                ii+=7200000;
+//            }
+//            result.put("people", all_people);
+//            result.put("series", allSeries);
+//
+//            return ServerResponse.createBySuccess("成功！", result);
+//        }
+        return null;
+    }
     //------------------------------------------------------------------------------------------------------
 }

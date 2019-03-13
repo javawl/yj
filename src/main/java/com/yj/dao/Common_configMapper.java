@@ -692,5 +692,11 @@ public interface Common_configMapper {
     //打卡参与单词挑战
     int insertWechatPlatformChallengeContestants(@Param("user_id") String user_id,@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
+    //展示微信号运营活动报名页
+    Map<Object,Object> showWxPlatformChallenge(@Param("now_time") String  now_time);
+
+    //展示微信号运营活动预约
+    Map<Object,Object> showWxPlatformChallengeReserved(@Param("now_time") String  now_time);
+
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
