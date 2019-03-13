@@ -131,8 +131,7 @@ public class TokenServiceImpl implements ITokenService {
 
 
     public ServerResponse<String> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
-        this.code = code;
-        String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxAppID, this.wxAppSecret, this.code);
+        String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxPlatformAppID, this.wxPlatformSecret, code);
         //发送post请求读取调用微信接口获取openid用户唯一标识
         JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformLoginUrl,requestUrlParam ));
         if (jsonObject.isEmpty()){
