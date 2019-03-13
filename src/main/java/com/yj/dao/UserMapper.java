@@ -51,6 +51,12 @@ public interface UserMapper {
     //获取token那里判断openid是否已经在数据库里了
     String isExistOpenid(@Param("openid") String openid);
 
+    //获取token那里判断微信公众号网页openid是否已经在数据库里了
+    String isExistWxPlatformOpenid(@Param("wechat_platform_openid") String wechat_platform_openid);
+
+    //获取unionId通过user_id
+    String findUnionIdById(@Param("id") String id);
+
     //获取用户openid
     String getOpenId(@Param("user_id") String user_id);
 
@@ -123,6 +129,9 @@ public interface UserMapper {
     //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
+    //添加用户
+    int addUser(@Param("username") String username, @Param("portrait") String portrait, @Param("gender") String gender, @Param("wechat_platform_openid") String wechat_platform_openid, @Param("register_time") String register_time);
+
     //计划表添加计划
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
@@ -163,6 +172,9 @@ public interface UserMapper {
 
     //找出那些公众号上有unionid但是小程序上没有的用户
     Map<Object,Object> getNewWechatPlatform(@Param("unionid") String unionid);
+
+    //根据时间戳获取新插入微信公众号的用户id
+    Map<Object,Object> getUserIdByTimeStampOpenId(@Param("wechat_platform_openid") String wechat_platform_openid, @Param("register_time") String register_time);
 
     //获取打卡历史记录
     List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);

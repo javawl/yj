@@ -490,6 +490,28 @@ public class UserController extends BaseController {
         return iTokenService.wx_token(portrait, nickname, gender, session, code);
     }
 
+
+    /**
+     * 给前端获取session_key
+     * @return
+     */
+    @RequestMapping(value = "wxReturnSessionKey.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> wxReturnSessionKey(String code){
+        return iTokenService.wxReturnSessionKey(code);
+    }
+
+
+    /**
+     * 微信公众号登录
+     * @return
+     */
+    @RequestMapping(value = "wx_platform_token.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
+        return iTokenService.wx_platform_token(portrait, nickname, gender, session, code);
+    }
+
     /**
      * 单词去重
      * @return
