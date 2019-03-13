@@ -21,12 +21,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Transactional(readOnly = false)
@@ -59,6 +57,7 @@ public class TokenServiceImpl implements ITokenService {
     protected String wxLoginUrl;
     protected String wxPlatformAppID;
     protected String wxPlatformLoginUrl;
+    protected String wxPlatformUnionIdUrl;
     protected String wxPlatformSecret;
 
     //构造方法
@@ -69,6 +68,7 @@ public class TokenServiceImpl implements ITokenService {
         this.wxPlatformAppID = WxConfig.wx_platform_app_id;
         this.wxPlatformSecret = WxConfig.wx_platform_app_secret;
         this.wxPlatformLoginUrl = WxConfig.wx_platform_login_url;
+        this.wxPlatformUnionIdUrl = WxConfig.wx_platform_unionId_url;
     }
 
 
@@ -158,6 +158,94 @@ public class TokenServiceImpl implements ITokenService {
                     logger.error("微信小程序登录异常",e.getStackTrace());
                     logger.error(e.getMessage(),e);
                     return ServerResponse.createByErrorMessage(e.getMessage());
+                }
+            }
+        }
+    }
+
+
+    public ServerResponse<String> setWxPlatformUserUnionId(String code, HttpServletRequest request, HttpSession session){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(code);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxAppID, this.wxAppSecret, this.code);
+            //发送post请求读取调用微信接口获取openid用户唯一标识
+            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformLoginUrl,requestUrlParam ));
+            if (jsonObject.isEmpty()){
+                //判断抓取网页是否为空
+                return ServerResponse.createByErrorMessage("获取session_key及openID时异常，微信内部错误");
+            }else {
+                Boolean loginFail = jsonObject.containsKey("errcode");
+                if (loginFail){
+                    return ServerResponse.createByErrorCodeMessage(Integer.valueOf(jsonObject.get("errcode").toString()),jsonObject.get("errmsg").toString());
+                }else {
+                    //没有报错，我们去吧token搞出来
+                    try {
+                        //获取AccessToken和openid
+                        String openid = jsonObject.get("openid").toString();
+                        String access_token = jsonObject.get("access_token").toString();
+                        String requestUnionIdUrlParam = String.format("access_token=%s&openid=%s&lang=zh_CN", access_token, openid);
+                        //发送post请求读取调用微信接口获取openid用户唯一标识
+                        JSONObject newJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformUnionIdUrl,requestUnionIdUrlParam ));
+                        if (newJsonObject.isEmpty()){
+                            //判断抓取网页是否为空
+                            return ServerResponse.createByErrorMessage("获取unionId时异常，微信内部错误");
+                        }else {
+                            Boolean unionFail = jsonObject.containsKey("errcode");
+                            if (unionFail){
+                                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(jsonObject.get("errcode").toString()),jsonObject.get("errmsg").toString());
+                            }
+                            String nickname = newJsonObject.get("nickname").toString();
+                            String sex = newJsonObject.get("sex").toString();
+                            if (sex.equals("1") || sex.equals("0")){
+                                sex = "0";
+                            }else {
+                                sex = "1";
+                            }
+                            String headimgurl = newJsonObject.get("headimgurl").toString();
+                            String unionid = newJsonObject.get("unionid").toString();
+                            //查一下是否有过unionid
+                            //先找是否有unionid
+                            Map<Object,Object> unionidUser = userMapper.getExistUnionid(unionid);
+                            if (unionidUser == null){
+                                //没有的话，直接插
+                                userMapper.wxPlatformSetUnionId(uid, sex, nickname, headimgurl, unionid);
+                                return ServerResponse.createBySuccess("成功！", token);
+                            }else{
+                                //有的话合并账号,微信公众号并向小程序
+                                userMapper.wxPlatformSetUnionId(unionidUser.get("id").toString(), sex, nickname, headimgurl, unionid);
+                                //删除微信公众号账号
+                                userMapper.deleteUser(uid);
+                                //将原缓存删掉，给出新的token
+                                //构建Map
+                                Map<Object,Object> cacheValue = new HashMap<Object, Object>();
+                                cacheValue.put("uid", unionidUser.get("id").toString());
+                                //存进session
+                                //删掉旧的session
+                                String session_id = token.substring(0,token.length() - 32);
+                                MySessionContext myc= MySessionContext.getInstance();
+                                HttpSession sess = myc.getSession(session_id);
+                                myc.delSession(sess);
+                                return ServerResponse.createBySuccess("成功！", this.saveToCache(session, cacheValue));
+                            }
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        logger.error("微信公众号设置unionid时异常",e.getStackTrace());
+                        logger.error(e.getMessage(),e);
+                        return ServerResponse.createByErrorMessage(e.getMessage());
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.service.IFileService;
+import com.yj.service.ITokenService;
 import com.yj.service.IVariousService;
 import com.yj.service.impl.VariousServiceImpl;
 import com.yj.util.PayUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -39,6 +41,9 @@ public class VariousController {
     //将Service注入进来
     @Autowired
     private IVariousService iVariousService;
+
+    @Autowired
+    private ITokenService iTokenService;
 
     @Autowired
     private IFileService iFileService;
@@ -1010,6 +1015,17 @@ public class VariousController {
     public ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request){
         //调用service层
         return iVariousService.setUserUnionId(portrait, username, unionid, request);
+    }
+
+
+    /**
+     * 添加公众号unionid
+     */
+    @RequestMapping(value="setWxPlatformUserUnionId.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> setWxPlatformUserUnionId( String code, HttpServletRequest request, HttpSession session){
+        //调用service层
+        return iTokenService.setWxPlatformUserUnionId(code, request, session);
     }
 
 

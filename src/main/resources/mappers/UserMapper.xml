@@ -564,6 +564,13 @@
     LIMIT 1
   </select>
 
+  <select id="getExistUnionid" resultType="map" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE `unionid` = #{unionid}
+    LIMIT 1
+  </select>
+
   <select id="getUserIdByTimeStampOpenId" resultType="map" parameterType="string">
     SELECT id
     FROM `user`
@@ -602,6 +609,16 @@
   <update id="change_open_status">
     UPDATE `user`
     set whether_open = #{number}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="wxPlatformSetUnionId" parameterType="string">
+    UPDATE `user`
+    set gender = #{gender},
+        username = #{username},
+        portrait = #{portrait},
+        unionid = #{unionid}
     WHERE id = #{id}
   </update>
 
@@ -701,4 +718,11 @@
     #{registerTime,jdbcType=VARCHAR}, #{lastLogin,jdbcType=VARCHAR}, #{insistDay,jdbcType=INTEGER},
     #{whetherOpen,jdbcType=INTEGER}, #{clockDay,jdbcType=INTEGER})
   </insert>
+
+  <delete id="deleteUser" parameterType="string" >
+    delete from `user`
+    WHERE id = #{id}
+  </delete>
+
+
 </mapper>

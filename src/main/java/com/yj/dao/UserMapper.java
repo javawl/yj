@@ -114,6 +114,9 @@ public interface UserMapper {
     //决定天数和单词数
     int change_open_status(@Param("id") String id, @Param("number") int number);
 
+    //微信公众号上传unionid
+    int wxPlatformSetUnionId(@Param("id") String id, @Param("gender") String gender, @Param("username") String username, @Param("portrait") String portrait, @Param("unionid") String unionid);
+
     //修改个人信息
     int update_my_info(@Param("id") String id, @Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("username") String username);
 
@@ -173,6 +176,9 @@ public interface UserMapper {
     //找出那些公众号上有unionid但是小程序上没有的用户
     Map<Object,Object> getNewWechatPlatform(@Param("unionid") String unionid);
 
+    //获取已有的unionid
+    Map<Object,Object> getExistUnionid(@Param("unionid") String unionid);
+
     //根据时间戳获取新插入微信公众号的用户id
     Map<Object,Object> getUserIdByTimeStampOpenId(@Param("wechat_platform_openid") String wechat_platform_openid, @Param("register_time") String register_time);
 
@@ -198,4 +204,7 @@ public interface UserMapper {
     List<Map> getFeedsInfo(@Param("start") int start,@Param("size") int size);
 
     int insertUser(User record);
+
+    //删除用户
+    int deleteUser(@Param("id") String id);
 }
