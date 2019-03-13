@@ -60,6 +60,9 @@ public interface UserMapper {
     //获取用户openid
     String getOpenId(@Param("user_id") String user_id);
 
+    //获取用户微信公众号openid
+    String getWechatPlatformOpenId(@Param("user_id") String user_id);
+
     //获取我的计划的计划名
     Map getUserSelectPlanAndDays(@Param("id") String id);
 

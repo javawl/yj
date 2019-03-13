@@ -1039,5 +1039,114 @@ public class VariousController {
     }
 
 
+    /**
+     * 微信公众号报名
+     */
+    @RequestMapping(value="wxPlatformChallengePay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> wxPlatformChallengePay(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformChallengePay(request);
+    }
+
+
+    /**
+     * 回调
+     * @Description:微信支付
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="wxPlatformPayNotify.do")
+    @ResponseBody
+    public void wxPlatformPayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        logger.error("回调开始");
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        logger.error("测试事务");
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            while((line = br.readLine()) != null){
+                sb.append(line);
+            }
+            br.close();
+            //sb为微信返回的xml
+            String notityXml = sb.toString();
+            String resXml = "";
+            System.out.println("接收到的报文：" + notityXml);
+
+            Map map = PayUtils.doXMLParse(notityXml);
+
+            String returnCode = (String) map.get("return_code");
+            String out_trade_no = (String) map.get("out_trade_no");
+            logger.error(out_trade_no);
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            if("SUCCESS".equals(returnCode)){
+                //验证签名是否正确
+                Map<String, String> validParams = PayUtils.paraFilter(map);  //回调验签时需要去除sign和空值参数
+                String validStr = PayUtils.createLinkString(validParams);//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+                String sign = PayUtils.sign(validStr, WxPayConfig.key, "utf-8").toUpperCase();//拼装生成服务器端验证的签名
+                //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
+                if(sign.equals(map.get("sign"))){
+                    /**此处添加自己的业务逻辑代码start**/
+                    String[] str_list = out_trade_no.split("_");
+                    String challenge_id = str_list[0];
+                    String now_time = String.valueOf((new Date()).getTime());
+                    //获取用户id
+                    String uid = str_list[1];
+                    //判断是否报过名
+                    //报过名不能报(任意未结束一期)
+                    Map<Object,Object> wechat_challenge = common_configMapper.find_user_attend_wx_platform_challenge(now_time,uid);
+                    if (wechat_challenge != null){
+                        logger.error("微信支付成功，但是已经报过名了不可再报！");
+                        throw new Exception("微信支付成功，但是已经报过名了不可再报！");
+                    }
+                    //插入参与数据库
+                    common_configMapper.insertWechatChallengeContestantsReal(uid,challenge_id,now_time);
+                    //插入单词挑战总数据库
+                    common_configMapper.changeWechatPlatformChallengeEnroll(challenge_id);
+                    /**此处添加自己的业务逻辑代码end**/
+                    //通知微信服务器已经支付成功
+                    resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
+                            + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                }
+            }else{
+                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                        + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                logger.error(return_msg);
+            }
+            System.out.println(resXml);
+            System.out.println("微信支付回调数据结束");
+            logger.error("微信支付回调数据结束");
+
+
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("微信公众号报名失败",e.getStackTrace());
+            logger.error("微信公众号报名失败",e);
+            e.printStackTrace();
+            //出现错误抛错
+            String resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                    + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+        }
+    }
+
+
     //------------------------------------------------------------------------------------------------------
 }

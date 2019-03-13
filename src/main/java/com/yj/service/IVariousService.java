@@ -141,4 +141,7 @@ public interface IVariousService {
 
     //微信公众平台运营活动报名页
     ServerResponse<Map<Object,Object>> wxPlatformApplicationPage(HttpServletRequest request);
+
+    //公众号支付
+    ServerResponse<Map<String, Object>> wxPlatformChallengePay(HttpServletRequest request);
 }

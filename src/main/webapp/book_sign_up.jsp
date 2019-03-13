@@ -23,8 +23,8 @@
         <img src="https://file.ourbeibei.com/l_e/static/images/bg_book_sign_up.png" alt="header"/>
         <canvas id="class-info" width="200" height="100"></canvas>
         <div class="text-container">
-            <div class="label-text">第10期</div>
-            <div class="label-text" style="margin-top: 0.7rem">开课时间9月4日</div>
+            <div class="label-text">第{{periods}}期</div>
+            <div class="label-text" style="margin-top: 0.7rem">开课时间{{st}}</div>
         </div>
     </div>
     <div class="label-container">
@@ -54,7 +54,7 @@
             <img style="width: 100%;" src="https://file.ourbeibei.com/l_e/static/images/bg_reading_info_10.png" alt="">
             <div class="info-sign-people-text">
                 <span class="normal-text">已报名阅读人数</span>
-                <span class="huge-text">2084</span>
+                <span class="huge-text">{{people}}</span>
                 <span class="normal-text">人</span>
                 <div>
                     <span class="normal-text">你也快来试试吧</span>
@@ -125,6 +125,7 @@
 
 </div>
 <script src="https://file.ourbeibei.com/l_e/static/js/book_sign_up.js"></script>
+<!--<script src="book_sign_up.js"></script>-->
 
 </body>
 </html>

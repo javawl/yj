@@ -1424,9 +1424,32 @@
     LIMIT 1
   </select>
 
+  <select id="find_user_attend_wx_platform_challenge" resultType="map" parameterType="string">
+    SELECT tb.*,wechat_platform_challenge_contestants.insist_day,wechat_platform_challenge_contestants.word_number,wechat_platform_challenge_contestants.id as wechat_platform_challenge_contestants_id
+    FROM wechat_platform_challenge_contestants,
+         (SELECT *
+          FROM wechat_platform_challenge
+          WHERE wechat_platform_challenge.et > #{now_time}) tb
+    WHERE wechat_platform_challenge_contestants.wechat_platform_challenge_id = tb.id
+    AND word_challenge_contestants.user_id = #{user_id}
+    LIMIT 1
+  </select>
+
+  <select id="getWechatChallengeById" resultType="map">
+    SELECT  *
+    FROM `wechat_platform_challenge`
+    WHERE id = #{id}
+  </select>
+
   <update id="changeWechatPlatformChallengeVirtualNumber">
     UPDATE `wechat_platform_challenge`
     set `virtual_number` = #{virtual_number}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeWechatPlatformChallengeEnroll">
+    UPDATE `wechat_platform_challenge`
+    set `enrollment` = `enrollment` + 1
     WHERE id = #{id}
   </update>
 
@@ -1440,6 +1463,10 @@
     values (#{user_id},#{wechat_platform_challenge_id},#{set_time},#{virtual},30)
   </insert>
 
+  <insert id="insertWechatChallengeContestantsReal" parameterType="string">
+    INSERT INTO wechat_platform_challenge_contestants (user_id,wechat_platform_challenge_id,set_time,`virtual`,`insist_day`)
+    values (#{user_id},#{wechat_platform_challenge_id},#{set_time},0,0)
+  </insert>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
