@@ -178,7 +178,7 @@ public class TokenServiceImpl implements ITokenService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
-            String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxAppID, this.wxAppSecret, this.code);
+            String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxPlatformAppID, this.wxPlatformSecret, this.code);
             //发送post请求读取调用微信接口获取openid用户唯一标识
             JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformLoginUrl,requestUrlParam ));
             if (jsonObject.isEmpty()){
