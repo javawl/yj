@@ -1023,9 +1023,9 @@ public class VariousController {
      */
     @RequestMapping(value="setWxPlatformUserUnionId.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> setWxPlatformUserUnionId( String code, HttpServletRequest request, HttpSession session){
+    public ServerResponse<String> setWxPlatformUserUnionId(HttpServletRequest request, HttpSession session){
         //调用service层
-        return iTokenService.setWxPlatformUserUnionId(code, request, session);
+        return iTokenService.setWxPlatformUserUnionId(request, session);
     }
 
     /**
@@ -1146,6 +1146,40 @@ public class VariousController {
             out.close();
         }
     }
+
+
+    /**
+     * 微信公众号阅读报名
+     */
+    @RequestMapping(value="readChallengeWxPlatformPay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> readChallengeWxPlatformPay(String series_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.readChallengeWxPlatformPay(series_id, request);
+    }
+
+
+    /**
+     * 微信公众号阅读助力报名
+     */
+    @RequestMapping(value="readChallengeHelpWxPlatformPay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPay(String series_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.readChallengeHelpWxPlatformPay(series_id, request);
+    }
+
+
+    /**
+     * 微信公众号阅读助力二次支付
+     */
+    @RequestMapping(value="readChallengeHelpWxPlatformPaySecond.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPaySecond(HttpServletRequest request){
+        //调用service层
+        return iVariousService.readChallengeHelpWxPlatformPaySecond(request);
+    }
+
 
 
     //------------------------------------------------------------------------------------------------------

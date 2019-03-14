@@ -396,6 +396,33 @@ public class CommonFunc {
         }
     }
 
+
+    //获取session中某个值
+    public static String getSessionValueByToken(HttpServletRequest request,String key, String session_key){
+        //key = session_id + token  其中token是32位的
+        if (key.length() != 64){
+            return null;
+        }
+        String session_id = key.substring(0,key.length() - 32);
+        //获取token
+        String token = key.substring(key.length()-32);
+        MySessionContext myc= MySessionContext.getInstance();
+        HttpSession session = myc.getSession(session_id);
+        if(session == null) {
+            //没有
+            return null;
+        }else{
+            Map user_info = (Map) session.getAttribute(token);
+            if (user_info != null){
+                return user_info.get(session_key).toString();
+            }
+
+            //没找到返回null
+            return null;
+        }
+    }
+
+
     //检查用户传入参数是否为空
     public static String CheckNull(List<Object> parameter){
         //返回null说明检查成功！

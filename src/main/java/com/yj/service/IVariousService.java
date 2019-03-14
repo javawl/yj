@@ -144,4 +144,13 @@ public interface IVariousService {
 
     //公众号支付
     ServerResponse<Map<String, Object>> wxPlatformChallengePay(HttpServletRequest request);
+
+    //公众号阅读报名
+    ServerResponse<Map<String, Object>> readChallengeWxPlatformPay(String series_id, HttpServletRequest request);
+
+    //公众号助力报名
+    ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPay(String series_id, HttpServletRequest request);
+
+    //公众号助力二次支付
+    ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPaySecond(HttpServletRequest request);
 }

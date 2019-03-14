@@ -15,5 +15,5 @@ public interface ITokenService {
 
     ServerResponse<String> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code);
 
-    ServerResponse<String> setWxPlatformUserUnionId(String code, HttpServletRequest request, HttpSession session);
+    ServerResponse<String> setWxPlatformUserUnionId(HttpServletRequest request, HttpSession session);
 }
