@@ -156,7 +156,7 @@ public class TokenServiceImpl implements ITokenService {
                 JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformNormalAccessTokenUrl, requestNormalAccessTokenUrlParam ));
                 if (normalAccessTokenJsonObject.isEmpty()){
                     //判断抓取网页是否为空
-                    return ServerResponse.createByErrorMessage("获取ticket时异常，微信内部错误");
+                    return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
                 }else {
                     Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
                     if (normalAccessTokenFail){
@@ -166,6 +166,7 @@ public class TokenServiceImpl implements ITokenService {
                         normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
                     }
                 }
+                logger.error("for_test:(normalAccessToken)" + normalAccessToken);
                 String ticket = "";
                 //将jsapi_ticket取出
                 String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", normalAccessToken);
@@ -183,6 +184,7 @@ public class TokenServiceImpl implements ITokenService {
                         ticket = ticketJsonObject.get("ticket").toString();
                     }
                 }
+                logger.error("for_test:(ticket)" + ticket);
                 //没有报错，我们去吧token搞出来
                 try {
                     Map<Object,Object> result = this.wxPlatformGrantToken(jsonObject, portrait, nickname, gender, session, ticket);
