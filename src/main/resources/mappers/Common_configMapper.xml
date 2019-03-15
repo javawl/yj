@@ -1449,6 +1449,13 @@
     LIMIT 1
   </select>
 
+  <select id="checkExistWxPlatformReserved" resultType="map">
+    SELECT *
+    FROM wechat_platform_challenge_reserved
+    WHERE user_id = #{user_id}
+    LIMIT 1
+  </select>
+
   <update id="changeWechatPlatformChallengeVirtualNumber">
     UPDATE `wechat_platform_challenge`
     set `virtual_number` = #{virtual_number}
@@ -1474,6 +1481,11 @@
   <insert id="insertWechatChallengeContestantsReal" parameterType="string">
     INSERT INTO wechat_platform_challenge_contestants (user_id,wechat_platform_challenge_id,set_time,`virtual`,`insist_day`)
     values (#{user_id},#{wechat_platform_challenge_id},#{set_time},0,0)
+  </insert>
+
+  <insert id="insertWxPlatformChallengeReserved" parameterType="string">
+    INSERT INTO wechat_platform_challenge_reserved (user_id,set_time)
+    values (#{user_id},#{set_time})
   </insert>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->

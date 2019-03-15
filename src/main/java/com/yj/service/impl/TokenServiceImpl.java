@@ -196,7 +196,7 @@ public class TokenServiceImpl implements ITokenService {
                     //时间戳
                     Long timeStamp = System.currentTimeMillis() / 1000;
                     String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl;
-                    String signature = PayUtils.sha1(str);
+                    String signature = CommonFunc.SHA1(str);
                     Map<String, Object> res = new HashMap<>();
                     res.put("noncestr", nonce_str);
                     res.put("timestamp", timeStamp);

@@ -3038,7 +3038,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_platform_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
-                response.put("studentId", wechat_challenge_challenge_id + uid);
+                response.put("studentId", "1" + uid);
                 response.put("st", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
                 response.put("et", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
                 //找到老师2
@@ -3463,6 +3463,60 @@ public class VariousServiceImpl implements IVariousService {
             logger.error("阅读助力二次支付失败",e.getStackTrace());
             logger.error("阅读助力二次支付失败",e);
             return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+
+    //预约公众号的挑战
+    public ServerResponse<Map<String,Object>> reservedWxPlatformChallenge(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            String now_time = String.valueOf((new Date()).getTime());
+            Map<Object,Object> wxPlatformChallengeReserved = common_configMapper.showWxPlatformChallengeReserved(now_time);
+            if (wxPlatformChallengeReserved == null){
+                return ServerResponse.createByErrorMessage("没有可预约期！");
+            }
+            //找到老师2
+            Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wxPlatformChallengeReserved.get("id").toString(), "3");
+            Map<String, Object> response = new HashMap<>();
+            response.put("qr_code", teacher.get("qr_code").toString());
+            response.put("studentId", "1" + uid);
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try {
+                Map<Object,Object> wechat_challenge = common_configMapper.find_user_attend_wx_platform_challenge(now_time,uid);
+                if (wechat_challenge != null){
+                    return ServerResponse.createByErrorMessage("已报名过不可再报！");
+                }
+                if (common_configMapper.checkExistWxPlatformReserved(uid) != null){
+                    throw new Exception("已经预约过了不可再预约！");
+                }
+                //预约
+                common_configMapper.insertWxPlatformChallengeReserved(uid,now_time);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccess("预约成功！",response);
+            } catch (Exception e) {
+                transactionManager.rollback(status);
+                logger.error("预约运营挑战失败",e.getStackTrace());
+                logger.error("预约运营挑战失败",e);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("预约失败！");
+            }
         }
     }
 
