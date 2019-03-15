@@ -59,6 +59,7 @@ public class TokenServiceImpl implements ITokenService {
     protected String wxPlatformAppID;
     protected String wxPlatformLoginUrl;
     protected String wxPlatformJsapiTicket;
+    protected String wxPlatformNormalAccessTokenUrl;
     protected String wxPlatformMakeSignatureUrl;
     protected String wxPlatformUnionIdUrl;
     protected String wxPlatformSecret;
@@ -72,6 +73,7 @@ public class TokenServiceImpl implements ITokenService {
         this.wxPlatformSecret = WxConfig.wx_platform_app_secret;
         this.wxPlatformLoginUrl = WxConfig.wx_platform_login_url;
         this.wxPlatformJsapiTicket = WxConfig.wx_platform_jsapi_ticket;
+        this.wxPlatformNormalAccessTokenUrl = WxConfig.wx_platform_normal_access_token_url;
         this.wxPlatformMakeSignatureUrl = WxConfig.wx_platform_make_signature_url;
         this.wxPlatformUnionIdUrl = WxConfig.wx_platform_unionId_url;
     }
@@ -147,10 +149,26 @@ public class TokenServiceImpl implements ITokenService {
             if (loginFail){
                 return ServerResponse.createByErrorCodeMessage(Integer.valueOf(jsonObject.get("errcode").toString()),jsonObject.get("errmsg").toString());
             }else {
-                String accessToken = jsonObject.get("access_token").toString();
+                String normalAccessToken = "";
+                //将access_token取出
+                String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+                //发送post请求读取调用微信接口获取openid用户唯一标识
+                JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformNormalAccessTokenUrl, requestNormalAccessTokenUrlParam ));
+                if (normalAccessTokenJsonObject.isEmpty()){
+                    //判断抓取网页是否为空
+                    return ServerResponse.createByErrorMessage("获取ticket时异常，微信内部错误");
+                }else {
+                    Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
+                    if (normalAccessTokenFail){
+                        return ServerResponse.createByErrorCodeMessage(Integer.valueOf(normalAccessTokenJsonObject.get("errcode").toString()),normalAccessTokenJsonObject.get("errmsg").toString());
+                    }else {
+                        //没有报错，我们去吧ticket搞出来
+                        normalAccessToken = normalAccessTokenJsonObject.get("ticket").toString();
+                    }
+                }
                 String ticket = "";
                 //将jsapi_ticket取出
-                String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", accessToken);
+                String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", normalAccessToken);
                 //发送post请求读取调用微信接口获取openid用户唯一标识
                 JSONObject ticketJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformJsapiTicket, requestTicketUrlParam ));
                 if (ticketJsonObject.isEmpty()){
