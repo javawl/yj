@@ -166,26 +166,22 @@ public class TokenServiceImpl implements ITokenService {
                         normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
                     }
                 }
-                logger.error("for_test:(normalAccessToken)" + normalAccessToken);
                 String ticket = "";
                 //将jsapi_ticket取出
                 String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", normalAccessToken);
                 //发送post请求读取调用微信接口获取openid用户唯一标识
                 JSONObject ticketJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformJsapiTicket, requestTicketUrlParam ));
-                logger.error(JSONObject.toJSONString(ticketJsonObject));
                 if (ticketJsonObject.isEmpty()){
                     //判断抓取网页是否为空
                     return ServerResponse.createByErrorMessage("获取ticket时异常，微信内部错误");
                 }else {
-                    Boolean ticketFail = ticketJsonObject.containsKey("errcode");
-                    if (ticketFail){
+                    if (!ticketJsonObject.get("errcode").equals("0")){
                         return ServerResponse.createByErrorCodeMessage(Integer.valueOf(ticketJsonObject.get("errcode").toString()),ticketJsonObject.get("errmsg").toString());
                     }else {
                         //没有报错，我们去吧ticket搞出来
                         ticket = ticketJsonObject.get("ticket").toString();
                     }
                 }
-                logger.error("for_test:(ticket)" + ticket);
                 //没有报错，我们去吧token搞出来
                 try {
                     Map<Object,Object> result = this.wxPlatformGrantToken(jsonObject, portrait, nickname, gender, session, ticket);
