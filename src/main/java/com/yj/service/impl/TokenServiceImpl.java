@@ -163,7 +163,7 @@ public class TokenServiceImpl implements ITokenService {
                         return ServerResponse.createByErrorCodeMessage(Integer.valueOf(normalAccessTokenJsonObject.get("errcode").toString()),normalAccessTokenJsonObject.get("errmsg").toString());
                     }else {
                         //没有报错，我们去吧ticket搞出来
-                        normalAccessToken = normalAccessTokenJsonObject.get("ticket").toString();
+                        normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
                     }
                 }
                 String ticket = "";
