@@ -46,7 +46,7 @@ public class Const {
     public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid
     public static final int REGISTER_STATE_EXISIT_TIME = 3600; //注册时一直到注册成功，手机号保存时间为1小时
     public static final int TOKEN_EXIST_TIME = 31536000; //用户token的注册时间
-    public static final int WX_TOKEN_EXIST_TIME = 3 * 60 * 60; //小程序token的存活时间
+    public static final int WX_TOKEN_EXIST_TIME = 2 * 60 * 60; //小程序token的存活时间
     public static final int INIT_STUDY_PEOPLE = 20000; //开始背单词的人数
     public static final Long INIT_STUDY_TIME = 1536771352000L; //开始背单词的人数的计算时间戳
     public static final Long HOT_RECOMMENDATIONS = 2678400000L; //因为热门推荐是一个月内热度前五的这是一个月的秒数(JAVA里面时间戳大三位)

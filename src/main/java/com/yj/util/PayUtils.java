@@ -41,6 +41,14 @@ public class PayUtils {
         return DigestUtils.md5Hex(getContentBytes(text, input_charset));
     }
     /**
+     * sha1加密
+     * @param text 需要签名的字符串
+     * @return 签名结果
+     */
+    public static String sha1(String text) {
+        return DigestUtils.sha1Hex(text);
+    }
+    /**
      * 签名字符串
      *  @param text 需要签名的字符串
      * @param sign 签名结果

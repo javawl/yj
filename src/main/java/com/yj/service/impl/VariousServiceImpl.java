@@ -2928,6 +2928,14 @@ public class VariousServiceImpl implements IVariousService {
         }
         String openid = userMapper.getWechatPlatformOpenId(uid);
         if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        //验证unionid
+        String union_id = userMapper.findUnionIdById(uid);
+        if (union_id == null){
+            return ServerResponse.createByErrorMessage("未授权成功不可报名！");
+        }
+        if (union_id.length() <= 0){
+            return ServerResponse.createByErrorMessage("未授权成功不可报名！");
+        }
         try{
             //时间戳
             String now_time = String.valueOf((new Date()).getTime());
@@ -3030,6 +3038,12 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_platform_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
+                response.put("studentId", wechat_challenge_challenge_id + uid);
+                response.put("st", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+                response.put("et", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+                //找到老师2
+                Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wechat_challenge_challenge_id, "2");
+                response.put("qr_code", teacher.get("qr_code").toString());
                 //这里先记录一下用户的支付情况
                 common_configMapper.insertPayRecord(uid,"1",now_time);
                 return ServerResponse.createBySuccess("成功",response);

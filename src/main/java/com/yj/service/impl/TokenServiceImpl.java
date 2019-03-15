@@ -10,6 +10,7 @@ import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
+import com.yj.util.PayUtils;
 import com.yj.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class TokenServiceImpl implements ITokenService {
     protected String wxLoginUrl;
     protected String wxPlatformAppID;
     protected String wxPlatformLoginUrl;
+    protected String wxPlatformJsapiTicket;
+    protected String wxPlatformMakeSignatureUrl;
     protected String wxPlatformUnionIdUrl;
     protected String wxPlatformSecret;
 
@@ -68,6 +71,8 @@ public class TokenServiceImpl implements ITokenService {
         this.wxPlatformAppID = WxConfig.wx_platform_app_id;
         this.wxPlatformSecret = WxConfig.wx_platform_app_secret;
         this.wxPlatformLoginUrl = WxConfig.wx_platform_login_url;
+        this.wxPlatformJsapiTicket = WxConfig.wx_platform_jsapi_ticket;
+        this.wxPlatformMakeSignatureUrl = WxConfig.wx_platform_make_signature_url;
         this.wxPlatformUnionIdUrl = WxConfig.wx_platform_unionId_url;
     }
 
@@ -130,7 +135,7 @@ public class TokenServiceImpl implements ITokenService {
 
 
 
-    public ServerResponse<String> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
+    public ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
         String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxPlatformAppID, this.wxPlatformSecret, code);
         //发送post请求读取调用微信接口获取openid用户唯一标识
         JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformLoginUrl,requestUrlParam ));
@@ -142,16 +147,45 @@ public class TokenServiceImpl implements ITokenService {
             if (loginFail){
                 return ServerResponse.createByErrorCodeMessage(Integer.valueOf(jsonObject.get("errcode").toString()),jsonObject.get("errmsg").toString());
             }else {
+                String accessToken = jsonObject.get("access_token").toString();
+                String ticket = "";
+                //将jsapi_ticket取出
+                String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", accessToken);
+                //发送post请求读取调用微信接口获取openid用户唯一标识
+                JSONObject ticketJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformJsapiTicket, requestTicketUrlParam ));
+                if (ticketJsonObject.isEmpty()){
+                    //判断抓取网页是否为空
+                    return ServerResponse.createByErrorMessage("获取ticket时异常，微信内部错误");
+                }else {
+                    Boolean ticketFail = ticketJsonObject.containsKey("errcode");
+                    if (ticketFail){
+                        return ServerResponse.createByErrorCodeMessage(Integer.valueOf(ticketJsonObject.get("errcode").toString()),ticketJsonObject.get("errmsg").toString());
+                    }else {
+                        //没有报错，我们去吧ticket搞出来
+                        ticket = ticketJsonObject.get("ticket").toString();
+                    }
+                }
                 //没有报错，我们去吧token搞出来
                 try {
-                    Map<Object,Object> result = this.wxPlatformGrantToken(jsonObject, portrait, nickname, gender, session);
+                    Map<Object,Object> result = this.wxPlatformGrantToken(jsonObject, portrait, nickname, gender, session, ticket);
                     String token = result.get("token").toString();
                     int type = Integer.valueOf(result.get("type").toString());
+                    //随机字符
+                    String nonce_str = CommonFunc.getRandomStringByLength(32);
+                    //时间戳
+                    Long timeStamp = System.currentTimeMillis() / 1000;
+                    String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl;
+                    String signature = PayUtils.sha1(str);
+                    Map<String, Object> res = new HashMap<>();
+                    res.put("noncestr", nonce_str);
+                    res.put("timestamp", timeStamp);
+                    res.put("signature", signature);
+                    res.put("token", token);
                     if (type == 0){
                         //没有unionid
-                        return ServerResponse.createBySuccess("unionId",token);
+                        return ServerResponse.createBySuccess("unionId",res);
                     }
-                    return ServerResponse.createBySuccess("成功！",token);
+                    return ServerResponse.createBySuccess("成功！",res);
                 }catch (Exception e){
                     e.printStackTrace();
                     logger.error("微信小程序登录异常",e.getStackTrace());
@@ -250,9 +284,10 @@ public class TokenServiceImpl implements ITokenService {
 //            }
 
             String accessToken = CommonFunc.getSessionValueByToken(request,token, "access_token");
+            String ticket = CommonFunc.getSessionValueByToken(request,token, "ticket");
             try {
                 //获取AccessToken和openid
-                String openid = userMapper.getOpenId(uid);
+                String openid = userMapper.getWechatPlatformOpenId(uid);
                 String requestUnionIdUrlParam = String.format("access_token=%s&openid=%s&lang=zh_CN", accessToken, openid);
                 //发送post请求读取调用微信接口获取openid用户唯一标识
                 JSONObject newJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformUnionIdUrl,requestUnionIdUrlParam ));
@@ -290,6 +325,8 @@ public class TokenServiceImpl implements ITokenService {
                         //构建Map
                         Map<Object,Object> cacheValue = new HashMap<Object, Object>();
                         cacheValue.put("uid", unionidUser.get("id").toString());
+                        cacheValue.put("access_token", accessToken);
+                        cacheValue.put("ticket", ticket);
                         //存进session
                         //删掉旧的session
                         String session_id = token.substring(0,token.length() - 32);
@@ -434,7 +471,7 @@ public class TokenServiceImpl implements ITokenService {
      * @param    微信公众号网页开发接口网页获取的信息jsonObject
      * @return   token
      * */
-    private Map<Object,Object> wxPlatformGrantToken(JSONObject jsonObject, String portrait, String nickname, String gender, HttpSession session) throws Exception{
+    private Map<Object,Object> wxPlatformGrantToken(JSONObject jsonObject, String portrait, String nickname, String gender, HttpSession session, String ticket) throws Exception{
         //拿到openID，在数据库里看一下openID存不存在
         //如果存在不处理，不存在数据库里新增一条user
         //生成令牌，准备缓存数据，写入缓存
@@ -539,6 +576,7 @@ public class TokenServiceImpl implements ITokenService {
             cacheValue.put("uid", uid);
             //存储AccessToken
             cacheValue.put("access_token", accessToken);
+            cacheValue.put("ticket", ticket);
             //存进session
             Map<Object,Object> result = new HashMap<>();
             result.put("token", this.saveToCache(session, cacheValue));

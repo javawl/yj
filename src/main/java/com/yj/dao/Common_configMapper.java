@@ -689,6 +689,9 @@ public interface Common_configMapper {
     //后台获取挑战
     Map<Object,Object> getWechatChallengeById(@Param("id") String id);
 
+    //获取挑战老师
+    Map<Object,Object> getWxPlatformChallengeTeacher(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("order") String order);
+
     //记录挑战的虚拟用户数
     int changeWechatPlatformChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
 

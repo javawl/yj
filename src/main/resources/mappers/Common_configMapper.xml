@@ -1441,6 +1441,14 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getWxPlatformChallengeTeacher" resultType="map">
+    SELECT  *
+    FROM `wechat_platform_challenge_teacher`
+    WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
+    AND `order` = #{order}
+    LIMIT 1
+  </select>
+
   <update id="changeWechatPlatformChallengeVirtualNumber">
     UPDATE `wechat_platform_challenge`
     set `virtual_number` = #{virtual_number}

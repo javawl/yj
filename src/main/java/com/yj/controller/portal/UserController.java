@@ -508,7 +508,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "wx_platform_token.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
+    public ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
         return iTokenService.wx_platform_token(portrait, nickname, gender, session, code);
     }
 
