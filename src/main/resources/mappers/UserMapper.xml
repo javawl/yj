@@ -629,6 +629,17 @@
   </update>
 
 
+  <update id="mergeUserUnionId" parameterType="string">
+    UPDATE `user`
+    set gender = #{gender},
+        username = #{username},
+        portrait = #{portrait},
+        wechat_platform_openid = #{wechat_platform_openid},
+        unionid = #{unionid}
+    WHERE id = #{id}
+  </update>
+
+
   <update id="update_my_info" parameterType="string">
     UPDATE `user`
     set gender = #{gender},

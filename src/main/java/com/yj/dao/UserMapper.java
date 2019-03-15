@@ -120,6 +120,9 @@ public interface UserMapper {
     //微信公众号上传unionid
     int wxPlatformSetUnionId(@Param("id") String id, @Param("gender") String gender, @Param("username") String username, @Param("portrait") String portrait, @Param("unionid") String unionid);
 
+    //合并账号更新union和公众号openid
+    int mergeUserUnionId(@Param("id") String id, @Param("gender") String gender, @Param("username") String username, @Param("portrait") String portrait, @Param("unionid") String unionid, @Param("wechat_platform_openid") String wechat_platform_openid);
+
     //修改个人信息
     int update_my_info(@Param("id") String id, @Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("username") String username);
 

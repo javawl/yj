@@ -280,10 +280,10 @@ public class TokenServiceImpl implements ITokenService {
                     if (unionidUser == null){
                         //没有的话，直接插
                         userMapper.wxPlatformSetUnionId(uid, sex, nickname, headimgurl, unionid);
-                        return ServerResponse.createBySuccess("成功！", token);
+                        return ServerResponse.createBySuccess("成功！", null);
                     }else{
                         //有的话合并账号,微信公众号并向小程序
-                        userMapper.wxPlatformSetUnionId(unionidUser.get("id").toString(), sex, nickname, headimgurl, unionid);
+                        userMapper.mergeUserUnionId(unionidUser.get("id").toString(), sex, nickname, headimgurl, unionid, openid);
                         //删除微信公众号账号
                         userMapper.deleteUser(uid);
                         //将原缓存删掉，给出新的token
@@ -293,10 +293,12 @@ public class TokenServiceImpl implements ITokenService {
                         //存进session
                         //删掉旧的session
                         String session_id = token.substring(0,token.length() - 32);
-                        MySessionContext myc= MySessionContext.getInstance();
-                        HttpSession sess = myc.getSession(session_id);
-                        myc.delSession(sess);
-                        return ServerResponse.createBySuccess("成功！", this.saveToCache(session, cacheValue));
+                        //获取token
+                        String tk = token.substring(token.length()-32);
+//                        MySessionContext myc= MySessionContext.getInstance();
+//                        HttpSession sess = myc.getSession(session_id);
+//                        myc.delSession(sess);
+                        return ServerResponse.createBySuccess("成功！", this.changeSessionCache(cacheValue, tk, session_id));
                     }
                 }
             }catch (Exception e){
@@ -566,5 +568,21 @@ public class TokenServiceImpl implements ITokenService {
         //获取session_id
         String session_id = session.getId();
         return session_id + key;
+    }
+
+
+
+    /*
+     * 修改session内部的值
+     * @param    cacheValue：要存入缓存的值
+     * @return   $key：token
+     * */
+    private String changeSessionCache(Map<Object,Object> cacheValue, String key, String session_id){
+        MySessionContext myc= MySessionContext.getInstance();
+        HttpSession session = myc.getSession(session_id);
+        //存入session
+        session.setAttribute(key, cacheValue);
+        session.setMaxInactiveInterval(Const.WX_TOKEN_EXIST_TIME);     //以秒为单位
+        return null;
     }
 }
