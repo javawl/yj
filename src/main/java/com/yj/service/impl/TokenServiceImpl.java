@@ -172,6 +172,7 @@ public class TokenServiceImpl implements ITokenService {
                 String requestTicketUrlParam = String.format("access_token=%s&type=jsapi", normalAccessToken);
                 //发送post请求读取调用微信接口获取openid用户唯一标识
                 JSONObject ticketJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformJsapiTicket, requestTicketUrlParam ));
+                logger.error(JSONObject.toJSONString(ticketJsonObject));
                 if (ticketJsonObject.isEmpty()){
                     //判断抓取网页是否为空
                     return ServerResponse.createByErrorMessage("获取ticket时异常，微信内部错误");
