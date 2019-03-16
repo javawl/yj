@@ -383,6 +383,12 @@
     WHERE id = #{user_id}
   </select>
 
+  <select id="getWechatPlatformOpenId" resultType="string" parameterType="string">
+    SELECT wechat_platform_openid
+    FROM `user`
+    WHERE id = #{user_id}
+  </select>
+
   <select id="getUserSelectPlanAndDays" resultType="map" parameterType="string">
     SELECT my_plan,plan_days,plan_words_number
     FROM user
@@ -618,6 +624,17 @@
     set gender = #{gender},
         username = #{username},
         portrait = #{portrait},
+        unionid = #{unionid}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="mergeUserUnionId" parameterType="string">
+    UPDATE `user`
+    set gender = #{gender},
+        username = #{username},
+        portrait = #{portrait},
+        wechat_platform_openid = #{wechat_platform_openid},
         unionid = #{unionid}
     WHERE id = #{id}
   </update>

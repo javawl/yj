@@ -1149,6 +1149,17 @@ public class VariousController {
 
 
     /**
+     * 微信公众号单词挑战报名
+     */
+    @RequestMapping(value="wxPlatformWordChallengePay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> wxPlatformWordChallengePay(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformWordChallengePay(request);
+    }
+
+
+    /**
      * 微信公众号阅读报名
      */
     @RequestMapping(value="readChallengeWxPlatformPay.do", method = RequestMethod.POST)
@@ -1178,6 +1189,72 @@ public class VariousController {
     public ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPaySecond(HttpServletRequest request){
         //调用service层
         return iVariousService.readChallengeHelpWxPlatformPaySecond(request);
+    }
+
+
+    /**
+     * 预约公众号的挑战
+     */
+    @RequestMapping(value="reservedWxPlatformChallenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> reservedWxPlatformChallenge(HttpServletRequest request){
+        //调用service层
+        return iVariousService.reservedWxPlatformChallenge(request);
+    }
+
+
+    /**
+     * 老师1
+     */
+    @RequestMapping(value="teacherOne.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> teacherOne(HttpServletRequest request){
+        //调用service层
+        return iVariousService.teacherOne(request);
+    }
+
+
+    /**
+     * 运营活动排行榜
+     */
+    @RequestMapping(value="wxPlatformChallengeRank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> wxPlatformChallengeRank(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformChallengeRank(request);
+    }
+
+
+    /**
+     * 分享页
+     */
+    @RequestMapping(value="wxPlatformChallengeSharePage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> wxPlatformChallengeSharePage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformChallengeSharePage(request);
+    }
+
+
+    /**
+     * 预约成功老师页
+     */
+    @RequestMapping(value="reservedWxPlatformChallengeTeacherPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> reservedWxPlatformChallengeTeacherPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.reservedWxPlatformChallengeTeacherPage(request);
+    }
+
+
+    /**
+     * 报名成功老师页
+     */
+    @RequestMapping(value="wxPlatformChallengePayTeacherPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> wxPlatformChallengePayTeacherPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.wxPlatformChallengePayTeacherPage(request);
     }
 
 

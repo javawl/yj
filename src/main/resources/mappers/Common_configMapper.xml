@@ -1424,6 +1424,27 @@
     LIMIT 1
   </select>
 
+  <select id="showWxPlatformChallengeContestants" resultType="map" parameterType="string">
+    SELECT `user`.username, tb.*
+    FROM `user`,
+    (SELECT word_number,user_id
+    FROM wechat_platform_challenge_contestants
+    WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
+    ORDER BY word_number DESC) tb
+    WHERE `user`.id = tb.user_id
+  </select>
+
+  <select id="showWxPlatformChallengeInsistDay" resultType="map" parameterType="string">
+    SELECT `user`.username, `user`.portrait, tb.*
+    FROM `user`,
+    (SELECT insist_day,user_id
+    FROM wechat_platform_challenge_contestants
+    WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
+    AND user_id = #{user_id}) tb
+    WHERE `user`.id = tb.user_id
+    LIMIT 1
+  </select>
+
   <select id="find_user_attend_wx_platform_challenge" resultType="map" parameterType="string">
     SELECT tb.*,wechat_platform_challenge_contestants.insist_day,wechat_platform_challenge_contestants.word_number,wechat_platform_challenge_contestants.id as wechat_platform_challenge_contestants_id
     FROM wechat_platform_challenge_contestants,
@@ -1446,6 +1467,18 @@
     FROM `wechat_platform_challenge_teacher`
     WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
     AND `order` = #{order}
+    LIMIT 1
+  </select>
+
+
+  <select id="existWxPlatformChallenge" resultType="map">
+    SELECT wechat_platform_challenge.*
+    FROM wechat_platform_challenge,
+    (SELECT  *
+    FROM `wechat_platform_challenge_contestants`
+    WHERE `user_id` = #{user_id}) tb
+    WHERE `wechat_platform_challenge_contestants`.wechat_platform_challenge_id = wechat_platform_challenge.id
+    AND wechat_platform_challenge.et > #{now_time}
     LIMIT 1
   </select>
 

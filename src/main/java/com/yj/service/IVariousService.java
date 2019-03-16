@@ -145,6 +145,9 @@ public interface IVariousService {
     //公众号支付
     ServerResponse<Map<String, Object>> wxPlatformChallengePay(HttpServletRequest request);
 
+    //公众号支付单词挑战
+    ServerResponse<Map<String, Object>> wxPlatformWordChallengePay(HttpServletRequest request);
+
     //公众号阅读报名
     ServerResponse<Map<String, Object>> readChallengeWxPlatformPay(String series_id, HttpServletRequest request);
 
@@ -153,4 +156,22 @@ public interface IVariousService {
 
     //公众号助力二次支付
     ServerResponse<Map<String, Object>> readChallengeHelpWxPlatformPaySecond(HttpServletRequest request);
+
+    //预约公众号的挑战
+    ServerResponse<Map<String,Object>> reservedWxPlatformChallenge(HttpServletRequest request);
+
+    //老师1
+    ServerResponse<Map<String,Object>> teacherOne(HttpServletRequest request);
+
+    //运营活动排行榜
+    ServerResponse<List<Map<Object,Object>>> wxPlatformChallengeRank(HttpServletRequest request);
+
+    //分享页
+    ServerResponse<Map<Object,Object>> wxPlatformChallengeSharePage(HttpServletRequest request);
+
+    //预约成功老师页
+    ServerResponse<Map<String,Object>> reservedWxPlatformChallengeTeacherPage(HttpServletRequest request);
+
+    //运营活动报名成功老师页
+    ServerResponse<Map<String, Object>> wxPlatformChallengePayTeacherPage(HttpServletRequest request);
 }

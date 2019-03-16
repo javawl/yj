@@ -84,7 +84,7 @@
                         <div v-for="item in key.books" class="book-title">{{item.title}}</div>
                     </div>
                     <div class="book-image-container">
-                        <img v-for="(item, idx) in key.books" alt="" src="{{item.img}}" v-bind:datasrc="item.img"
+                        <img v-for="(item, idx) in key.books" alt="" v-bind:src="item.img"
                              v-bind:style="{ zIndex: 10 - idx, right: (idx * 2.5 + 2) + 'rem'}">
                     </div>
                 </div>

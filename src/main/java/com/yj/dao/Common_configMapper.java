@@ -692,6 +692,9 @@ public interface Common_configMapper {
     //获取挑战老师
     Map<Object,Object> getWxPlatformChallengeTeacher(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("order") String order);
 
+    //找出报名的那一期
+    Map<Object,Object> existWxPlatformChallenge(@Param("user_id") String user_id,@Param("now_time") String now_time);
+
     //查看用户是否预定过
     Map<Object,Object> checkExistWxPlatformReserved(@Param("user_id") String user_id);
 
@@ -712,6 +715,12 @@ public interface Common_configMapper {
 
     //展示微信号运营活动预约
     Map<Object,Object> showWxPlatformChallengeReserved(@Param("now_time") String  now_time);
+
+    //展示微信号运营活动预约
+    List<Map<Object,Object>> showWxPlatformChallengeContestants(@Param("wechat_platform_challenge_id") String  wechat_platform_challenge_id);
+
+    //展示微信号运营活动预约
+    Map<Object,Object> showWxPlatformChallengeInsistDay(@Param("wechat_platform_challenge_id") String  wechat_platform_challenge_id, @Param("user_id") String  user_id);
 
     //打卡参与运营挑战
     int insertWechatChallengeContestantsReal(@Param("user_id") String user_id,@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("set_time") String set_time);
