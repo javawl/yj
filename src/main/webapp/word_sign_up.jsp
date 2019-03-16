@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <title>单词挑战报名</title>
     <!--<link href="word_sign_up.css" type="text/css" rel="stylesheet"/>-->
-    <link href="https://file.ourbeibei.com/l_e/static/css/word_sign_up.css">
+    <link href="https://file.ourbeibei.com/l_e/static/css/word_sign_up.css" type="text/css" rel="stylesheet">
     <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
     <script src="https://file.ourbeibei.com/l_e/static/node_modules/vue/dist/vue.js"></script>
     <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>

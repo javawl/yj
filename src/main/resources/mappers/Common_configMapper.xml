@@ -1452,7 +1452,7 @@
           FROM wechat_platform_challenge
           WHERE wechat_platform_challenge.et > #{now_time}) tb
     WHERE wechat_platform_challenge_contestants.wechat_platform_challenge_id = tb.id
-    AND word_challenge_contestants.user_id = #{user_id}
+    AND wechat_platform_challenge_contestants.user_id = #{user_id}
     LIMIT 1
   </select>
 

@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
     <title>背呗挑战赛</title>
     <link rel="stylesheet" href="https://file.ourbeibei.com/l_e/static/css/challenge_sign_up.css" type="text/css">
+    <!--<link href="challenge_sign_up.css" type="text/css" rel="stylesheet" >-->
     <style type="text/css"></style>
     <script src="https://file.ourbeibei.com/l_e/static/node_modules/vue/dist/vue.js"></script>
     <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
@@ -29,7 +30,7 @@
             </div>
 
         </div>
-        <img class="learn-img" src="../images/ic_try.png" alt="" v-on:click="onLearningClick()">
+        <img class="learn-img" src="https://file.ourbeibei.com/l_e/static/images/ic_try.png" alt="" v-on:click="onLearningClick()">
     </div>
 
     <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_1.png" alt="">
@@ -45,7 +46,7 @@
         <span class="min-text">最终解释权归背呗背单词所有</span>
     </div>
 
-    <div class="bottom-button-container">
+    <div class="bottom-button-container" v-if="status === 'no'">
         <div class="flex-container" v-if="signType === 'formal'">
             <span class="money-text pink">￥29.9</span>
             <div class="info-text-container">
@@ -63,7 +64,7 @@
         <div class="dialog-container">
             <span class="label-text">还在犹豫？<span>联系督学老师了解下</span></span>
             <div class="portrait-container">
-                <img src="../images/img_portrait_tmp.png" alt="">
+                <img src="https://file.ourbeibei.com/l_e/static/images/img_portrait_tmp.png" alt="">
             </div>
             <button class="pay-button" v-on:click="">重新支付</button>
             <button class="chat-button" v-on:click="onTeacherTap()">跟TA聊聊</button>
@@ -75,5 +76,6 @@
     </div>
 </div>
 <script src="https://file.ourbeibei.com/l_e/static/js/challenge_sign_up.js"></script>
+<!--<script src="challenge_sign_up.js"></script>-->
 </body>
 </html>

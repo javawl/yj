@@ -369,6 +369,13 @@
       <version>2.5</version>
     </dependency>
     <!-- 跨域过滤器相关 -->
+    <!--微信公众号自动回复-->
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.4.9</version>
+    </dependency>
+
 
   </dependencies>
 
