@@ -3795,7 +3795,6 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
-
     //预约成功老师页
     public ServerResponse<Map<String,Object>> reservedWxPlatformChallengeTeacherPage(HttpServletRequest request){
         String token = request.getHeader("token");

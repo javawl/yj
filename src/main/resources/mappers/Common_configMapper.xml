@@ -1477,7 +1477,7 @@
     (SELECT  *
     FROM `wechat_platform_challenge_contestants`
     WHERE `user_id` = #{user_id}) tb
-    WHERE `wechat_platform_challenge_contestants`.wechat_platform_challenge_id = wechat_platform_challenge.id
+    WHERE tb.wechat_platform_challenge_id = wechat_platform_challenge.id
     AND wechat_platform_challenge.et > #{now_time}
     LIMIT 1
   </select>
