@@ -19,31 +19,34 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 </head>
 <body>
-<div id="app" class="container">
-    <div style="position:relative;width: 100%;">
-        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_header_challenge.png" alt="">
-        <div class="end-time-container" v-if="signType === 'formal'">
-            <span class="normal-text">第{{periods}}期报名开启</span>
-            <div class="end-time">
-                <span class="normal-text">仅剩{{rest_number}}个名额</span>
-                <span class="normal-text" style="margin-left: 1rem">{{hours}}:{{minutes}}:{{seconds}}</span>
+<div id="app">
+    <div class="container">
+        <!--可滚动元素-->
+        <div style="position:relative;width: 100%;">
+            <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_header_challenge.png" alt="">
+            <div class="end-time-container" v-if="signType === 'formal'">
+                <span class="normal-text">第{{periods}}期报名开启</span>
+                <div class="end-time">
+                    <span class="normal-text">仅剩{{rest_number}}个名额</span>
+                    <span class="normal-text" style="margin-left: 1rem">{{hours}}:{{minutes}}:{{seconds}}</span>
+                </div>
+
             </div>
-
+            <img class="learn-img" src="https://file.ourbeibei.com/l_e/static/images/ic_try.png" alt="" v-on:click="onLearningClick()">
         </div>
-        <img class="learn-img" src="https://file.ourbeibei.com/l_e/static/images/ic_try.png" alt="" v-on:click="onLearningClick()">
-    </div>
 
-    <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_1.png" alt="">
-    <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_2.png" alt="">
-    <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_3.png" alt="">
-    <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_4.png" alt="">
-    <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_5.png" alt="">
-    <div style="position: relative;width: 100%;">
-        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_6.png" alt="">
-        <div style="text-align: center;width: 100%;display: flex;justify-content: center">
-            <span class="text-container normal-text" v-if="signType === 'formal'">仅剩&nbsp<span class="larger-text">{{rest_number}}</span>&nbsp个名额</span>
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_1.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_2.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_3.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_4.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_5.png" alt="">
+        <div style="position: relative;width: 100%;">
+            <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_6.png" alt="">
+            <div style="text-align: center;width: 100%;display: flex;justify-content: center">
+                <span class="text-container normal-text" v-if="signType === 'formal'">仅剩&nbsp<span class="larger-text">{{rest_number}}</span>&nbsp个名额</span>
+            </div>
+            <span class="min-text">最终解释权归背呗背单词所有</span>
         </div>
-        <span class="min-text">最终解释权归背呗背单词所有</span>
     </div>
 
     <div class="bottom-button-container" v-if="status === 'no'">
@@ -66,13 +69,11 @@
             <div class="portrait-container">
                 <img src="https://file.ourbeibei.com/l_e/static/images/img_portrait_tmp.png" alt="">
             </div>
-            <button class="pay-button" v-on:click="">重新支付</button>
+            <button class="pay-button" v-on:click="onRepay()">重新支付</button>
             <button class="chat-button" v-on:click="onTeacherTap()">跟TA聊聊</button>
         </div>
 
         <img class="close-img" src="https://file.ourbeibei.com/l_e/static/images/ic_dialog_close.png" alt="" v-on:click="onCloseDialog()">
-
-
     </div>
 </div>
 <script src="https://file.ourbeibei.com/l_e/static/js/challenge_sign_up.js"></script>

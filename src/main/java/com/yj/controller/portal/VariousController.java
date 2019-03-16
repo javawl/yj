@@ -1,5 +1,6 @@
 package com.yj.controller.portal;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
@@ -8,6 +9,7 @@ import com.yj.service.ITokenService;
 import com.yj.service.IVariousService;
 import com.yj.service.impl.VariousServiceImpl;
 import com.yj.util.PayUtils;
+import com.yj.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +31,8 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 /**
  * Created by 63254 on 2018/9/1.
  */
@@ -1018,6 +1018,111 @@ public class VariousController {
         String responseMessage = iVariousService.processRequest(request);
         out.print(responseMessage);
         out.flush();
+    }
+
+
+    /**
+     * 设置底部导航栏
+     */
+    @RequestMapping(value="setWxPlatformMenu.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> setWxPlatformMenu(){
+        //拼凑json
+        Map<Object,Object> mapToJson = new HashMap<>();
+        List<Map<Object,Object>> ButtonList = new ArrayList<>();
+        Map<Object,Object> Button1Map = new HashMap<>();
+        Button1Map.put("name", "福利");
+        List<Map<Object,Object>> Button1 = new ArrayList<>();
+        Map<Object,Object> Button1Children1 = new HashMap<>();
+        Button1Children1.put("type", "view");
+        Button1Children1.put("name", "挑战赛");
+        Button1Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button1.add(Button1Children1);
+        Map<Object,Object> Button1Children2 = new HashMap<>();
+        Button1Children2.put("type", "view");
+        Button1Children2.put("name", "单词挑战");
+        Button1Children2.put("url", "https://www.ourbeibei.com/word_sign_up.jsp");
+        Button1.add(Button1Children2);
+        Map<Object,Object> Button1Children3 = new HashMap<>();
+        Button1Children3.put("type", "view");
+        Button1Children3.put("name", "语境阅读");
+        Button1Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button1.add(Button1Children3);
+        Button1Map.put("sub_button", Button1);
+
+        //背呗  =>  查询成绩、邀你进群、意见投票、商务合作、关于我们
+        Map<Object,Object> Button2Map = new HashMap<>();
+        Button2Map.put("name", "背呗");
+        List<Map<Object,Object>> Button2 = new ArrayList<>();
+        Map<Object,Object> Button2Children1 = new HashMap<>();
+        Button2Children1.put("type", "view");
+        Button2Children1.put("name", "查询成绩");
+        Button2Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button2.add(Button2Children1);
+        Map<Object,Object> Button2Children2 = new HashMap<>();
+        Button2Children2.put("type", "view");
+        Button2Children2.put("name", "邀你进群");
+        Button2Children2.put("url", "https://www.ourbeibei.com/word_sign_up.jsp");
+        Button2.add(Button2Children2);
+        Map<Object,Object> Button2Children3 = new HashMap<>();
+        Button2Children3.put("type", "view");
+        Button2Children3.put("name", "意见投票");
+        Button2Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2.add(Button2Children3);
+        Map<Object,Object> Button2Children4 = new HashMap<>();
+        Button2Children4.put("type", "view");
+        Button2Children4.put("name", "商务合作");
+        Button2Children4.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2.add(Button2Children4);
+        Map<Object,Object> Button2Children5 = new HashMap<>();
+        Button2Children5.put("type", "view");
+        Button2Children5.put("name", "关于我们");
+        Button2Children5.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2.add(Button2Children5);
+        Button2Map.put("sub_button", Button2);
+
+        //最终插入
+        ButtonList.add(Button1Map);
+        ButtonList.add(Button2Map);
+        mapToJson.put("button", ButtonList);
+
+
+        String menu = JSONObject.toJSONString(mapToJson);
+        //获取AccessToken
+        String normalAccessToken = "";
+        //将access_token取出
+        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
+        if (normalAccessTokenJsonObject.isEmpty()){
+            //判断抓取网页是否为空
+            return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
+        }else {
+            Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
+            if (normalAccessTokenFail){
+                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(normalAccessTokenJsonObject.get("errcode").toString()),"获取普通的AccessToken时异常"+normalAccessTokenJsonObject.get("errmsg").toString());
+            }else {
+                //没有报错，我们去吧ticket搞出来
+                normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
+            }
+        }
+
+        String requestSetMenuAccessTokenUrlParam = String.format("access_token=%s", normalAccessToken);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.sendPost( WxConfig.wx_platform_set_menu_url, requestSetMenuAccessTokenUrlParam ));
+        if (SetMenuJsonObject.isEmpty()){
+            //判断抓取网页是否为空
+            return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
+        }else {
+            Boolean SetMenuFail = SetMenuJsonObject.containsKey("errcode");
+            if (SetMenuFail){
+                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(SetMenuJsonObject.get("errcode").toString()),"获取普通的AccessToken时异常"+SetMenuJsonObject.get("errmsg").toString());
+            }else {
+                //没有报错，我们去吧ticket搞出来
+                normalAccessToken = SetMenuJsonObject.get("access_token").toString();
+            }
+        }
+        return null;
     }
 
 
