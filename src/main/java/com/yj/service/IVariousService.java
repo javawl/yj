@@ -136,6 +136,9 @@ public interface IVariousService {
     //微信公众号首次验证消息的确来自微信服务器
     void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response);
 
+    //公众号自动回复
+    String processRequest(HttpServletRequest request);
+
     //添加unionid
     ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request);
 

@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1004,6 +1005,19 @@ public class VariousController {
     public void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response){
         //调用service层
         iVariousService.checkWechatPlatform(signature, timestamp, nonce, echostr, response);
+    }
+
+
+    /**
+     * 接受信息发送信息
+     */
+    @RequestMapping(value="checkWechatPlatform.do", method = RequestMethod.POST)
+    @ResponseBody
+    public void sendWxPlatformMsg(PrintWriter out, HttpServletRequest request){
+        //调用service层
+        String responseMessage = iVariousService.processRequest(request);
+        out.print(responseMessage);
+        out.flush();
     }
 
 

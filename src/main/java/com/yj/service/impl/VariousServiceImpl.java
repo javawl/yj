@@ -9,14 +9,12 @@ import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IVariousService;
-import com.yj.util.IpUtils;
-import com.yj.util.PayUtils;
-import com.yj.util.ReplyMessage;
-import com.yj.util.WechatPlatformUtil;
+import com.yj.util.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContexts;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.jws.Oneway;
 import javax.net.ssl.SSLContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -2791,6 +2790,32 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+    //接受信息
+    public String processRequest(HttpServletRequest request) {
+        Map<String, String> map = WechatMessageUtil.xmlToMap(request);
+        // 发送方帐号（一个OpenID）
+        String fromUserName = map.get("FromUserName");
+        // 开发者微信号
+        String toUserName = map.get("ToUserName");
+        // 消息类型
+        String msgType = map.get("MsgType");
+        // 默认回复一个"success"
+        String responseMessage = "success";
+        // 对消息进行处理
+        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+            TextMessage textMessage = new TextMessage();
+            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+            textMessage.setToUserName(fromUserName);
+            textMessage.setFromUserName(toUserName);
+            textMessage.setCreateTime(System.currentTimeMillis());
+            textMessage.setContent("我已经受到你发来的消息了");
+            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+        }
+        return responseMessage;
+    }
+
+
+
     //添加unionid
     public ServerResponse<String> setUserUnionId(String portrait, String username, String unionid, HttpServletRequest request){
         String token = request.getHeader("token");
@@ -3860,94 +3885,6 @@ public class VariousServiceImpl implements IVariousService {
         return ServerResponse.createBySuccess("成功！",response);
     }
 
-
-    public void replyWxPlatformMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        // 当你用微信给平台发送信息时就会到这里
-//        // 回复音乐和图文消息，我都写死了，自己可以根据自己的需要加相应的处理
-//        request.setCharacterEncoding("UTF-8");
-//        response.setContentType("text/html;charset=UTF-8");
-//        PrintWriter pw = response.getWriter();
-//        String wxMsgXml = IOUtils.toString(request.getInputStream(), "utf-8");
-//        RequestTextMessage textMsg = new RequestTextMessage();
-//        String event = null;
-//        StringBuffer replyMsg = new StringBuffer();
-//        String returnXml = null;
-//        //UserPro p = new UserPro();
-//        try {
-//            textMsg = ReplyMessage.getRequestTextMessage(wxMsgXml);
-//            event = textMsg.getEvent();
-//            String openID = textMsg.getFromUserName().toString();
-//
-//
-//            if (textMsg.getEvent() != null) {
-//                // 获取用户基本信息
-//                if (textMsg != null && event.equals("subscribe")) {
-//                    //Info info = p.userProcessing(openID);
-//                    // 保存微信用户基本信息
-//                    //chatService.savaUserInfo(info);
-//                    // 保存微信用户openid到用户管理
-//                    sysUserService.saveOpenid(openID);
-//
-//                    List<Enter> chatList = new ArrayList<Enter>();
-//                    chatList = chatService.queryChat();
-//                    replyMsg.append("欢迎使用微信平台！");
-//                    // 查询数据库,关注回复欢迎语
-//                    for (int i = 0; i < chatList.size(); i++) {
-//                        replyMsg.append(
-//                                "\r\n" + chatList.get(i).getKeyWord() + "、" + chatList.get(i).getEnterContent() + "");
-//                        returnXml = ReplyMessage.getReplyTextMessage(replyMsg.toString(), textMsg.getFromUserName(),
-//                                textMsg.getToUserName());
-//                    }
-//                } else {//取消关注删除用户信息
-//                    //chatService.deleteUserInfo(textMsg.getFromUserName());
-//                    sysUserService.deleteUserByOpenId(openID);
-//                }
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (textMsg.getContent() != null) {
-//
-//
-//            //StringBuffer replyMsg = new StringBuffer();
-//            String receive = textMsg.getContent().trim();
-//            //String returnXml = null;
-//            if (receive.equals("1")) {
-//                // 回复音乐信息
-//                returnXml = ReplyMessage.getReplyMusicMessage(textMsg.getFromUserName(), textMsg.getToUserName());
-//
-//
-//            } else if (receive.equals("3")) {
-//                // 回复图文
-//                returnXml = ReplyMessage.getReplyTuwenMessager(textMsg.getFromUserName(), textMsg.getToUserName());
-//
-//
-//            } else if (receive.equals("2")) {
-//                // 回复时间
-//                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//
-//
-//                replyMsg.append("当前时间\r\n" + df.format(new Date()));
-//                returnXml = ReplyMessage.getReplyTextMessage(replyMsg.toString(), textMsg.getFromUserName(),
-//                        textMsg.getToUserName());
-//            } else {
-//                // 关键字查询
-//                Item item = (Item) chatService.queryImgText(receive);
-//                if (item == null) {
-//                    replyMsg.append("没有此关键字有关的内容,请重新输入");
-//                    returnXml = ReplyMessage.getReplyTextMessage(replyMsg.toString(), textMsg.getFromUserName(),
-//                            textMsg.getToUserName());
-//                } else {
-//                    returnXml = ReplyMessage.getReplyTuwenMessage(textMsg.getFromUserName(), textMsg.getToUserName(),
-//                            item);
-//                }
-//            }
-//            //pw.println(returnXml);
-//        }
-//        pw.println(returnXml);
-    }
 
 
     //------------------------------------------------------------------------------------------------------
