@@ -1434,6 +1434,7 @@
     WHERE `user`.id = tb.user_id
   </select>
 
+
   <select id="showWxPlatformChallengeInsistDay" resultType="map" parameterType="string">
     SELECT `user`.username, `user`.portrait, tb.*
     FROM `user`,
@@ -1499,6 +1500,29 @@
     UPDATE `wechat_platform_challenge`
     set `enrollment` = `enrollment` + 1
     WHERE id = #{id}
+  </update>
+
+
+  <update id="mergeWxPlatformChallengeContestants" parameterType="string">
+    UPDATE wechat_platform_challenge_contestants
+    SET user_id = #{new_user_id}
+      WHERE id in
+        (SELECT tb.id
+         FROM (SELECT `id`
+               FROM wechat_platform_challenge_contestants
+               WHERE user_id = #{user_id}) tb
+        )
+  </update>
+
+  <update id="mergeWxPlatformChallengeReserved" parameterType="string">
+    UPDATE wechat_platform_challenge_reserved
+      SET user_id = #{new_user_id}
+      WHERE id in
+            (SELECT tb.id
+             FROM (SELECT `id`
+                   FROM wechat_platform_challenge_reserved
+                   WHERE user_id = #{user_id}) tb
+            )
   </update>
 
   <insert id="insertWechatPlatformChallenge" parameterType="string">

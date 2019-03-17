@@ -704,6 +704,12 @@ public interface Common_configMapper {
     //修改挑战的报名人数
     int changeWechatPlatformChallengeEnroll(@Param("id") String id);
 
+    //为了合并账号
+    int mergeWxPlatformChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeWxPlatformChallengeReserved(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
     //后台插入万元挑战
     int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
 
@@ -718,6 +724,8 @@ public interface Common_configMapper {
 
     //展示微信号运营活动预约
     List<Map<Object,Object>> showWxPlatformChallengeContestants(@Param("wechat_platform_challenge_id") String  wechat_platform_challenge_id);
+
+
 
     //展示微信号运营活动预约
     Map<Object,Object> showWxPlatformChallengeInsistDay(@Param("wechat_platform_challenge_id") String  wechat_platform_challenge_id, @Param("user_id") String  user_id);

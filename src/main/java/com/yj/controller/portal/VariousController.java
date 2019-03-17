@@ -1028,7 +1028,7 @@ public class VariousController {
     @ResponseBody
     public ServerResponse<String> setWxPlatformMenu(){
         //拼凑json
-        Map<Object,Object> mapToJson = new HashMap<>();
+        Map<String,Object> mapToJson = new HashMap<>();
         List<Map<Object,Object>> ButtonList = new ArrayList<>();
         Map<Object,Object> Button1Map = new HashMap<>();
         Button1Map.put("name", "福利");
@@ -1036,7 +1036,7 @@ public class VariousController {
         Map<Object,Object> Button1Children1 = new HashMap<>();
         Button1Children1.put("type", "view");
         Button1Children1.put("name", "挑战赛");
-        Button1Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button1Children1.put("url", "");
         Button1.add(Button1Children1);
         Map<Object,Object> Button1Children2 = new HashMap<>();
         Button1Children2.put("type", "view");
@@ -1057,27 +1057,27 @@ public class VariousController {
         Map<Object,Object> Button2Children1 = new HashMap<>();
         Button2Children1.put("type", "view");
         Button2Children1.put("name", "查询成绩");
-        Button2Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button2Children1.put("url", "");
         Button2.add(Button2Children1);
         Map<Object,Object> Button2Children2 = new HashMap<>();
         Button2Children2.put("type", "view");
         Button2Children2.put("name", "邀你进群");
-        Button2Children2.put("url", "https://www.ourbeibei.com/word_sign_up.jsp");
+        Button2Children2.put("url", "");
         Button2.add(Button2Children2);
         Map<Object,Object> Button2Children3 = new HashMap<>();
         Button2Children3.put("type", "view");
         Button2Children3.put("name", "意见投票");
-        Button2Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2Children3.put("url", "");
         Button2.add(Button2Children3);
         Map<Object,Object> Button2Children4 = new HashMap<>();
         Button2Children4.put("type", "view");
         Button2Children4.put("name", "商务合作");
-        Button2Children4.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2Children4.put("url", "");
         Button2.add(Button2Children4);
         Map<Object,Object> Button2Children5 = new HashMap<>();
         Button2Children5.put("type", "view");
         Button2Children5.put("name", "关于我们");
-        Button2Children5.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button2Children5.put("url", "");
         Button2.add(Button2Children5);
         Button2Map.put("sub_button", Button2);
 
@@ -1087,7 +1087,6 @@ public class VariousController {
         mapToJson.put("button", ButtonList);
 
 
-        String menu = JSONObject.toJSONString(mapToJson);
         //获取AccessToken
         String normalAccessToken = "";
         //将access_token取出
@@ -1107,22 +1106,15 @@ public class VariousController {
             }
         }
 
-        String requestSetMenuAccessTokenUrlParam = String.format("access_token=%s", normalAccessToken);
+
         //发送post请求读取调用微信接口获取openid用户唯一标识
-        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.sendPost( WxConfig.wx_platform_set_menu_url, requestSetMenuAccessTokenUrlParam ));
+        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.mapPost( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken,  mapToJson));
         if (SetMenuJsonObject.isEmpty()){
             //判断抓取网页是否为空
             return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
         }else {
-            Boolean SetMenuFail = SetMenuJsonObject.containsKey("errcode");
-            if (SetMenuFail){
-                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(SetMenuJsonObject.get("errcode").toString()),"获取普通的AccessToken时异常"+SetMenuJsonObject.get("errmsg").toString());
-            }else {
-                //没有报错，我们去吧ticket搞出来
-                normalAccessToken = SetMenuJsonObject.get("access_token").toString();
-            }
+            return ServerResponse.createBySuccess("成功", JSONObject.toJSONString(SetMenuJsonObject));
         }
-        return null;
     }
 
 

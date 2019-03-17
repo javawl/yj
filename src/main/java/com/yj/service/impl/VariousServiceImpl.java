@@ -2799,6 +2799,8 @@ public class VariousServiceImpl implements IVariousService {
         String toUserName = map.get("ToUserName");
         // 消息类型
         String msgType = map.get("MsgType");
+        // 消息内容
+        String Content = map.get("Content");
         // 默认回复一个"success"
         String responseMessage = "success";
         // 对消息进行处理
@@ -2832,14 +2834,58 @@ public class VariousServiceImpl implements IVariousService {
 //            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
 //        }
 
-        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+        if (Content.equals("背呗")){
             TextMessage textMessage = new TextMessage();
             textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
             textMessage.setToUserName(fromUserName);
             textMessage.setFromUserName(toUserName);
             textMessage.setCreateTime(System.currentTimeMillis());
-            textMessage.setContent("哦~你好鸭！");
+            textMessage.setContent("李叫人家名字干嘛鸭！");
             responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+        }else if (Content.equals("背单词")) {// 文本消息
+            TextMessage textMessage = new TextMessage();
+            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+            textMessage.setToUserName(fromUserName);
+            textMessage.setFromUserName(toUserName);
+            textMessage.setCreateTime(System.currentTimeMillis());
+            textMessage.setContent("天哪噜！你是大学霸嘛？");
+            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+        }else if (Content.equals("1")) {// 文本消息
+            TextMessage textMessage = new TextMessage();
+            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+            textMessage.setToUserName(fromUserName);
+            textMessage.setFromUserName(toUserName);
+            textMessage.setCreateTime(System.currentTimeMillis());
+            textMessage.setContent("好的呢，收到！Sir");
+            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+        }else if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+            java.util.Random rd = new java.util.Random();
+            int sj = rd.nextInt(2)+1;
+            if (sj == 1){
+                TextMessage textMessage = new TextMessage();
+                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+                textMessage.setToUserName(fromUserName);
+                textMessage.setFromUserName(toUserName);
+                textMessage.setCreateTime(System.currentTimeMillis());
+                textMessage.setContent("汪汪汪");
+                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+            }else if (sj == 2){
+                TextMessage textMessage = new TextMessage();
+                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+                textMessage.setToUserName(fromUserName);
+                textMessage.setFromUserName(toUserName);
+                textMessage.setCreateTime(System.currentTimeMillis());
+                textMessage.setContent("干嘛鸭！怎么不背单词了鸭");
+                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+            }else {
+                TextMessage textMessage = new TextMessage();
+                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+                textMessage.setToUserName(fromUserName);
+                textMessage.setFromUserName(toUserName);
+                textMessage.setCreateTime(System.currentTimeMillis());
+                textMessage.setContent("哦~你好鸭！");
+                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+            }
         }
         return responseMessage;
     }
@@ -2881,12 +2927,10 @@ public class VariousServiceImpl implements IVariousService {
                     //有的话做一下合并
                     String newUserId = newWechatPlatformUser.get("id").toString();
                     //todo 将公众号的记录的id全部转成当前的uid完成账号合并
-
-
-
-
-
-
+                    //合并参加者
+                    common_configMapper.mergeWxPlatformChallengeContestants(uid, newUserId);
+                    //合并预约者
+                    common_configMapper.mergeWxPlatformChallengeReserved(uid, newUserId);
                     //插入unionid
                     userMapper.update_username_portrait_unionid(uid, portrait, username, unionid);
                 }
@@ -3075,7 +3119,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + wechat_challenge_challenge_id + "_" + uid + "_" + "wx_platform" + "_" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "2990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -3109,7 +3153,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_platform_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
-                response.put("studentId", "1" + uid);
+                response.put("studentId", "2990" + uid);
                 response.put("st", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
                 response.put("et", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
                 //找到老师2
