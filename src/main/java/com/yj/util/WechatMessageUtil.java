@@ -68,7 +68,7 @@ public class WechatMessageUtil {
     /**
      * 事件推送消息中,自定义菜单事件,点击菜单拉取消息时的事件推送
      */
-    public static final String MESSAGE_EVENT_CLICK = "CLICK";
+    public static final String MESSAGE_EVENT_CLICK = "click";
     /**
      * 事件推送消息中,自定义菜单事件,点击菜单跳转链接时的事件推送
      */

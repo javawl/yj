@@ -517,6 +517,7 @@
     SELECT username,portrait,invite_reward,id as user_id
     FROM `user`
     ORDER BY invite_reward DESC,last_login DESC
+    LIMIT 50
   </select>
 
   <select id="getWordChallengeId" resultType="string">

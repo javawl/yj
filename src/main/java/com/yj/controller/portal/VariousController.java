@@ -10,6 +10,7 @@ import com.yj.service.IVariousService;
 import com.yj.service.impl.VariousServiceImpl;
 import com.yj.util.PayUtils;
 import com.yj.util.UrlUtil;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1026,18 +1027,18 @@ public class VariousController {
      */
     @RequestMapping(value="setWxPlatformMenu.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<JSONObject> setWxPlatformMenu(){
+    public ServerResponse<String> setWxPlatformMenu(){
         //拼凑json
         Map<String,Object> mapToJson = new HashMap<>();
         List<Map<Object,Object>> ButtonList = new ArrayList<>();
         Map<Object,Object> Button1Map = new HashMap<>();
         Button1Map.put("name", "福利");
         List<Map<Object,Object>> Button1 = new ArrayList<>();
-        Map<Object,Object> Button1Children1 = new HashMap<>();
-        Button1Children1.put("type", "view");
-        Button1Children1.put("name", "挑战赛");
-        Button1Children1.put("url", "");
-        Button1.add(Button1Children1);
+//        Map<Object,Object> Button1Children1 = new HashMap<>();
+//        Button1Children1.put("type", "view");
+//        Button1Children1.put("name", "挑战赛");
+//        Button1Children1.put("url", "");
+//        Button1.add(Button1Children1);
         Map<Object,Object> Button1Children2 = new HashMap<>();
         Button1Children2.put("type", "view");
         Button1Children2.put("name", "单词挑战");
@@ -1058,30 +1059,30 @@ public class VariousController {
         Map<Object,Object> Button2Map = new HashMap<>();
         Button2Map.put("name", "背呗");
         List<Map<Object,Object>> Button2 = new ArrayList<>();
-        Map<Object,Object> Button2Children1 = new HashMap<>();
-        Button2Children1.put("type", "view");
-        Button2Children1.put("name", "查询成绩");
-        Button2Children1.put("url", "");
-        Button2.add(Button2Children1);
-        Map<Object,Object> Button2Children2 = new HashMap<>();
-        Button2Children2.put("type", "view");
-        Button2Children2.put("name", "邀你进群");
-        Button2Children2.put("url", "");
-        Button2.add(Button2Children2);
-        Map<Object,Object> Button2Children3 = new HashMap<>();
-        Button2Children3.put("type", "view");
-        Button2Children3.put("name", "意见投票");
-        Button2Children3.put("url", "");
-        Button2.add(Button2Children3);
-        Map<Object,Object> Button2Children4 = new HashMap<>();
-        Button2Children4.put("type", "view");
-        Button2Children4.put("name", "商务合作");
-        Button2Children4.put("url", "");
-        Button2.add(Button2Children4);
+//        Map<Object,Object> Button2Children1 = new HashMap<>();
+//        Button2Children1.put("type", "view");
+//        Button2Children1.put("name", "查询成绩");
+//        Button2Children1.put("url", "");
+//        Button2.add(Button2Children1);
+//        Map<Object,Object> Button2Children2 = new HashMap<>();
+//        Button2Children2.put("type", "view");
+//        Button2Children2.put("name", "邀你进群");
+//        Button2Children2.put("url", "");
+//        Button2.add(Button2Children2);
+//        Map<Object,Object> Button2Children3 = new HashMap<>();
+//        Button2Children3.put("type", "view");
+//        Button2Children3.put("name", "意见投票");
+//        Button2Children3.put("url", "");
+//        Button2.add(Button2Children3);
+//        Map<Object,Object> Button2Children4 = new HashMap<>();
+//        Button2Children4.put("type", "view");
+//        Button2Children4.put("name", "商务合作");
+//        Button2Children4.put("url", "");
+//        Button2.add(Button2Children4);
         Map<Object,Object> Button2Children5 = new HashMap<>();
-        Button2Children5.put("type", "view");
-        Button2Children5.put("name", "关于我们");
-        Button2Children5.put("url", "");
+        Button2Children5.put("type", "click");
+        Button2Children5.put("name", "关于背呗");
+        Button2Children5.put("key", "about_beibei");
         Button2.add(Button2Children5);
         Button2Map.put("sub_button", Button2);
 
@@ -1089,8 +1090,6 @@ public class VariousController {
         ButtonList.add(Button1Map);
         ButtonList.add(Button2Map);
         mapToJson.put("button", ButtonList);
-
-//        return ServerResponse.createBySuccess("成功", JSONObject.parseObject(JSON.toJSONString(mapToJson)));
 
         //获取AccessToken
         String normalAccessToken = "";
@@ -1111,16 +1110,87 @@ public class VariousController {
             }
         }
 
-
         //发送post请求读取调用微信接口获取openid用户唯一标识
-        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.jsonPost( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(mapToJson))));
-        if (SetMenuJsonObject.isEmpty()){
+        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken, JSONObject.parseObject(JSON.toJSONString(mapToJson)));
+        return ServerResponse.createBySuccess("成功", JSONObject.toJSONString(test));
+    }
+
+
+    /**
+     * 获取素材列表
+     */
+    @RequestMapping(value="getSucaiList.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<JSONObject> getSucaiList(){
+
+        //获取AccessToken
+        String normalAccessToken = "";
+        //将access_token取出
+        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
+        if (normalAccessTokenJsonObject.isEmpty()){
             //判断抓取网页是否为空
             return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
         }else {
-            return ServerResponse.createBySuccess("成功", SetMenuJsonObject);
+            Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
+            if (normalAccessTokenFail){
+                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(normalAccessTokenJsonObject.get("errcode").toString()),"获取普通的AccessToken时异常"+normalAccessTokenJsonObject.get("errmsg").toString());
+            }else {
+                //没有报错，我们去吧ticket搞出来
+                normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
+            }
         }
+
+        //获取图文消息
+        Map<Object,Object> pic_txt = new HashMap<>();
+        pic_txt.put("type", "news");
+        pic_txt.put("offset", 13);
+        pic_txt.put("count", 1);
+
+        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+
+        //获取单篇的图文消息
+        return ServerResponse.createBySuccess("成功", test);
     }
+
+
+    /**
+     * 获取单个素材
+     */
+    @RequestMapping(value="getSingleSucaiList.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<JSONObject> getSingleSucaiList(){
+
+        //获取AccessToken
+        String normalAccessToken = "";
+        //将access_token取出
+        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
+        if (normalAccessTokenJsonObject.isEmpty()){
+            //判断抓取网页是否为空
+            return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
+        }else {
+            Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
+            if (normalAccessTokenFail){
+                return ServerResponse.createByErrorCodeMessage(Integer.valueOf(normalAccessTokenJsonObject.get("errcode").toString()),"获取普通的AccessToken时异常"+normalAccessTokenJsonObject.get("errmsg").toString());
+            }else {
+                //没有报错，我们去吧ticket搞出来
+                normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
+            }
+        }
+
+        //获取图文消息
+        Map<Object,Object> pic_txt = new HashMap<>();
+        pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
+
+        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+
+        //获取单篇的图文消息
+        return ServerResponse.createBySuccess("成功", test);
+    }
+
 
 
     /**

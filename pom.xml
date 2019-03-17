@@ -376,6 +376,12 @@
       <version>1.4.9</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.spec.javax.net.ssl</groupId>
+      <artifactId>jboss-jsse-api_8.0_spec</artifactId>
+      <version>1.0.0.Final</version>
+    </dependency>
+
 
   </dependencies>
 

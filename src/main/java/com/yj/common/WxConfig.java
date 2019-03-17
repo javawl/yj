@@ -10,6 +10,8 @@ public class WxConfig {
     public static final String wx_platform_jsapi_ticket = "https://api.weixin.qq.com/cgi-bin/ticket/getticket";   //微信公众号获取jsapi_ticket
     public static final String wx_platform_normal_access_token_url = "https://api.weixin.qq.com/cgi-bin/token";   //微信公众号获取普通的AccessToken
     public static final String wx_platform_set_menu_url = "https://api.weixin.qq.com/cgi-bin/menu/create";   //微信公众号设置菜单
+    public static final String wx_platform_get_pic_txt = "https://api.weixin.qq.com/cgi-bin/material/batchget_material";   //微信公众号获取图文素材
+    public static final String wx_platform_get_pic_txt_single = "https://api.weixin.qq.com/cgi-bin/material/get_material";   //微信公众号获取图文素材(单个
     public static final String wx_platform_make_signature_url = "https://www.ourbeibei.com/book_sign_up.jsp";   //生成signature的地址
     public static final String wx_platform_unionId_url = "https://api.weixin.qq.com/sns/userinfo";   //微信公众号unionId登录地址
     public static final String qr_code_m_program = "https://api.weixin.qq.com/wxa/getwxacodeunlimit";   //B类小程序码地址

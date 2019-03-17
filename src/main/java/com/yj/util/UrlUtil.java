@@ -1,13 +1,17 @@
 package com.yj.util;
 
 import com.alibaba.fastjson.JSONObject;
+
+import java.net.*;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -17,8 +21,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
@@ -140,71 +142,55 @@ public class UrlUtil {
     }
 
 
-    /*入参说明
-     *
-     * param url 请求地址
-     * param jsonObject	请求的json数据
-     * param encoding	编码格式
-     *
-     * */
-    public static String jsonPost(String url,JSONObject jsonObject){
-        String encoding = "utf-8";
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(url);
-        String response = null;
+    /**
+     * 向指定URL发送post方法的请求，请求内容为json格式的字符串
+     * @param urlString
+     * @param jsonObject
+     * @return JSONObject 直接返回json对象
+     */
+    public static JSONObject postJson(String urlString ,JSONObject jsonObject) {
+        JSONObject returnJson = null;
         try {
-            StringEntity s = new StringEntity(jsonObject.toString());
-            s.setContentEncoding(encoding);
-            s.setContentType("application/json");//发送json数据需要设置contentType
-            post.setEntity(s);
-            HttpResponse res = httpclient.execute(post);
-            if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
-                String result = EntityUtils.toString(res.getEntity());// 返回json格式：
-                response = JSONObject.toJSONString(result);
+            // 创建连接
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Content-Type","application/json;charset=UTF-8");//**注意点1**，需要此格式，后边这个字符集可以不设置
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(
+                    connection.getOutputStream());
+            out.write(jsonObject.toString().getBytes("UTF-8"));//**注意点2**，需要此格式
+            out.flush();
+            out.close();
+            // 读取响应
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream(),"utf-8"));//**注意点3**，需要此格式
+            String lines;
+            StringBuffer sb = new StringBuffer("");
+            while ((lines = reader.readLine()) != null) {
+                sb.append(lines);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("sb:"+sb);
+            returnJson = JSONObject.parseObject(sb.toString());
+            reader.close();
+            // 断开连接
+            connection.disconnect();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return response;
+        return returnJson;
     }
 
 
-    /*入参说明
-     *
-     * param url 请求地址
-     * param map	请求的map数据
-     * param encoding	编码格式
-     *
-     * */
-    public static String mapPost(String url, Map<String,Object> map){
-        String encoding = "utf-8";
-        CloseableHttpClient httpClient = null;
-        HttpPost httpPost = null;
-        String result = null;
-        try{
-            httpClient = HttpClients.createDefault();
-            httpPost = new HttpPost(url);
-            //设置参数
-            List<NameValuePair> list = new ArrayList<NameValuePair>();
-            Iterator iterator = map.entrySet().iterator();
-            while(iterator.hasNext()){
-                Map.Entry<String,String> elem = (Map.Entry<String, String>) iterator.next();
-                list.add(new BasicNameValuePair(elem.getKey(),String.valueOf(elem.getValue())));
-            }
-            if(list.size() > 0){
-                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list,encoding);
-                httpPost.setEntity(entity);
-            }
-            HttpResponse response = httpClient.execute(httpPost);
-            if(response != null){
-                HttpEntity resEntity = response.getEntity();
-                if(resEntity != null){
-                    result = EntityUtils.toString(resEntity,encoding);
-                }
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-        return result;
-    }
 }
