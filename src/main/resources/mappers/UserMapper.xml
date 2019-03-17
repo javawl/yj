@@ -563,7 +563,7 @@
   </select>
 
   <select id="getNewWechatPlatform" resultType="map" parameterType="string">
-    SELECT id
+    SELECT id,wechat_platform_openid
     FROM `user`
     WHERE `unionid` = #{unionid}
     AND `wechat` = 'WechatPlatform'
@@ -665,6 +665,16 @@
     UPDATE `user`
     set portrait = #{portrait},
     username = #{username},
+    `unionid` = #{unionid}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="update_username_portrait_unionid_platform_id" parameterType="string">
+    UPDATE `user`
+    set portrait = #{portrait},
+    username = #{username},
+    wechat_platform_openid = #{wechat_platform_openid},
     `unionid` = #{unionid}
     WHERE id = #{id}
   </update>

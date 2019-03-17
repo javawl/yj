@@ -2932,7 +2932,7 @@ public class VariousServiceImpl implements IVariousService {
                     //合并预约者
                     common_configMapper.mergeWxPlatformChallengeReserved(uid, newUserId);
                     //插入unionid
-                    userMapper.update_username_portrait_unionid(uid, portrait, username, unionid);
+                    userMapper.update_username_portrait_unionid_platform_id(uid, portrait, username, newWechatPlatformUser.get("wechat_platform_openid").toString(), unionid);
                 }
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");

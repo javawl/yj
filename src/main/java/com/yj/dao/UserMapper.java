@@ -135,6 +135,9 @@ public interface UserMapper {
     //修改个人信息
     int update_username_portrait_unionid(@Param("id") String id, @Param("portrait") String portrait, @Param("username") String username, @Param("unionid") String unionid);
 
+    //修改个人信息
+    int update_username_portrait_unionid_platform_id(@Param("id") String id, @Param("portrait") String portrait, @Param("username") String username, @Param("wechat_platform_openid") String wechat_platform_openid, @Param("unionid") String unionid);
+
     //决定我的计划和单词数和天数
     int decide_plan_user(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
