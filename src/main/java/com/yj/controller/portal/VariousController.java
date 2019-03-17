@@ -1026,7 +1026,7 @@ public class VariousController {
      */
     @RequestMapping(value="setWxPlatformMenu.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<String> setWxPlatformMenu(){
+    public ServerResponse<JSONObject> setWxPlatformMenu(){
         //拼凑json
         Map<String,Object> mapToJson = new HashMap<>();
         List<Map<Object,Object>> ButtonList = new ArrayList<>();
@@ -1049,6 +1049,10 @@ public class VariousController {
         Button1Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
         Button1.add(Button1Children3);
         Button1Map.put("sub_button", Button1);
+
+
+
+
 
         //背呗  =>  查询成绩、邀你进群、意见投票、商务合作、关于我们
         Map<Object,Object> Button2Map = new HashMap<>();
@@ -1086,6 +1090,7 @@ public class VariousController {
         ButtonList.add(Button2Map);
         mapToJson.put("button", ButtonList);
 
+//        return ServerResponse.createBySuccess("成功", JSONObject.parseObject(JSON.toJSONString(mapToJson)));
 
         //获取AccessToken
         String normalAccessToken = "";
@@ -1108,12 +1113,12 @@ public class VariousController {
 
 
         //发送post请求读取调用微信接口获取openid用户唯一标识
-        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.mapPost( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken,  mapToJson));
+        JSONObject SetMenuJsonObject = JSON.parseObject( UrlUtil.jsonPost( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(mapToJson))));
         if (SetMenuJsonObject.isEmpty()){
             //判断抓取网页是否为空
             return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
         }else {
-            return ServerResponse.createBySuccess("成功", JSONObject.toJSONString(SetMenuJsonObject));
+            return ServerResponse.createBySuccess("成功", SetMenuJsonObject);
         }
     }
 
