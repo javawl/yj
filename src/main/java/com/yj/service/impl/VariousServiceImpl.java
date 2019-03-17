@@ -2933,6 +2933,8 @@ public class VariousServiceImpl implements IVariousService {
                     common_configMapper.mergeWxPlatformChallengeReserved(uid, newUserId);
                     //插入unionid
                     userMapper.update_username_portrait_unionid_platform_id(uid, portrait, username, newWechatPlatformUser.get("wechat_platform_openid").toString(), unionid);
+                    //删除微信公众号账号
+                    userMapper.deleteUser(newUserId);
                 }
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
