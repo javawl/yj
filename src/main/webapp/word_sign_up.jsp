@@ -29,7 +29,7 @@
         <!--<span class="label-rule">规则详情</span>-->
         <div class="challenge-label-text">
             <span class="normal-text">已有</span>
-            <span class="huge-text">{{people}}}</span>
+            <span class="huge-text">{{people}}</span>
             <span class="normal-text">人参加挑战</span>
         </div>
         <!--<div class="invite-container">-->

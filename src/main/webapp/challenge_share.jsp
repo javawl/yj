@@ -15,6 +15,7 @@
     <style type="text/css"></style>
     <script src="https://file.ourbeibei.com/l_e/static/node_modules/vue/dist/vue.js"></script>
     <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
     <title>背呗背单词</title>
 </head>
 <body>
@@ -32,7 +33,7 @@
                 <div class="huge-text-container">
                     <span class="white">坚持打卡瓜分</span><span class="yellow">万元现金</span>
                 </div>
-                <div class="min-text white">活动倒计时：{{hours}}:{{minutes}}:{{seconds}}</div>
+                <!--<div class="min-text white">活动倒计时：{{hours}}:{{minutes}}:{{seconds}}</div>-->
             </div>
 
             <div class="qr-code-container">
