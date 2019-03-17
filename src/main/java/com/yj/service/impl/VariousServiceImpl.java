@@ -2804,89 +2804,89 @@ public class VariousServiceImpl implements IVariousService {
         // 默认回复一个"success"
         String responseMessage = "success";
         // 对消息进行处理
-//        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
-//            TextMessage textMessage = new TextMessage();
-//            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-//            textMessage.setToUserName(fromUserName);
-//            textMessage.setFromUserName(toUserName);
-//            textMessage.setCreateTime(System.currentTimeMillis());
-//            textMessage.setContent("Hello~小可爱~~\n" +
-//                    "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
+        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+            TextMessage textMessage = new TextMessage();
+            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+            textMessage.setToUserName(fromUserName);
+            textMessage.setFromUserName(toUserName);
+            textMessage.setCreateTime(System.currentTimeMillis());
+            textMessage.setContent("Hello~小可爱~~\n" +
+                    "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
 //                    "\n" +
 //                    "【背呗挑战赛】\n" +
 //                    "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
 //                    "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
 //                    "补贴名额有限，快快猛戳报名<a href='https://www.ourbeibei.com/challenge_sign_up.jsp'><链接1></a>\n" +
-//                    "\n" +
-//                    "【单词挑战】\n" +
-//                    "如果29.9还嫌太多，试试9.9？\n" +
-//                    "坚持背单词28天，不仅可以领回9.9，还可以一起瓜分剩余挑战金！！！\n" +
-//                    "有人领了100元，有人领了80元，看看你能领多少！\n" +
-//                    "本期挑战即将开始！！\n" +
-//                    "<a href='https://www.ourbeibei.com/word_sign_up.jsp'><链接2></a>快快戳我报名吧！！背呗在这里等你\n" +
-//                    "\n" +
-//                    "【语境阅读】\n" +
-//                    "每天10分钟，60天读完1-5本英语原著\n" +
-//                    "领略外国文学魅力的同时，听说读写能力得到全面提升\n" +
-//                    "小说难度分级，班群交流学习，老师全程解答，帮你扫除阅读障碍！！\n" +
-//                    "坚持每天打卡还能领回全部学费哟~~\n" +
-//                    "还犹豫什么呢？快戳此报名<a href='https://www.ourbeibei.com/book_sign_up.jsp'><链接3></a>\n");
-//            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-//        }
-
-        if (Content.equals("背呗")){
-            TextMessage textMessage = new TextMessage();
-            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-            textMessage.setToUserName(fromUserName);
-            textMessage.setFromUserName(toUserName);
-            textMessage.setCreateTime(System.currentTimeMillis());
-            textMessage.setContent("李叫人家名字干嘛鸭！");
+                    "\n" +
+                    "【单词挑战】\n" +
+                    "如果29.9还嫌太多，试试9.9？\n" +
+                    "坚持背单词28天，不仅可以领回9.9，还可以一起瓜分剩余挑战金！！！\n" +
+                    "有人领了100元，有人领了80元，看看你能领多少！\n" +
+                    "本期挑战即将开始！！\n" +
+                    "<a href='http://www.ourbeibei.com/word_sign_up.jsp'><链接2></a>快快戳我报名吧！！背呗在这里等你\n" +
+                    "\n" +
+                    "【语境阅读】\n" +
+                    "每天10分钟，60天读完1-5本英语原著\n" +
+                    "领略外国文学魅力的同时，听说读写能力得到全面提升\n" +
+                    "小说难度分级，班群交流学习，老师全程解答，帮你扫除阅读障碍！！\n" +
+                    "坚持每天打卡还能领回全部学费哟~~\n" +
+                    "还犹豫什么呢？快戳此报名<a href='http://www.ourbeibei.com/book_sign_up.jsp'><链接3></a>\n");
             responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-        }else if (Content.equals("背单词")) {// 文本消息
-            TextMessage textMessage = new TextMessage();
-            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-            textMessage.setToUserName(fromUserName);
-            textMessage.setFromUserName(toUserName);
-            textMessage.setCreateTime(System.currentTimeMillis());
-            textMessage.setContent("天哪噜！你是大学霸嘛？");
-            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-        }else if (Content.equals("1")) {// 文本消息
-            TextMessage textMessage = new TextMessage();
-            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-            textMessage.setToUserName(fromUserName);
-            textMessage.setFromUserName(toUserName);
-            textMessage.setCreateTime(System.currentTimeMillis());
-            textMessage.setContent("好的呢，收到！Sir");
-            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-        }else if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
-            java.util.Random rd = new java.util.Random();
-            int sj = rd.nextInt(2)+1;
-            if (sj == 1){
-                TextMessage textMessage = new TextMessage();
-                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-                textMessage.setToUserName(fromUserName);
-                textMessage.setFromUserName(toUserName);
-                textMessage.setCreateTime(System.currentTimeMillis());
-                textMessage.setContent("汪汪汪");
-                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-            }else if (sj == 2){
-                TextMessage textMessage = new TextMessage();
-                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-                textMessage.setToUserName(fromUserName);
-                textMessage.setFromUserName(toUserName);
-                textMessage.setCreateTime(System.currentTimeMillis());
-                textMessage.setContent("干嘛鸭！怎么不背单词了鸭");
-                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-            }else {
-                TextMessage textMessage = new TextMessage();
-                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-                textMessage.setToUserName(fromUserName);
-                textMessage.setFromUserName(toUserName);
-                textMessage.setCreateTime(System.currentTimeMillis());
-                textMessage.setContent("哦~你好鸭！");
-                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
-            }
         }
+
+//        if (Content.equals("背呗")){
+//            TextMessage textMessage = new TextMessage();
+//            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//            textMessage.setToUserName(fromUserName);
+//            textMessage.setFromUserName(toUserName);
+//            textMessage.setCreateTime(System.currentTimeMillis());
+//            textMessage.setContent("李叫人家名字干嘛鸭！");
+//            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//        }else if (Content.equals("背单词")) {// 文本消息
+//            TextMessage textMessage = new TextMessage();
+//            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//            textMessage.setToUserName(fromUserName);
+//            textMessage.setFromUserName(toUserName);
+//            textMessage.setCreateTime(System.currentTimeMillis());
+//            textMessage.setContent("天哪噜！你是大学霸嘛？");
+//            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//        }else if (Content.equals("1")) {// 文本消息
+//            TextMessage textMessage = new TextMessage();
+//            textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//            textMessage.setToUserName(fromUserName);
+//            textMessage.setFromUserName(toUserName);
+//            textMessage.setCreateTime(System.currentTimeMillis());
+//            textMessage.setContent("好的呢，收到！Sir");
+//            responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//        }else if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+//            java.util.Random rd = new java.util.Random();
+//            int sj = rd.nextInt(2)+1;
+//            if (sj == 1){
+//                TextMessage textMessage = new TextMessage();
+//                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//                textMessage.setToUserName(fromUserName);
+//                textMessage.setFromUserName(toUserName);
+//                textMessage.setCreateTime(System.currentTimeMillis());
+//                textMessage.setContent("汪汪汪");
+//                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//            }else if (sj == 2){
+//                TextMessage textMessage = new TextMessage();
+//                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//                textMessage.setToUserName(fromUserName);
+//                textMessage.setFromUserName(toUserName);
+//                textMessage.setCreateTime(System.currentTimeMillis());
+//                textMessage.setContent("干嘛鸭！怎么不背单词了鸭");
+//                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//            }else {
+//                TextMessage textMessage = new TextMessage();
+//                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
+//                textMessage.setToUserName(fromUserName);
+//                textMessage.setFromUserName(toUserName);
+//                textMessage.setCreateTime(System.currentTimeMillis());
+//                textMessage.setContent("哦~你好鸭！");
+//                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+//            }
+//        }
         return responseMessage;
     }
 
