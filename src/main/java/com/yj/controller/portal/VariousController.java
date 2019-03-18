@@ -8,8 +8,7 @@ import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
 import com.yj.service.IVariousService;
 import com.yj.service.impl.VariousServiceImpl;
-import com.yj.util.PayUtils;
-import com.yj.util.UrlUtil;
+import com.yj.util.*;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1162,17 +1161,45 @@ public class VariousController {
     @ResponseBody
     public ServerResponse<JSONObject> getSingleSucaiList(){
 
-        //获取AccessToken
-        String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+//        //获取AccessToken
+//        String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+//
+//        //获取图文消息
+//        Map<Object,Object> pic_txt = new HashMap<>();
+//        pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
+//
+//        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+//
+//        //获取单篇的图文消息
+//        return ServerResponse.createBySuccess("成功", test);
 
-        //获取图文消息
-        Map<Object,Object> pic_txt = new HashMap<>();
-        pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
 
-        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+//        //获取AccessToken
+//        String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+//        System.out.println(normalAccessToken);
+//        //获取图文消息
+//        Map<Object,Object> pic_txt = new HashMap<>();
+//        pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
+//        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+//        List<JSONObject> singleNewsList = (List<JSONObject>)test.get("news_item");
+//        List<PlatformNews> newsList = new ArrayList<>();
+//        JSONObject singleNews = singleNewsList.get(0);
+//        PlatformNews platformNews = new PlatformNews();
+//        platformNews.setTitle(singleNews.get("title").toString());
+//        platformNews.setDescription(singleNews.get("digest").toString());
+//        platformNews.setUrl(singleNews.get("url").toString());
+//        platformNews.setPicUrl(singleNews.get("thumb_url").toString());
+//        newsList.add(platformNews);
+//        PlatformNewsMessage platformNewsMessage = new PlatformNewsMessage();
+//        platformNewsMessage.setToUserName("toUserName");
+//        platformNewsMessage.setFromUserName("fromUserName");
+//        platformNewsMessage.setCreateTime(System.currentTimeMillis());
+//        platformNewsMessage.setMsgType(WechatMessageUtil.MESSAGE_NEWS);
+//        platformNewsMessage.setArticles(newsList);
+//        platformNewsMessage.setArticleCount(newsList.size());
+//        System.out.println(WechatMessageUtil.newsMessageToXml(platformNewsMessage));
 
-        //获取单篇的图文消息
-        return ServerResponse.createBySuccess("成功", test);
+        return null;
     }
 
 

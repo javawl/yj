@@ -2884,12 +2884,12 @@ public class VariousServiceImpl implements IVariousService {
                     PlatformNews platformNews = new PlatformNews();
                     platformNews.setTitle(singleNews.get("title").toString());
                     platformNews.setDescription(singleNews.get("digest").toString());
-                    platformNews.setUrl(singleNews.get("url").toString());
                     platformNews.setPicUrl(singleNews.get("thumb_url").toString());
+                    platformNews.setUrl(singleNews.get("url").toString());
                     newsList.add(platformNews);
                     PlatformNewsMessage platformNewsMessage = new PlatformNewsMessage();
-                    platformNewsMessage.setToUserName(toUserName);
-                    platformNewsMessage.setFromUserName(fromUserName);
+                    platformNewsMessage.setToUserName(fromUserName);
+                    platformNewsMessage.setFromUserName(toUserName);
                     platformNewsMessage.setCreateTime(System.currentTimeMillis());
                     platformNewsMessage.setMsgType(WechatMessageUtil.MESSAGE_NEWS);
                     platformNewsMessage.setArticles(newsList);
