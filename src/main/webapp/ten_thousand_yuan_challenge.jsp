@@ -226,7 +226,7 @@
 </body>
 <script>
     function single(id) {
-        window.location.href = "show_read_class_series.jsp?id="+id;
+        window.location.href = "wechat_platform_challenge_member.jsp?id="+id;
     }
     function del(id) {
         if (confirm("你确定要删除？")){

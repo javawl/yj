@@ -166,6 +166,8 @@ public class VariousServiceImpl implements IVariousService {
                     needToReadBookInfo.put("chapter_id", needChapterId);
                     //把开始到现在有多少天放出去
                     result.put("begin_day", beginDay);
+                    //把他的坚持天数放出来
+                    result.put("clock_day", selectBeginningReadClass.get("insist_day").toString());
                     //查看今天需要读的有没有读
                     if (common_configMapper.checkReadClassClockIn(selectBeginningReadClass.get("series_id").toString(), needBookId, id, needChapterId) == null){
                         //今日未打卡

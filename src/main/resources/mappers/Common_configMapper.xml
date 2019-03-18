@@ -754,9 +754,9 @@
   <select id="showSelectBeginReadClassSeries" resultType="map" parameterType="string">
     SELECT tb2.*,read_class.*
     FROM read_class,
-         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id,tb.whether_help
+         (SELECT read_class_series.name,read_class_series.read_class_id,read_class_series.id as series_id,tb.whether_help,tb.insist_day
           FROM read_class_series,
-               (SELECT series_id,whether_help
+               (SELECT series_id,whether_help,insist_day
                 FROM read_class_contestants
                 WHERE read_class_contestants.user_id = #{user_id}) tb
           WHERE read_class_series.id = tb.series_id) tb2
@@ -1490,6 +1490,17 @@
     WHERE user_id = #{user_id}
     LIMIT 1
   </select>
+
+
+  <select id="platformChallengeUser" resultType="map">
+    SELECT `user`.username,`user`.portrait,tb2.*
+    FROM `user`,
+         (SELECT wechat_platform_challenge_contestants.user_id,wechat_platform_challenge_contestants.insist_day,wechat_platform_challenge_contestants.word_number,tb.*
+          FROM wechat_platform_challenge_contestants
+          WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}) tb2
+    WHERE tb2.user_id = `user`.id
+  </select>
+
 
   <update id="changeWechatPlatformChallengeVirtualNumber">
     UPDATE `wechat_platform_challenge`

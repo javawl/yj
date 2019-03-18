@@ -39,7 +39,7 @@
     $(document).ready(function(){
         $("#add_new").attr('href',"add_read_class_series.jsp?id="+class_id);
         $.ajax({
-            url: url+"/admin/showReadClassSeriesUser.do?id="+class_id,
+            url: url+"/admin/showPlatformChallengeSeriesUser.do?id="+class_id,
             type:'GET',
             dataType:'json',
             success:function (result) {
@@ -207,32 +207,32 @@
 </script>
 <body>
 <center>
-    <h1>阅读挑战参与用户</h1>
+    <h1>参与用户</h1>
     <br>
     <table cellpadding="9" width="87%" border="1" cellspacing="0" id="author_info">
         <tr>
-            <td>头像</td>
+            <td>学号</td>
             <td>昵称</td>
-            <td>系列名</td>
-            <td>坚持天数</td>
-            <td>总金额</td>
+            <td>头像</td>
+            <td>挑战天数</td>
+            <td>挑战单词数</td>
             <td>操作</td>
         </tr>
     </table>
     <h1>本期阅读挑战详情和结算</h1>
     <br>
-    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">
-        <tr>
-            <td>总金额(资金池)</td>
-            <td>成功挑战用户数</td>
-            <td>成功率</td>
-            <td>奖励金金额/人</td>
-            <td>挑战失败用户数</td>
-            <td>最后营收</td>
-            <%--<td>是否最终确认</td>--%>
-            <td>操作</td>
-        </tr>
-    </table>
+    <%--<table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">--%>
+        <%--<tr>--%>
+            <%--<td>总金额(资金池)</td>--%>
+            <%--<td>成功挑战用户数</td>--%>
+            <%--<td>成功率</td>--%>
+            <%--<td>奖励金金额/人</td>--%>
+            <%--<td>挑战失败用户数</td>--%>
+            <%--<td>最后营收</td>--%>
+            <%--&lt;%&ndash;<td>是否最终确认</td>&ndash;%&gt;--%>
+            <%--<td>操作</td>--%>
+        <%--</tr>--%>
+    <%--</table>--%>
     <div id="remind">
     </div>
     <table id="page">

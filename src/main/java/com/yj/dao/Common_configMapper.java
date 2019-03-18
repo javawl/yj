@@ -698,6 +698,9 @@ public interface Common_configMapper {
     //查看用户是否预定过
     Map<Object,Object> checkExistWxPlatformReserved(@Param("user_id") String user_id);
 
+    //后台根据期数id获取参与者
+    List<Map<Object,Object>> platformChallengeUser(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id);
+
     //记录挑战的虚拟用户数
     int changeWechatPlatformChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
 

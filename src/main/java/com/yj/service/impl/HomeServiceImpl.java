@@ -1827,7 +1827,8 @@ public class HomeServiceImpl implements IHomeService {
             //获取当天0点多一秒时间戳
             String one = CommonFunc.getOneDate();
             //查看坚持天数表中有没有数据
-            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
+//            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
+            Map getInsistDay = dictionaryMapper.checkInsistDayMessage(id, one);
             if (getInsistDay == null){
                 return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
             }
