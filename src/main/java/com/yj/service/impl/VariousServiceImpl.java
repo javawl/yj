@@ -1679,15 +1679,16 @@ public class VariousServiceImpl implements IVariousService {
 
     //展现已选课程老师信息
     public ServerResponse<Map<Object,Object>> showSelectReadClassTeacher(HttpServletRequest request){
-        String token = request.getHeader("token");
-        //验证参数是否为空
-        List<Object> l1 = new ArrayList<Object>(){{
-            add(token);
-        }};
-        String CheckNull = CommonFunc.CheckNull(l1);
-        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-        //验证token
-        String uid = CommonFunc.CheckToken(request,token);
+//        String token = request.getHeader("token");
+//        //验证参数是否为空
+//        List<Object> l1 = new ArrayList<Object>(){{
+//            add(token);
+//        }};
+//        String CheckNull = CommonFunc.CheckNull(l1);
+//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+//        //验证token
+//        String uid = CommonFunc.CheckToken(request,token);
+        String uid = "289";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -2865,17 +2866,36 @@ public class VariousServiceImpl implements IVariousService {
             responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
         }
 
-        if (WechatMessageUtil.MESSAGE_EVENT_CLICK.equals(msgType)) {// 点击
-            // 消息key
-            String Key = map.get("EventKey");
-            if (Key.equals("about_beibei")){
-                TextMessage textMessage = new TextMessage();
-                textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
-                textMessage.setToUserName(fromUserName);
-                textMessage.setFromUserName(toUserName);
-                textMessage.setCreateTime(System.currentTimeMillis());
-                textMessage.setContent("背呗正在拼命开发中...");
-                responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
+        //获取AccessToken
+        String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+        if (WechatMessageUtil.MESSAGE_EVENT.equals(msgType)) {// 点击
+            String Event = map.get("Event");
+            if (Event.equals(WechatMessageUtil.MESSAGE_EVENT_CLICK)){
+                // 消息key
+                String Key = map.get("EventKey");
+                if (Key.equals("about_beibei")){
+                    //获取图文消息
+                    Map<Object,Object> pic_txt = new HashMap<>();
+                    pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
+                    JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+                    List<JSONObject> singleNewsList = (List<JSONObject>)test.get("news_item");
+                    List<PlatformNews> newsList = new ArrayList<>();
+                    JSONObject singleNews = singleNewsList.get(0);
+                    PlatformNews platformNews = new PlatformNews();
+                    platformNews.setTitle(singleNews.get("title").toString());
+                    platformNews.setDescription(singleNews.get("digest").toString());
+                    platformNews.setUrl(singleNews.get("url").toString());
+                    platformNews.setPicUrl(singleNews.get("thumb_url").toString());
+                    newsList.add(platformNews);
+                    PlatformNewsMessage platformNewsMessage = new PlatformNewsMessage();
+                    platformNewsMessage.setToUserName(toUserName);
+                    platformNewsMessage.setFromUserName(fromUserName);
+                    platformNewsMessage.setCreateTime(System.currentTimeMillis());
+                    platformNewsMessage.setMsgType(WechatMessageUtil.MESSAGE_NEWS);
+                    platformNewsMessage.setArticles(newsList);
+                    platformNewsMessage.setArticleCount(newsList.size());
+                    responseMessage = WechatMessageUtil.newsMessageToXml(platformNewsMessage);
+                }
             }
         }
 

@@ -11,6 +11,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.yj.cache.LRULocalCache;
 import com.yj.dao.DictionaryMapper;
 import com.yj.util.MD5Util;
 import com.yj.util.UrlUtil;
@@ -422,6 +423,18 @@ public class CommonFunc {
             //没找到返回null
             return null;
         }
+    }
+
+
+    //根据sessionid和token和key获取值
+    public static Object getCacheValueByKey(String key){
+        return LRULocalCache.get(key);
+    }
+
+
+    //缓存
+    public static void setCacheValueByKey(String key,  Map<Object,Object> cacheValue, int second){
+        LRULocalCache.put(key, cacheValue, second);
     }
 
 
@@ -1083,5 +1096,45 @@ public class CommonFunc {
             length--;
         }
         return str.substring(0, length);
+    }
+
+    /**
+     * 微信公众号获取普通AccessToken
+     */
+    public static Map<String, Object> wxPlatformNormlaAccessToken() {
+        Map<String, Object> result = new HashMap<>();
+        //判断如果session里有的话直接返回
+        if (LRULocalCache.containsKey("wxplatformaccesstoken")){
+            result.put("status", "1");
+            result.put("access_token", LRULocalCache.get("wxplatformaccesstoken"));
+            System.out.println("缓存");
+            return result;
+        }
+        //将access_token取出
+        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
+        if (normalAccessTokenJsonObject.isEmpty()){
+            //判断抓取网页是否为空
+            result.put("status", "0");
+            result.put("access_token", "获取普通的AccessToken时异常，微信内部错误");
+            return result;
+        }else {
+            Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
+            if (normalAccessTokenFail){
+                result.put("status", "0");
+                result.put("access_token", normalAccessTokenJsonObject.get("errcode").toString() + "获取普通的AccessToken时异常" + normalAccessTokenJsonObject.get("errmsg").toString());
+                return result;
+            }else {
+                String normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
+                //没有报错
+                result.put("status", "1");
+                result.put("access_token", normalAccessToken);
+                //存入缓存
+                LRULocalCache.put("wxplatformaccesstoken", normalAccessToken, 7200);
+                System.out.println("生成");
+                return result;
+            }
+        }
     }
 }

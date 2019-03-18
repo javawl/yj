@@ -68,7 +68,7 @@ public class WechatMessageUtil {
     /**
      * 事件推送消息中,自定义菜单事件,点击菜单拉取消息时的事件推送
      */
-    public static final String MESSAGE_EVENT_CLICK = "click";
+    public static final String MESSAGE_EVENT_CLICK = "CLICK";
     /**
      * 事件推送消息中,自定义菜单事件,点击菜单跳转链接时的事件推送
      */
@@ -122,4 +122,18 @@ public class WechatMessageUtil {
 
     }
 
+
+    /**
+     * 图文消息转化为XML
+     *
+     * @param newsMessage
+     * @return
+     */
+    public static String newsMessageToXml(PlatformNewsMessage newsMessage){
+        XStream xstream = new XStream();
+        xstream.alias("xml", newsMessage.getClass());
+        xstream.alias("item", new PlatformNews().getClass());
+        return xstream.toXML(newsMessage);
+
+    }
 }
