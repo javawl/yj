@@ -614,11 +614,11 @@ public class AdminServiceImpl implements IAdminService {
             List<Map<Object,Object>> ReadChallengeContestants = common_configMapper.showAllReadClassContestants(s_id);
             for (int j = 0; j < ReadChallengeContestants.size(); j++){
                 //判断是否真实用户
-                if (ReadChallengeContestants.get(i).get("virtual").toString().equals("0")){
+                if (ReadChallengeContestants.get(j).get("virtual").toString().equals("0")){
                     //真实用户
                     total_real_people += 1;
                     //判断是否成功
-                    if (Integer.valueOf(ReadChallengeContestants.get(i).get("insist_day").toString()) >= allDay){
+                    if (Integer.valueOf(ReadChallengeContestants.get(j).get("insist_day").toString()) >= allDay){
                         //挑战成功
                         success_people += 1;
                     }else {
@@ -626,7 +626,7 @@ public class AdminServiceImpl implements IAdminService {
                     }
                 }
                 Double userFee;
-                if (ReadChallengeContestants.get(i).get("whether_help").toString().equals("0")){
+                if (ReadChallengeContestants.get(j).get("whether_help").toString().equals("0")){
                     //99
                     //用户报名金额
                     userFee = 99.9;
@@ -636,7 +636,7 @@ public class AdminServiceImpl implements IAdminService {
                 }
                 //把每个用户的坚持都算一遍
                 aggregate_amount += userFee;
-                userWinAmount = userWinAmount + (Double.valueOf(ReadChallengeContestants.get(i).get("insist_day").toString()) * (userFee / Double.valueOf(String.valueOf(allDay))));
+                userWinAmount = userWinAmount + (Double.valueOf(ReadChallengeContestants.get(j).get("insist_day").toString()) * (userFee / Double.valueOf(String.valueOf(allDay))));
             }
         }
 
@@ -1297,6 +1297,156 @@ public class AdminServiceImpl implements IAdminService {
 //        }
 
         return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    //-------------------公众号后台
+    //展示单个挑战详情
+    public ServerResponse<Map<Object,Object>> show_platform_challenge_info(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        Map<Object,Object> ChallengeInfo = common_configMapper.showPlatformChallengeById(id);
+        //判断状态是否结束
+        if ((new Date()).getTime() <= Long.valueOf(ChallengeInfo.get("et").toString())){
+            //未结束
+            ChallengeInfo.put("whether_finish", "0");
+        }else {
+            //已结束
+            ChallengeInfo.put("whether_finish", "1");
+        }
+        ChallengeInfo.put("st", CommonFunc.getFormatTime(Long.valueOf(ChallengeInfo.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+        ChallengeInfo.put("et", CommonFunc.getFormatTime(Long.valueOf(ChallengeInfo.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        ChallengeInfo.put("success_rate", Double.valueOf(ChallengeInfo.get("success_rate").toString()) * 100 + "%");
+
+        return ServerResponse.createBySuccess("成功！",ChallengeInfo);
+    }
+
+
+    //结算挑战账单
+    public ServerResponse<String> settle_accounts_platform_challenge(String id, String reward,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //成功人数
+        int success_people = 0;
+        //总的真实用户数
+        int total_real_people = 0;
+        //失败人数
+        int loser = 0;
+        //总金额
+        Double aggregate_amount = 0.0;
+        //用户赢走的总金额
+        Double userWinAmount = 0.0;
+        Map<Object,Object> r_c = common_configMapper.showReadClassById(id);
+        //计算时长
+        //总天数
+        int allDay = 90;
+        //第一轮先计算reward
+        Double userFee = Double.valueOf(reward);
+        List<Map<Object,Object>> ChallengeContestants = common_configMapper.showAllPlatformChallengeContestants(id);
+        for (int j = 0; j < ChallengeContestants.size(); j++){
+            //判断是否真实用户
+            if (ChallengeContestants.get(j).get("virtual").toString().equals("0")){
+                //真实用户
+                total_real_people += 1;
+                //判断是否成功
+                if (Integer.valueOf(ChallengeContestants.get(j).get("insist_day").toString()) >= allDay){
+                    //挑战成功
+                    success_people += 1;
+                }else {
+                    loser += 1;
+                }
+            }
+            //把每个用户的坚持都算一遍
+            aggregate_amount += userFee;
+        }
+
+        //用户拿走的钱
+        userWinAmount = ((success_people* 1.0) * userFee);
+        //营收
+        Double profit_loss = aggregate_amount - userWinAmount;
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //成功率
+            Double success_rate = success_people * 1.0 / total_real_people * 1.0;
+            common_configMapper.settleAccountsPlatformChallenge(String.valueOf(aggregate_amount),String.valueOf(profit_loss),String.valueOf(success_people),String.valueOf(success_rate),String.valueOf(loser),id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    //删除挑战用户
+    public ServerResponse<String> deletePlatformChallengeUser(String id, String user_id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(user_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            common_configMapper.reduceWechatPlatformChallengeEnroll(id);
+            common_configMapper.deleteChallengeUser(id, user_id);
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    //展示查看数据
+    @Override
+    public ServerResponse<List<Map>> show_virtual_user_platform(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取虚拟用户信息
+        List<Map> userInfo = common_configMapper.showPlatformVirtualUser(start,Integer.valueOf(size));
+
+        for(int i = 0; i < userInfo.size(); i++){
+//            if (Integer.valueOf(userInfo.get(i).get("gender").toString()) == 0){
+//                //代表男
+//                userInfo.get(i).put("gender","男");
+//            }else {
+//                userInfo.get(i).put("gender","女");
+//            }
+            userInfo.get(i).put("portrait",CommonFunc.judgePicPath(userInfo.get(i).get("portrait").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countPlatformVirtualUser(),userInfo);
     }
 
 }

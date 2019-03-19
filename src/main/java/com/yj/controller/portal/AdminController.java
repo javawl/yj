@@ -1739,6 +1739,72 @@ public class AdminController {
     }
 
 
+    /**
+     * 公众号活动每天虚拟用户增加单词
+     * @param token
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "daily_add_wx_platform_virtual_user_word_number.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String daily_add_wx_platform_virtual_user_word_number(String token, HttpServletResponse response){
+        if (!token.equals("daily_add_wx_platform_virtual_user_word_number")){
+            return "false";
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //获取当前时间戳
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取所有在开始的挑战
+            List<Map<Object,Object>> beginningWordChallenge = common_configMapper.getBeginningWxPlatformChallenge(nowTime);
+            for (int i = 0; i < beginningWordChallenge.size(); i++){
+                //获取挑战id
+                String wx_id = beginningWordChallenge.get(i).get("id").toString();
+                //获取这个挑战的虚拟用户
+                List<Map<Object,Object>> virtualUser = common_configMapper.findWxPlatformChallengeVirtualUser(wx_id);
+                //获取用户数量
+                Double countVirtualNumber = virtualUser.size() * 1.0;
+                //比例
+                Double ratio1 = 150.0/200.0;
+                Double ratio2 = 190.0/200.0;
+                Double ratio3 = 1.0;
+                for (int j = 0; j < virtualUser.size(); j++){
+                    if ((j+1)/countVirtualNumber < ratio1){
+                        common_configMapper.dailyAddWxPlatformChallengeVirtualUserWordNumber("10",virtualUser.get(j).get("id").toString());
+//                        if (CommonFunc.getNotTimeHour(new Date()) == 8){
+//                            //八点
+//                            //第一种情况
+//
+//                        }
+                    }else if ((j+1)/countVirtualNumber < ratio2){
+                        common_configMapper.dailyAddWxPlatformChallengeVirtualUserWordNumber("20",virtualUser.get(j).get("id").toString());
+//                        if (CommonFunc.getNotTimeHour(new Date()) == 9){
+//
+//                        }
+                    }else if ((j+1)/countVirtualNumber < ratio3){
+                        common_configMapper.dailyAddWxPlatformChallengeVirtualUserWordNumber("30",virtualUser.get(j).get("id").toString());
+//                        if (CommonFunc.getNotTimeHour(new Date()) == 10){
+//
+//                        }
+                    }
+                }
+            }
+            transactionManager.commit(status);
+            return "success";
+        }catch (Exception e){
+            logger.error("每天给虚拟用户增加单词数异常",e.getStackTrace());
+            logger.error("每天给虚拟用户增加单词数异常",e);
+            e.printStackTrace();
+            return "error";
+        }
+    }
+
+
 
     /**
      * 阅读挑战每日提醒
@@ -2407,6 +2473,66 @@ public class AdminController {
             return ServerResponse.createByErrorMessage("更新出错！");
         }
     }
+
+
+    /**
+     * 新建虚拟用户
+     * @param portrait   头像
+     * @param username   昵称
+     * @param gender     性别
+     * @param sign       个性签名
+     * @param response   response
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "upload_virtual_user_platform.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_virtual_user_platform(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username,String gender, String sign, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //头像
+            String name1 = iFileService.upload(portrait,path,"l_e/user/portrait");
+            String url1 = "user/portrait/"+name1;
+            //存到数据库
+            //这里插入一下
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("B305FDA58B6ADD5B4EBE25E94FB09FD2");
+            user.setPortrait(url1);
+            user.setGender(Integer.valueOf(gender));
+            user.setPlanDays(0);
+            user.setPlanWordsNumber(0);
+            user.setInsistDay(0);
+            user.setWhetherOpen(1);
+            user.setClockDay(0);
+            user.setPersonalitySignature(sign);
+            //时间戳
+            user.setRegisterTime(String.valueOf(new Date().getTime()));
+
+            int resultCount = userMapper.insertUser(user);
+            System.out.println(resultCount);
+            if (resultCount != 1){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            //新的user id
+            int new_user_id = user.getId();
+            //插到虚拟用户
+            common_configMapper.insertVirtualPlatformId(String.valueOf(new_user_id));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
 
     /**
      * 合成音频
@@ -3205,12 +3331,123 @@ public class AdminController {
         String CheckNull = CommonFunc.CheckNull(l1);
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //获取参与者
-        List<Map<Object,Object>> Info = common_configMapper.platformChallengeUser(id);
+        List<Map<Object,Object>> Info = common_configMapper.platformChallengeUser(id, "0");
         for(int i = 0; i < Info.size(); i++){
             Info.get(i).put("portrait",CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
         }
 
         return ServerResponse.createBySuccess("成功", Info);
+    }
+
+    /**
+     * 展示挑战的参与虚拟用户
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "showPlatformChallengeVirtualUser.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showPlatformChallengeVirtualUser(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取参与者
+        List<Map<Object,Object>> Info = common_configMapper.platformChallengeUser(id, "1");
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("portrait",CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+        }
+
+        return ServerResponse.createBySuccess("成功", Info);
+    }
+
+    /**
+     * 用户挑战天数加一
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "platform_challenge_day_add.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> platform_challenge_day_add(String id,String user_id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(user_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        common_configMapper.changeWechatPlatformChallengeAddDay(id, user_id);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 虚拟用户挑战天数加一
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "platform_challenge_virtual_user_day_add.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> platform_challenge_virtual_user_day_add(String id,String user_id,String number,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(user_id);
+            add(number);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        common_configMapper.changeWechatPlatformChallengeVirtualUserAddDay(id, user_id, number);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+    /**
+     * 展示挑战信息
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "show_platform_challenge_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> show_platform_challenge_info(String id,HttpServletRequest request){
+        return iAdminService.show_platform_challenge_info(id, request);
+    }
+
+
+    /**
+     * 结算挑战账单
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "settle_accounts_platform_challenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> settle_accounts_platform_challenge(String id, String reward,HttpServletRequest request){
+        return iAdminService.settle_accounts_platform_challenge(id, reward, request);
+    }
+
+
+    /**
+     * 删除挑战用户
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deletePlatformChallengeUser.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deletePlatformChallengeUser(String id, String user_id,HttpServletRequest request){
+        return iAdminService.deletePlatformChallengeUser(id, user_id, request);
+    }
+
+
+    /**
+     * 虚拟用户
+     * @return
+     */
+    @RequestMapping(value = "show_virtual_user_platform.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map>> show_virtual_user_platform(String page,String size,HttpServletRequest request){
+        return iAdminService.show_virtual_user_platform(page, size, request);
     }
 
 

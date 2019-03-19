@@ -1887,6 +1887,14 @@ public class HomeServiceImpl implements IHomeService {
                     common_config.addNormalChallengeInsistDay(wordChallengeId,id);
                 }
 
+                //如果参加了正在进行的运营活动挑战的话坚持天数加一
+                //找出是否有正在进行的计划并且该用户参加了
+                Map<Object,Object> userAttendWxPlatformChallenge = common_config.findClockWxPlatformChallenge(String.valueOf((new Date()).getTime()),id);
+                if (userAttendWxPlatformChallenge != null){
+                    String WxPlatformChallengeId = userAttendWxPlatformChallenge.get("id").toString();
+                    common_config.changeWechatPlatformChallengeAddDay(WxPlatformChallengeId,id);
+                }
+
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             } catch (Exception e) {

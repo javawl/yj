@@ -23,6 +23,16 @@ public interface IAdminService {
 
     ServerResponse<String> change_special_mp3( HttpServletResponse response, HttpServletRequest request) throws Exception;
 
+    ServerResponse<Map<Object,Object>> show_platform_challenge_info(String id,HttpServletRequest request);
+
+    //结算挑战账单
+    ServerResponse<String> settle_accounts_platform_challenge(String id, String reward,HttpServletRequest request);
+
+    //删除挑战用户
+    ServerResponse<String> deletePlatformChallengeUser(String id, String user_id,HttpServletRequest request);
+
+    ServerResponse<List<Map>> show_virtual_user_platform(String page,String size,HttpServletRequest request);
+
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
     ServerResponse delete_feeds(String id, HttpServletResponse response);

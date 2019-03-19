@@ -174,6 +174,12 @@
   </insert>
 
 
+  <insert id="insertVirtualPlatformId" parameterType="string">
+    INSERT INTO virtual_user_wechat_platform_challenge (user_id)
+    values (#{user_id})
+  </insert>
+
+
   <insert id="insertLotteryDrawReal" parameterType="string">
     INSERT INTO lottery_draw_contestants (user_id,lottery_draw_id,set_time,`virtual`)
     values (#{user_id},#{lottery_draw_id},#{set_time},#{virtual})
@@ -391,6 +397,13 @@
     AND `word_challenge`.et > #{now_time}
   </select>
 
+  <select id="getBeginningWxPlatformChallenge" resultType="map" parameterType="string">
+    SELECT id,periods
+    FROM `wechat_platform_challenge`
+    WHERE `wechat_platform_challenge`.st &lt; #{now_time}
+    AND `wechat_platform_challenge`.et > #{now_time}
+  </select>
+
   <select id="showLotteryDrawContestantsVirtual" resultType="map" parameterType="string">
     SELECT id,username,portrait
     FROM `user`
@@ -474,6 +487,14 @@
     SELECT id
     FROM `word_challenge_contestants`
     WHERE word_challenge_id = #{c_id}
+    AND `virtual` = 1
+  </select>
+
+
+  <select id="findWxPlatformChallengeVirtualUser" resultType="map">
+    SELECT id
+    FROM `wechat_platform_challenge_contestants`
+    WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
     AND `virtual` = 1
   </select>
 
@@ -1495,11 +1516,49 @@
   <select id="platformChallengeUser" resultType="map">
     SELECT `user`.username,`user`.portrait,tb2.*
     FROM `user`,
-         (SELECT wechat_platform_challenge_contestants.user_id,wechat_platform_challenge_contestants.insist_day,wechat_platform_challenge_contestants.word_number,tb.*
+         (SELECT wechat_platform_challenge_contestants.user_id,wechat_platform_challenge_contestants.insist_day,wechat_platform_challenge_contestants.word_number
           FROM wechat_platform_challenge_contestants
-          WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}) tb2
+          WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
+          AND wechat_platform_challenge_contestants.virtual = #{virtual}) tb2
     WHERE tb2.user_id = `user`.id
   </select>
+
+
+    <select id="showPlatformChallengeById" resultType="map" parameterType="string">
+        SELECT *
+        FROM wechat_platform_challenge
+        WHERE id = #{id}
+    </select>
+
+
+  <select id="showAllPlatformChallengeContestants" resultType="map">
+    SELECT *
+    FROM `wechat_platform_challenge_contestants`
+    WHERE wechat_platform_challenge_id = #{wechat_platform_challenge_id}
+  </select>
+
+
+    <select id="showPlatformVirtualUser" resultType="map">
+        SELECT id,username,portrait,gender,personality_signature
+        FROM `user`
+        WHERE id IN (SELECT  user_id as id
+                     FROM `virtual_user_wechat_platform_challenge`)
+            LIMIT #{start},#{size}
+    </select>
+
+
+  <select id="findClockWxPlatformChallenge" resultType="map" parameterType="string">
+    SELECT wechat_platform_challenge.id
+    FROM wechat_platform_challenge,
+         (SELECT *
+          FROM wechat_platform_challenge_contestants
+          WHERE user_id = #{user_id}) tb
+    WHERE tb.wechat_platform_challenge_id = wechat_platform_challenge.id
+    AND wechat_platform_challenge.et > #{now_time}
+    AND wechat_platform_challenge.st &lt; #{now_time}
+    LIMIT 1
+  </select>
+
 
 
   <update id="changeWechatPlatformChallengeVirtualNumber">
@@ -1512,6 +1571,28 @@
     UPDATE `wechat_platform_challenge`
     set `enrollment` = `enrollment` + 1
     WHERE id = #{id}
+  </update>
+
+  <update id="reduceWechatPlatformChallengeEnroll">
+    UPDATE `wechat_platform_challenge`
+    set `enrollment` = `enrollment` - 1
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="changeWechatPlatformChallengeAddDay">
+    UPDATE `wechat_platform_challenge_contestants`
+    set `insist_day` = `insist_day` + 1
+    WHERE wechat_platform_challenge_id = #{id}
+    AND user_id = #{user_id}
+  </update>
+
+
+  <update id="changeWechatPlatformChallengeVirtualUserAddDay">
+    UPDATE `wechat_platform_challenge_contestants`
+    set `word_number` = `word_number` + #{number}
+    WHERE wechat_platform_challenge_id = #{id}
+    AND user_id = #{user_id}
   </update>
 
 
@@ -1537,6 +1618,16 @@
             )
   </update>
 
+  <update id="settleAccountsPlatformChallenge">
+    UPDATE `wechat_platform_challenge`
+    set `aggregate_amount` = #{aggregate_amount},
+        `profit_loss` = #{profit_loss},
+        `success_people` = #{success_people},
+        `success_rate` = #{success_rate},
+        `loser` = #{loser}
+    WHERE id = #{id}
+  </update>
+
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
     values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM wechat_platform_challenge) tb),0)+1)
@@ -1556,6 +1647,13 @@
     INSERT INTO wechat_platform_challenge_reserved (user_id,set_time)
     values (#{user_id},#{set_time})
   </insert>
+
+
+  <delete id="deleteChallengeUser" parameterType="string" >
+    DELETE FROM `wechat_platform_challenge_contestants`
+    WHERE wechat_platform_challenge_id = #{id}
+    AND user_id = #{user_id}
+  </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
@@ -1597,6 +1695,12 @@
 
   <update id="dailyAddVirtualUserWordNumber">
     UPDATE `word_challenge_contestants`
+    set `word_number` = `word_number` + #{word_number}
+    WHERE id = #{id}
+  </update>
+
+  <update id="dailyAddWxPlatformChallengeVirtualUserWordNumber">
+    UPDATE `wechat_platform_challenge_contestants`
     set `word_number` = `word_number` + #{word_number}
     WHERE id = #{id}
   </update>

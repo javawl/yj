@@ -1146,6 +1146,11 @@
     FROM virtual_user
   </select>
 
+  <select id="countPlatformVirtualUser" resultType="string">
+    SELECT count(id)
+    FROM virtual_user_wechat_platform_challenge
+  </select>
+
   <select id="countVirtualUserChallenge" resultType="string">
     SELECT count(id)
     FROM virtual_user_challenge

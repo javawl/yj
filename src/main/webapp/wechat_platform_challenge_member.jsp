@@ -34,12 +34,12 @@
         if(r!=null)return  unescape(r[2]); return null;
         // 获取get参数的方法
     }
-    var class_id = parseInt(GetQueryString("id"));
-    var all_url = url+"/admin/showReadClassSeries.do?id="+class_id;
+    var challenge_id = parseInt(GetQueryString("id"));
+    var all_url = url+"/admin/showReadClassSeries.do?id="+challenge_id;
     $(document).ready(function(){
-        $("#add_new").attr('href',"add_read_class_series.jsp?id="+class_id);
+        $("#add_new").attr('href',"add_read_class_series.jsp?id="+challenge_id);
         $.ajax({
-            url: url+"/admin/showPlatformChallengeSeriesUser.do?id="+class_id,
+            url: url+"/admin/showPlatformChallengeSeriesUser.do?id="+challenge_id,
             type:'GET',
             dataType:'json',
             success:function (result) {
@@ -52,18 +52,13 @@
                     }else {
                         string2 = '<img style="max-width: 50px; max-height: 50px;" src="'+data[i]['portrait']+'">';
                     }
-                    if (data[i]['whether_help']=='0'){
-                        string1 = "99.9"
-                    }else {
-                        string1 = "59.9"
-                    }
                     $("#author_info").append('<tr>'+
-                        '<td style="width: 4%;">'+string2+'</td>'+
+                        '<td style="width: 4%;">'+ "1" + data[i]['user_id']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
-                        '<td style="width: 4%;">'+data[i]['name']+'</td>'+
+                        '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+data[i]['insist_day']+'</td>'+
-                        '<td style="width: 4%;">'+string1+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="user_info('+"'"+data[i]['user_id']+"',"+ "'"+data[i]['series_id']+"'"+')">查看</button></td>'+
+                        '<td style="width: 4%;">'+data[i]['word_number']+'</td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="user_add_day('+"'"+data[i]['user_id']+"',"+ "'"+challenge_id+"'"+')">添加</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['user_id']+"',"+ "'"+challenge_id+"'"+')">删除</button></td>'+
                         '</tr>');
                 }
             },
@@ -73,14 +68,15 @@
             }
         });
         $.ajax({
-            url:url+"/admin/show_read_challenge_info.do?id="+class_id,
+            url:url+"/admin/show_platform_challenge_info.do?id="+challenge_id,
             type:'POST',
             data:{
-                id:class_id
+                id:challenge_id,
+                reward:$("#reward").val()
             },
             dataType:'json',
             success:function (result) {
-                var lottery_draw = result["data"];4
+                var lottery_draw = result["data"];
                 if (lottery_draw['whether_finish'] == '0'){
                     //没结束
                     $("#this_challenge_info").css("display",'none')
@@ -116,94 +112,6 @@
         });
     });
 
-    //--------------------------------------------------------------------
-    // 修改词汇量(添加输入框)
-    //判断是否有输入框
-    var exist_introduction = 0;
-    function change_sent(id){
-        if (exist_introduction === 0){
-            exist_introduction = 1;
-            flag_id = id;
-            var input_id = "book_introduction" + id;
-            $("#introduction"+id).empty();
-            $("#introduction"+id).append('词汇量描述：<input id='+ input_id + ' type="text"><br><button onclick="upload_sent('+"'"+id+"'"+')">提交</button>');
-        }
-    }
-    // 修改词汇量(上传)
-    function upload_sent(id) {
-        $.ajax({
-            url:url+"/admin/update_class_series_info.do",
-            type:'POST',
-            data:{
-                inner: document.getElementById("book_introduction" + id).value,
-                id: id,
-                type: "introduction"
-            },
-            dataType:'json',
-            async: false,
-            success:function (result) {
-                var code = result['code'];
-                var msg = result['msg'];
-                if (code != 200){
-                    alert(msg);
-                }else {
-                    alert(msg);
-                }
-            },
-            error:function (result) {
-                console.log(result);
-                alert("服务器出错！");
-            }
-        });
-        exist_introduction = 0;
-        history.go(0);
-        $("html, body").scrollTop(0).animate({scrollTop: $("#introduction"+id).offset().top});
-    }
-    //--------------------------------------------------------------------
-    //--------------------------------------------------------------------
-    // 名字(添加输入框)
-    //判断是否有输入框
-    var exist_name = 0;
-    function change_name(id){
-        if (exist_name === 0){
-            exist_name = 1;
-            flag_id = id;
-            var input_id = "series_name" + id;
-            $("#name"+id).empty();
-            $("#name"+id).append('名字：<input id='+ input_id + ' type="text"><br><button onclick="upload_exist_name('+"'"+id+"'"+')">提交</button>');
-        }
-    }
-    // 名字(上传)
-    function upload_exist_name(id) {
-        $.ajax({
-            url:url+"/admin/update_class_series_info.do",
-            type:'POST',
-            data:{
-                inner: document.getElementById("series_name" + id).value,
-                id: id,
-                type: "name"
-            },
-            dataType:'json',
-            async: false,
-            success:function (result) {
-                var code = result['code'];
-                var msg = result['msg'];
-                if (code != 200){
-                    alert(msg);
-                }else {
-                    alert(msg);
-                }
-            },
-            error:function (result) {
-                console.log(result);
-                alert("服务器出错！");
-            }
-        });
-        exist_name = 0;
-        history.go(0);
-        $("html, body").scrollTop(0).animate({scrollTop: $("#name"+id).offset().top});
-    }
-    //--------------------------------------------------------------------
 </script>
 <body>
 <center>
@@ -221,18 +129,19 @@
     </table>
     <h1>本期阅读挑战详情和结算</h1>
     <br>
-    <%--<table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">--%>
-        <%--<tr>--%>
-            <%--<td>总金额(资金池)</td>--%>
-            <%--<td>成功挑战用户数</td>--%>
-            <%--<td>成功率</td>--%>
-            <%--<td>奖励金金额/人</td>--%>
-            <%--<td>挑战失败用户数</td>--%>
-            <%--<td>最后营收</td>--%>
-            <%--&lt;%&ndash;<td>是否最终确认</td>&ndash;%&gt;--%>
-            <%--<td>操作</td>--%>
-        <%--</tr>--%>
-    <%--</table>--%>
+    请输入给每位成功用户发放金额<input id="reward" type="text">
+    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="this_challenge_info">
+        <tr>
+            <td>总金额(资金池)</td>
+            <td>成功挑战用户数</td>
+            <td>成功率</td>
+            <td>用户得到金额/人</td>
+            <td>挑战失败用户数</td>
+            <td>最后营收</td>
+            <%--<td>是否最终确认</td>--%>
+            <td>操作</td>
+        </tr>
+    </table>
     <div id="remind">
     </div>
     <table id="page">
@@ -242,11 +151,46 @@
 <script>
     function settle_accounts() {
         if (confirm("你确定要结算了？")){
+            if ($("#reward").val().length === 0){
+                alert("给每位成功用户发放金额不能为空！");
+                return;
+            }
+            if (!isNotANumber($("#reward").val())){
+                alert("请输入数字！");
+                return;
+            }
             $.ajax({
-                url:url+"/admin/settle_accounts_read_class.do",
+                url:url+"/admin/settle_accounts_platform_challenge.do",
                 type:'POST',
                 data:{
-                    id:class_id
+                    id:challenge_id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
+    }
+    function user_add_day(user_id, c_id) {
+        if (confirm("你确定要加一？")){
+            $.ajax({
+                url:url+"/admin/platform_challenge_day_add.do",
+                type:'POST',
+                data:{
+                    id:challenge_id,
+                    user_id:user_id
                 },
                 dataType:'json',
                 success:function (result) {
@@ -272,13 +216,14 @@
     function check_chapter_new_word(id) {
         window.location.href = "read_class_chapter_new_word.jsp?id="+id+"&book_id="+book_id;
     }
-    function del(id) {
+    function del(user_id, c_id) {
         if (confirm("你确定要删除？删除之后不可恢复！")){
             $.ajax({
-                url:url+"/admin/deleteReadClassSeries.do",
+                url:url+"/admin/deletePlatformChallengeUser.do",
                 type:'POST',
                 data:{
-                    id:id
+                    user_id:user_id,
+                    id: challenge_id
                 },
                 dataType:'json',
                 success:function (result) {

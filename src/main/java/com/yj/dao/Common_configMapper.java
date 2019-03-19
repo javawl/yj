@@ -50,8 +50,11 @@ public interface Common_configMapper {
     //用户领取红包更新用户表
     int getWordChallengeRedPack(@Param("bill") String bill,@Param("whether_challenge_success") String whether_challenge_success, @Param("id") String id, @Param("challenge_red_packet") String challenge_red_packet);
 
-    //用户领取红包更新用户表
+    //虚拟用户增加单词
     int dailyAddVirtualUserWordNumber(@Param("word_number") String word_number,@Param("id") String id);
+
+    //虚拟用户增加单词
+    int dailyAddWxPlatformChallengeVirtualUserWordNumber(@Param("word_number") String word_number,@Param("id") String id);
 
     //用户领取红包更新用户表
     int withDrawChangeUserBill(@Param("bill") Double bill,@Param("user_id") String user_id);
@@ -178,6 +181,9 @@ public interface Common_configMapper {
     //插入虚拟id
     int insertVirtualChallengeId(@Param("user_id") String user_id);
 
+    //插入虚拟id
+    int insertVirtualPlatformId(@Param("user_id") String user_id);
+
     //打卡参与抽奖
     int insertLotteryDrawReal(@Param("user_id") String user_id,@Param("lottery_draw_id") String lottery_draw_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
@@ -277,6 +283,9 @@ public interface Common_configMapper {
     //获取开始的单词挑战
     List<Map<Object,Object>> getBeginningWordChallenge(@Param("now_time") String now_time);
 
+    //获取开始的公众号运营挑战
+    List<Map<Object,Object>> getBeginningWxPlatformChallenge(@Param("now_time") String now_time);
+
     //后台根据id获取奖品参与者虚拟
     List<Map<Object,Object>> showLotteryDrawContestantsVirtual(@Param("id") String id);
 
@@ -309,6 +318,9 @@ public interface Common_configMapper {
 
     //将某期单词挑战的虚拟用户查出来
     List<Map<Object,Object>> findWordChallengeVirtualUser(@Param("c_id") String c_id);
+
+    //将某期运营挑战的虚拟用户查出来
+    List<Map<Object,Object>> findWxPlatformChallengeVirtualUser(@Param("c_id") String c_id);
 
     //找出是否该用户是被人邀请
     Map<Object,Object> findUserWhetherInvited(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
@@ -699,7 +711,19 @@ public interface Common_configMapper {
     Map<Object,Object> checkExistWxPlatformReserved(@Param("user_id") String user_id);
 
     //后台根据期数id获取参与者
-    List<Map<Object,Object>> platformChallengeUser(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id);
+    List<Map<Object,Object>> platformChallengeUser(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id, @Param("virtual") String virtual);
+
+    //展示单条公众号挑战
+    Map<Object,Object> showPlatformChallengeById(@Param("id") String  id);
+
+    //参加公众号挑战的报名情况
+    List<Map<Object,Object>> showAllPlatformChallengeContestants(@Param("wechat_platform_challenge_id") String  wechat_platform_challenge_id);
+
+    //后台虚拟用户信息
+    List<Map> showPlatformVirtualUser(@Param("start") int start, @Param("size") int size);
+
+    //找出用户正在参加的单词挑战
+    Map<Object,Object> findClockWxPlatformChallenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 
     //记录挑战的虚拟用户数
     int changeWechatPlatformChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
@@ -707,11 +731,24 @@ public interface Common_configMapper {
     //修改挑战的报名人数
     int changeWechatPlatformChallengeEnroll(@Param("id") String id);
 
+    //修改挑战的报名人数
+    int reduceWechatPlatformChallengeEnroll(@Param("id") String id);
+
+    //修改挑战的报名人数
+    int changeWechatPlatformChallengeAddDay(@Param("id") String id, @Param("user_id") String user_id);
+
+    //修改挑战的报名人数
+    int changeWechatPlatformChallengeVirtualUserAddDay(@Param("id") String id, @Param("user_id") String user_id, @Param("number") String number);
+
     //为了合并账号
     int mergeWxPlatformChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
 
     //为了合并账号
     int mergeWxPlatformChallengeReserved(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //结算挑战表
+    int settleAccountsPlatformChallenge(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,
+                                @Param("success_rate") String success_rate, @Param("loser") String loser, @Param("id") String id);
 
     //后台插入万元挑战
     int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
@@ -738,6 +775,9 @@ public interface Common_configMapper {
 
     //预约
     int insertWxPlatformChallengeReserved(@Param("user_id") String user_id,@Param("set_time") String set_time);
+
+    //删除挑战用户
+    int deleteChallengeUser(@Param("id") String id, @Param("user_id") String user_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

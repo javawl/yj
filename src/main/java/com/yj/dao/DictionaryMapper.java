@@ -332,6 +332,9 @@ public interface DictionaryMapper {
     String countVirtualUser();
 
     //后台
+    String countPlatformVirtualUser();
+
+    //后台
     String countVirtualUserChallenge();
 
     //后台

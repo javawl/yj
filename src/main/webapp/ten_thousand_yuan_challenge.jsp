@@ -172,7 +172,7 @@
                         '<td style="width: 4%;">'+data[i]['st']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['et']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['virtual_number']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="virtual('+"'"+data[i]['id']+"'"+')">查看</button></td>'+
                         '<td style="width: 6%;">'+data[i]['enrollment']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['upper_limit']+'</td>'+
                         '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button>(若删除，参加该期的的所有用户记录也会删除)</td>'+
@@ -203,6 +203,7 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;">
+                <button style="float: right"><a href="wechat_platform_virtual_user.jsp?page=1&size=15">展示虚拟用户</a></button>
             </td>
             <td style="border-left: 0;">
                 <button style="float: right"><a href="add_ten_thousand_yuan_challenge.jsp">新建</a></button>
@@ -227,6 +228,9 @@
 <script>
     function single(id) {
         window.location.href = "wechat_platform_challenge_member.jsp?id="+id;
+    }
+    function virtual(id) {
+        window.location.href = "wechat_platform_challenge_virtual_user.jsp?id="+id;
     }
     function del(id) {
         if (confirm("你确定要删除？")){
