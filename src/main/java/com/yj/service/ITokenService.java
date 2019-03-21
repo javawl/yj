@@ -12,7 +12,11 @@ public interface ITokenService {
 
     ServerResponse<String> wx_token(String portrait, String nickname, String gender, HttpSession session, String code);
 
+    ServerResponse<String> wx_game_token(String portrait, String nickname, String gender, HttpSession session, String code);
+
     ServerResponse<String> wxReturnSessionKey(String code);
+
+    ServerResponse<String> wxGameReturnSessionKey(String code);
 
     ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code);
 

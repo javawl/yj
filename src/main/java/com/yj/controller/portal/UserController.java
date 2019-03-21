@@ -480,7 +480,7 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 测试
+     * 小程序登录
      * @return
      */
     @RequestMapping(value = "wx_login.do", method = RequestMethod.POST)
@@ -492,6 +492,17 @@ public class UserController extends BaseController {
 
 
     /**
+     * 小游戏登录
+     * @return
+     */
+    @RequestMapping(value = "wx_game_login.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> wx_game_login(String portrait, String nickname, String gender, HttpSession session, String code){
+        return iTokenService.wx_game_token(portrait, nickname, gender, session, code);
+    }
+
+
+    /**
      * 给前端获取session_key
      * @return
      */
@@ -499,6 +510,17 @@ public class UserController extends BaseController {
     @ResponseBody
     public ServerResponse<String> wxReturnSessionKey(String code){
         return iTokenService.wxReturnSessionKey(code);
+    }
+
+
+    /**
+     * 小游戏给前端获取session_key
+     * @return
+     */
+    @RequestMapping(value = "wxGameReturnSessionKey.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> wxGameReturnSessionKey(String code){
+        return iTokenService.wxGameReturnSessionKey(code);
     }
 
 

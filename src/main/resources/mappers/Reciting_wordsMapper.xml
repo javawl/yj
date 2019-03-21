@@ -152,4 +152,98 @@
       set_time = #{setTime,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <!-- *****************************************懂词帝小游戏相关************************************************** -->
+  <select id="gameHomePageUserInfo" parameterType="string" resultType="map">
+    SELECT plan,tb.*
+    FROM plans,
+       (
+          SELECT game_plan,game_exp,game_vit,game_last_online_time
+          FROM `user`
+          WHERE `id` = #{id}
+          LIMIT 1
+         )tb
+    WHERE dictionary_type = tb.game_plan
+  </select>
+
+  <select id="getGameHomePageNPCSay" resultType="map" parameterType="int">
+    SELECT msg
+    FROM `game_npc_say`
+    order by rand() limit #{size}
+  </select>
+
+  <select id="getGameUserTakeInAllPlan" resultType="map" parameterType="string">
+    SELECT stage,tb2.*
+    FROM game_take_plan,
+        (
+          SELECT plans.id,plans.plan
+          FROM plans,
+               (
+                 SELECT `id` FROM plan_types
+               ) tb
+          WHERE tb.id = plans.type_id
+        ) tb2
+    WHERE game_take_plan.user_id = #{user_id}
+    AND game_take_plan.plan_id = tb2.id
+  </select>
+
+  <select id="getGameAllPlanNotInUserTake" resultType="map" parameterType="string">
+    SELECT plans.id,plans.plan
+    FROM plans,
+         (
+           SELECT `id`
+           FROM plan_types
+         ) tb
+    WHERE tb.id = plans.type_id
+    AND plans.`id` NOT IN
+          (
+            SELECT plan_id
+            FROM game_take_plan
+            WHERE game_take_plan.user_id = #{user_id}
+          )
+  </select>
+
+  <select id="getGameUserTakePlanSituation" resultType="map" parameterType="string">
+    SELECT plans.dictionary_type,tb.*
+    FROM plans,
+        (
+          SELECT *
+          FROM game_take_plan
+          WHERE game_take_plan.user_id = #{user_id}
+            AND game_take_plan.plan_id = #{plan_id}
+            LIMIT 1
+        )tb
+    WHERE plans.id = tb.plan_id
+  </select>
+
+  <select id="getDictionaryByDictionaryType" parameterType="string" resultType="map">
+    SELECT word,meaning
+    FROM dictionary
+    WHERE `type` = #{type}
+  </select>
+
+  <select id="getUserRank" parameterType="string" resultType="map">
+    SELECT rank,rank_exp,lv
+    FROM game_rank
+    WHERE rank_exp &lt; #{rank_exp}
+    ORDER BY rank_exp DESC
+    LIMIT 1
+  </select>
+
+
+  <update id="gameSelectPlan" parameterType="string">
+    UPDATE `user`
+    SET `game_plan` = #{game_plan}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameUserLogOutTimeSet" parameterType="string">
+    UPDATE `user`
+    SET `game_last_online_time` = #{game_last_online_time}
+    WHERE id = #{id}
+  </update>
+
+  <!-- ********************************************************************************************************** -->
 </mapper>

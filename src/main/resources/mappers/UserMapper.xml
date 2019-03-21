@@ -364,6 +364,13 @@
     LIMIT 1
   </select>
 
+  <select id="isExistGameOpenid" resultType="string" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE wechat_game_openid = #{openid}
+    LIMIT 1
+  </select>
+
   <select id="isExistWxPlatformOpenid" resultType="string" parameterType="string">
     SELECT id
     FROM `user`
@@ -585,6 +592,14 @@
     LIMIT 1
   </select>
 
+  <select id="getUserIdByTimeStampGameOpenId" resultType="map" parameterType="string">
+    SELECT id
+    FROM `user`
+    WHERE `wechat_game_openid` = #{wechat_game_openid}
+    AND `register_time` = #{register_time}
+    LIMIT 1
+  </select>
+
   <select id="getUserAllInsistDay" resultType="map" parameterType="string">
     SELECT *
     FROM `insist_day`
@@ -690,6 +705,11 @@
   <insert id="addUser" parameterType="string">
     INSERT INTO `user` (username, portrait, gender, wechat_platform_openid, register_time, plan_days, plan_words_number, insist_day, whether_open, clock_day, wechat)
     values (#{username}, #{portrait}, #{gender}, #{wechat_platform_openid}, #{register_time}, 0, 0, 0, 1, 0, 'WechatPlatform')
+  </insert>
+
+  <insert id="addGameUser" parameterType="string">
+    INSERT INTO `user` (username, portrait, gender, wechat_game_openid, register_time, plan_days, plan_words_number, insist_day, whether_open, clock_day, wechat)
+    values (#{username}, #{portrait}, #{gender}, #{wechat_game_openid}, #{register_time}, 0, 0, 0, 1, 0, 'WechatGame')
   </insert>
 
   <insert id="decide_plan_all" parameterType="string">

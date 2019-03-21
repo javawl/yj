@@ -51,6 +51,9 @@ public interface UserMapper {
     //获取token那里判断openid是否已经在数据库里了
     String isExistOpenid(@Param("openid") String openid);
 
+    //获取token那里判断openid是否已经在数据库里了
+    String isExistGameOpenid(@Param("openid") String openid);
+
     //获取token那里判断微信公众号网页openid是否已经在数据库里了
     String isExistWxPlatformOpenid(@Param("wechat_platform_openid") String wechat_platform_openid);
 
@@ -144,6 +147,9 @@ public interface UserMapper {
     //添加用户
     int addUser(@Param("username") String username, @Param("portrait") String portrait, @Param("gender") String gender, @Param("wechat_platform_openid") String wechat_platform_openid, @Param("register_time") String register_time);
 
+    //添加小游戏用户
+    int addGameUser(@Param("username") String username, @Param("portrait") String portrait, @Param("gender") String gender, @Param("wechat_game_openid") String wechat_game_openid, @Param("register_time") String register_time);
+
     //计划表添加计划
     int decide_plan_all(@Param("id") String id, @Param("plan") String plan, @Param("days") String days, @Param("daily_word_number") String daily_word_number);
 
@@ -190,6 +196,9 @@ public interface UserMapper {
 
     //根据时间戳获取新插入微信公众号的用户id
     Map<Object,Object> getUserIdByTimeStampOpenId(@Param("wechat_platform_openid") String wechat_platform_openid, @Param("register_time") String register_time);
+
+    //根据时间戳获取新插入微信小游戏的用户id
+    Map<Object,Object> getUserIdByTimeStampGameOpenId(@Param("wechat_game_openid") String wechat_game_openid, @Param("register_time") String register_time);
 
     //获取打卡历史记录
     List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);

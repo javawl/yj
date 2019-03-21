@@ -21,6 +21,7 @@
     <bean id="iMessageService" class="com.yj.service.impl.MessageServiceImpl"></bean>
     <bean id="iVariousService" class="com.yj.service.impl.VariousServiceImpl"></bean>
     <bean id="iTokenService" class="com.yj.service.impl.TokenServiceImpl"></bean>
+    <bean id="iGameService" class="com.yj.service.impl.GameServiceImpl"></bean>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>

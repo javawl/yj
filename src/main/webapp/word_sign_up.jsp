@@ -38,6 +38,12 @@
         <span class="min-text">最终解释权归背呗背单词所有</span>
     </div>
     <button class="sign-button" v-on:click="onSignTap()">立即开始挑战</button>
+    <div v-if="isShowDialog === true" class="mask">
+        <div class="qr-code-container">
+            <img src="https://file.ourbeibei.com/l_e/static/images/min_program_qr_code.jpg" alt="">
+        </div>
+        <img class="close-img" src="https://file.ourbeibei.com/l_e/static/images/ic_dialog_close.png" alt="" v-on:click="onCloseDialog()">
+    </div>
 </div>
 <script src="https://file.ourbeibei.com/l_e/static/js/word_sign_up.js"></script>
 <!--<script src="word_sign_up.js"></script>-->

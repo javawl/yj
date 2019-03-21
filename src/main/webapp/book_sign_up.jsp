@@ -66,7 +66,7 @@
     <div class="detail-container" v-else>
         <div class="header-label">
             <div class="line"></div>
-            <span>1期书单</span>
+            <span>{{periods}}期书单</span>
             <div class="line"></div>
         </div>
         <div id="content" style="width: 100%;display: flex;flex-direction: column;align-items: center">
@@ -121,6 +121,13 @@
             </div>
 
         </div>
+    </div>
+
+    <div v-if="isShowDialog === true" class="mask">
+        <div class="qr-code-container">
+            <img src="https://file.ourbeibei.com/l_e/static/images/min_program_qr_code.jpg" alt="">
+        </div>
+        <img class="close-img" src="https://file.ourbeibei.com/l_e/static/images/ic_dialog_close.png" alt="" v-on:click="onCloseDialog()">
     </div>
 
 </div>

@@ -19,7 +19,7 @@
     <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 </head>
 <body>
-<div id="app">
+<div id="app" style="height: 100%;width: 100%;">
     <div class="container">
         <!--可滚动元素-->
         <div style="position:relative;width: 100%;">
@@ -74,6 +74,12 @@
         </div>
 
         <img class="close-img" src="https://file.ourbeibei.com/l_e/static/images/ic_dialog_close.png" alt="" v-on:click="onCloseDialog()">
+    </div>
+    <div class="mask" v-if="isShowQrCode === true">
+        <div class="qr-code-container">
+            <img src="https://file.ourbeibei.com/l_e/static/images/min_program_qr_code.jpg" alt="">
+        </div>
+        <img class="close-img" src="https://file.ourbeibei.com/l_e/static/images/ic_dialog_close.png" alt="" v-on:click="onCloseQrCode()">
     </div>
 </div>
 <script src="https://file.ourbeibei.com/l_e/static/js/challenge_sign_up.js"></script>

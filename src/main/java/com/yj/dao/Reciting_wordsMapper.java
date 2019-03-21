@@ -1,6 +1,10 @@
 package com.yj.dao;
 
 import com.yj.pojo.Reciting_words;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 public interface Reciting_wordsMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +18,31 @@ public interface Reciting_wordsMapper {
     int updateByPrimaryKeySelective(Reciting_words record);
 
     int updateByPrimaryKey(Reciting_words record);
+
+
+    Map<String,Object> gameHomePageUserInfo(@Param("id") String id);
+
+    //获取首页的npc说的话
+    List<Map<String,Object>> getGameHomePageNPCSay(@Param("size") int size);
+
+    //获取用户参与过的计划的信息
+    List<Map<String,Object>> getGameUserTakeInAllPlan(@Param("user_id") String user_id);
+
+    //获取用户没有参与的计划的信息
+    List<Map<String,Object>> getGameAllPlanNotInUserTake(@Param("user_id") String user_id);
+
+    //查出用户参与计划情况
+    Map<String,Object> getGameUserTakePlanSituation(@Param("user_id") String user_id, @Param("plan_id") String plan_id);
+
+    //查出某词汇
+    List<Map<String,Object>> getDictionaryByDictionaryType(@Param("type") String type);
+
+    //查出用户所在级别
+    Map<String,Object> getUserRank(@Param("rank_exp") String rank_exp);
+
+    //更换计划
+    int gameSelectPlan(@Param("id") String id, @Param("game_plan") String game_plan);
+
+    //小游戏用户切后台或者退出记录时间（用于计算离线）
+    int gameUserLogOutTimeSet(@Param("id") String id, @Param("game_last_online_time") String game_last_online_time);
 }
