@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>后台管理系统</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
     <script type="text/javascript">
         <%
             String url = Const.DOMAIN_NAME;

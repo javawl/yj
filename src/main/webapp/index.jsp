@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>背呗背单词</title>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
     <style type="text/css" rel="stylesheet">
         body{ margin: 0 auto; padding: 0; width: 100%;}
         h1{ margin-top: 3rem;}
