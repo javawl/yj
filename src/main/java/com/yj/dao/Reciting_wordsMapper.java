@@ -32,7 +32,7 @@ public interface Reciting_wordsMapper {
     List<Map<String,Object>> getGameAllPlanNotInUserTake(@Param("user_id") String user_id);
 
     //查出用户参与计划情况
-    Map<String,Object> getGameUserTakePlanSituation(@Param("user_id") String user_id, @Param("plan_id") String plan_id);
+    Map<String,Object> getGameUserTakePlanSituation(@Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);
 
     //查出某词汇
     List<Map<String,Object>> getDictionaryByDictionaryType(@Param("type") String type);
@@ -43,6 +43,15 @@ public interface Reciting_wordsMapper {
     //更换计划
     int gameSelectPlan(@Param("id") String id, @Param("game_plan") String game_plan);
 
+    //增加经验
+    int gameAddExp(@Param("id") String id, @Param("game_exp") String game_exp);
+
+    //过关
+    int gameStageClear(@Param("stage") String stage, @Param("number_flag") String number_flag, @Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);
+
     //小游戏用户切后台或者退出记录时间（用于计算离线）
     int gameUserLogOutTimeSet(@Param("id") String id, @Param("game_last_online_time") String game_last_online_time);
+
+    //小游戏用户插入词汇闯关记录
+    int gameInsertTakePlan(@Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type, @Param("stage") String stage, @Param("number_flag") String number_flag, @Param("set_time") String set_time);
 }

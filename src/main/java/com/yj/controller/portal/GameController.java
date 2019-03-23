@@ -86,4 +86,15 @@ public class GameController extends BaseController {
         //调用service层
         return iGameService.gameGetCurrentStage(request);
     }
+
+
+    /**
+     * 小游戏过关打卡
+     */
+    @RequestMapping(value="gameStageClear.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<String, Object>>> gameStageClear(int stage, int exp, int wordNumber, HttpServletRequest request){
+        //调用service层
+        return iGameService.gameStageClear(stage, exp, wordNumber, request);
+    }
 }

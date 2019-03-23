@@ -197,7 +197,7 @@ public class TokenServiceImpl implements ITokenService {
 
 
 
-    public ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code){
+    public ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code, String page_name){
         String requestUrlParam = String.format("appid=%s&secret=%s&code=%s&grant_type=authorization_code", this.wxPlatformAppID, this.wxPlatformSecret, code);
         //发送post请求读取调用微信接口获取openid用户唯一标识
         JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformLoginUrl,requestUrlParam ));
@@ -255,7 +255,7 @@ public class TokenServiceImpl implements ITokenService {
                     String nonce_str = CommonFunc.getRandomStringByLength(32);
                     //时间戳
                     Long timeStamp = System.currentTimeMillis() / 1000;
-                    String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl + "?code=" + code + "&state=1";
+                    String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl + page_name + ".jsp?code=" + code + "&state=1";
                     String signature = CommonFunc.SHA1(str);
                     Map<String, Object> res = new HashMap<>();
                     res.put("noncestr", nonce_str);

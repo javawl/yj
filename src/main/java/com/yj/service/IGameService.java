@@ -19,4 +19,6 @@ public interface IGameService {
 
     ServerResponse<List<Map<String, Object>>> gameGetCurrentStage(HttpServletRequest request);
 
+    ServerResponse<List<Map<String, Object>>> gameStageClear(int stage, int exp, int wordNumber, HttpServletRequest request);
+
 }

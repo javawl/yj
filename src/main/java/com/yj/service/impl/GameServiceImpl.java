@@ -11,7 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -110,31 +114,31 @@ public class GameServiceImpl implements IGameService {
         List<Map<String,Object>> gameUserTakeInAllPlan = recitingWordsMapper.getGameUserTakeInAllPlan(uid);
         for (int i = 0; i < gameUserTakeInAllPlan.size(); i++){
             //如果是自己正在学的
-            if (selectPlanId.equals(gameUserTakeInAllPlan.get(i).get("id").toString())){
+            if (selectPlanId.equals(gameUserTakeInAllPlan.get(i).get("dictionary_type").toString())){
                 //判断是否真的有记录
                 resultMap.put("take_plan", gameUserTakeInAllPlan.get(i).get("plan").toString());
                 resultMap.put("stage", gameUserTakeInAllPlan.get(i).get("stage").toString());
-                resultMap.put("plan_id", gameUserTakeInAllPlan.get(i).get("id").toString());
+                resultMap.put("plan_id", gameUserTakeInAllPlan.get(i).get("dictionary_type").toString());
             }else {
                 Map<String, Object> tmpMap = new HashMap<>();
                 tmpMap.put("take_plan", gameUserTakeInAllPlan.get(i).get("plan").toString());
                 tmpMap.put("stage", gameUserTakeInAllPlan.get(i).get("stage").toString());
-                tmpMap.put("plan_id", gameUserTakeInAllPlan.get(i).get("id").toString());
+                tmpMap.put("plan_id", gameUserTakeInAllPlan.get(i).get("dictionary_type").toString());
                 resultList.add(tmpMap);
             }
         }
         List<Map<String,Object>> gameAllPlanNotInUserTake = recitingWordsMapper.getGameAllPlanNotInUserTake(uid);
         for (int i = 0; i < gameAllPlanNotInUserTake.size(); i++){
-            if (selectPlanId.equals(gameAllPlanNotInUserTake.get(i).get("id").toString())){
+            if (selectPlanId.equals(gameAllPlanNotInUserTake.get(i).get("dictionary_type").toString())){
                 //判断如果记录里连四级都没有
                 resultMap.put("take_plan", gameAllPlanNotInUserTake.get(i).get("plan").toString());
                 resultMap.put("stage", "未闯关");
-                resultMap.put("plan_id", gameAllPlanNotInUserTake.get(i).get("id").toString());
+                resultMap.put("plan_id", gameAllPlanNotInUserTake.get(i).get("dictionary_type").toString());
             }else {
                 Map<String, Object> tmpMap = new HashMap<>();
                 tmpMap.put("take_plan", gameAllPlanNotInUserTake.get(i).get("plan").toString());
                 tmpMap.put("stage", "未闯关");
-                tmpMap.put("plan_id", gameAllPlanNotInUserTake.get(i).get("id").toString());
+                tmpMap.put("plan_id", gameAllPlanNotInUserTake.get(i).get("dictionary_type").toString());
                 resultList.add(tmpMap);
             }
         }
@@ -226,32 +230,128 @@ public class GameServiceImpl implements IGameService {
         }
         //查询用户信息
         Map<String,Object> gameHomePageUserInfo = recitingWordsMapper.gameHomePageUserInfo(uid);
+        //找出该词汇下所有单词
+        //下面这行就是dictionary_type
         String userPlanId = gameHomePageUserInfo.get("game_plan").toString();
         //查出用户参与计划情况
         Map<String,Object> gameUserTakePlanSituation = recitingWordsMapper.getGameUserTakePlanSituation(uid, userPlanId);
-        //找出该词汇下所有单词
-        String dictionaryType = gameUserTakePlanSituation.get("dictionary_type").toString();
-        List<Map<String,Object>> userTakePlanWords = recitingWordsMapper.getDictionaryByDictionaryType(dictionaryType);
+        List<Map<String,Object>> userTakePlanWords = recitingWordsMapper.getDictionaryByDictionaryType(userPlanId);
         //找出轮询求模后的余数也就是当前指向词汇的index
-        int index = Integer.valueOf(gameUserTakePlanSituation.get("number_flag").toString()) % userTakePlanWords.size();
+        int index;
+        int stage;
+        if (gameUserTakePlanSituation != null){
+            index = Integer.valueOf(gameUserTakePlanSituation.get("number_flag").toString()) % userTakePlanWords.size();
+            stage = Integer.valueOf(gameUserTakePlanSituation.get("stage").toString());
+        }else{
+            stage = 0;
+            index = 0;
+        }
         //找出该用户要背多少单词
-        int lv = Integer.valueOf(gameUserTakePlanSituation.get("lv").toString());
         int split = 80;
         int n = 10;
         int moreNumber = 8;
         int lessNumber = 6;
         int wordNumber;
-        if (lv > split){
+        if (stage > split){
             wordNumber = moreNumber * n;
         }else {
-            if ((lv + n) <= split){
+            if ((stage + n) <= split){
                 wordNumber = lessNumber * n;
             }else {
-                wordNumber = (split - lv) * lessNumber + (lv + 10 - split) * moreNumber;
+                wordNumber = (split - stage) * lessNumber + (stage + 10 - split) * moreNumber;
             }
         }
         //取出该数量
         return ServerResponse.createBySuccess("成功！", userTakePlanWords.subList(index, index + wordNumber));
+    }
+
+
+    /**
+     * 小游戏过关打卡
+     * @param stage  闯过的那一关的stage
+     * @param exp    经验值
+     * @param wordNumber    一关几个单词（6个或8个）
+     * @param request  request
+     */
+    public ServerResponse<List<Map<String, Object>>> gameStageClear(int stage, int exp, int wordNumber, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            //查询用户信息
+            Map<String,Object> gameHomePageUserInfo = recitingWordsMapper.gameHomePageUserInfo(uid);
+            //找出该词汇下所有单词
+            //下面这行就是dictionary_type
+            String userPlanId = gameHomePageUserInfo.get("game_plan").toString();
+            //查出用户参与计划情况
+            Map<String,Object> gameUserTakePlanSituation = recitingWordsMapper.getGameUserTakePlanSituation(uid, userPlanId);
+            int nowStage;
+            if (gameUserTakePlanSituation != null){
+                nowStage = Integer.valueOf(gameUserTakePlanSituation.get("stage").toString());
+                if (stage > nowStage){
+                    nowStage = stage;
+                }
+                //加关卡
+                recitingWordsMapper.gameStageClear(String.valueOf(nowStage), String.valueOf(wordNumber), uid, userPlanId);
+            }else{
+                nowStage = 0;
+                if (stage > nowStage){
+                    nowStage = stage;
+                }
+                recitingWordsMapper.gameInsertTakePlan(uid, userPlanId, String.valueOf(nowStage), String.valueOf(wordNumber), String.valueOf((new Date()).getTime()));
+            }
+            //加经验
+            recitingWordsMapper.gameAddExp(uid, String.valueOf(exp));
+            //取出该数量
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功！");
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("过关失败",e.getStackTrace());
+            logger.error("过关失败",e);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("过关失败！");
+        }
+    }
+
+
+    /**
+     * 小游戏世界排行榜
+     * @param request  request
+     */
+    public ServerResponse<List<Map<String, Object>>> gameWorldRank(int page, int size, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //将页数和大小转化为limit
+        int start = (page - 1) * size;
+        return ServerResponse.createBySuccessMessage("成功！");
     }
 
 }

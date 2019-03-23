@@ -18,7 +18,7 @@ public interface ITokenService {
 
     ServerResponse<String> wxGameReturnSessionKey(String code);
 
-    ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code);
+    ServerResponse<Map<String, Object>> wx_platform_token(String portrait, String nickname, String gender, HttpSession session, String code, String page_name);
 
     ServerResponse<String> setWxPlatformUserUnionId(HttpServletRequest request, HttpSession session);
 }
