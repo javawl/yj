@@ -267,6 +267,51 @@ public class GameServiceImpl implements IGameService {
 
 
     /**
+     * pk 获取单词
+     * @param request  request
+     */
+    public ServerResponse<List<Map<String, Object>>> gamePKGetWord(int wordNumber, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(wordNumber);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查询用户信息
+        Map<String,Object> gameHomePageUserInfo = recitingWordsMapper.gameHomePageUserInfo(uid);
+        //找出该词汇下所有单词
+        //下面这行就是dictionary_type
+        String userPlanId = gameHomePageUserInfo.get("game_plan").toString();
+        //查出用户参与计划情况
+        Map<String,Object> gameUserTakePlanSituation = recitingWordsMapper.getGameUserTakePlanSituation(uid, userPlanId);
+        List<Map<String,Object>> userTakePlanWords = recitingWordsMapper.getDictionaryByDictionaryType(userPlanId);
+        //找出轮询求模后的余数也就是当前指向词汇的index
+
+        int index;
+        if (gameUserTakePlanSituation != null){
+            index = Integer.valueOf(gameUserTakePlanSituation.get("number_flag").toString()) % userTakePlanWords.size();
+            //更新轮询
+            recitingWordsMapper.gameChangeWordListIndex(String.valueOf(wordNumber), uid, userPlanId);
+        }else{
+            index = 0;
+            String stage = "0";
+            recitingWordsMapper.gameInsertTakePlan(uid,userPlanId, stage, String.valueOf(wordNumber),String.valueOf((new Date()).getTime()));
+        }
+
+        //取出该数量
+        return ServerResponse.createBySuccess("成功！", userTakePlanWords.subList(index, index + wordNumber));
+    }
+
+
+    /**
      * 小游戏过关打卡
      * @param stage  闯过的那一关的stage
      * @param exp    经验值
@@ -335,7 +380,7 @@ public class GameServiceImpl implements IGameService {
      * 小游戏世界排行榜
      * @param request  request
      */
-    public ServerResponse<List<Map<String, Object>>> gameWorldRank(int page, int size, HttpServletRequest request){
+    public ServerResponse<Map<String, Object>> gameWorldRank(int page, int size, HttpServletRequest request){
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -351,7 +396,43 @@ public class GameServiceImpl implements IGameService {
         }
         //将页数和大小转化为limit
         int start = (page - 1) * size;
-        return ServerResponse.createBySuccessMessage("成功！");
+        //查出用户排名
+        List<Map<String,Object>> worldRank = recitingWordsMapper.getUserWorldRank(start, size);
+        //查出所有的游戏排名信息
+        List<Map<String,Object>> getGameRankInfo = recitingWordsMapper.getGameRankInfo();
+        Map<String, Object> result = new HashMap<>();
+        //判断是否需要未上榜
+        int flag = 0;
+        //匹配等级
+        for (int i = 0; i < worldRank.size(); i++){
+            if (worldRank.get(i).get("id").toString().equals(uid)){
+                result.put("username", worldRank.get(i).get("username").toString());
+                result.put("game_exp", worldRank.get(i).get("game_exp").toString());
+                result.put("rank", String.valueOf(i + 1));
+                result.put("portrait", CommonFunc.judgePicPath(worldRank.get(i).get("portrait").toString()));
+                flag = 1;
+            }
+            worldRank.get(i).put("rank", String.valueOf(i + 1));
+            worldRank.get(i).put("portrait", CommonFunc.judgePicPath(worldRank.get(i).get("portrait").toString()));
+            for (int j = 0; j < getGameRankInfo.size(); j++){
+                if (Integer.valueOf(worldRank.get(i).get("game_exp").toString()) >= Integer.valueOf(getGameRankInfo.get(j).get("rank_exp").toString())){
+                    worldRank.get(i).put("nickname", getGameRankInfo.get(j).get("rank").toString());
+                    break;
+                }
+            }
+        }
+        if (flag == 0){
+            //未上榜
+            //查询用户信息
+            Map<String,Object> gameUserInfo = recitingWordsMapper.getUserExpById(uid);
+            result.put("username", gameUserInfo.get("username").toString());
+            result.put("game_exp", gameUserInfo.get("game_exp").toString());
+            result.put("rank", "未上榜");
+            result.put("portrait", CommonFunc.judgePicPath(gameUserInfo.get("portrait").toString()));
+        }
+        result.put("worldRank", worldRank);
+
+        return ServerResponse.createBySuccess("成功！", result);
     }
 
 }

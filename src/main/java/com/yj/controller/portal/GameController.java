@@ -89,6 +89,17 @@ public class GameController extends BaseController {
 
 
     /**
+     * pk时获取新的单词
+     */
+    @RequestMapping(value="gamePKGetWord.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<String, Object>>> gamePKGetWord(int wordNumber, HttpServletRequest request){
+        //调用service层
+        return iGameService.gamePKGetWord(wordNumber, request);
+    }
+
+
+    /**
      * 小游戏过关打卡
      */
     @RequestMapping(value="gameStageClear.do", method = RequestMethod.POST)
@@ -96,5 +107,16 @@ public class GameController extends BaseController {
     public ServerResponse<List<Map<String, Object>>> gameStageClear(int stage, int exp, int wordNumber, HttpServletRequest request){
         //调用service层
         return iGameService.gameStageClear(stage, exp, wordNumber, request);
+    }
+
+
+    /**
+     * 世界排行榜
+     */
+    @RequestMapping(value="gameWorldRank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> gameWorldRank(int page, int size, HttpServletRequest request){
+        //调用service层
+        return iGameService.gameWorldRank(page, size, request);
     }
 }

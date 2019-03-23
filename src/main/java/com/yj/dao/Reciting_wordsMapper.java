@@ -25,6 +25,9 @@ public interface Reciting_wordsMapper {
     //获取首页的npc说的话
     List<Map<String,Object>> getGameHomePageNPCSay(@Param("size") int size);
 
+    //获取用户经验信息
+    Map<String,Object> getUserExpById(@Param("id") String id);
+
     //获取用户参与过的计划的信息
     List<Map<String,Object>> getGameUserTakeInAllPlan(@Param("user_id") String user_id);
 
@@ -40,6 +43,12 @@ public interface Reciting_wordsMapper {
     //查出用户所在级别
     Map<String,Object> getUserRank(@Param("rank_exp") String rank_exp);
 
+    //查出所有的游戏等级信息
+    List<Map<String,Object>> getGameRankInfo();
+
+    //获取世界排名
+    List<Map<String,Object>> getUserWorldRank(@Param("start") int start, @Param("size") int size);
+
     //更换计划
     int gameSelectPlan(@Param("id") String id, @Param("game_plan") String game_plan);
 
@@ -48,6 +57,9 @@ public interface Reciting_wordsMapper {
 
     //过关
     int gameStageClear(@Param("stage") String stage, @Param("number_flag") String number_flag, @Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);
+
+    //增加用户在该词汇轮询索引
+    int gameChangeWordListIndex(@Param("number_flag") String number_flag, @Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);
 
     //小游戏用户切后台或者退出记录时间（用于计算离线）
     int gameUserLogOutTimeSet(@Param("id") String id, @Param("game_last_online_time") String game_last_online_time);

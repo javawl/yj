@@ -442,7 +442,7 @@ public class CommonFunc {
     public static String CheckNull(List<Object> parameter){
         //返回null说明检查成功！
         for (int i = 0; i < parameter.size(); i++){
-            if (parameter.get(i) == null || parameter.get(i).equals("")) return "请补全参数！";
+            if (parameter.get(i) == null || parameter.get(i).toString().equals("")) return "请补全参数！";
         }
         return null;
     }
