@@ -61,8 +61,11 @@
         <div class="flex-container" v-else  style="text-align: center">
             <span class="purple huge-text" v-on:click="onAppoint()">预约下一期</span>
         </div>
-
     </div>
+    <div class="bottom-button-container" v-else-if="status === 'yes'" style="background-color: lightgray;text-align: center">
+        <div class="signed-text">您已经报名参加了</div>
+    </div>
+
     <div class="mask" v-if="isShowDialog === true">
         <div class="dialog-container">
             <span class="label-text">还在犹豫？<span>联系督学老师了解下</span></span>
