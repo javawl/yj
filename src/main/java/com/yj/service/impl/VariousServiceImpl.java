@@ -3164,7 +3164,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
-            packageParams.put("out_trade_no", wechat_challenge_challenge_id + "_" + uid + "_" + "wx_platform" + "_" + now_time);//商户订单号
+            packageParams.put("out_trade_no", wechat_challenge_challenge_id + "_" + uid + "_p" + now_time);//商户订单号
             packageParams.put("total_fee", "2990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.wechat_platform_notify_url);//支付成功后的回调地址
@@ -3186,7 +3186,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
                     + "<notify_url>" + WxPayConfig.wechat_platform_notify_url + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
-                    + "<out_trade_no>" + wechat_challenge_challenge_id + "_" + uid + "_" + "wx_platform" + "_" + now_time + "</out_trade_no>"
+                    + "<out_trade_no>" + wechat_challenge_challenge_id + "_" + uid + "_p" + now_time + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
                     + "<total_fee>" + "2990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
