@@ -1638,6 +1638,11 @@
     values (#{user_id},#{wechat_platform_challenge_id},#{set_time},#{virtual},30)
   </insert>
 
+  <insert id="insertWechatPlatformChallengeTeacher" parameterType="string">
+    INSERT INTO wechat_platform_challenge_teacher (qr_code,wechat_platform_challenge_id,`order`,`portrait`,`username`)
+    values (#{qr_code},#{wechat_platform_challenge_id},#{order},#{portrait},#{username})
+  </insert>
+
   <insert id="insertWechatChallengeContestantsReal" parameterType="string">
     INSERT INTO wechat_platform_challenge_contestants (user_id,wechat_platform_challenge_id,set_time,`virtual`,`insist_day`)
     values (#{user_id},#{wechat_platform_challenge_id},#{set_time},0,0)
@@ -1653,6 +1658,21 @@
     DELETE FROM `wechat_platform_challenge_contestants`
     WHERE wechat_platform_challenge_id = #{id}
     AND user_id = #{user_id}
+  </delete>
+
+  <delete id="deletePlatformChallenge" parameterType="string" >
+    DELETE FROM `wechat_platform_challenge`
+    WHERE `id` = #{id}
+  </delete>
+
+  <delete id="deletePlatformChallengeContestants" parameterType="string" >
+    DELETE FROM `wechat_platform_challenge_contestants`
+    WHERE `wechat_platform_challenge_id` = #{id}
+  </delete>
+
+  <delete id="deletePlatformChallengeTeacher" parameterType="string" >
+    DELETE FROM `wechat_platform_challenge_teacher`
+    WHERE `wechat_platform_challenge_id` = #{id}
   </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->

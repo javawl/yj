@@ -3244,7 +3244,14 @@ public class AdminController {
      */
     @RequestMapping(value = "upload_ten_thousand_yuan_challenge.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> upload_ten_thousand_yuan_challenge(String people, String st, String et, HttpServletRequest request){
+    public ServerResponse<String> upload_ten_thousand_yuan_challenge(@RequestParam(value = "t1_qr",required = false) MultipartFile t1_qr,
+                                                                     @RequestParam(value = "t2_qr",required = false) MultipartFile t2_qr,
+                                                                     @RequestParam(value = "t3_qr",required = false) MultipartFile t3_qr,
+                                                                     @RequestParam(value = "t1_portrait",required = false) MultipartFile t1_portrait,
+                                                                     @RequestParam(value = "t2_portrait",required = false) MultipartFile t2_portrait,
+                                                                     @RequestParam(value = "t3_portrait",required = false) MultipartFile t3_portrait,
+                                                                     String t1_name, String t2_name, String t3_name,
+                                                                     String people, String st, String et, HttpServletRequest request){
         String st_str;
         String et_str;
         try {
@@ -3281,6 +3288,28 @@ public class AdminController {
                 String user_id = all_virtual_user.get(i).get("user_id").toString();
                 common_configMapper.insertWechatPlatformChallengeContestants(user_id,challenge_id,now_time,"1");
             }
+            //存图片
+            //上传老师二维码
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //压缩
+            String name1 = iFileService.upload(t1_qr,path,"l_e/read_class/mp3");
+            String t1_qr_url = "read_class/mp3/"+name1;
+            String name2 = iFileService.upload(t2_qr,path,"l_e/read_class/mp3");
+            String t2_qr_url = "read_class/mp3/"+name2;
+            String name3 = iFileService.upload(t3_qr,path,"l_e/read_class/mp3");
+            String t3_qr_url = "read_class/mp3/"+name3;
+
+            //压缩
+            String name4 = iFileService.upload(t1_portrait,path,"l_e/read_class/mp3");
+            String t1_portrait_url = "read_class/mp3/"+name4;
+            String name5 = iFileService.upload(t2_portrait,path,"l_e/read_class/mp3");
+            String t2_portrait_url = "read_class/mp3/"+name5;
+            String name6 = iFileService.upload(t3_portrait,path,"l_e/read_class/mp3");
+            String t3_portrait_url = "read_class/mp3/"+name6;
+            //存入老师
+            common_configMapper.insertWechatPlatformChallengeTeacher(t1_qr_url, challenge_id, "1", t1_portrait_url, t1_name);
+            common_configMapper.insertWechatPlatformChallengeTeacher(t2_qr_url, challenge_id, "2", t2_portrait_url, t2_name);
+            common_configMapper.insertWechatPlatformChallengeTeacher(t3_qr_url, challenge_id, "3", t3_portrait_url, t3_name);
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
@@ -3448,6 +3477,48 @@ public class AdminController {
     @ResponseBody
     public ServerResponse<List<Map>> show_virtual_user_platform(String page,String size,HttpServletRequest request){
         return iAdminService.show_virtual_user_platform(page, size, request);
+    }
+
+
+    /**
+     * 删除万元挑战
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deletePlatformChallenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deletePlatformChallenge(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除参与者
+            common_configMapper.deletePlatformChallengeContestants(id);
+            //删除老师
+            common_configMapper.deletePlatformChallengeTeacher(id);
+
+            int delResult = common_configMapper.deletePlatformChallenge(id);
+            if (delResult == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+
     }
 
 

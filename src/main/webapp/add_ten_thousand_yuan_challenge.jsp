@@ -41,6 +41,15 @@
                 alert("请输入数字！");
                 return;
             }
+            if (typeof($('#t1_qr')[0].files[0]) == "undefined" || typeof($('#t2_qr')[0].files[0]) == "undefined" || typeof($('#t3_qr')[0].files[0]) == "undefined"){
+                alert("请选择老师二维码,不能为空！");
+                return;
+            }
+
+            if (typeof($('#t1_portrait')[0].files[0]) == "undefined" || typeof($('#t2_portrait')[0].files[0]) == "undefined" || typeof($('#t3_portrait')[0].files[0]) == "undefined"){
+                alert("请选择老师头像,不能为空！");
+                return;
+            }
             // if ($("#virtual").val().length === 0){
             //     alert("虚拟用户数不能为空！");
             //     return;
@@ -53,6 +62,15 @@
             formData.append('st', $("#st").val());
             formData.append('et', $("#et").val());
             formData.append('people', $("#people").val());
+            formData.append('t1_name', $("#t1_name").val());
+            formData.append('t2_name', $("#t2_name").val());
+            formData.append('t3_name', $("#t3_name").val());
+            formData.append('t1_qr', $('#t1_qr')[0].files[0]);
+            formData.append('t2_qr', $('#t2_qr')[0].files[0]);
+            formData.append('t3_qr', $('#t3_qr')[0].files[0]);
+            formData.append('t1_portrait', $('#t1_portrait')[0].files[0]);
+            formData.append('t2_portrait', $('#t2_portrait')[0].files[0]);
+            formData.append('t3_portrait', $('#t3_portrait')[0].files[0]);
             // formData.append('virtual', $("#virtual").val());
             $.ajax({
                 url:url+"/admin/upload_ten_thousand_yuan_challenge.do",
@@ -107,6 +125,30 @@
                 <td align="left">
                     <input type="text" id="people">
                 </td>
+            </tr>
+            <tr>
+                <td>老师1名字：</td>
+                <td><input id="t1_name" type="text"></td>
+                <td>老师1头像：</td>
+                <td><input id="t1_portrait" name="pic" type="file"></td>
+                <td>老师1二维码图片：</td>
+                <td><input id="t1_qr" name="pic" type="file"></td>
+            </tr>
+            <tr>
+                <td>老师2名字：</td>
+                <td><input id="t2_name" type="text"></td>
+                <td>老师2头像：</td>
+                <td><input id="t2_portrait" name="pic" type="file"></td>
+                <td>老师2二维码图片：</td>
+                <td><input id="t2_qr" name="pic" type="file"></td>
+            </tr>
+            <tr>
+                <td>老师3名字：</td>
+                <td><input id="t3_name" type="text"></td>
+                <td>老师3头像：</td>
+                <td><input id="t3_portrait" name="pic" type="file"></td>
+                <td>老师3二维码图片：</td>
+                <td><input id="t3_qr" name="pic" type="file"></td>
             </tr>
             <%--<tr>--%>
                 <%--<td align="left">--%>

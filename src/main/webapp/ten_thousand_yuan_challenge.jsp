@@ -237,7 +237,7 @@
         if (confirm("你确定要删除？")){
             if (confirm("若删除，参加该期的的所有用户记录也会删除，你确定要删除？")){
                 $.ajax({
-                    url:url+"/admin/deleteReadClass.do",
+                    url:url+"/admin/deletePlatformChallenge.do",
                     type:'POST',
                     data:{
                         id:id

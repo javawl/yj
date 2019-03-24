@@ -756,6 +756,9 @@ public interface Common_configMapper {
     //打卡参与单词挑战
     int insertWechatPlatformChallengeContestants(@Param("user_id") String user_id,@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("set_time") String set_time,@Param("virtual") String virtual);
 
+    //插入万元挑战的老师
+    int insertWechatPlatformChallengeTeacher(@Param("qr_code") String qr_code,@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id,@Param("order") String order,@Param("portrait") String portrait,@Param("username") String username);
+
     //展示微信号运营活动报名页
     Map<Object,Object> showWxPlatformChallenge(@Param("now_time") String  now_time);
 
@@ -778,6 +781,15 @@ public interface Common_configMapper {
 
     //删除挑战用户
     int deleteChallengeUser(@Param("id") String id, @Param("user_id") String user_id);
+
+    //删除挑战
+    int deletePlatformChallenge(@Param("id") String id);
+
+    //删除挑战
+    int deletePlatformChallengeContestants(@Param("id") String id);
+
+    //删除挑战
+    int deletePlatformChallengeTeacher(@Param("id") String id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
