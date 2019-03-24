@@ -3958,7 +3958,12 @@ public class VariousServiceImpl implements IVariousService {
             if (beginDay > 30){
                 rank.put("friends", "30");
             }else {
-                rank.put("friends", String.valueOf(beginDay));
+                if (beginDay <= 0){
+                    rank.put("friends", "0");
+                }else {
+                    rank.put("friends", String.valueOf(beginDay));
+                }
+
             }
             return ServerResponse.createBySuccess("成功！",rank);
         }
