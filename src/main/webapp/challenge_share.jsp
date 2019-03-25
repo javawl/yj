@@ -33,7 +33,7 @@
                 <div class="huge-text-container">
                     <span class="white">坚持打卡瓜分</span><span class="yellow">万元现金</span>
                 </div>
-                <!--<div class="min-text white">活动倒计时：{{hours}}:{{minutes}}:{{seconds}}</div>-->
+                <div class="min-text white">活动倒计时：{{hours}}:{{minutes}}:{{seconds}}</div>
             </div>
 
             <div class="qr-code-container">

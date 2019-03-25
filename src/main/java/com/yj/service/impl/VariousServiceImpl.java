@@ -2867,9 +2867,6 @@ public class VariousServiceImpl implements IVariousService {
                     "还犹豫什么呢？快戳此报名<a href=\"http://www.ourbeibei.com/book_sign_up.jsp\">链接3</a>\n");
             responseMessage = WechatMessageUtil.textMessageToXml(textMessage);
         }
-
-        //获取AccessToken
-        String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
         if (WechatMessageUtil.MESSAGE_EVENT.equals(msgType)) {// 点击
             String Event = map.get("Event");
             if (Event.equals(WechatMessageUtil.MESSAGE_EVENT_CLICK)){
@@ -2877,17 +2874,17 @@ public class VariousServiceImpl implements IVariousService {
                 String Key = map.get("EventKey");
                 if (Key.equals("about_beibei")){
                     //获取图文消息
-                    Map<Object,Object> pic_txt = new HashMap<>();
-                    pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
-                    JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
-                    List<JSONObject> singleNewsList = (List<JSONObject>)test.get("news_item");
+//                    Map<Object,Object> pic_txt = new HashMap<>();
+//                    pic_txt.put("media_id", "zEq3FYNSQKIy-fT95pdwJrRz9DR4-x0A9zlIk8cX1tc");
+//                    JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_get_pic_txt_single + "?access_token=" + normalAccessToken,  JSONObject.parseObject(JSON.toJSONString(pic_txt)));
+//                    List<JSONObject> singleNewsList = (List<JSONObject>)test.get("news_item");
+//                    JSONObject singleNews = singleNewsList.get(0);
                     List<PlatformNews> newsList = new ArrayList<>();
-                    JSONObject singleNews = singleNewsList.get(0);
                     PlatformNews platformNews = new PlatformNews();
-                    platformNews.setTitle(singleNews.get("title").toString());
-                    platformNews.setDescription(singleNews.get("digest").toString());
-                    platformNews.setPicUrl(singleNews.get("thumb_url").toString());
-                    platformNews.setUrl(singleNews.get("url").toString());
+                    platformNews.setTitle("背单词，上背呗");
+                    platformNews.setDescription("真实语境背单词 轻松考过四六级");
+                    platformNews.setPicUrl("http://mmbiz.qpic.cn/mmbiz_jpg/qPt9bYUNFa1nzxPTQzhDjBHGkcRpphHianryuohTzMibB90jsbZNFibRpD0uKp991bHpFovibibLsBKunXPicaDyEAKQ/0?wx_fmt=jpeg");
+                    platformNews.setUrl("http://mp.weixin.qq.com/s?__biz=MzUxNTk3MTAxNw==&mid=100000019&idx=1&sn=15d75da64eedefd8f23bedcceb00510d&chksm=79afc3b54ed84aa38abae0409e2e3e6544b0b1d7cea078b0a631cf53dd719db6b5094f3f4f37#rd");
                     newsList.add(platformNews);
                     PlatformNewsMessage platformNewsMessage = new PlatformNewsMessage();
                     platformNewsMessage.setToUserName(fromUserName);
@@ -3165,7 +3162,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", wechat_challenge_challenge_id + "_" + uid + "_p" + now_time.substring(0, now_time.length() - 3));//商户订单号
-            packageParams.put("total_fee", "2990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.wechat_platform_notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -3188,7 +3185,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + wechat_challenge_challenge_id + "_" + uid + "_p" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "2990" + "</total_fee>"
+                    + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -3222,7 +3219,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_platform_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
-                response.put("studentId", "2990" + uid);
+                response.put("studentId", "1" + uid);
                 response.put("st", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
                 response.put("et", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
                 //找到老师2

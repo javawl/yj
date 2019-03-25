@@ -1058,16 +1058,18 @@ public class VariousController {
         Map<Object,Object> Button2Map = new HashMap<>();
         Button2Map.put("name", "背呗");
         List<Map<Object,Object>> Button2 = new ArrayList<>();
-//        Map<Object,Object> Button2Children1 = new HashMap<>();
-//        Button2Children1.put("type", "view");
-//        Button2Children1.put("name", "查询成绩");
-//        Button2Children1.put("url", "");
-//        Button2.add(Button2Children1);
-//        Map<Object,Object> Button2Children2 = new HashMap<>();
-//        Button2Children2.put("type", "view");
-//        Button2Children2.put("name", "邀你进群");
-//        Button2Children2.put("url", "");
-//        Button2.add(Button2Children2);
+        Map<Object,Object> Button2Children1 = new HashMap<>();
+        Button2Children1.put("type", "miniprogram");
+        Button2Children1.put("name", "背呗背单词");
+        Button2Children1.put("url", "http://mp.weixin.qq.com");
+        Button2Children1.put("appid", WxConfig.wx_app_id);
+        Button2Children1.put("pagepath", Const.WX_HOME_PATH);
+        Button2.add(Button2Children1);
+        Map<Object,Object> Button2Children2 = new HashMap<>();
+        Button2Children2.put("type", "view");
+        Button2Children2.put("name", "学习分享");
+        Button2Children2.put("url", "https://www.ourbeibei.com/challenge_share.jsp");
+        Button2.add(Button2Children2);
 //        Map<Object,Object> Button2Children3 = new HashMap<>();
 //        Button2Children3.put("type", "view");
 //        Button2Children3.put("name", "意见投票");
@@ -1078,11 +1080,11 @@ public class VariousController {
 //        Button2Children4.put("name", "商务合作");
 //        Button2Children4.put("url", "");
 //        Button2.add(Button2Children4);
-        Map<Object,Object> Button2Children5 = new HashMap<>();
-        Button2Children5.put("type", "click");
-        Button2Children5.put("name", "关于背呗");
-        Button2Children5.put("key", "about_beibei");
-        Button2.add(Button2Children5);
+//        Map<Object,Object> Button2Children5 = new HashMap<>();
+//        Button2Children5.put("type", "click");
+//        Button2Children5.put("name", "关于背呗");
+//        Button2Children5.put("key", "about_beibei");
+//        Button2.add(Button2Children5);
         Button2Map.put("sub_button", Button2);
 
         //最终插入
