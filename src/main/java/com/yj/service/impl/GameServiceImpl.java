@@ -363,6 +363,8 @@ public class GameServiceImpl implements IGameService {
             }
             //加经验
             recitingWordsMapper.gameAddExp(uid, String.valueOf(exp));
+            //本月份的经验也增加
+
             //取出该数量
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功！");

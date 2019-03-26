@@ -1048,6 +1048,11 @@ public class VariousController {
         Button1Children3.put("name", "语境阅读");
         Button1Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
         Button1.add(Button1Children3);
+        Map<Object,Object> Button1Children4 = new HashMap<>();
+        Button1Children4.put("type", "view");
+        Button1Children4.put("name", "挑战赛排行榜");
+        Button1Children4.put("url", "https://www.ourbeibei.com/rank.jsp");
+        Button1.add(Button1Children4);
         Button1Map.put("sub_button", Button1);
 
 

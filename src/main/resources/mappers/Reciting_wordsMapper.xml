@@ -254,7 +254,8 @@
 
   <update id="gameAddExp" parameterType="string">
     UPDATE `user`
-    SET `game_exp` = `game_exp` + #{game_exp}
+    SET `game_exp` = `game_exp` + #{game_exp},
+        `game_present_month_exp` = `game_present_month_exp` + #{game_exp}
     WHERE id = #{id}
   </update>
 
