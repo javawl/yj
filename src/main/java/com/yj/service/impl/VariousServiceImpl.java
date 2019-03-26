@@ -2815,11 +2815,11 @@ public class VariousServiceImpl implements IVariousService {
             textMessage.setCreateTime(System.currentTimeMillis());
             textMessage.setContent("Hello~小可爱~~\n" +
                     "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
-//                    "\n" +
-//                    "【背呗挑战赛】\n" +
-//                    "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
-//                    "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
-//                    "补贴名额有限，快快猛戳报名<a href='https://www.ourbeibei.com/challenge_sign_up.jsp'>链接1</a>\n" +
+                    "\n" +
+                    "【背呗挑战赛】\n" +
+                    "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
+                    "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
+                    "补贴名额有限，快快猛戳报名<a href='https://www.ourbeibei.com/challenge_sign_up.jsp'>链接1</a>\n" +
                     "\n" +
                     "【单词挑战】\n" +
                     "如果29.9还嫌太多，试试9.9？\n" +
