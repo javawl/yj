@@ -1033,11 +1033,11 @@ public class VariousController {
         Map<Object,Object> Button1Map = new HashMap<>();
         Button1Map.put("name", "福利");
         List<Map<Object,Object>> Button1 = new ArrayList<>();
-//        Map<Object,Object> Button1Children1 = new HashMap<>();
-//        Button1Children1.put("type", "view");
-//        Button1Children1.put("name", "挑战赛");
-//        Button1Children1.put("url", "");
-//        Button1.add(Button1Children1);
+        Map<Object,Object> Button1Children1 = new HashMap<>();
+        Button1Children1.put("type", "view");
+        Button1Children1.put("name", "挑战赛");
+        Button1Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button1.add(Button1Children1);
         Map<Object,Object> Button1Children2 = new HashMap<>();
         Button1Children2.put("type", "view");
         Button1Children2.put("name", "单词挑战");

@@ -2846,11 +2846,11 @@ public class VariousServiceImpl implements IVariousService {
             textMessage.setCreateTime(System.currentTimeMillis());
             textMessage.setContent("Hello~小可爱~~\n" +
                     "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
-//                    "\n" +
-//                    "【背呗挑战赛】\n" +
-//                    "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
-//                    "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
-//                    "补贴名额有限，快快猛戳报名<a href='https://www.ourbeibei.com/challenge_sign_up.jsp'>链接1</a>\n" +
+                    "\n" +
+                    "【背呗挑战赛】\n" +
+                    "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
+                    "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
+                    "补贴名额有限，快快猛戳报名<a href='https://www.ourbeibei.com/challenge_sign_up.jsp'>链接1</a>\n" +
                     "\n" +
                     "【单词挑战】\n" +
                     "如果29.9还嫌太多，试试9.9？\n" +
@@ -3162,7 +3162,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", wechat_challenge_challenge_id + "_" + uid + "_p" + now_time.substring(0, now_time.length() - 3));//商户订单号
-            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "2990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.wechat_platform_notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -3185,7 +3185,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + wechat_challenge_challenge_id + "_" + uid + "_p" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "2990" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
