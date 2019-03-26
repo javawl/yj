@@ -421,10 +421,12 @@ public class GameServiceImpl implements IGameService {
                 }
             }
         }
+        //查询用户信息
+        Map<String,Object> gameUserInfo = recitingWordsMapper.getUserExpById(uid);
+        Map<String,Object> userRank = recitingWordsMapper.getUserRank(gameUserInfo.get("game_exp").toString());
+        result.put("lv", userRank.get("lv").toString());
         if (flag == 0){
             //未上榜
-            //查询用户信息
-            Map<String,Object> gameUserInfo = recitingWordsMapper.getUserExpById(uid);
             result.put("username", gameUserInfo.get("username").toString());
             result.put("game_exp", gameUserInfo.get("game_exp").toString());
             result.put("rank", "未上榜");

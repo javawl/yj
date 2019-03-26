@@ -1559,6 +1559,24 @@
     LIMIT 1
   </select>
 
+  <select id="showWxPlatformSharePic" resultType="map">
+    SELECT *
+    FROM common_config
+  </select>
+
+
+  <select id="findClockPlatformChallenge" resultType="map" parameterType="string">
+    SELECT wechat_platform_challenge.id
+    FROM wechat_platform_challenge,
+         (SELECT *
+          FROM wechat_platform_challenge_contestants
+          WHERE user_id = #{user_id}) tb
+    WHERE tb.wechat_platform_challenge_id = wechat_platform_challenge.id
+    AND wechat_platform_challenge.et > #{now_time}
+    AND wechat_platform_challenge.st &lt; #{now_time}
+    LIMIT 1
+  </select>
+
 
 
   <update id="changeWechatPlatformChallengeVirtualNumber">
@@ -1596,6 +1614,32 @@
   </update>
 
 
+  <update id="updatePlatformChallengeOutsideSent" parameterType="string">
+    UPDATE `common_config`
+    SET `wx_platform_share_sent_outside`=#{wx_platform_share_sent_outside}
+    WHERE id = 1
+  </update>
+
+
+  <update id="updatePlatformChallengeTopPic" parameterType="string">
+    UPDATE `common_config`
+    SET `wx_platform_share_pic_top`=#{wx_platform_share_pic_top}
+    WHERE id = 1
+  </update>
+
+  <update id="updatePlatformChallengeMiddlePic" parameterType="string">
+    UPDATE `common_config`
+    SET `wx_platform_share_pic_middle`=#{wx_platform_share_pic_middle}
+    WHERE id = 1
+  </update>
+
+  <update id="updatePlatformChallengeOutsidePic" parameterType="string">
+    UPDATE `common_config`
+    SET `wx_platform_share_pic_outside`=#{wx_platform_share_pic_outside}
+    WHERE id = 1
+  </update>
+
+
   <update id="mergeWxPlatformChallengeContestants" parameterType="string">
     UPDATE wechat_platform_challenge_contestants
     SET user_id = #{new_user_id}
@@ -1627,6 +1671,7 @@
         `loser` = #{loser}
     WHERE id = #{id}
   </update>
+
 
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)

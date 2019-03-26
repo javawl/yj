@@ -1725,13 +1725,22 @@ public class HomeServiceImpl implements IHomeService {
                     if (resultUpdate == 0){
                         throw new Exception();
                     }
+                    String nowStamp = String.valueOf((new Date()).getTime());
 
                     //如果参加了正在进行的单词挑战的话已背单词增加
                     //找出是否有正在进行的计划并且该用户参加了
-                    Map<Object,Object> userAttendWordChallenge = common_config.findClockWordChallenge(String.valueOf((new Date()).getTime()),id);
+                    Map<Object,Object> userAttendWordChallenge = common_config.findClockWordChallenge(nowStamp,id);
                     if (userAttendWordChallenge != null){
                         String wordChallengeId = userAttendWordChallenge.get("id").toString();
                         common_config.addNormalChallengeWordNumber(String.valueOf(learned_word),wordChallengeId,id);
+                    }
+
+                    //如果参加了正在进行的单词挑战的话已背单词增加
+                    //找出是否有正在进行的计划并且该用户参加了
+                    Map<Object,Object> userAttendPlatformChallenge = common_config.findClockPlatformChallenge(nowStamp,id);
+                    if (userAttendPlatformChallenge != null){
+                        String platformChallengeId = userAttendPlatformChallenge.get("id").toString();
+                        common_config.changeWechatPlatformChallengeVirtualUserAddDay(String.valueOf(learned_word),platformChallengeId,id);
                     }
 
                     //获取当天0点多一秒时间戳

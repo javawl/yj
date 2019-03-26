@@ -320,7 +320,7 @@ public interface Common_configMapper {
     List<Map<Object,Object>> findWordChallengeVirtualUser(@Param("c_id") String c_id);
 
     //将某期运营挑战的虚拟用户查出来
-    List<Map<Object,Object>> findWxPlatformChallengeVirtualUser(@Param("c_id") String c_id);
+    List<Map<Object,Object>> findWxPlatformChallengeVirtualUser(@Param("wechat_platform_challenge_id") String wechat_platform_challenge_id);
 
     //找出是否该用户是被人邀请
     Map<Object,Object> findUserWhetherInvited(@Param("word_challenge_id") String word_challenge_id,@Param("user_id") String user_id);
@@ -725,6 +725,12 @@ public interface Common_configMapper {
     //找出用户正在参加的单词挑战
     Map<Object,Object> findClockWxPlatformChallenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
 
+    //展示公众号分享图
+    List<Map<Object,Object>> showWxPlatformSharePic();
+
+    //找出用户正在参加的运营挑战
+    Map<Object,Object> findClockPlatformChallenge(@Param("now_time") String  now_time,@Param("user_id") String  user_id);
+
     //记录挑战的虚拟用户数
     int changeWechatPlatformChallengeVirtualNumber(@Param("id") String id,@Param("virtual_number") int virtual_number);
 
@@ -739,6 +745,18 @@ public interface Common_configMapper {
 
     //修改挑战的报名人数
     int changeWechatPlatformChallengeVirtualUserAddDay(@Param("id") String id, @Param("user_id") String user_id, @Param("number") String number);
+
+    //修改外分享语句
+    int updatePlatformChallengeOutsideSent(@Param("wx_platform_share_sent_outside") String wx_platform_share_sent_outside);
+
+    //修改外分享顶部图
+    int updatePlatformChallengeTopPic(@Param("wx_platform_share_pic_top") String wx_platform_share_pic_top);
+
+    //修改外分享中间图
+    int updatePlatformChallengeMiddlePic(@Param("wx_platform_share_pic_middle") String wx_platform_share_pic_middle);
+
+    //修改外分享外部图
+    int updatePlatformChallengeOutsidePic(@Param("wx_platform_share_pic_outside") String wx_platform_share_pic_outside);
 
     //为了合并账号
     int mergeWxPlatformChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);

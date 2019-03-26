@@ -1786,7 +1786,7 @@ public class AdminController {
 //                        if (CommonFunc.getNotTimeHour(new Date()) == 9){
 //
 //                        }
-                    }else if ((j+1)/countVirtualNumber < ratio3){
+                    }else if ((j+1)/countVirtualNumber <= ratio3){
                         common_configMapper.dailyAddWxPlatformChallengeVirtualUserWordNumber("30",virtualUser.get(j).get("id").toString());
 //                        if (CommonFunc.getNotTimeHour(new Date()) == 10){
 //
@@ -3344,6 +3344,25 @@ public class AdminController {
     }
 
 
+    /**
+     * 展示公众号分享图
+     * @return
+     */
+    @RequestMapping(value = "showWxPlatformSharePic.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showWxPlatformSharePic(HttpServletRequest request){
+        //展示公众号分享图
+        List<Map<Object,Object>> Info = common_configMapper.showWxPlatformSharePic();
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("wx_platform_share_pic_top",CommonFunc.judgePicPath(Info.get(i).get("wx_platform_share_pic_top").toString()));
+            Info.get(i).put("wx_platform_share_pic_middle",CommonFunc.judgePicPath(Info.get(i).get("wx_platform_share_pic_middle").toString()));
+            Info.get(i).put("wx_platform_share_pic_outside",CommonFunc.judgePicPath(Info.get(i).get("wx_platform_share_pic_outside").toString()));
+        }
+
+        return ServerResponse.createBySuccess("成功",Info);
+    }
+
+
 
     /**
      * 展示挑战的参与用户
@@ -3519,6 +3538,84 @@ public class AdminController {
             return ServerResponse.createByErrorMessage("更新出错！");
         }
 
+    }
+
+
+    /**
+     * 修改外分享语句
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "updateWxPlatformShareSent.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse updateWxPlatformShareSent(String inner, HttpServletResponse response){
+        common_configMapper.updatePlatformChallengeOutsideSent(inner);
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 修改挑战赛分享图
+     * @param file
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadWxPlatformSharePicTop.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadWxPlatformSharePicTop(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletResponse response, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload(file,path,"l_e/user/portrait");
+        String url = "user/portrait/"+name;
+        //存到数据库
+        int result = common_configMapper.updatePlatformChallengeTopPic(url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url);
+    }
+
+
+    /**
+     * 修改挑战赛分享图
+     * @param file
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadWxPlatformSharePicMiddle.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadWxPlatformSharePicMiddle(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletResponse response, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload(file,path,"l_e/user/portrait");
+        String url = "user/portrait/"+name;
+        //存到数据库
+        int result = common_configMapper.updatePlatformChallengeMiddlePic(url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url);
+    }
+
+    /**
+     * 修改挑战赛分享图
+     * @param file
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadWxPlatformSharePicOutside.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadWxPlatformSharePicOutside(@RequestParam(value = "upload_file",required = false) MultipartFile file, HttpServletResponse response, HttpServletRequest request){
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String name = iFileService.upload(file,path,"l_e/user/portrait");
+        String url = "user/portrait/"+name;
+        //存到数据库
+        int result = common_configMapper.updatePlatformChallengeOutsidePic(url);
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("更新失败");
+        }
+        return ServerResponse.createBySuccess("成功",url);
     }
 
 

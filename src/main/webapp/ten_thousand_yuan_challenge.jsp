@@ -173,10 +173,10 @@
                         '<td style="width: 4%;">'+data[i]['st']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['et']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['virtual_number']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="virtual('+"'"+data[i]['id']+"'"+')">查看</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;">查看</button></td>'+
                         '<td style="width: 6%;">'+data[i]['enrollment']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['upper_limit']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button>(若删除，参加该期的的所有用户记录也会删除)</td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button>(若删除，参加该期的的所有用户记录也会删除)</td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){

@@ -1178,6 +1178,20 @@ public class VariousController {
     }
 
 
+    /**
+     * 获取挑战赛外部分享图片和话
+     */
+    @RequestMapping(value="getPlatformShareOutsidePic.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<Map> getPlatformShareOutsidePic(){
+
+        Map info = common_configMapper.getCommonConfig();
+
+        //获取单篇的图文消息
+        return ServerResponse.createBySuccess("成功", info);
+    }
+
+
 
     /**
      * 添加unionid
