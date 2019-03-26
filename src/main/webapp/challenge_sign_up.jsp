@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
 <html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
@@ -40,8 +41,10 @@
         <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_3.png" alt="">
         <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_4.png" alt="">
         <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_5.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_6.png" alt="">
+        <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_7.png" alt="">
         <div style="position: relative;width: 100%;">
-            <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_6.png" alt="">
+            <img class="bg-img" src="https://file.ourbeibei.com/l_e/static/images/bg_challenge_8.png" alt="">
             <div style="text-align: center;width: 100%;display: flex;justify-content: center">
                 <span class="text-container normal-text" v-if="signType === 'formal'">仅剩&nbsp<span class="larger-text">{{rest_number}}</span>&nbsp个名额</span>
             </div>
@@ -49,11 +52,12 @@
         </div>
     </div>
 
+    <div class="count-down" v-if="status === 'no'">活动倒计时：{{hours}}:{{minutes}}:{{seconds}}</div>
     <div class="bottom-button-container" v-if="status === 'no'">
         <div class="flex-container" v-if="signType === 'formal'">
-            <span class="money-text pink">￥29.9</span>
+            <span class="money-text pink">￥29.9<span class="gray delete">￥99.9</span></span>
             <div class="info-text-container">
-                <span class="gray normal-text">90天全勤学习并打卡</span>
+                <span class="gray normal-text">99天全勤学习并打卡</span>
                 <span class="pink normal-text">&nbsp;&nbsp;奖励<span class="pink huge-text">100</span> 元</span>
             </div>
             <button class="challenge-button" v-on:click="onChallengeSign()">立即挑战</button>
