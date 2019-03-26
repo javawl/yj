@@ -1737,18 +1737,10 @@ public class HomeServiceImpl implements IHomeService {
 
                     //如果参加了正在进行的单词挑战的话已背单词增加
                     //找出是否有正在进行的计划并且该用户参加了
-                    if (id.equals("303")){
-                        logger.error("zhoulihan");
-                    }
                     Map<Object,Object> userAttendPlatformChallenge = common_config.findClockPlatformChallenge(nowStamp,id);
                     if (userAttendPlatformChallenge != null){
-                        logger.error("zilin");
                         String platformChallengeId = userAttendPlatformChallenge.get("id").toString();
-                        int change_result = common_config.changeWechatPlatformChallengeVirtualUserAddDay(String.valueOf(learned_word),platformChallengeId,id);
-                        logger.error(String.valueOf(learned_word));
-                        logger.error(platformChallengeId);
-                        logger.error(id);
-                        logger.error(String.valueOf(change_result));
+                        common_config.changeWechatPlatformChallengeVirtualUserAddDay(platformChallengeId,id,String.valueOf(learned_word));
                     }
 
                     //获取当天0点多一秒时间戳
