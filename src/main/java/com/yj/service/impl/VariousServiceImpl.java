@@ -3224,7 +3224,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("et", CommonFunc.getFormatTime(Long.valueOf(selectWordChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
                 //找到老师2
                 Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wechat_challenge_challenge_id, "2");
-                response.put("qr_code", teacher.get("qr_code").toString());
+                response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
                 //这里先记录一下用户的支付情况
                 common_configMapper.insertPayRecord(uid,"1",now_time);
                 return ServerResponse.createBySuccess("成功",response);
@@ -3832,7 +3832,7 @@ public class VariousServiceImpl implements IVariousService {
             //找到老师2
             Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wxPlatformChallengeReserved.get("id").toString(), "3");
             Map<String, Object> response = new HashMap<>();
-            response.put("qr_code", teacher.get("qr_code").toString());
+            response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
             response.put("studentId", "1" + uid);
             //事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
@@ -3889,7 +3889,7 @@ public class VariousServiceImpl implements IVariousService {
             Map<String, Object> response = new HashMap<>();
             response.put("portrait", CommonFunc.judgePicPath(teacher.get("portrait").toString()));
             response.put("username", teacher.get("username").toString());
-            response.put("qr_code", teacher.get("qr_code").toString());
+            response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
             return ServerResponse.createBySuccess("成功！",response);
         }
     }
@@ -3990,7 +3990,7 @@ public class VariousServiceImpl implements IVariousService {
             //找到老师3
             Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wxPlatformChallengeReserved.get("id").toString(), "3");
             Map<String, Object> response = new HashMap<>();
-            response.put("qr_code", teacher.get("qr_code").toString());
+            response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
             response.put("studentId", "1" + uid);
             return ServerResponse.createBySuccess("成功！",response);
         }
@@ -4023,7 +4023,7 @@ public class VariousServiceImpl implements IVariousService {
         //找到老师2
         Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(attendChallenge.get("id").toString(), "2");
         Map<String, Object> response = new HashMap<>();
-        response.put("qr_code", teacher.get("qr_code").toString());
+        response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
         response.put("studentId", "1" + uid);
         response.put("st", CommonFunc.getFormatTime(Long.valueOf(attendChallenge.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
         response.put("et", CommonFunc.getFormatTime(Long.valueOf(attendChallenge.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
