@@ -764,7 +764,7 @@
   <select id="randSelectVideo" resultType="map" parameterType="int">
     SELECT dictionary.word,tb.*
     FROM
-    (select * from word_video_information
+    (select `views`,`img`,`video`,`word_id`,`id` from word_video_information
     order by rand() limit #{size}) tb
     JOIN dictionary
     ON dictionary.id = tb.word_id

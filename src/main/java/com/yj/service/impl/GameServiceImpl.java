@@ -361,9 +361,8 @@ public class GameServiceImpl implements IGameService {
                 }
                 recitingWordsMapper.gameInsertTakePlan(uid, userPlanId, String.valueOf(nowStage), String.valueOf(wordNumber), String.valueOf((new Date()).getTime()));
             }
-            //加经验
+            //加经验，本月份的经验也增加
             recitingWordsMapper.gameAddExp(uid, String.valueOf(exp));
-            //本月份的经验也增加
 
             //取出该数量
             transactionManager.commit(status);
