@@ -111,6 +111,17 @@ public class GameController extends BaseController {
 
 
     /**
+     * 小游戏领取红包
+     */
+    @RequestMapping(value="gameReceiveRedPacket.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<String, Object>>> gameReceiveRedPacket(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameReceiveRedPacket(request);
+    }
+
+
+    /**
      * 世界排行榜
      */
     @RequestMapping(value="gameWorldRank.do", method = RequestMethod.POST)
@@ -118,5 +129,16 @@ public class GameController extends BaseController {
     public ServerResponse<Map<String, Object>> gameWorldRank(int page, int size, HttpServletRequest request){
         //调用service层
         return iGameService.gameWorldRank(page, size, request);
+    }
+
+
+    /**
+     * 挑战排行榜
+     */
+    @RequestMapping(value="gameChallengeRank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> gameChallengeRank(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameChallengeRank(request);
     }
 }

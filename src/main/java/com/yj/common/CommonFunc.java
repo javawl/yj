@@ -487,6 +487,47 @@ public class CommonFunc {
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
+    //获取各种时间
+    public static String getVariousTime(String type){
+        // 获取当前年份、月份、日期
+        Calendar cale = null;
+        cale = Calendar.getInstance();
+        int year = cale.get(Calendar.YEAR);
+        int month = cale.get(Calendar.MONTH) + 1;
+        int day = cale.get(Calendar.DATE);
+        int hour = cale.get(Calendar.HOUR_OF_DAY);
+        int minute = cale.get(Calendar.MINUTE);
+        int second = cale.get(Calendar.SECOND);
+        int dow = cale.get(Calendar.DAY_OF_WEEK);
+        int dom = cale.get(Calendar.DAY_OF_MONTH);
+        int doy = cale.get(Calendar.DAY_OF_YEAR);
+        if (type.equals("year")){
+            return String.valueOf(year);
+        }else if (type.equals("month")){
+            return String.valueOf(month);
+        }else if (type.equals("day")){
+            return String.valueOf(day);
+        }else if (type.equals("hour")){
+            return String.valueOf(hour);
+        }else if (type.equals("minute")){
+            return String.valueOf(minute);
+        }else if (type.equals("second")){
+            return String.valueOf(second);
+        }else {
+            return String.valueOf(hour);
+        }
+    }
+
+    //获取上个月的时间戳
+    public static Date getLastMonthTime(){
+        // 获取当前年份、月份、日期
+        Calendar cale = null;
+        cale = Calendar.getInstance();
+        cale.setTime(new Date());
+        cale.add(Calendar.MONTH, -1);
+        return cale.getTime();
+    }
+
     //获取当月一号零点时间戳
     public static String getMonthOneDate(){
         Calendar calendar = Calendar.getInstance();
@@ -817,6 +858,15 @@ public class CommonFunc {
         }
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(new Date(time));
+    }
+
+    //获取时间格式
+    public static String getFormatTimeByDate(Date time,String format){
+        if (format == null){
+            format= "yyyy-MM-dd HH:mm:ss";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return sdf.format(time);
     }
 
     //时间格式转换时间戳

@@ -402,6 +402,21 @@
     </dependency>
 
 
+    <!-- WebSocket -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-websocket</artifactId>
+      <version>5.1.5.RELEASE</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-messaging</artifactId>
+      <version>5.1.5.RELEASE</version>
+    </dependency>
+
+
   </dependencies>
 
 

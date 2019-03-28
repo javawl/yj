@@ -74,6 +74,19 @@ public class GameServiceImpl implements IGameService {
         gameHomePageUserInfo.put("rank", userRank.get("rank").toString());
         gameHomePageUserInfo.put("rank_exp", userRank.get("rank_exp").toString());
         gameHomePageUserInfo.put("lv", userRank.get("lv").toString());
+        //判断是否有红包
+        //本月一号0点
+        String monthZeroTime = CommonFunc.getMonthOneDate();
+        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthZeroTime);
+        if (hasRedPacket != null){
+            //有红包
+            gameHomePageUserInfo.put("hasRedPacket", "yes");
+            gameHomePageUserInfo.put("redPacket", hasRedPacket.get("reward").toString());
+        }else {
+            //没红包
+            gameHomePageUserInfo.put("hasRedPacket", "no");
+            gameHomePageUserInfo.put("redPacket", "0");
+        }
         //计算离线经验
         if (((new Date()).getTime() - Long.valueOf(gameLastOnlineTime)) > Const.ONE_HOUR_DATE){
             //大于1小时
@@ -378,6 +391,69 @@ public class GameServiceImpl implements IGameService {
 
 
     /**
+     * 领取红包(没有unionid不能领!!)
+     */
+    public ServerResponse<List<Map<String, Object>>> gameReceiveRedPacket(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //判断是否有红包
+        //本月一号0点
+        String monthZeroTime = CommonFunc.getMonthOneDate();
+        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthZeroTime);
+        if (hasRedPacket == null){
+            //没红包
+            return ServerResponse.createByErrorMessage("暂无红包！");
+        }
+        //判断是否有unionid
+        //验证unionid
+        String union_id = userMapper.findUnionIdById(uid);
+        if (union_id == null){
+            return ServerResponse.createByErrorMessage("未授权成功不可领取红包！");
+        }
+        if (union_id.length() <= 0){
+            return ServerResponse.createByErrorMessage("未授权成功不可领取红包！");
+        }
+        String now_time = String.valueOf((new Date()).getTime());
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            //修改红包状态
+            recitingWordsMapper.gameChangeRedPacketStatus(uid, monthZeroTime);
+
+            //明细表加入红包明细
+            common_configMapper.insertBill(uid,CommonFunc.getFormatTimeByDate(CommonFunc.getLastMonthTime(),"yyyy/MM") + "游戏挑战获得红包",hasRedPacket.get("reward").toString(),now_time,null);
+
+            //钱包加入红包
+            recitingWordsMapper.gameUpdateBill(uid, hasRedPacket.get("reward").toString());
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功！");
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("游戏领取红包失败",e.getStackTrace());
+            logger.error("游戏领取红包失败",e);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("领取红包失败！");
+        }
+    }
+
+
+    /**
      * 小游戏世界排行榜
      * @param request  request
      */
@@ -415,6 +491,7 @@ public class GameServiceImpl implements IGameService {
             }
             worldRank.get(i).put("rank", String.valueOf(i + 1));
             worldRank.get(i).put("portrait", CommonFunc.judgePicPath(worldRank.get(i).get("portrait").toString()));
+            worldRank.get(i).put("username", worldRank.get(i).get("username").toString());
             for (int j = 0; j < getGameRankInfo.size(); j++){
                 if (Integer.valueOf(worldRank.get(i).get("game_exp").toString()) >= Integer.valueOf(getGameRankInfo.get(j).get("rank_exp").toString())){
                     worldRank.get(i).put("nickname", getGameRankInfo.get(j).get("rank").toString());
@@ -434,6 +511,77 @@ public class GameServiceImpl implements IGameService {
             result.put("portrait", CommonFunc.judgePicPath(gameUserInfo.get("portrait").toString()));
         }
         result.put("worldRank", worldRank);
+
+        return ServerResponse.createBySuccess("成功！", result);
+    }
+
+
+    /**
+     * 小游戏挑战赛排行榜
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> gameChallengeRank(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //判断是否需要未上榜
+        int flag = 0;
+        //查出用户排名
+        List<Map<String,Object>> challengeRank = recitingWordsMapper.getUserChallengeRank(0, 100);
+        Map<String, Object> result = new HashMap<>();
+        //匹配等级
+        for (int i = 0; i < challengeRank.size(); i++){
+            if (challengeRank.get(i).get("id").toString().equals(uid)){
+                result.put("username", challengeRank.get(i).get("username").toString());
+                result.put("game_present_month_exp", challengeRank.get(i).get("game_present_month_exp").toString());
+                result.put("rank", String.valueOf(i + 1));
+                result.put("portrait", CommonFunc.judgePicPath(challengeRank.get(i).get("portrait").toString()));
+                flag += 1;
+            }
+            //设置奖金
+            if (i == 0){
+                challengeRank.get(i).put("reward", "1000");
+            }else if (i == 1){
+                challengeRank.get(i).put("reward", "600");
+            }else if (i == 2){
+                challengeRank.get(i).put("reward", "400");
+            }else if (i < 10){
+                challengeRank.get(i).put("reward", "200");
+            }else if (i < 20){
+                challengeRank.get(i).put("reward", "150");
+            }else if (i < 50){
+                challengeRank.get(i).put("reward", "100");
+            }else if (i < 70){
+                challengeRank.get(i).put("reward", "80");
+            }else if (i < 100){
+                challengeRank.get(i).put("reward", "15");
+            }
+            challengeRank.get(i).put("rank", String.valueOf(i + 1));
+            challengeRank.get(i).put("username", challengeRank.get(i).get("username").toString());
+            challengeRank.get(i).put("portrait", CommonFunc.judgePicPath(challengeRank.get(i).get("portrait").toString()));
+        }
+        if (flag == 0){
+            //查询用户信息
+            Map<String,Object> gameUserInfo = recitingWordsMapper.getUserExpById(uid);
+            Map<String,Object> userRank = recitingWordsMapper.getUserRank(gameUserInfo.get("game_exp").toString());
+            result.put("lv", userRank.get("lv").toString());
+            //未上榜
+            result.put("username", gameUserInfo.get("username").toString());
+            result.put("game_present_month_exp", gameUserInfo.get("game_present_month_exp").toString());
+            result.put("rank", "未上榜");
+            result.put("portrait", CommonFunc.judgePicPath(gameUserInfo.get("portrait").toString()));
+        }
+        result.put("challengeRank", challengeRank);
 
         return ServerResponse.createBySuccess("成功！", result);
     }

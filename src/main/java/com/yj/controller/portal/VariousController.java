@@ -1405,6 +1405,31 @@ public class VariousController {
     }
 
 
+
+
+    /**
+     * 老师2
+     */
+    @RequestMapping(value="teacherTwo.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> teacherTwo(HttpServletRequest request){
+        //调用service层
+        return iVariousService.teacherTwo(request);
+    }
+
+
+
+    /**
+     * 老师3
+     */
+    @RequestMapping(value="teacherThree.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> teacherThree(HttpServletRequest request){
+        //调用service层
+        return iVariousService.teacherThree(request);
+    }
+
+
     /**
      * 运营活动排行榜
      */

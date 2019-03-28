@@ -23,6 +23,10 @@ public interface IGameService {
 
     ServerResponse<List<Map<String, Object>>> gameStageClear(int stage, int exp, int wordNumber, HttpServletRequest request);
 
+    ServerResponse<List<Map<String, Object>>> gameReceiveRedPacket(HttpServletRequest request);
+
     ServerResponse<Map<String, Object>> gameWorldRank(int page, int size, HttpServletRequest request);
+
+    ServerResponse<Map<String, Object>> gameChallengeRank(HttpServletRequest request);
 
 }

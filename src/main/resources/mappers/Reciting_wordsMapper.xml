@@ -175,7 +175,7 @@
   </select>
 
   <select id="getUserExpById" resultType="map" parameterType="string">
-    SELECT username,portrait,game_exp
+    SELECT username,portrait,game_exp,game_present_month_exp
     FROM `user`
     WHERE id = #{id}
   </select>
@@ -228,7 +228,7 @@
   <select id="getUserRank" parameterType="string" resultType="map">
     SELECT rank,rank_exp,lv
     FROM game_rank
-    WHERE rank_exp &lt; #{rank_exp}
+    WHERE rank_exp &lt;= #{rank_exp}
     ORDER BY rank_exp DESC
     LIMIT 1
   </select>
@@ -246,9 +246,32 @@
     LIMIT #{start}, #{size}
   </select>
 
+  <select id="getUserChallengeRank" resultType="map">
+    SELECT id, username,portrait,game_present_month_exp
+    FROM `user`
+    ORDER BY game_present_month_exp DESC
+    LIMIT #{start}, #{size}
+  </select>
+
+
+  <select id="gameJudgeHasRedPacket" resultType="map">
+    SELECT reward
+    FROM `game_challenge_red_packet`
+    WHERE `game_challenge_red_packet`.user_id = #{id}
+    AND `game_challenge_red_packet`.et = #{time}
+    AND `game_challenge_red_packet`.wheather_gain = 0
+    LIMIT 1
+  </select>
+
   <update id="gameSelectPlan" parameterType="string">
     UPDATE `user`
     SET `game_plan` = #{game_plan}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameUpdateBill" parameterType="string">
+    UPDATE `user`
+    SET `bill` = #{bill}
     WHERE id = #{id}
   </update>
 
@@ -265,6 +288,14 @@
     `number_flag` = `number_flag` + #{number_flag}
     WHERE user_id = #{user_id}
     AND dictionary_type = #{dictionary_type}
+  </update>
+
+  <update id="gameChangeRedPacketStatus" parameterType="string">
+    UPDATE `game_challenge_red_packet`
+    SET `wheather_gain` = 1
+    WHERE `game_challenge_red_packet`.user_id = #{id}
+    AND `game_challenge_red_packet`.et = #{time}
+    AND `game_challenge_red_packet`.wheather_gain = 0
   </update>
 
 

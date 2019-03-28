@@ -49,14 +49,26 @@ public interface Reciting_wordsMapper {
     //获取世界排名
     List<Map<String,Object>> getUserWorldRank(@Param("start") int start, @Param("size") int size);
 
+    //获取挑战赛排名
+    List<Map<String,Object>> getUserChallengeRank(@Param("start") int start, @Param("size") int size);
+
+    //查看是否有红包可以领
+    Map<String,Object> gameJudgeHasRedPacket(@Param("id") String id, @Param("time") String time);
+
     //更换计划
     int gameSelectPlan(@Param("id") String id, @Param("game_plan") String game_plan);
+
+    //加入钱包
+    int gameUpdateBill(@Param("id") String id, @Param("bill") String bill);
 
     //增加经验
     int gameAddExp(@Param("id") String id, @Param("game_exp") String game_exp);
 
     //过关
     int gameStageClear(@Param("stage") String stage, @Param("number_flag") String number_flag, @Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);
+
+    //修改红包状态
+    int gameChangeRedPacketStatus(@Param("id") String id, @Param("time") String time);
 
     //增加用户在该词汇轮询索引
     int gameChangeWordListIndex(@Param("number_flag") String number_flag, @Param("user_id") String user_id, @Param("dictionary_type") String dictionary_type);

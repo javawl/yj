@@ -166,6 +166,12 @@ public interface IVariousService {
     //老师1
     ServerResponse<Map<String,Object>> teacherOne(HttpServletRequest request);
 
+    //老师2
+    ServerResponse<Map<String,Object>> teacherTwo(HttpServletRequest request);
+
+    //老师3
+    ServerResponse<Map<String,Object>> teacherThree(HttpServletRequest request);
+
     //运营活动排行榜
     ServerResponse<List<Map<Object,Object>>> wxPlatformChallengeRank(HttpServletRequest request);
 
