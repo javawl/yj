@@ -1036,22 +1036,22 @@ public class VariousController {
         Map<Object,Object> Button1Children1 = new HashMap<>();
         Button1Children1.put("type", "view");
         Button1Children1.put("name", "挑战赛");
-        Button1Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.jsp");
+        Button1Children1.put("url", "https://www.ourbeibei.com/challenge_sign_up.html");
         Button1.add(Button1Children1);
         Map<Object,Object> Button1Children2 = new HashMap<>();
         Button1Children2.put("type", "view");
         Button1Children2.put("name", "单词挑战");
-        Button1Children2.put("url", "https://www.ourbeibei.com/word_sign_up.jsp");
+        Button1Children2.put("url", "https://www.ourbeibei.com/word_sign_up.html");
         Button1.add(Button1Children2);
         Map<Object,Object> Button1Children3 = new HashMap<>();
         Button1Children3.put("type", "view");
         Button1Children3.put("name", "语境阅读");
-        Button1Children3.put("url", "https://www.ourbeibei.com/book_sign_up.jsp");
+        Button1Children3.put("url", "https://www.ourbeibei.com/book_sign_up.html");
         Button1.add(Button1Children3);
         Map<Object,Object> Button1Children4 = new HashMap<>();
         Button1Children4.put("type", "view");
         Button1Children4.put("name", "挑战赛排行榜");
-        Button1Children4.put("url", "https://www.ourbeibei.com/rank.jsp");
+        Button1Children4.put("url", "https://www.ourbeibei.com/rank.html");
         Button1.add(Button1Children4);
         Button1Map.put("sub_button", Button1);
 
@@ -1073,7 +1073,7 @@ public class VariousController {
         Map<Object,Object> Button2Children2 = new HashMap<>();
         Button2Children2.put("type", "view");
         Button2Children2.put("name", "学习分享");
-        Button2Children2.put("url", "https://www.ourbeibei.com/challenge_share.jsp");
+        Button2Children2.put("url", "https://www.ourbeibei.com/challenge_share.html");
         Button2.add(Button2Children2);
 //        Map<Object,Object> Button2Children3 = new HashMap<>();
 //        Button2Children3.put("type", "view");
