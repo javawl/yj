@@ -255,7 +255,7 @@ public class TokenServiceImpl implements ITokenService {
                     String nonce_str = CommonFunc.getRandomStringByLength(32);
                     //时间戳
                     Long timeStamp = System.currentTimeMillis() / 1000;
-                    String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl + page_name + ".jsp?code=" + code + "&state=1";
+                    String str = "jsapi_ticket="+ticket+"&noncestr="+nonce_str+"&timestamp="+timeStamp+"&url=" + this.wxPlatformMakeSignatureUrl + page_name + ".html?code=" + code + "&state=1";
                     String signature = CommonFunc.SHA1(str);
                     Map<String, Object> res = new HashMap<>();
                     res.put("noncestr", nonce_str);
