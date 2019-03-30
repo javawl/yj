@@ -1191,6 +1191,12 @@ public class VariousController {
     public ServerResponse<Map> getPlatformShareOutsidePic(){
 
         Map info = common_configMapper.getCommonConfig();
+        for (int i = 0; i < info.size(); i++){
+            info.put("wx_platform_share_pic_middle", CommonFunc.judgePicPath(info.get("wx_platform_share_pic_middle").toString()));
+            info.put("wx_platform_share_pic_outside", CommonFunc.judgePicPath(info.get("wx_platform_share_pic_outside").toString()));
+            info.put("wx_platform_share_pic_top", CommonFunc.judgePicPath(info.get("wx_platform_share_pic_top").toString()));
+            info.put("wx_platform_share_sent_outside", CommonFunc.judgePicPath(info.get("wx_platform_share_sent_outside").toString()));
+        }
 
         //获取单篇的图文消息
         return ServerResponse.createBySuccess("成功", info);
