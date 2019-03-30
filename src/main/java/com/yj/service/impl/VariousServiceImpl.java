@@ -2996,6 +2996,14 @@ public class VariousServiceImpl implements IVariousService {
                     common_configMapper.mergeWxPlatformChallengeContestants(uid, newUserId);
                     //合并预约者
                     common_configMapper.mergeWxPlatformChallengeReserved(uid, newUserId);
+                    //合并单词挑战
+                    common_configMapper.mergeWordChallengeContestants(uid, newUserId);
+                    common_configMapper.mergeWordChallengeInviteRelation(uid, newUserId);
+                    //合并阅读
+                    common_configMapper.mergeReadChallengeContestants(uid, newUserId);
+                    common_configMapper.mergeReadChallengeHelp(uid, newUserId);
+                    common_configMapper.mergeReadChallengeHelpSignUp(uid, newUserId);
+                    common_configMapper.mergeReadChallengeReserved(uid, newUserId);
                     //插入unionid
                     userMapper.update_username_portrait_unionid_platform_id(uid, portrait, username, newWechatPlatformUser.get("wechat_platform_openid").toString(), unionid);
                     //删除微信公众号账号

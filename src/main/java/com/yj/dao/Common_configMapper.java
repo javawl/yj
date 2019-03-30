@@ -762,7 +762,25 @@ public interface Common_configMapper {
     int mergeWxPlatformChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
 
     //为了合并账号
+    int mergeWordChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeReadChallengeContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
     int mergeWxPlatformChallengeReserved(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeReadChallengeReserved(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeReadChallengeHelpSignUp(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeReadChallengeHelp(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeWordChallengeInviteRelation(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
 
     //结算挑战表
     int settleAccountsPlatformChallenge(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,

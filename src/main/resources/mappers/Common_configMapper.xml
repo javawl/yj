@@ -1651,6 +1651,28 @@
         )
   </update>
 
+  <update id="mergeWordChallengeContestants" parameterType="string">
+    UPDATE word_challenge_contestants
+    SET user_id = #{new_user_id}
+    WHERE id in
+          (SELECT tb.id
+           FROM (SELECT `id`
+                 FROM word_challenge_contestants
+                 WHERE user_id = #{user_id}) tb
+          )
+  </update>
+
+  <update id="mergeReadChallengeContestants" parameterType="string">
+    UPDATE read_class_contestants
+    SET user_id = #{new_user_id}
+    WHERE id in
+          (SELECT tb.id
+           FROM (SELECT `id`
+                 FROM read_class_contestants
+                 WHERE user_id = #{user_id}) tb
+          )
+  </update>
+
   <update id="mergeWxPlatformChallengeReserved" parameterType="string">
     UPDATE wechat_platform_challenge_reserved
       SET user_id = #{new_user_id}
@@ -1660,6 +1682,54 @@
                    FROM wechat_platform_challenge_reserved
                    WHERE user_id = #{user_id}) tb
             )
+  </update>
+
+
+  <update id="mergeReadChallengeReserved" parameterType="string">
+    UPDATE read_class_reserved
+      SET user_id = #{new_user_id}
+      WHERE id in
+            (SELECT tb.id
+             FROM (SELECT `id`
+                   FROM read_class_reserved
+                   WHERE user_id = #{user_id}) tb
+            )
+  </update>
+
+  <update id="mergeReadChallengeHelp" parameterType="string">
+    UPDATE read_class_help
+      SET user_id = #{new_user_id}
+      WHERE id in
+            (SELECT tb.id
+             FROM (SELECT `id`
+                   FROM read_class_help
+                   WHERE user_id = #{user_id}) tb
+            )
+  </update>
+
+
+  <update id="mergeReadChallengeHelpSignUp" parameterType="string">
+    UPDATE read_class_help_sign_up
+      SET user_id = #{new_user_id}
+      WHERE id in
+            (SELECT tb.id
+             FROM (SELECT `id`
+                   FROM read_class_help_sign_up
+                   WHERE user_id = #{user_id}) tb
+            )
+  </update>
+
+
+
+  <update id="mergeWordChallengeInviteRelation" parameterType="string">
+    UPDATE word_challenge_invite_relation
+    SET user_id = #{new_user_id}
+    WHERE id in
+          (SELECT tb.id
+           FROM (SELECT `id`
+                 FROM word_challenge_invite_relation
+                 WHERE user_id = #{user_id}) tb
+          )
   </update>
 
   <update id="settleAccountsPlatformChallenge">

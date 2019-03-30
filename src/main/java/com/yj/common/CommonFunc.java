@@ -104,6 +104,20 @@ public class CommonFunc {
         return MD5Util.MD5EncodeUtf8(randChars + timestamp + salt);
     }
 
+
+    //小游戏获取经验值生成token
+    public static String generateGameToken(String salt, String uid){
+        //生成token（唯一标示）
+        CommonFunc func = new CommonFunc();
+        //生成32位随机字符串
+        String randChars = func.getRandChars(32);
+        //获取当前时间戳
+        String timestamp = String.valueOf(new Date().getTime());
+        //salt 盐
+        //md5加密
+        return MD5Util.MD5EncodeUtf8(randChars + timestamp + salt + uid);
+    }
+
     //发送手机验证码
     public String sendPhoneMessage(String phone){
         //腾讯云暂时不用
@@ -504,9 +518,17 @@ public class CommonFunc {
         if (type.equals("year")){
             return String.valueOf(year);
         }else if (type.equals("month")){
-            return String.valueOf(month);
+            if (String.valueOf(month).length() == 1){
+                return "0" + String.valueOf(month) ;
+            }else {
+                return String.valueOf(month) ;
+            }
         }else if (type.equals("day")){
-            return String.valueOf(day);
+            if (String.valueOf(day).length() == 1){
+                return "0" + String.valueOf(day) ;
+            }else {
+                return String.valueOf(day) ;
+            }
         }else if (type.equals("hour")){
             return String.valueOf(hour);
         }else if (type.equals("minute")){

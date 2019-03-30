@@ -141,4 +141,15 @@ public class GameController extends BaseController {
         //调用service层
         return iGameService.gameChallengeRank(request);
     }
+
+
+    /**
+     * 小游戏在线加经验获取token
+     */
+    @RequestMapping(value="gameOnlineExpToken.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gameOnlineExpToken(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameOnlineExpToken(request);
+    }
 }

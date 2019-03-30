@@ -1,4 +1,5 @@
 package com.yj.service.impl;
+import com.yj.cache.LRULocalCache;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
@@ -7,6 +8,7 @@ import com.yj.dao.DictionaryMapper;
 import com.yj.dao.Reciting_wordsMapper;
 import com.yj.dao.UserMapper;
 import com.yj.service.IGameService;
+import com.yj.util.AES;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -584,6 +586,51 @@ public class GameServiceImpl implements IGameService {
         result.put("challengeRank", challengeRank);
 
         return ServerResponse.createBySuccess("成功！", result);
+    }
+
+
+
+    /**
+     * 小游戏在线加经验获取token
+     * @param request  request
+     */
+    public ServerResponse<String> gameOnlineExpToken(HttpServletRequest request){
+        //获得加密字符串
+        String key = request.getHeader("key");
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(key);
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        try {
+            //解码
+            AES aes = new AES();
+            String sourceSent = AES.DecryptCBC(key, aes.getGameOnlineKey());
+            //判断是不是按照要求来的
+            // 日（xx）年 月（xx）* 3 月 日 年 % 2
+            String correct = String.valueOf(Long.valueOf(CommonFunc.getVariousTime("day") + CommonFunc.getVariousTime("year") + CommonFunc.getVariousTime("month")) * 3)
+            + String.valueOf(Long.valueOf(CommonFunc.getVariousTime("day") + CommonFunc.getVariousTime("year") + CommonFunc.getVariousTime("month")) % 2);
+            if (correct.equals(sourceSent)){
+                String newToken = CommonFunc.generateGameToken(aes.getGameOnlineKey(), uid);
+                //存入缓存 (1分钟过期)
+                LRULocalCache.put(token, "1", 60);
+                return ServerResponse.createBySuccess("成功！", token);
+            }else {
+                return ServerResponse.createByErrorMessage("输入格式有误！");
+            }
+        }catch (Exception ex){
+            logger.error("小游戏在线加经验获取token异常", ex.getStackTrace());
+            return ServerResponse.createByErrorMessage("获取标识失败！");
+        }
     }
 
 }

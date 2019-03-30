@@ -29,4 +29,6 @@ public interface IGameService {
 
     ServerResponse<Map<String, Object>> gameChallengeRank(HttpServletRequest request);
 
+    ServerResponse<String> gameOnlineExpToken(HttpServletRequest request);
+
 }
