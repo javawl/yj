@@ -633,4 +633,137 @@ public class GameServiceImpl implements IGameService {
         }
     }
 
+
+    /**
+     * 小游戏在线加经验获取
+     * @param request  request
+     */
+    public ServerResponse<String> gameOnlineExpAdd(HttpServletRequest request){
+        //获得加密字符串
+        String online_token = request.getHeader("online_token");
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(online_token);
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查看缓存 (1分钟过期)
+        if (!LRULocalCache.containsKey(online_token)){
+            //没有token
+            return ServerResponse.createByErrorMessage("增加经验验证错误！");
+        }
+        //在这里设置多少秒一传
+        int duringTime = 30;
+        //间隔
+        int during = 3;
+        //查询用户信息
+        Map<String,Object> gameUserInfo = recitingWordsMapper.getUserOnlineExpById(uid);
+        //计算今天经验上限
+        //每三秒增加lv的平方，一天上限四小时
+        //上限次数
+        int upLimitTimes = 4 * 60 * 60 / 3;
+        //判断是不是null
+        //获取零点多一秒
+        String Zero = CommonFunc.getOneDate();
+        Long now_time = (new Date()).getTime();
+        if (gameUserInfo.get("game_online_record_time") != null && gameUserInfo.get("game_today_receive_online_exp_times") != null){
+            //两个都不为null才判断
+            String gameOnlineRecordTime = gameUserInfo.get("game_online_record_time").toString();
+            String gameTodayReceiveOnlineExpTimes = gameUserInfo.get("game_today_receive_online_exp_times").toString();
+            //今天次数达到上限
+            if ((Long.valueOf(gameOnlineRecordTime) > Long.valueOf(Zero)) && Integer.valueOf(gameTodayReceiveOnlineExpTimes) >= upLimitTimes){
+                return ServerResponse.createByErrorMessage("到达今日经验值上限！");
+            }
+            //判断三十秒
+            if (((now_time - Long.valueOf(gameUserInfo.get("game_online_record_time").toString())) <= 29000L) && Long.valueOf(gameOnlineRecordTime) >= Long.valueOf(Zero)){
+                return ServerResponse.createByErrorMessage("获取经验过频繁！");
+            }
+        }
+
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+
+            if (gameUserInfo.get("game_online_record_time") == null){
+                //如果换了一天，次数清零
+                recitingWordsMapper.gameOnlineExpTimesSetZero(uid, "0");
+            }else {
+                String gameOnlineRecordTime = gameUserInfo.get("game_online_record_time").toString();
+                if (Long.valueOf(gameOnlineRecordTime) <= Long.valueOf(Zero)){
+                    //上次是昨天
+                    //如果换了一天，次数清零
+                    recitingWordsMapper.gameOnlineExpTimesSetZero(uid, "0");
+                }
+            }
+            //如果原本次数非空的话就加上，空的话就这一次
+            int new_times = 1;
+            if (gameUserInfo.get("game_today_receive_online_exp_times") != null){
+                new_times += Integer.valueOf(gameUserInfo.get("game_today_receive_online_exp_times").toString());
+            }
+            //把level找出来
+            //当前经验值
+            String gameExp = gameUserInfo.get("game_exp").toString();
+            //查出所在等级
+            Map<String,Object> userRank = recitingWordsMapper.getUserRank(gameExp);
+            int lv = Integer.valueOf(userRank.get("lv").toString());
+            //计算经验值
+            //todo 把经验加上
+            int exp = duringTime / during * (lv * lv);
+            recitingWordsMapper.gameAddExp(uid, String.valueOf(exp));
+            //todo 把次数和时间更新
+            recitingWordsMapper.gameOnlineExpTimesAdd(uid, String.valueOf(new_times), String.valueOf(now_time));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功！");
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("增加经验失败",e.getStackTrace());
+            logger.error("增加经验失败",e);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("增加经验失败！");
+        }
+    }
+
+
+    /**
+     * 游戏专场
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查询用户信息
+        Map<String,Object> gameHomePageUserInfo = recitingWordsMapper.gameHomePageUserInfo(uid);
+        //当前经验值
+        String gameExp = gameHomePageUserInfo.get("game_exp").toString();
+        List<Map<String,Object>> pkField = recitingWordsMapper.gamePkField();
+        Map<String, Object> result = new HashMap<>();
+        result.put("userGameExp", gameExp);
+        result.put("pkField", pkField);
+
+        return ServerResponse.createBySuccess("成功！",result);
+    }
+
 }

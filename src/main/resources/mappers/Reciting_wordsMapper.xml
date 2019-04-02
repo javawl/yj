@@ -180,6 +180,12 @@
     WHERE id = #{id}
   </select>
 
+  <select id="getUserOnlineExpById" resultType="map" parameterType="string">
+    SELECT game_online_record_time,game_today_receive_online_exp_times,game_exp
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
   <select id="getGameUserTakeInAllPlan" resultType="map" parameterType="string">
     SELECT stage,tb2.*
     FROM game_take_plan,
@@ -225,6 +231,11 @@
     WHERE `type` = #{type}
   </select>
 
+  <select id="gamePkField" parameterType="string" resultType="map">
+    SELECT `name`,exp
+    FROM game_pk_field
+  </select>
+
   <select id="getUserRank" parameterType="string" resultType="map">
     SELECT rank,rank_exp,lv
     FROM game_rank
@@ -266,6 +277,19 @@
   <update id="gameSelectPlan" parameterType="string">
     UPDATE `user`
     SET `game_plan` = #{game_plan}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameOnlineExpTimesSetZero" parameterType="string">
+    UPDATE `user`
+    SET `game_today_receive_online_exp_times` = #{game_today_receive_online_exp_times}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameOnlineExpTimesAdd" parameterType="string">
+    UPDATE `user`
+    SET `game_today_receive_online_exp_times` = #{game_today_receive_online_exp_times},
+        `game_online_record_time` = #{game_online_record_time}
     WHERE id = #{id}
   </update>
 

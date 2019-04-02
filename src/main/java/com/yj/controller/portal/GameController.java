@@ -152,4 +152,26 @@ public class GameController extends BaseController {
         //调用service层
         return iGameService.gameOnlineExpToken(request);
     }
+
+
+    /**
+     * 小游戏在线加经验
+     */
+    @RequestMapping(value="gameOnlineExpAdd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gameOnlineExpAdd(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameOnlineExpAdd(request);
+    }
+
+
+    /**
+     * 小游戏专场
+     */
+    @RequestMapping(value="gamePkField.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request){
+        //调用service层
+        return iGameService.gamePkField(request);
+    }
 }

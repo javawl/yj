@@ -31,4 +31,8 @@ public interface IGameService {
 
     ServerResponse<String> gameOnlineExpToken(HttpServletRequest request);
 
+    ServerResponse<String> gameOnlineExpAdd(HttpServletRequest request);
+
+    ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request);
+
 }

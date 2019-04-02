@@ -28,6 +28,9 @@ public interface Reciting_wordsMapper {
     //获取用户经验信息
     Map<String,Object> getUserExpById(@Param("id") String id);
 
+    //获取用户经验信息
+    Map<String,Object> getUserOnlineExpById(@Param("id") String id);
+
     //获取用户参与过的计划的信息
     List<Map<String,Object>> getGameUserTakeInAllPlan(@Param("user_id") String user_id);
 
@@ -39,6 +42,9 @@ public interface Reciting_wordsMapper {
 
     //查出某词汇
     List<Map<String,Object>> getDictionaryByDictionaryType(@Param("type") String type);
+
+    //查出游戏专场
+    List<Map<String,Object>> gamePkField();
 
     //查出用户所在级别
     Map<String,Object> getUserRank(@Param("rank_exp") String rank_exp);
@@ -57,6 +63,12 @@ public interface Reciting_wordsMapper {
 
     //更换计划
     int gameSelectPlan(@Param("id") String id, @Param("game_plan") String game_plan);
+
+    //次数清零
+    int gameOnlineExpTimesSetZero(@Param("id") String id, @Param("game_today_receive_online_exp_times") String game_today_receive_online_exp_times);
+
+    //在线增加经验
+    int gameOnlineExpTimesAdd(@Param("id") String id, @Param("game_today_receive_online_exp_times") String game_today_receive_online_exp_times, @Param("game_online_record_time") String game_online_record_time);
 
     //加入钱包
     int gameUpdateBill(@Param("id") String id, @Param("bill") String bill);
