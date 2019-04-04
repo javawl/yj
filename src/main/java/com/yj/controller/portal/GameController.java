@@ -5,6 +5,7 @@ import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
 import com.yj.service.IGameService;
 import com.yj.service.ITokenService;
+import com.yj.websocket.SocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.Socket;
 import java.util.List;
 import java.util.Map;
 
@@ -173,5 +175,18 @@ public class GameController extends BaseController {
     public ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request){
         //调用service层
         return iGameService.gamePkField(request);
+    }
+
+
+    /**
+     * 测试websocket
+     */
+    @RequestMapping(value="testWebSocket.do", method = RequestMethod.GET)
+    @ResponseBody
+    public String testWebSocket(HttpServletRequest request, String user){
+//        SocketHandler.sendMessagesToUsers(new org.springframework.web.socket.TextMessage("你好鸭！"));
+        System.out.println(user);
+        SocketHandler.sendMessageToUser(user, new org.springframework.web.socket.TextMessage("fuck"));
+        return "ok";
     }
 }

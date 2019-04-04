@@ -10,11 +10,11 @@ public class WxPayConfig {
     //微信公众号支付成功后的服务器回调url
     public static final String wechat_platform_notify_url = "https://www.ourbeibei.com/various/wxPlatformPayNotify.do";
     //阅读支付成功后的服务器回调url
-    public static final String read_notify_url = "http://123.207.85.37:8080/various/readPayNotify.do";
+    public static final String read_notify_url = "https://www.ourbeibei.com/various/readPayNotify.do";
     //阅读支付成功后的服务器回调url
-    public static final String read_help_pay_notify = "http://123.207.85.37:8080/various/readHelpPayNotify.do";
+    public static final String read_help_pay_notify = "https://www.ourbeibei.com/various/readHelpPayNotify.do";
     //阅读支付成功后的服务器回调url
-    public static final String read_help_pay_notify_second = "http://123.207.85.37:8080/various/readChallengeHelpPaySecondNotify.do";
+    public static final String read_help_pay_notify_second = "https://www.ourbeibei.com/various/readChallengeHelpPaySecondNotify.do";
     //签名方式，固定值
     public static final String SIGNTYPE = "MD5";
     //交易类型，小程序支付的固定值为JSAPI

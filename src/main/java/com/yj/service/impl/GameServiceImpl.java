@@ -763,6 +763,31 @@ public class GameServiceImpl implements IGameService {
         result.put("userGameExp", gameExp);
         result.put("pkField", pkField);
 
+        Map<String, Integer> onlinePeople = new HashMap<>();
+        //取出游戏在线的人
+        List<Object> WebSocketUserList = (List<Object>)LRULocalCache.get("WebSocketUserList");
+        for (int i = 0; i < WebSocketUserList.size(); i++){
+            String[] str_list = WebSocketUserList.get(i).toString().split("_");
+            String field = str_list[1];
+            if (onlinePeople.containsKey(field)){
+                int number = onlinePeople.get("onlinePeople");
+                number += 1;
+                onlinePeople.put(field, number);
+            }else {
+                onlinePeople.put(field, 1);
+            }
+        }
+        result.put("onlinePeople", onlinePeople);
+
+        //随机抽取用户头像
+        //使用sql语句随机获取9个http开头的用户头像
+        List<Object> headUserPortraitArray = new ArrayList<>();
+        List<Map<Object,Object>> head_user_portrait = userMapper.getHomePagePortraitRandom(9);
+        for (int i=0;i<head_user_portrait.size();i++) {
+            headUserPortraitArray.add(CommonFunc.judgePicPath(head_user_portrait.get(i).get("portrait").toString()));
+        }
+        result.put("head_user_portrait",headUserPortraitArray);
+
         return ServerResponse.createBySuccess("成功！",result);
     }
 
