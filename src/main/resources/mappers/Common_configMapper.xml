@@ -111,6 +111,13 @@
     WHERE set_time > #{set_time}
   </update>
 
+  <update id="change_game_reward_sent">
+    UPDATE game_challenge_red_packet
+    set `wheather_gain` = #{wheather_gain}
+    WHERE user_id = #{user_id}
+    AND challenge_id = #{challenge_id}
+  </update>
+
   <update id="change_draw_win_status">
     UPDATE lottery_draw_contestants
     set `status` = #{status}
@@ -174,6 +181,12 @@
   </insert>
 
 
+  <insert id="insertVirtualGameId" parameterType="string">
+    INSERT INTO virtual_user_game (user_id)
+    values (#{user_id})
+  </insert>
+
+
   <insert id="insertVirtualPlatformId" parameterType="string">
     INSERT INTO virtual_user_wechat_platform_challenge (user_id)
     values (#{user_id})
@@ -223,6 +236,53 @@
   </select>
 
 
+  <select id="getGameNpcSay" resultType="map">
+    SELECT  *
+    FROM `game_npc_say`
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="getGameShare" resultType="map">
+    SELECT  *
+    FROM `game_share`
+    LIMIT #{start},#{size}
+  </select>
+
+
+  <select id="getGameMonthChallenge" resultType="map">
+    SELECT  *
+    FROM `game_month_challenge`
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="checkRedPacketRecordExist" resultType="map">
+    SELECT  *
+    FROM game_challenge_red_packet
+    WHERE user_id = #{user_id}
+    AND challenge_id = #{challenge_id}
+    LIMIT 1
+  </select>
+
+
+  <select id="getGameMonthChallengeRedPacket" resultType="map">
+      SELECT username,portrait
+      FROM  `user`,
+      (SELECT  *
+       FROM `game_challenge_red_packet`
+       WHERE challenge_id = #{challenge_id}) tb
+      WHERE `user`.id = tb.user_id
+      ORDER BY reward DESC
+  </select>
+
+
+  <select id="checkGameMonthChallenge" resultType="map">
+    SELECT  *
+    FROM `game_month_challenge`
+    WHERE id = #{id}
+  </select>
+
+
+
   <select id="showAuthorInfo" resultType="map">
     SELECT id,username,portrait,gender,personality_signature
     FROM `user`
@@ -246,6 +306,16 @@
     FROM `virtual_user_challenge`)
     LIMIT #{start},#{size}
   </select>
+
+
+  <select id="showVirtualUserGame" resultType="map">
+    SELECT id,username,portrait,game_exp,game_present_month_exp
+    FROM `user`
+    WHERE id IN (SELECT  user_id as id
+    FROM `virtual_user_game`)
+    LIMIT #{start},#{size}
+  </select>
+
 
   <select id="getTop100VirtualUserChallenge" resultType="map">
     SELECT  user_id as id
@@ -1161,6 +1231,15 @@
     AND helper_id = #{helper_id}
   </select>
 
+
+  <select id="getChapterIdByOrderBook" resultType="map">
+    SELECT id
+    FROM read_class_chapter
+    WHERE `order` = #{order}
+    AND book_id = #{book_id}
+    LIMIT 1
+  </select>
+
   <insert id="insertReadChallengeContestantsReal" parameterType="string">
     INSERT INTO read_class_contestants (user_id,series_id,set_time,`virtual`,`insist_day`,`whether_help`)
     values (#{user_id},#{series_id},#{set_time},0,0,#{whether_help})
@@ -1743,6 +1822,21 @@
   </update>
 
 
+  <!--公众号运营活动数据统计-->
+  <update id="addOfficialAccountsSubscribe">
+    UPDATE `data_info`
+    set `daily_wechat_platform_subscribe` = `daily_wechat_platform_subscribe` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addWordChallengeParticipants">
+    UPDATE `data_info`
+    set `daily_wechat_platform_challenge_participants` = `daily_wechat_platform_challenge_participants` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
     values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM wechat_platform_challenge) tb),0)+1)
@@ -1788,6 +1882,37 @@
   <delete id="deletePlatformChallengeTeacher" parameterType="string" >
     DELETE FROM `wechat_platform_challenge_teacher`
     WHERE `wechat_platform_challenge_id` = #{id}
+  </delete>
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>小游戏>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <update id="updateGameUserOpenid" parameterType="string">
+      UPDATE `user`
+      SET wechat_game_openid = 'virtual'
+      WHERE id = #{id}
+  </update>
+
+
+  <insert id="insertFishSay" parameterType="string">
+    INSERT INTO game_npc_say (msg)
+    values (#{msg})
+  </insert>
+
+  <insert id="insertGameShare" parameterType="string">
+    INSERT INTO game_share (txt, pic)
+    values (#{txt}, #{pic})
+  </insert>
+
+  <delete id="deleteFishSay" parameterType="string" >
+    DELETE FROM `game_npc_say`
+    WHERE `id` = #{id}
+  </delete>
+
+
+  <delete id="deleteGameOperatingShare" parameterType="string" >
+    DELETE FROM `game_share`
+    WHERE `id` = #{id}
   </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->

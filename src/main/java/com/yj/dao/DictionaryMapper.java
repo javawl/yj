@@ -326,6 +326,15 @@ public interface DictionaryMapper {
     String countDataInfo();
 
     //后台
+    String countNpcSayInfo();
+
+    //后台
+    String countGameShare();
+
+    //后台
+    String countMonthChallenge();
+
+    //后台
     String countFeedsAuthor();
 
     //后台
@@ -336,6 +345,9 @@ public interface DictionaryMapper {
 
     //后台
     String countVirtualUserChallenge();
+
+    //后台
+    String countVirtualUserGame();
 
     //后台
     String countAdvice();
@@ -434,6 +446,9 @@ public interface DictionaryMapper {
 
     //后台
     int deleteVirtualRecord(@Param("id") String id);
+
+    //后台
+    int deleteVirtualGameRecord(@Param("id") String id);
 
     //后台
     int deleteLotteryDrawContestants(@Param("id") String id);

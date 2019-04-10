@@ -11,12 +11,12 @@
     <style type="text/css">
         body{ margin: 0 auto;padding: 0;}
         .top{ width: 100%;height: 75px;background-color: grey;}
-        .left_bar{ width: 13%;height: 693px; background-color: lightgray; float: left;}
+        .left_bar{ width: 13%;height: 800px; background-color: lightgray; float: left;}
         .min_body{ width: 100%;}
         .title{ font-size: 20px; margin-top: 27px; margin-left: 50px; font-weight: bolder;float: left;}
         .exit{ font-size: 20px; margin-top: 27px; margin-right: 25px; font-weight: bolder;float: right;}
         .first_p{ margin-top: 0; padding-top: 16px;}
-        .main{ width: 87%; height: 693px; float: right;}
+        .main{ width: 87%; height: 800px; float: right;}
     </style>
     <meta charset="UTF-8">
     <title>后台管理系统</title>
@@ -56,6 +56,10 @@
                 <p onclick="change_src('show_read_class_introduction_pic.jsp?page=1&size=15')">阅读报名页往期评论</p>
                 <p onclick="change_src('ten_thousand_yuan_challenge.jsp?page=1&size=15')">万元挑战（运营）</p>
                 <p onclick="change_src('wx_platform_challenge_share.jsp?page=1&size=15')">运营挑战分享图</p>
+                <p onclick="change_src('show_game_fish_say.jsp?page=1&size=15')">游戏肥鱼说的话</p>
+                <p onclick="change_src('show_virtual_user_game.jsp?page=1&size=15')">游戏虚拟用户</p>
+                <p onclick="change_src('show_game_operating_share.jsp?page=1&size=15')">小游戏运营分享</p>
+                <p onclick="change_src('show_game_month_challenge.jsp?page=1&size=15')">小游戏万元挑战</p>
             </center>
         </div>
         <div class="main">

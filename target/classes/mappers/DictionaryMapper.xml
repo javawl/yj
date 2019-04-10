@@ -386,7 +386,7 @@
   </select>
 
   <select id="homePageFirstGetChange" resultType="map" parameterType="int">
-    SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
+    SELECT feeds.id,feeds.title,feeds.pic,feeds.video,feeds.likes,feeds.kind,feeds.comments,feeds.cover_select,feeds.favours,username,portrait,`user`.id as user_id
     FROM feeds,`user`
     WHERE auther_id = `user`.id
     ORDER BY feeds.set_time DESC
@@ -1046,6 +1046,11 @@
     WHERE user_id = #{id}
   </delete>
 
+  <delete id="deleteVirtualGameRecord" parameterType="string" >
+    delete from virtual_user_game
+    WHERE user_id = #{id}
+  </delete>
+
   <delete id="deleteLotteryDrawContestants" parameterType="string" >
     delete from lottery_draw_contestants
     WHERE lottery_draw_id = #{id}
@@ -1136,6 +1141,22 @@
     FROM data_info
   </select>
 
+  <select id="countNpcSayInfo" resultType="string">
+    SELECT count(id)
+    FROM game_npc_say
+  </select>
+
+  <select id="countGameShare" resultType="string">
+    SELECT count(id)
+    FROM game_share
+  </select>
+
+
+  <select id="countMonthChallenge" resultType="string">
+    SELECT count(id)
+    FROM game_month_challenge
+  </select>
+
   <select id="countFeedsAuthor" resultType="string">
     SELECT count(id)
     FROM author_info
@@ -1154,6 +1175,11 @@
   <select id="countVirtualUserChallenge" resultType="string">
     SELECT count(id)
     FROM virtual_user_challenge
+  </select>
+
+  <select id="countVirtualUserGame" resultType="string">
+    SELECT count(id)
+    FROM virtual_user_game
   </select>
 
   <select id="countAdvice" resultType="string">

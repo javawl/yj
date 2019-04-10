@@ -157,6 +157,17 @@ public class GameController extends BaseController {
 
 
     /**
+     * 小游戏日常加经验获取token
+     */
+    @RequestMapping(value="gameDailyExpToken.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gameDailyExpToken(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameDailyExpToken(request);
+    }
+
+
+    /**
      * 小游戏在线加经验
      */
     @RequestMapping(value="gameOnlineExpAdd.do", method = RequestMethod.POST)
@@ -168,6 +179,17 @@ public class GameController extends BaseController {
 
 
     /**
+     * 小游戏日常加经验
+     */
+    @RequestMapping(value="gameDailyExpAdd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gameDailyExpAdd(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameDailyExpAdd(request);
+    }
+
+
+    /**
      * 小游戏专场
      */
     @RequestMapping(value="gamePkField.do", method = RequestMethod.POST)
@@ -175,6 +197,39 @@ public class GameController extends BaseController {
     public ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request){
         //调用service层
         return iGameService.gamePkField(request);
+    }
+
+
+    /**
+     * 分享
+     */
+    @RequestMapping(value="gameShare.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> gameShare(HttpServletRequest request){
+        //调用service层
+        return iGameService.gameShare(request);
+    }
+
+
+    /**
+     * 小游戏确立pk关系
+     */
+    @RequestMapping(value="gameMakeConnection.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> gameMakeConnection(String pkId, HttpServletRequest request){
+        //调用service层
+        return iGameService.gameMakeConnection(pkId, request);
+    }
+
+
+    /**
+     * 小游戏确立pk结算
+     */
+    @RequestMapping(value="gamePkSettlement.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gamePkSettlement(String pkId, HttpServletRequest request){
+        //调用service层
+        return iGameService.gamePkSettlement(pkId, request);
     }
 
 

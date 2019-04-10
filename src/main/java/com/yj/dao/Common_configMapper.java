@@ -33,6 +33,9 @@ public interface Common_configMapper {
     int changeMAU(@Param("mau") int mau, @Param("set_time") String set_time);
 
     //修改中奖状态
+    int change_game_reward_sent(@Param("wheather_gain") String wheather_gain, @Param("user_id") String user_id, @Param("challenge_id") String challenge_id);
+
+    //修改中奖状态
     int change_draw_win_status(@Param("status") String status, @Param("user_id") String user_id, @Param("lottery_draw_id") String lottery_draw_id);
 
     //修改日完成任务次数
@@ -182,6 +185,9 @@ public interface Common_configMapper {
     int insertVirtualChallengeId(@Param("user_id") String user_id);
 
     //插入虚拟id
+    int insertVirtualGameId(@Param("user_id") String user_id);
+
+    //插入虚拟id
     int insertVirtualPlatformId(@Param("user_id") String user_id);
 
     //打卡参与抽奖
@@ -214,6 +220,24 @@ public interface Common_configMapper {
     //后台获取每日的那些信息（DAU等）
     List<Map> getDailyAdminInfo(@Param("start") int start, @Param("size") int size);
 
+    //后台获取游戏里的肥鱼说的话
+    List<Map<Object,Object>> getGameNpcSay(@Param("start") int start, @Param("size") int size);
+
+    //后台获取游戏里的肥鱼说的话
+    List<Map<Object,Object>> getGameShare(@Param("start") int start, @Param("size") int size);
+
+    //后台获取游戏里的万元挑战
+    List<Map<Object,Object>> getGameMonthChallenge(@Param("start") int start, @Param("size") int size);
+
+    //后台获取游戏里的万元挑战是否有红包记录
+    Map<Object,Object> checkRedPacketRecordExist(@Param("user_id") String user_id, @Param("challenge_id") String challenge_id);
+
+    //后台获取游戏里的万元挑战
+    List<Map<String,Object>> getGameMonthChallengeRedPacket(@Param("challenge_id") String  challenge_id);
+
+    //后台获取游戏里的万元挑战
+    Map<Object,Object> checkGameMonthChallenge(@Param("id") String id);
+
     //后台feeds的作者信息
     List<Map> showAuthorInfo(@Param("start") int start, @Param("size") int size);
 
@@ -222,6 +246,9 @@ public interface Common_configMapper {
 
     //后台虚拟用户信息
     List<Map> showVirtualUserChallenge(@Param("start") int start, @Param("size") int size);
+
+    //后台虚拟用户信息
+    List<Map<Object,Object>> showVirtualUserGame(@Param("start") int start, @Param("size") int size);
 
     //后台虚拟用户信息
     List<Map<Object,Object>> getTop100VirtualUserChallenge();
@@ -525,6 +552,9 @@ public interface Common_configMapper {
     //查看是否助力过
     Map<Object,Object> findIsReadClassHelp(@Param("user_id") String user_id,@Param("help_sign_up_id") String help_sign_up_id,@Param("helper_id") String helper_id);
 
+    //根据order和书本id获取chapter id
+    Map<Object,Object> getChapterIdByOrderBook(@Param("order") String order,@Param("book_id") String book_id);
+
     //查看用户是否预定过
     Map<Object,Object> checkExistReserved(@Param("user_id") String user_id);
 
@@ -786,6 +816,12 @@ public interface Common_configMapper {
     int settleAccountsPlatformChallenge(@Param("aggregate_amount") String aggregate_amount, @Param("profit_loss") String profit_loss, @Param("success_people") String success_people,
                                 @Param("success_rate") String success_rate, @Param("loser") String loser, @Param("id") String id);
 
+    //公众号关注人数增加
+    int addOfficialAccountsSubscribe(@Param("set_time") String set_time);
+
+    //单词挑战参加人数增加
+    int addWordChallengeParticipants(@Param("set_time") String set_time);
+
     //后台插入万元挑战
     int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
 
@@ -826,6 +862,26 @@ public interface Common_configMapper {
 
     //删除挑战
     int deletePlatformChallengeTeacher(@Param("id") String id);
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>小游戏>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //虚拟用户初始化openid
+    int updateGameUserOpenid(@Param("id") String id);
+
+    //插入肥鱼
+    int insertFishSay(@Param("msg") String msg);
+
+    //插入分享
+    int insertGameShare(@Param("txt") String txt, @Param("pic") String pic);
+
+    //删除肥鱼
+    int deleteFishSay(@Param("id") String id);
+
+    //删除分享
+    int deleteGameOperatingShare(@Param("id") String id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

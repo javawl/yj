@@ -133,6 +133,9 @@ public interface IVariousService {
     //领取阅读挑战的红包
     ServerResponse<String> getReadClassRedPacket(HttpServletRequest request);
 
+    //根据书本id和order获取章节id
+    ServerResponse<String> getChapterIdByOrderBook(String bookId, String order, HttpServletRequest request);
+
     //微信公众号首次验证消息的确来自微信服务器
     void checkWechatPlatform(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response);
 

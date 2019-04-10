@@ -219,6 +219,7 @@ public class HomeServiceImpl implements IHomeService {
                     m3.put("id",m2.get("id"));
                     m3.put("title",m2.get("title"));
                     m3.put("likes",m2.get("favours"));
+                    m3.put("kind",m2.get("kind"));
                     m3.put("comments",m2.get("comments"));
                     m3.put("author_username",m2.get("username"));
                     m3.put("author_id",m2.get("user_id"));
@@ -368,6 +369,7 @@ public class HomeServiceImpl implements IHomeService {
                     m3.put("title",m2.get("title"));
                     m3.put("likes",m2.get("favours"));
                     m3.put("comments",m2.get("comments"));
+                    m3.put("kind",m2.get("kind"));
                     m3.put("author_username",m2.get("username"));
                     m3.put("author_id",m2.get("user_id"));
                     if (m2.get("portrait")==null){

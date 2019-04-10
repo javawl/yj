@@ -619,6 +619,74 @@ public class CommonFunc {
         return time + "000";
     }
 
+
+    //获取传入时间的那天的当月零点1秒的时间戳
+    public static String getInputTimeMonthZero(String input_time) {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(input_time)));
+        //计算注册当天的零点
+        history.set(Calendar.DAY_OF_MONTH, 1);
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+    //获取传入时间的那天的当月结尾的时间戳
+    public static String getInputTimeMonthEnd(String input_time) {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        history.setTime(new Date(Long.valueOf(input_time)));
+        //计算注册当天的零点
+        history.set(Calendar.DAY_OF_MONTH, history.getActualMaximum(Calendar.DAY_OF_MONTH));
+        history.set(Calendar.HOUR_OF_DAY, 23);
+        history.set(Calendar.MINUTE, 59);
+        history.set(Calendar.SECOND, 59);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
+    //获取上个月一号零点1秒的时间戳
+    public static String getInputTimeLastMonthZero() {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        //计算注册当天的零点
+        history.add(Calendar.MONTH, -1);
+        history.set(Calendar.DAY_OF_MONTH, 1);
+        history.set(Calendar.HOUR_OF_DAY, 0);
+        history.set(Calendar.MINUTE, 0);
+        history.set(Calendar.SECOND, 1);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
+    //获取上个月最后一天的时间戳
+    public static String getInputTimeLastMonthEnd() {
+        //获取注册时间零点
+        Calendar history = Calendar.getInstance();
+        //计算注册当天的零点
+        history.set(Calendar.DAY_OF_MONTH, 1);
+        history.add(Calendar.DATE, -1);
+        history.set(Calendar.HOUR_OF_DAY, 23);
+        history.set(Calendar.MINUTE, 59);
+        history.set(Calendar.SECOND, 59);
+        long history_one = history.getTime().getTime();
+        String time = String.valueOf(history_one);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
     //获取传入时间的那天的零点多一秒的时间戳
     public static String getRegisterTimeOne(String register_time) {
         //获取注册时间零点

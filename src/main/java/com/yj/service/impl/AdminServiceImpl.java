@@ -4,10 +4,7 @@ import com.google.common.collect.Lists;
 //import com.iflytek.cloud.speech.*;
 import com.yj.common.*;
 import com.yj.controller.portal.AdminController;
-import com.yj.dao.Common_configMapper;
-import com.yj.dao.DictionaryMapper;
-import com.yj.dao.FeedsMapper;
-import com.yj.dao.UserMapper;
+import com.yj.dao.*;
 import com.yj.pojo.Feeds;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
@@ -53,6 +50,9 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private Common_configMapper common_configMapper;
+
+    @Autowired
+    private Reciting_wordsMapper reciting_wordsMapper;
 
     @Autowired
     private IFileService iFileService;
@@ -1447,6 +1447,297 @@ public class AdminServiceImpl implements IAdminService {
         }
 
         return ServerResponse.createBySuccess(dictionaryMapper.countPlatformVirtualUser(),userInfo);
+    }
+
+
+
+    //展示那条鱼说的话
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> showFishSay(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取每日的信息，倒序展示
+        List<Map<Object,Object>> gameNpcSay = common_configMapper.getGameNpcSay(start,Integer.valueOf(size));
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countNpcSayInfo(),gameNpcSay);
+    }
+
+
+    //展现小游戏运营分享
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> showGameOperatingShare(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取小游戏运营分享
+        List<Map<Object,Object>> gameShare = common_configMapper.getGameShare(start,Integer.valueOf(size));
+        for (int i = 0; i < gameShare.size(); i++){
+            if (gameShare.get(i).get("pic") != null){
+                gameShare.get(i).put("pic", CommonFunc.judgePicPath(gameShare.get(i).get("pic").toString()));
+            }
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countGameShare(),gameShare);
+    }
+
+
+    //展现小游戏万元挑战
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> showGameMonthChallenge(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取小游戏万元挑战
+        List<Map<Object,Object>> gameMonthChallenge = common_configMapper.getGameMonthChallenge(start,Integer.valueOf(size));
+        for (int i = 0; i < gameMonthChallenge.size(); i++){
+            gameMonthChallenge.get(i).put("time", CommonFunc.getFormatTime(Long.valueOf(gameMonthChallenge.get(i).get("time").toString()),"yyyy/MM"));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countMonthChallenge(),gameMonthChallenge);
+    }
+
+
+
+    //展现小游戏万元挑战成员
+    @Override
+    public ServerResponse<List<Map<String,Object>>> showGameMonthChallengeMember(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //查看是否确认
+        Map<Object,Object> gameMonthChallenge = common_configMapper.checkGameMonthChallenge(id);
+        if (gameMonthChallenge == null){
+            return ServerResponse.createByErrorMessage("没有这个挑战！");
+        }
+        List<Map<String,Object>> challengeRank;
+        if (gameMonthChallenge.get("is_deliver").toString().equals("1")){
+            //已确认的话直接去表里面查
+            challengeRank = common_configMapper.getGameMonthChallengeRedPacket(id);
+            for (int i = 0; i < challengeRank.size(); i++){
+                challengeRank.get(i).put("portrait", CommonFunc.judgePicPath(challengeRank.get(i).get("portrait").toString()));
+                challengeRank.get(i).put("rank", String.valueOf(i + 1));
+            }
+        }else {
+            //直接用户表排序
+            //查出用户排名
+            challengeRank = reciting_wordsMapper.getUserChallengeRank(0, 100);
+            //匹配等级
+            for (int i = 0; i < challengeRank.size(); i++){
+                //设置奖金
+                if (i == 0){
+                    challengeRank.get(i).put("reward", "1000");
+                }else if (i == 1){
+                    challengeRank.get(i).put("reward", "600");
+                }else if (i == 2){
+                    challengeRank.get(i).put("reward", "400");
+                }else if (i < 10){
+                    challengeRank.get(i).put("reward", "200");
+                }else if (i < 20){
+                    challengeRank.get(i).put("reward", "150");
+                }else if (i < 50){
+                    challengeRank.get(i).put("reward", "100");
+                }else if (i < 70){
+                    challengeRank.get(i).put("reward", "80");
+                }else if (i < 100){
+                    challengeRank.get(i).put("reward", "15");
+                }
+                challengeRank.get(i).put("user_id", challengeRank.get(i).get("id").toString());
+                challengeRank.get(i).put("rank", String.valueOf(i + 1));
+                challengeRank.get(i).put("username", challengeRank.get(i).get("username").toString());
+                challengeRank.get(i).put("portrait", CommonFunc.judgePicPath(challengeRank.get(i).get("portrait").toString()));
+                challengeRank.get(i).put("wheather_gain", "0");
+            }
+        }
+
+        //判断是否虚拟
+        for (int i = 0; i < challengeRank.size(); i++){
+            //获取userId
+            String userId = challengeRank.get(i).get("user_id").toString();
+            //看看虚拟用户列表中有没有
+            if (reciting_wordsMapper.gameVirtualUserGameIsExist(userId) != null){
+                challengeRank.get(i).put("status", "virtual");
+            }else {
+                challengeRank.get(i).put("status", "real");
+            }
+        }
+
+
+        return ServerResponse.createBySuccess("成功",challengeRank);
+    }
+
+
+
+    //小游戏万元挑战确认
+    @Override
+    public ServerResponse<String> gameMonthChallengeCommit(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //查看是否确认
+        Map<Object,Object> gameMonthChallenge = common_configMapper.checkGameMonthChallenge(id);
+        if (gameMonthChallenge == null){
+            return ServerResponse.createByErrorMessage("没有这个挑战！");
+        }
+        List<Map<String,Object>> challengeRank;
+        if (gameMonthChallenge.get("is_deliver").toString().equals("1")){
+            return ServerResponse.createByErrorMessage("已经确认过！");
+        }else {
+            //事务
+            DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+            //隔离级别
+            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            TransactionStatus status = transactionManager.getTransaction(def);
+            try{
+                //获取那个月的时间
+                String challengeTime = gameMonthChallenge.get("time").toString();
+                String st = CommonFunc.getInputTimeMonthZero(challengeTime);
+                //计算那个月最后一天23点59分的时间
+                String et = CommonFunc.getInputTimeMonthEnd(challengeTime);
+                //直接用户表排序
+                //查出用户排名
+                challengeRank = reciting_wordsMapper.getUserChallengeRank(0, 100);
+                //匹配等级
+                for (int i = 0; i < challengeRank.size(); i++){
+                    //设置奖金
+                    if (i == 0){
+                        challengeRank.get(i).put("reward", "1000");
+                    }else if (i == 1){
+                        challengeRank.get(i).put("reward", "600");
+                    }else if (i == 2){
+                        challengeRank.get(i).put("reward", "400");
+                    }else if (i < 10){
+                        challengeRank.get(i).put("reward", "200");
+                    }else if (i < 20){
+                        challengeRank.get(i).put("reward", "150");
+                    }else if (i < 50){
+                        challengeRank.get(i).put("reward", "100");
+                    }else if (i < 70){
+                        challengeRank.get(i).put("reward", "80");
+                    }else if (i < 100){
+                        challengeRank.get(i).put("reward", "15");
+                    }
+                }
+
+                for (int i = 0; i < challengeRank.size(); i++){
+                    //看看虚拟用户列表中有没有
+                    if (reciting_wordsMapper.gameVirtualUserGameIsExist(challengeRank.get(i).get("id").toString()) != null){
+                        reciting_wordsMapper.gameInsertChangeRedPacket(challengeRank.get(i).get("id").toString(), st, et, "1", id, challengeRank.get(i).get("reward").toString());
+                    }else {
+                        reciting_wordsMapper.gameInsertChangeRedPacket(challengeRank.get(i).get("id").toString(), st, et, "0", id, challengeRank.get(i).get("reward").toString());
+                    }
+                }
+
+                //最后将挑战表确认
+                reciting_wordsMapper.gameChallengeOver(id);
+                transactionManager.commit(status);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                transactionManager.rollback(status);
+                e.printStackTrace();
+                return ServerResponse.createByErrorMessage("更新出错！");
+            }
+        }
+    }
+
+
+
+    //展示查看数据
+    @Override
+    public ServerResponse<List<Map<Object,Object>>> show_virtual_user_game(String page,String size,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取虚拟用户信息(先将用户信息都取出来，然后在取1000用户来排序)
+        List<Map<Object,Object>> userInfo = common_configMapper.showVirtualUserGame(start,Integer.valueOf(size));
+        //top1000
+        List<Map<String,Object>> topGameExpUser = reciting_wordsMapper.getTopGameExpUser();
+
+        //top1000
+        List<Map<String,Object>> topGamePresentMonthExpUser = reciting_wordsMapper.getTopGamePresentMonthExpUser();
+
+        //获取所有的等级信息
+        List<Map<String,Object>> allRank = reciting_wordsMapper.getAllRank();
+
+        for(int i = 0; i < userInfo.size(); i++){
+            String gameExp;
+            if (userInfo.get(i).get("game_exp") == null){
+                gameExp = "0";
+            }else {
+                gameExp = userInfo.get(i).get("game_exp").toString();
+            }
+            //计算经验值等级
+            int expFlag = 0;
+            for (int j = 0; j < allRank.size(); j++){
+                if (Long.valueOf(allRank.get(j).get("rank_exp").toString()) > Long.valueOf(gameExp)){
+                    userInfo.get(i).put("lv", String.valueOf(Integer.valueOf(allRank.get(j).get("lv").toString()) - 1));
+                    expFlag = 1;
+                    break;
+                }
+            }
+            if (expFlag == 0){
+                userInfo.get(i).put("lv", "最高级");
+            }
+
+            //计算排名
+            //计算经验值等级
+            int expRankFlag = 0;
+            for (int j = 0; j < topGameExpUser.size(); j++){
+                if (topGameExpUser.get(j).get("id").toString().equals(userInfo.get(i).get("id").toString())){
+                    userInfo.get(i).put("expRank", String.valueOf(j + 1));
+                    expRankFlag = 1;
+                }
+            }
+            if (expRankFlag == 0){
+                userInfo.get(i).put("expRank", "1000名外");
+            }
+
+            //计算挑战赛等级
+            int expChallengeFlag = 0;
+            for (int j = 0; j < topGamePresentMonthExpUser.size(); j++){
+                if (topGamePresentMonthExpUser.get(j).get("id").toString().equals(userInfo.get(i).get("id").toString())){
+                    userInfo.get(i).put("challengeRank", String.valueOf(j + 1));
+                    expChallengeFlag = 1;
+                }
+            }
+            if (expChallengeFlag == 0){
+                userInfo.get(i).put("challengeRank", "1000名外");
+            }
+            userInfo.get(i).put("portrait",CommonFunc.judgePicPath(userInfo.get(i).get("portrait").toString()));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUserGame(), userInfo);
     }
 
 }

@@ -21,11 +21,16 @@ public class SocketHandler implements WebSocketHandler {
 
         //去找之前等待并且场次信息匹配的用户
         //本用户的信息
+        //将时间戳作为场次id
+        String nowTime = String.valueOf((new Date()).getTime());
         Map<String, Object> pk_info = (Map<String, Object>)session.getHandshakeAttributes().get("pk_info");
+        pk_info.put("pkId", nowTime);
         String jsonStr = JSON.toJSONString(pk_info, SerializerFeature.WriteMapNullValue);
         Map<String, Object> enemy = sendPkMatchUser(pk_info.get("lv").toString(), pk_info.get("PkField").toString(), pk_info.get("token").toString(),
                 new org.springframework.web.socket.TextMessage(jsonStr));
         if (enemy != null){
+            //将时间戳作为场次id
+            enemy.put("pkId", nowTime);
             String enemyJsonStr = JSON.toJSONString(enemy, SerializerFeature.WriteMapNullValue);
             if (session.isOpen()) {
                 session.sendMessage(new org.springframework.web.socket.TextMessage(enemyJsonStr));

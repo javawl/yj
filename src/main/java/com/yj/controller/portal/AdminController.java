@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
+import com.yj.dao.Reciting_wordsMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IAdminService;
@@ -53,6 +54,9 @@ public class AdminController {
 
     @Autowired
     private Common_configMapper common_configMapper;
+
+    @Autowired
+    private Reciting_wordsMapper recitingWordsMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -712,6 +716,44 @@ public class AdminController {
     }
 
 
+
+    /**
+     * 修改发放reward情况
+     * @param id        用户id
+     * @return          Str
+     */
+    @RequestMapping(value = "changeGameRewardSent.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> changeGameRewardSent(String id, String challenge_id){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(challenge_id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (common_configMapper.checkRedPacketRecordExist(id, challenge_id) == null){
+            return ServerResponse.createByErrorMessage("挑战未结束");
+        }
+        common_configMapper.change_game_reward_sent("1", id, challenge_id);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+
+    /**
+     * 结束小游戏的挑战
+     * @param id        用户id
+     * @return          Str
+     */
+    @RequestMapping(value = "gameMonthChallengeCommit.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> gameMonthChallengeCommit(String id,HttpServletRequest request){
+        return iAdminService.gameMonthChallengeCommit(id, request);
+    }
+
+
     /**
      * 后台修改用户头像
      * @param file      图片
@@ -1050,6 +1092,42 @@ public class AdminController {
             }
             //删除参与记录
             common_configMapper.deleteDrawVirtualUser(id);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            transactionManager.rollback(status);
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 删除小游戏虚拟用户
+     * @param id         虚拟用户id
+     * @param response   response
+     * @return           Str
+     */
+    @RequestMapping(value = "delete_virtual_user_game.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse delete_virtual_user_game(String id, HttpServletResponse response){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除用户列表信息（这里借用一下读者那里的sql）
+            int resultAuthor = dictionaryMapper.deleteFeedsAuthor(id);
+            if (resultAuthor == 0){
+                throw new Exception();
+            }
+            //删除虚拟用户记录
+            int result_recode = dictionaryMapper.deleteVirtualGameRecord(id);
+            if (result_recode == 0){
+                throw new Exception();
+            }
             transactionManager.commit(status);
             return ServerResponse.createBySuccessMessage("成功");
         }catch (Exception e){
@@ -1731,6 +1809,7 @@ public class AdminController {
             transactionManager.commit(status);
             return "success";
         }catch (Exception e){
+            transactionManager.rollback(status);
             logger.error("每天给虚拟用户增加单词数异常",e.getStackTrace());
             logger.error("每天给虚拟用户增加单词数异常",e);
             e.printStackTrace();
@@ -1797,6 +1876,7 @@ public class AdminController {
             transactionManager.commit(status);
             return "success";
         }catch (Exception e){
+            transactionManager.rollback(status);
             logger.error("每天给虚拟用户增加单词数异常",e.getStackTrace());
             logger.error("每天给虚拟用户增加单词数异常",e);
             e.printStackTrace();
@@ -1997,6 +2077,40 @@ public class AdminController {
         }catch (Exception e){
             logger.error("阅读挑战预约提醒异常",e.getStackTrace());
             logger.error("阅读挑战预约提醒异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+
+    /**
+     * 小游戏将这个月的经验刷成上个月的经验
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "gamePresentExpToLastExp.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String gamePresentExpToLastExp(String token, HttpServletResponse response){
+        if (!token.equals("gamePresentExpToLastExp")){
+            return "false";
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            List<Map<String,Object>>gameUser = recitingWordsMapper.getGameUser();
+            for (int i = 0; i < gameUser.size(); i++){
+                recitingWordsMapper.gameUpdateMonthExp(gameUser.get(i).get("game_present_month_exp").toString(), "0", gameUser.get(i).get("id").toString());
+            }
+            transactionManager.commit(status);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            logger.error("小游戏更新挑战月份经验异常",e.getStackTrace());
+            logger.error("小游戏更新挑战月份经验异常",e);
             e.printStackTrace();
         }
         return "success";
@@ -2357,6 +2471,31 @@ public class AdminController {
     }
 
 
+
+    @RequestMapping(value = "uploadGameShare.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadGameShare(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String name1 = iFileService.upload(portrait,path,"l_e/user/portrait");
+            String url1 = "user/portrait/"+name1;
+            common_configMapper.insertGameShare(username, url1);
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
     /**
      * 新建虚拟用户
      * @param portrait   头像
@@ -2465,6 +2604,66 @@ public class AdminController {
             int new_user_id = user.getId();
             //插到虚拟用户
             common_configMapper.insertVirtualChallengeId(String.valueOf(new_user_id));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccess("成功",url1);
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 上传小游戏的虚拟用户
+     * @param portrait   头像
+     * @param username   昵称
+     * @param gender     性别
+     * @param sign       个性签名
+     * @param response   response
+     * @param request    request
+     * @return           Str
+     */
+    @RequestMapping(value = "upload_virtual_user_game.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> upload_virtual_user_game(@RequestParam(value = "portrait",required = false) MultipartFile portrait, String username,String gender, String sign, HttpServletResponse response, HttpServletRequest request){
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            //头像
+            String name1 = iFileService.upload(portrait,path,"l_e/user/portrait");
+            String url1 = "user/portrait/"+name1;
+            //存到数据库
+            //这里插入一下
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("B305FDA58B6ADD5B4EBE25E94FB09FD2");
+            user.setPortrait(url1);
+            user.setGender(Integer.valueOf(gender));
+            user.setPlanDays(0);
+            user.setPlanWordsNumber(0);
+            user.setInsistDay(0);
+            user.setWhetherOpen(1);
+            user.setClockDay(0);
+            user.setPersonalitySignature(sign);
+            //时间戳
+            user.setRegisterTime(String.valueOf(new Date().getTime()));
+
+            int resultCount = userMapper.insertUser(user);
+            System.out.println(resultCount);
+            if (resultCount != 1){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            //新的user id
+            int new_user_id = user.getId();
+            //插到虚拟用户
+            common_configMapper.insertVirtualGameId(String.valueOf(new_user_id));
+            common_configMapper.updateGameUserOpenid(String.valueOf(new_user_id));
             transactionManager.commit(status);
             return ServerResponse.createBySuccess("成功",url1);
         }catch (Exception e){
@@ -3452,6 +3651,26 @@ public class AdminController {
         return ServerResponse.createBySuccessMessage("成功");
     }
 
+
+    /**
+     * 虚拟用户词力值加一
+     * @return
+     */
+    @RequestMapping(value = "gameVirtualUserExpAdd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> gameVirtualUserExpAdd(String user_id,String number,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(user_id);
+            add(number);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        recitingWordsMapper.gameAddExp(user_id, number);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
     /**
      * 展示挑战信息
      * @param id
@@ -3620,4 +3839,117 @@ public class AdminController {
 
 
     //-----------------------------------------------------微信公众号运营活动（下闭合线）----------------------------------------------------------
+
+    //-----------------------------------------------------小游戏----------------------------------------------------------
+
+    /**
+     * 返回肥鱼说的话
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showFishSay.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showFishSay(String page,String size,HttpServletRequest request){
+        return iAdminService.showFishSay(page, size, request);
+    }
+
+
+    /**
+     * 小游戏运营分享
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showGameOperatingShare.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showGameOperatingShare(String page,String size,HttpServletRequest request){
+        return iAdminService.showGameOperatingShare(page, size, request);
+    }
+
+
+    /**
+     * 小游戏万元挑战
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showGameMonthChallenge.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showGameMonthChallenge(String page,String size,HttpServletRequest request){
+        return iAdminService.showGameMonthChallenge(page, size, request);
+    }
+
+
+
+    /**
+     * 小游戏万元挑战成员
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "showGameMonthChallengeMember.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<String,Object>>> showGameMonthChallengeMember(String id,HttpServletRequest request){
+        return iAdminService.showGameMonthChallengeMember(id, request);
+    }
+
+
+    /**
+     * 添加肥鱼说的话
+     * @return
+     */
+    @RequestMapping(value = "addFishSay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> addFishSay(String say, HttpServletRequest request){
+
+        common_configMapper.insertFishSay(say);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 删除肥鱼说的话
+     * @return
+     */
+    @RequestMapping(value = "deleteFishSay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteFishSay(String id, HttpServletRequest request){
+
+        common_configMapper.deleteFishSay(id);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 删除肥鱼说的话
+     * @return
+     */
+    @RequestMapping(value = "deleteGameShare.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteGameShare(String id, HttpServletRequest request){
+
+        common_configMapper.deleteGameOperatingShare(id);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+
+    /**
+     * 删除肥鱼说的话
+     * @return
+     */
+    @RequestMapping(value = "show_virtual_user_game.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> show_virtual_user_game(String page,String size,HttpServletRequest request){
+        return iAdminService.show_virtual_user_game(page, size, request);
+    }
+
+
+    //-----------------------------------------------------小游戏（下闭合线）----------------------------------------------------------
 }

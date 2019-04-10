@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
+import com.yj.dao.UserMapper;
 import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
 import com.yj.service.IVariousService;
@@ -51,6 +52,9 @@ public class VariousController {
 
     @Autowired
     private Common_configMapper common_configMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private ApplicationContext ctx;
@@ -373,6 +377,15 @@ public class VariousController {
     @ResponseBody
     public void wxPayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
         logger.error("回调开始");
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        String uid_copy = "";
+        String word_challenge_id_copy = "";
+        String now_time_copy = "";
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -409,9 +422,12 @@ public class VariousController {
                     /**此处添加自己的业务逻辑代码start**/
                     String[] str_list = out_trade_no.split("_");
                     String word_challenge_id = str_list[0];
+                    word_challenge_id_copy = word_challenge_id;
                     String now_time = String.valueOf((new Date()).getTime());
+                    now_time_copy = now_time;
                     //获取用户id
                     String uid = str_list[1];
+                    uid_copy = uid;
                     //邀请用户id
                     String user_id = str_list[2];
                     //判断是否报过名
@@ -425,6 +441,13 @@ public class VariousController {
                     common_configMapper.insertWordChallengeContestantsReal(uid,word_challenge_id,now_time);
                     //插入单词挑战总数据库
                     common_configMapper.changeWordChallengeEnroll(word_challenge_id);
+                    if (is_exist == null){
+                        common_configMapper.insertDataInfo(1,0,one, Month_one);
+                        common_configMapper.addWordChallengeParticipants(one);
+                    }else {
+                        common_configMapper.addWordChallengeParticipants(one);
+                    }
+
                     if (!user_id.equals("no")){
                         if (!CommonFunc.isInteger(user_id)){
                             logger.error("传入user_id非法！");
@@ -467,7 +490,6 @@ public class VariousController {
             System.out.println("微信支付回调数据结束");
             logger.error("微信支付回调数据结束");
 
-
             BufferedOutputStream out = new BufferedOutputStream(
                     response.getOutputStream());
             out.write(resXml.getBytes());
@@ -478,6 +500,12 @@ public class VariousController {
             transactionManager.rollback(status);
             logger.error("报名失败",e.getStackTrace());
             logger.error("报名失败",e);
+            if (!uid_copy.equals("") && !word_challenge_id_copy.equals("") && !now_time_copy.equals("")){
+                //插入参与数据库
+                common_configMapper.insertWordChallengeContestantsReal(uid_copy,word_challenge_id_copy,now_time_copy);
+                //插入单词挑战总数据库
+                common_configMapper.changeWordChallengeEnroll(word_challenge_id_copy);
+            }
             e.printStackTrace();
             //出现错误抛错
             String resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
@@ -989,6 +1017,17 @@ public class VariousController {
     public ServerResponse<String> getReadClassRedPacket(HttpServletRequest request){
         //调用service层
         return iVariousService.getReadClassRedPacket(request);
+    }
+
+
+    /**
+     * 根据order和书本号获取章节id
+     */
+    @RequestMapping(value="getChapterIdByOrderBook.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> getChapterIdByOrderBook(String bookId, String order, HttpServletRequest request){
+        //调用service层
+        return iVariousService.getChapterIdByOrderBook(bookId, order, request);
     }
 
 

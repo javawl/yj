@@ -77,9 +77,12 @@ public class GameServiceImpl implements IGameService {
         gameHomePageUserInfo.put("rank_exp", userRank.get("rank_exp").toString());
         gameHomePageUserInfo.put("lv", userRank.get("lv").toString());
         //判断是否有红包
-        //本月一号0点
-        String monthZeroTime = CommonFunc.getMonthOneDate();
-        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthZeroTime);
+        String nowTime = String.valueOf((new Date()).getTime());
+        //上个月最后一天23点59分
+        String monthEndTime = CommonFunc.getInputTimeLastMonthEnd();
+        //今天0点
+        String todayZero = CommonFunc.getZeroDate();
+        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthEndTime);
         if (hasRedPacket != null){
             //有红包
             gameHomePageUserInfo.put("hasRedPacket", "yes");
@@ -97,6 +100,17 @@ public class GameServiceImpl implements IGameService {
         }else {
             gameHomePageUserInfo.put("offline_exp", 0);
         }
+
+        //为了争取时间不采用事务
+        if (gameHomePageUserInfo.get("game_last_login") == null || Long.valueOf(todayZero) > Long.valueOf(gameHomePageUserInfo.get("game_last_login").toString())){
+            gameHomePageUserInfo.put("first_login_exp", Integer.valueOf(userRank.get("lv").toString()) * 400);
+        }else {
+            gameHomePageUserInfo.put("first_login", 0);
+        }
+
+        //更新用户上次登录时间
+        recitingWordsMapper.gameRecordLoginTime(uid, nowTime);
+
         return ServerResponse.createBySuccess("成功！",gameHomePageUserInfo);
     }
 
@@ -410,9 +424,9 @@ public class GameServiceImpl implements IGameService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }
         //判断是否有红包
-        //本月一号0点
-        String monthZeroTime = CommonFunc.getMonthOneDate();
-        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthZeroTime);
+        //上个月最后一天23点59分
+        String monthEndTime = CommonFunc.getInputTimeLastMonthEnd();
+        Map<String,Object> hasRedPacket = recitingWordsMapper.gameJudgeHasRedPacket(uid, monthEndTime);
         if (hasRedPacket == null){
             //没红包
             return ServerResponse.createByErrorMessage("暂无红包！");
@@ -435,7 +449,7 @@ public class GameServiceImpl implements IGameService {
         TransactionStatus status = transactionManager.getTransaction(def);
         try {
             //修改红包状态
-            recitingWordsMapper.gameChangeRedPacketStatus(uid, monthZeroTime);
+            recitingWordsMapper.gameChangeRedPacketStatus(uid, monthEndTime);
 
             //明细表加入红包明细
             common_configMapper.insertBill(uid,CommonFunc.getFormatTimeByDate(CommonFunc.getLastMonthTime(),"yyyy/MM") + "游戏挑战获得红包",hasRedPacket.get("reward").toString(),now_time,null);
@@ -622,8 +636,8 @@ public class GameServiceImpl implements IGameService {
             if (correct.equals(sourceSent)){
                 String newToken = CommonFunc.generateGameToken(aes.getGameOnlineKey(), uid);
                 //存入缓存 (1分钟过期)
-                LRULocalCache.put(token, "1", 60);
-                return ServerResponse.createBySuccess("成功！", token);
+                LRULocalCache.put(newToken, "1", 60);
+                return ServerResponse.createBySuccess("成功！", newToken);
             }else {
                 return ServerResponse.createByErrorMessage("输入格式有误！");
             }
@@ -737,6 +751,145 @@ public class GameServiceImpl implements IGameService {
 
 
     /**
+     * 小游戏（首次登录|离线经验）加经验获取token
+     * @param request  request
+     */
+    public ServerResponse<String> gameDailyExpToken(HttpServletRequest request){
+        //获得加密字符串
+        String key = request.getHeader("key");
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(key);
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        try {
+            //解码
+            AES aes = new AES();
+            String sourceSent = AES.DecryptCBC(key, aes.getGameOnlineKey());
+            //判断是不是按照要求来的
+            // 年 日（xx）月（xx）* 2 月 日 年 % 3
+            String correct = String.valueOf(Long.valueOf(CommonFunc.getVariousTime("year") + CommonFunc.getVariousTime("day") + CommonFunc.getVariousTime("month")) * 2)
+                    + String.valueOf(Long.valueOf(CommonFunc.getVariousTime("day") + CommonFunc.getVariousTime("year") + CommonFunc.getVariousTime("month")) % 3);
+            if (correct.equals(sourceSent)){
+                String newToken = CommonFunc.generateGameToken(aes.getGameOnlineKey(), uid);
+                //存入缓存 (1分钟过期)
+                LRULocalCache.put(newToken, "1", 60);
+                return ServerResponse.createBySuccess("成功！", newToken);
+            }else {
+                return ServerResponse.createByErrorMessage("输入格式有误！");
+            }
+        }catch (Exception ex){
+            logger.error("小游戏在线加经验获取token异常", ex.getStackTrace());
+            return ServerResponse.createByErrorMessage("获取标识失败！");
+        }
+    }
+
+
+    /**
+     * 小游戏（首次登录| 离线经验）加经验获取
+     * @param request  request
+     */
+    public ServerResponse<String> gameDailyExpAdd(HttpServletRequest request){
+        //获得加密字符串
+        String exp_token = request.getHeader("exp_token");
+        String exp = request.getHeader("exp");
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(exp_token);
+            add(token);
+            add(exp);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查看缓存 (1分钟过期)
+        if (!LRULocalCache.containsKey(exp_token)){
+            //没有token
+            return ServerResponse.createByErrorMessage("增加经验验证错误！");
+        }
+
+
+        //查询用户信息
+        Map<String,Object> gameUserInfo = recitingWordsMapper.getUserDailyExpById(uid);
+        //判断是不是null
+        //获取零点多一秒
+        String Zero = CommonFunc.getOneDate();
+        Long now_time = (new Date()).getTime();
+        //上限次数
+        int upLimitTimes = 25;
+        //单词上限经验
+        int upLimitExp = 400 * 30;
+        // 设置最大等级为30级上线，一次加经验不得超过 400 * 30 = 12000，一天24小时加上首次登录，次数不超25
+        //一次经验值上限
+        if (Integer.valueOf(exp) > upLimitExp){
+            return ServerResponse.createByErrorMessage("获取经验有误！");
+        }
+        //都不为空才有可能上限
+        if (gameUserInfo.get("game_today_receive_daily_exp_times") != null && gameUserInfo.get("game_daily_record_time") != null){
+            //两个都不为null才判断
+            String gameDailyRecordTime = gameUserInfo.get("game_daily_record_time").toString();
+            String gameTodayReceiveDailyExpTimes = gameUserInfo.get("game_today_receive_daily_exp_times").toString();
+            //今天次数达到上限
+            if ((Long.valueOf(gameDailyRecordTime) > Long.valueOf(Zero)) && Integer.valueOf(gameTodayReceiveDailyExpTimes) >= upLimitTimes){
+                return ServerResponse.createByErrorMessage("到达今日经验值上限！");
+            }
+        }
+
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+
+            if (gameUserInfo.get("game_daily_record_time") == null){
+                //如果换了一天，次数清零
+                recitingWordsMapper.gameDailyExpTimesSetZero(uid, "0");
+            }else {
+                String gameDailyRecordTime = gameUserInfo.get("game_daily_record_time").toString();
+                if (Long.valueOf(gameDailyRecordTime) <= Long.valueOf(Zero)){
+                    //上次是昨天
+                    //如果换了一天，次数清零
+                    recitingWordsMapper.gameDailyExpTimesSetZero(uid, "0");
+                }
+            }
+            //如果原本次数非空的话就加上，空的话就这一次
+            int new_times = 1;
+            if (gameUserInfo.get("game_today_receive_daily_exp_times") != null){
+                new_times += Integer.valueOf(gameUserInfo.get("game_today_receive_daily_exp_times").toString());
+            }
+            recitingWordsMapper.gameAddExp(uid, exp);
+            //todo 把次数和时间更新
+            recitingWordsMapper.gameDailyExpTimesAdd(uid, String.valueOf(new_times), String.valueOf(now_time));
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功！");
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("日常增加经验失败",e.getStackTrace());
+            logger.error("日常增加经验失败",e);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("增加经验失败！");
+        }
+    }
+
+
+    /**
      * 游戏专场
      * @param request  request
      */
@@ -789,6 +942,169 @@ public class GameServiceImpl implements IGameService {
         result.put("head_user_portrait",headUserPortraitArray);
 
         return ServerResponse.createBySuccess("成功！",result);
+    }
+
+
+
+    /**
+     * 分享图
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> gameShare(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查询用户信息
+        Map<String,Object> gameShare = recitingWordsMapper.getGameShare();
+        gameShare.put("pic", CommonFunc.judgePicPath(gameShare.get("pic").toString()));
+
+        return ServerResponse.createBySuccess("成功！",gameShare);
+    }
+
+
+
+    /**
+     * PK确认关系
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> gameMakeConnection(String pkId, HttpServletRequest request){
+        String token = request.getHeader("token");
+        String user_id = request.getHeader("uid");
+        String pay = request.getHeader("p");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(user_id);
+            add(pkId);
+            add(pay);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查询用户
+        Map<String,Object> checkUser = recitingWordsMapper.checkUser(uid);
+        if (checkUser == null){
+            return ServerResponse.createByErrorMessage("对手不存在！");
+        }
+
+        String nowTime = String.valueOf((new Date()).getTime());
+        //查一下是否重复建立
+        Map<String, Object> checkRelationship = recitingWordsMapper.gameIsSetRelationship(uid, user_id, pkId);
+        if (checkRelationship != null){
+            return ServerResponse.createByErrorMessage("对战已建立！");
+        }
+        recitingWordsMapper.gameInsertRelationship(uid, user_id, pkId, pay, nowTime);
+
+        return ServerResponse.createBySuccessMessage("成功！");
+    }
+
+
+
+    /**
+     * PK结算
+     * @param request  request
+     */
+    public ServerResponse<String> gamePkSettlement(String pkId, HttpServletRequest request){
+        String token = request.getHeader("token");
+        String user_id = request.getHeader("uid");
+        String result = request.getHeader("result");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(user_id);
+            add(pkId);
+            add(result);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }
+        //查询用户
+        Map<String,Object> checkUser = recitingWordsMapper.checkUser(uid);
+        if (checkUser == null){
+            return ServerResponse.createByErrorMessage("对手不存在！");
+        }
+
+
+        //查一下是否重复建立
+        Map<String, Object> checkRelationship = recitingWordsMapper.gameIsSetRelationship(uid, user_id, pkId);
+        if (checkRelationship == null){
+            return ServerResponse.createByErrorMessage("对战关系未完全建立！");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            if (result.equals("w")){
+                //胜利，查看对手状态是否已经是失败
+                Map<String, Object> checkRelationshipOther = recitingWordsMapper.gameIsSetRelationship(user_id, uid, pkId);
+                if (checkRelationshipOther == null){
+                    return ServerResponse.createByErrorMessage("对战关系未完全建立！");
+                }
+                if (checkRelationshipOther.get("result").toString().equals("1")){
+                    //对手失败
+                    //对手扣词力值
+                    recitingWordsMapper.gameDecreaseExp(user_id, checkRelationshipOther.get("pay").toString());
+                    //自己增加
+                    recitingWordsMapper.gameAddExp(user_id, checkRelationship.get("pay").toString());
+                    //记录结果
+                    recitingWordsMapper.gamePkSettlement("2", uid, user_id, pkId);
+                }else {
+                    //记录结果
+                    recitingWordsMapper.gamePkSettlement("2", uid, user_id, pkId);
+                }
+            }else if (result.equals("l")){
+                //失败，查看对手状态是否已经是胜利
+                Map<String, Object> checkRelationshipOther = recitingWordsMapper.gameIsSetRelationship(user_id, uid, pkId);
+                if (checkRelationshipOther == null){
+                    return ServerResponse.createByErrorMessage("对战关系未完全建立！");
+                }
+                if (checkRelationshipOther.get("result").toString().equals("2")){
+                    //对手成功
+                    //对手加
+                    recitingWordsMapper.gameAddExp(user_id, checkRelationshipOther.get("pay").toString());
+                    //自己扣词力值
+                    recitingWordsMapper.gameDecreaseExp(user_id, checkRelationship.get("pay").toString());
+                    //记录结果
+                    recitingWordsMapper.gamePkSettlement("1", uid, user_id, pkId);
+                }else {
+                    //记录结果
+                    recitingWordsMapper.gamePkSettlement("1", uid, user_id, pkId);
+                }
+            }else {
+                return ServerResponse.createByErrorMessage("没有该结果！");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功！");
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("pk结算失败",e.getStackTrace());
+            logger.error("pk结算失败",e);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("结算失败！");
+        }
     }
 
 }

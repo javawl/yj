@@ -33,6 +33,18 @@ public interface IAdminService {
 
     ServerResponse<List<Map>> show_virtual_user_platform(String page,String size,HttpServletRequest request);
 
+    ServerResponse<List<Map<Object,Object>>> showFishSay(String page,String size,HttpServletRequest request);
+
+    ServerResponse<List<Map<Object,Object>>> showGameOperatingShare(String page,String size,HttpServletRequest request);
+
+    ServerResponse<List<Map<Object,Object>>> showGameMonthChallenge(String page,String size,HttpServletRequest request);
+
+    ServerResponse<List<Map<String,Object>>> showGameMonthChallengeMember(String id,HttpServletRequest request);
+
+    ServerResponse<String> gameMonthChallengeCommit(String id,HttpServletRequest request);
+
+    ServerResponse<List<Map<Object,Object>>> show_virtual_user_game(String page,String size,HttpServletRequest request);
+
     ServerResponse delete_daily_pic(String id, HttpServletResponse response);
 
     ServerResponse delete_feeds(String id, HttpServletResponse response);

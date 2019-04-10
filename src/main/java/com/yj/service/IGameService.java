@@ -33,6 +33,16 @@ public interface IGameService {
 
     ServerResponse<String> gameOnlineExpAdd(HttpServletRequest request);
 
+    ServerResponse<String> gameDailyExpToken(HttpServletRequest request);
+
+    ServerResponse<String> gameDailyExpAdd(HttpServletRequest request);
+
     ServerResponse<Map<String, Object>> gamePkField(HttpServletRequest request);
+
+    ServerResponse<Map<String, Object>> gameShare(HttpServletRequest request);
+
+    ServerResponse<Map<String, Object>> gameMakeConnection(String pkId, HttpServletRequest request);
+
+    ServerResponse<String> gamePkSettlement(String pkId, HttpServletRequest request);
 
 }

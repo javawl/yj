@@ -1367,7 +1367,7 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_" + now_time.substring(0, now_time.length() - 3));//商户订单号
-            packageParams.put("total_fee", "990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
             packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -1390,7 +1390,7 @@ public class VariousServiceImpl implements IVariousService {
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "990" + "</total_fee>"
+                    + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -2775,6 +2775,34 @@ public class VariousServiceImpl implements IVariousService {
     }
 
 
+
+    //根据order和书本号获取章节id
+    public ServerResponse<String> getChapterIdByOrderBook(String bookId, String order, HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(bookId);
+            add(order);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> chapterIdByOrderBook = common_configMapper.getChapterIdByOrderBook(order, bookId);
+            if (chapterIdByOrderBook == null){
+                return ServerResponse.createByErrorMessage("没有该章节！");
+            }
+
+            return ServerResponse.createBySuccess("成功", chapterIdByOrderBook.get("id").toString());
+        }
+    }
+
+
     //------------------------------------------------------------------------------------------------------
     //---------------------------------------微信公众号------------------------------------------------------
     //首次验证消息的确来自微信服务器
@@ -2869,6 +2897,19 @@ public class VariousServiceImpl implements IVariousService {
             }
             // 对消息进行处理
             if (WechatMessageUtil.MESSAGE_EVENT_SUBSCRIBE.equals(Event)) {// 关注
+                //获取当天0点多一秒时间戳
+                String one = CommonFunc.getOneDate();
+                //获取当月一号零点的时间戳
+                String Month_one = CommonFunc.getMonthOneDate();
+                //先判断当天有没有数据，有的话更新
+                Map is_exist = userMapper.getDailyDataInfo(one);
+                if (is_exist == null){
+                    common_configMapper.insertDataInfo(1,0,one, Month_one);
+                    common_configMapper.addOfficialAccountsSubscribe(one);
+                }else {
+                    common_configMapper.addOfficialAccountsSubscribe(one);
+                }
+
                 TextMessage textMessage = new TextMessage();
                 textMessage.setMsgType(WechatMessageUtil.MESSAGE_TEXT);
                 textMessage.setToUserName(fromUserName);

@@ -160,7 +160,7 @@
     SELECT plans.plan,plans.dictionary_type,tb.*
     FROM plans,
        (
-          SELECT game_plan,game_exp,game_vit,game_last_online_time
+          SELECT game_plan,game_exp,game_vit,game_last_online_time,game_last_login
           FROM `user`
           WHERE `id` = #{id}
           LIMIT 1
@@ -174,6 +174,13 @@
     order by rand() limit #{size}
   </select>
 
+
+  <select id="getGameShare" resultType="map" parameterType="int">
+    SELECT txt,pic
+    FROM `game_share`
+    order by rand() limit 1
+  </select>
+
   <select id="getUserExpById" resultType="map" parameterType="string">
     SELECT username,portrait,game_exp,game_present_month_exp
     FROM `user`
@@ -182,6 +189,18 @@
 
   <select id="getUserOnlineExpById" resultType="map" parameterType="string">
     SELECT game_online_record_time,game_today_receive_online_exp_times,game_exp
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
+  <select id="checkUser" resultType="map" parameterType="string">
+    SELECT `id`
+    FROM `user`
+    WHERE id = #{id}
+  </select>
+
+  <select id="getUserDailyExpById" resultType="map" parameterType="string">
+    SELECT game_today_receive_daily_exp_times,game_daily_record_time
     FROM `user`
     WHERE id = #{id}
   </select>
@@ -236,12 +255,44 @@
     FROM game_pk_field
   </select>
 
+  <select id="gameIsSetRelationship" parameterType="string" resultType="map">
+    SELECT id
+    FROM game_pk_relationship
+    WHERE user_id = #{user_id}
+    AND enemy_id = #{enemy_id}
+    AND pk_id = #{pk_id}
+    LIMIT 1
+  </select>
+
   <select id="getUserRank" parameterType="string" resultType="map">
     SELECT rank,rank_exp,lv
     FROM game_rank
     WHERE rank_exp &lt;= #{rank_exp}
     ORDER BY rank_exp DESC
     LIMIT 1
+  </select>
+
+
+  <select id="getAllRank" parameterType="string" resultType="map">
+    SELECT rank,rank_exp,lv
+    FROM game_rank
+    ORDER BY rank_exp ASC
+  </select>
+
+  <select id="getTopGameExpUser" parameterType="string" resultType="map">
+    SELECT id,game_exp
+    FROM `user`
+    WHERE `wechat_game_openid` is not NULL
+    ORDER BY game_exp + 0 ASC
+    LIMIT 1000
+  </select>
+
+  <select id="getTopGamePresentMonthExpUser" parameterType="string" resultType="map">
+    SELECT id,game_present_month_exp
+    FROM `user`
+    WHERE `wechat_game_openid` is not NULL
+    ORDER BY game_present_month_exp ASC
+    LIMIT 1000
   </select>
 
   <select id="getGameRankInfo" resultType="map">
@@ -253,14 +304,21 @@
   <select id="getUserWorldRank" resultType="map">
     SELECT id, username,portrait,game_exp
     FROM `user`
-    ORDER BY game_exp DESC
+    ORDER BY game_exp + 0 DESC
     LIMIT #{start}, #{size}
+  </select>
+
+  <select id="getGameUser" resultType="map">
+    SELECT id,game_present_month_exp
+    FROM `user`
+    WHERE wechat_game_openid is not null
   </select>
 
   <select id="getUserChallengeRank" resultType="map">
     SELECT id, username,portrait,game_present_month_exp
     FROM `user`
-    ORDER BY game_present_month_exp DESC
+    WHERE wechat_game_openid is not null
+    ORDER BY game_present_month_exp + 0 DESC
     LIMIT #{start}, #{size}
   </select>
 
@@ -274,9 +332,24 @@
     LIMIT 1
   </select>
 
+
+  <select id="gameVirtualUserGameIsExist" resultType="map">
+    SELECT user_id
+    FROM `virtual_user_game`
+    WHERE user_id = #{id}
+    LIMIT 1
+  </select>
+
   <update id="gameSelectPlan" parameterType="string">
     UPDATE `user`
     SET `game_plan` = #{game_plan}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="gameRecordLoginTime" parameterType="string">
+    UPDATE `user`
+    SET `game_last_login` = #{game_last_login}
     WHERE id = #{id}
   </update>
 
@@ -286,10 +359,23 @@
     WHERE id = #{id}
   </update>
 
+  <update id="gameDailyExpTimesSetZero" parameterType="string">
+    UPDATE `user`
+    SET `game_today_receive_daily_exp_times` = #{game_today_receive_daily_exp_times}
+    WHERE id = #{id}
+  </update>
+
   <update id="gameOnlineExpTimesAdd" parameterType="string">
     UPDATE `user`
     SET `game_today_receive_online_exp_times` = #{game_today_receive_online_exp_times},
         `game_online_record_time` = #{game_online_record_time}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameDailyExpTimesAdd" parameterType="string">
+    UPDATE `user`
+    SET `game_today_receive_daily_exp_times` = #{game_today_receive_daily_exp_times},
+        `game_daily_record_time` = #{game_daily_record_time}
     WHERE id = #{id}
   </update>
 
@@ -306,6 +392,20 @@
     WHERE id = #{id}
   </update>
 
+  <update id="gameUpdateMonthExp" parameterType="string">
+    UPDATE `user`
+    SET `game_last_month_exp` = #{game_last_month_exp},
+        `game_present_month_exp` = #{game_present_month_exp}
+    WHERE id = #{id}
+  </update>
+
+  <update id="gameDecreaseExp" parameterType="string">
+    UPDATE `user`
+    SET `game_exp` = `game_exp` - #{game_exp},
+        `game_present_month_exp` = `game_present_month_exp` - #{game_exp}
+    WHERE id = #{id}
+  </update>
+
   <update id="gameStageClear" parameterType="string">
     UPDATE `game_take_plan`
     SET `stage` = #{stage},
@@ -313,6 +413,13 @@
     WHERE user_id = #{user_id}
     AND dictionary_type = #{dictionary_type}
   </update>
+
+  <update id="gameChallengeOver" parameterType="string">
+    UPDATE `game_month_challenge`
+    SET `is_deliver` = 1
+    WHERE `id` = #{id}
+  </update>
+
 
   <update id="gameChangeRedPacketStatus" parameterType="string">
     UPDATE `game_challenge_red_packet`
@@ -336,9 +443,27 @@
     WHERE id = #{id}
   </update>
 
+  <update id="gamePkSettlement" parameterType="string">
+    UPDATE `game_pk_relationship`
+    SET `result` = #{result}
+    WHERE user_id = #{user_id}
+    AND enemy_id = #{enemy_id}
+    AND pk_id = #{pk_id}
+  </update>
+
   <insert id="gameInsertTakePlan">
     INSERT game_take_plan (user_id, dictionary_type, stage, number_flag, set_time)
     values (#{user_id},#{dictionary_type},#{stage},#{number_flag},#{set_time})
+  </insert>
+
+  <insert id="gameInsertRelationship">
+    INSERT game_pk_relationship (user_id, enemy_id, pk_id, pay, set_time)
+    values (#{user_id},#{enemy_id},#{pk_id},#{pay},#{set_time})
+  </insert>
+
+  <insert id="gameInsertChangeRedPacket">
+    INSERT game_challenge_red_packet (user_id, st, et, wheather_gain, challenge_id, reward)
+    values (#{user_id},#{st},#{et},#{wheather_gain},#{challenge_id}, #{reward})
   </insert>
 
   <!-- ********************************************************************************************************** -->

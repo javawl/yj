@@ -89,20 +89,21 @@
                         seven_day_retention = "0%";
                         month_retention = "0%";
                     }else {
-                        var two_day_retention = String(parseFloat(data['daily_data'][i]['two_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
-                        var seven_day_retention = String(parseFloat(data['daily_data'][i]['seven_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
-                        var month_retention = String(parseFloat(data['daily_data'][i]['month_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00) + "%";
+                        var two_day_retention = String((parseFloat(data['daily_data'][i]['two_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00).toFixed(2)) + "%";
+                        var seven_day_retention = String((parseFloat(data['daily_data'][i]['seven_day_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00).toFixed(2)) + "%";
+                        var month_retention = String((parseFloat(data['daily_data'][i]['month_retention'] * 1.0) / parseFloat(data['daily_data'][i]['daily_add_user']) * 100.00).toFixed(2)) + "%";
                     }
 
                     $("#daily_data").append('<tr>'+
                             '<td>'+data['daily_data'][i]['daily_add_user']+'</td>'+
-                            '<td><div style="width: 400px;">'+data['daily_data'][i]['daily_app_start']+'</div></td>'+
-                            '<td>'+data['daily_data'][i]['daily_finish_work']+'</td>'+
+                            '<td><div style="max-width: 30px;">'+data['daily_data'][i]['daily_app_start']+'</div></td>'+
+                            '<td><div style="max-width: 10px;">'+data['daily_data'][i]['daily_finish_work']+'</div></td>'+
                             '<td>'+data['daily_data'][i]['dau']+'</td>'+
                             '<td>'+data['daily_data'][i]['mau']+'</td>'+
                             '<td>'+two_day_retention+'</td>'+
                             '<td>'+seven_day_retention+'</td>'+
                             '<td>'+month_retention+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_word_challenge_participants']+'</td>'+
                             '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
@@ -156,6 +157,7 @@
             <td>次日留存率</td>
             <td>7日留存率</td>
             <td>30日留存率</td>
+            <td>每日参加单词挑战人数</td>
             <td>日期</td>
         </tr>
     </table>
