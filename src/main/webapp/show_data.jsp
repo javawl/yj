@@ -104,6 +104,7 @@
                             '<td>'+seven_day_retention+'</td>'+
                             '<td>'+month_retention+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_word_challenge_participants']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_wechat_platform_subscribe']+'</td>'+
                             '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
@@ -158,6 +159,7 @@
             <td>7日留存率</td>
             <td>30日留存率</td>
             <td>每日参加单词挑战人数</td>
+            <td>日关注公众号人数</td>
             <td>日期</td>
         </tr>
     </table>

@@ -1832,7 +1832,7 @@
 
   <update id="addWordChallengeParticipants">
     UPDATE `data_info`
-    set `daily_wechat_platform_challenge_participants` = `daily_wechat_platform_challenge_participants` + 1
+    set `daily_word_challenge_participants` = `daily_word_challenge_participants` + 1
     WHERE set_time = #{set_time}
   </update>
 

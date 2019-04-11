@@ -127,4 +127,57 @@
       other = #{other,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="wordChallengeErrorUser" parameterType="string" resultType="map">
+    SELECT *
+    FROM
+    (SELECT *
+    FROM
+    (SELECT insist_day.is_correct,insist_day.user_id,insist_day.set_time
+    FROM insist_day,
+    (SELECT user_id
+    FROM word_challenge_contestants
+    WHERE word_challenge_contestants.word_challenge_id = #{word_challenge_id}
+    AND word_challenge_contestants.virtual = 0) tb
+    WHERE (insist_day.is_correct = 2 OR insist_day.is_correct = 3)
+    AND insist_day.user_id = tb.user_id) tb2
+    WHERE tb2.set_time >= #{st}
+    AND tb2.set_time &lt;= #{et}
+    GROUP BY user_id,set_time
+    HAVING COUNT(set_time) > 1) tb3
+    GROUP BY user_id
+  </select>
+
+  <select id="countRealTotalInsistDay" parameterType="string" resultType="map">
+    SELECT user_id
+    FROM insist_day
+    WHERE user_id = #{user_id}
+    GROUP BY insist_day.set_time
+  </select>
+
+  <select id="countRealTotalWordChallengeInsistDay" parameterType="string" resultType="map">
+    SELECT user_id
+    FROM insist_day
+    WHERE user_id = #{user_id}
+    AND insist_day.set_time >= #{st}
+    AND insist_day.set_time &lt;= #{et}
+    GROUP BY insist_day.set_time
+  </select>
+
+
+  <update id="correctInsistDay" parameterType="string">
+    UPDATE `user`
+    SET insist_day = #{insist_day},
+        clock_day = #{insist_day}
+    WHERE id = #{id}
+  </update>
+
+
+  <update id="correctWordChallengeInsistDay" parameterType="string">
+    UPDATE `word_challenge_contestants`
+    SET insist_day = #{insist_day}
+    WHERE user_id = #{user_id}
+    AND  word_challenge_id = #{word_challenge_id}
+  </update>
 </mapper>

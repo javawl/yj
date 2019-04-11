@@ -90,7 +90,7 @@
                         '<td style="width: 4%;">'+data[i]['virtual_number']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['enrollment']+'</td>'+
                         '<td style="width: 6%;">'+data[i]['profit_loss']+'</td>'+
-                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td style="width: 6%;"><button style="margin-left: 5px;" onclick="single('+"'"+data[i]['id']+"'"+')">查看</button><button style="margin-left: 5px;" onclick="del('+"'"+data[i]['id']+"'"+')">查看打卡数据异常</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -143,7 +143,8 @@
         window.location.href = "single_word_challenge.jsp?id="+id;
     }
     function del(id) {
-        if (confirm("暂无删除功能")){
+        window.location.href = "show_word_challenge_error.jsp?id="+id;
+        // if (confirm("暂无删除功能")){
             // $.ajax({
             //     url:url+"/admin/delete_lottery_draw.do",
             //     type:'POST',
@@ -166,7 +167,7 @@
             //         alert("服务器出错！");
             //     }
             // });
-        }
+        // }
     }
 </script>
 </html>
