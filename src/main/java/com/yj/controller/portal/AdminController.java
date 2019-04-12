@@ -2833,6 +2833,31 @@ public class AdminController {
 
 
     /**
+     * 更新阅读每一句的时间
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "update_class_book_inner_time.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse update_class_book_inner_time(String id,String t, HttpServletResponse response){
+        //格式 00:02.51
+        String[]  strs = t.split(":");
+        String first = strs[0];
+        String second = strs[1];
+        String[] str1 = second.split("\\.");
+        second = str1[0];
+        String third = str1[1] + "0";
+        int time = 0;
+        time += Integer.valueOf(third);
+        time += Integer.valueOf(second) * 1000;
+        time += Integer.valueOf(first) * 60 * 1000;
+        common_configMapper.updateReadClassBookInnerSt(id,String.valueOf(time));
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
      * 更新阅读挑战书籍信息
      * @param response
      * @return

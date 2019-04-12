@@ -146,6 +146,8 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;">
             </td>
         </tr>

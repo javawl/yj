@@ -48,6 +48,8 @@
                     $("#daily_data").append('<tr>'+
                         '<td>'+data[i]['id']+'</td>'+
                         '<td><div style="max-width: 550px; word-wrap: break-word">'+data[i]['en'] + "<br>" + data[i]['cn'] +'</div> </td>'+
+                        '<td><div>'+ data[i]['st'] +'</div> </td>'+
+                        '<td>句子开始时间（毫秒，例如：1000代表第一秒）：<input id=' + "time" + data[i]['id'] + ' type="text"><br><button onclick="upload_time('+"'"+data[i]['id']+"'"+')">提交</button></td>'+
                         // '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['order']+'</td>'+
                         // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
                         // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
@@ -188,6 +190,36 @@
         history.go(0);
         $("html, body").scrollTop(0).animate({scrollTop: $("#author"+id).offset().top});
     }
+
+    // 修改每句的时间
+    function upload_time(id) {
+        $.ajax({
+            url:url+"/admin/update_class_book_inner_time.do",
+            type:'POST',
+            data:{
+                t: document.getElementById("time" + id).value,
+                id: id
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+        exist_author = 0;
+        history.go(0);
+        $("html, body").scrollTop(0).animate({scrollTop: $("#time"+id).offset().top});
+    }
     //--------------------------------------------------------------------
 </script>
 <body>
@@ -210,7 +242,8 @@
         <tr>
             <td>序号</td>
             <td>内容</td>
-            <%--<td>操作</td>--%>
+            <td>句子开始时间</td>
+            <td>操作</td>
         </tr>
     </table>
     <table id="page">

@@ -645,6 +645,9 @@ public interface Common_configMapper {
     //更新书本简介
     int updateReadClassBookIntroduction(@Param("id") String id, @Param("introduction") String introduction);
 
+    //更新书本内容开始时间
+    int updateReadClassBookInnerSt(@Param("id") String id, @Param("st") String st);
+
     //更新系列词汇量
     int updateReadClassWordNumberNeed(@Param("id") String id, @Param("word_number_need") String word_number_need);
 

@@ -1364,6 +1364,12 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateReadClassBookInnerSt" parameterType="string">
+        UPDATE `read_class_chapter_inner` SET
+        `st`=#{st}
+        WHERE id = #{id}
+    </update>
+
     <update id="updateReadClassWordNumberNeed" parameterType="string">
         UPDATE `read_class_series` SET
         `word_number_need`=#{word_number_need}
