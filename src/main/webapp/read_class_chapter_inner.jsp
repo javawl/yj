@@ -49,7 +49,7 @@
                         '<td>'+data[i]['id']+'</td>'+
                         '<td><div style="max-width: 550px; word-wrap: break-word">'+data[i]['en'] + "<br>" + data[i]['cn'] +'</div> </td>'+
                         '<td><div>'+ data[i]['st'] +'</div> </td>'+
-                        '<td>句子开始时间（毫秒，例如：1000代表第一秒）：<input id=' + "time" + data[i]['id'] + ' type="text"><br><button onclick="upload_time('+"'"+data[i]['id']+"'"+')">提交</button></td>'+
+                        '<td>句子开始时间（毫秒，例如：1000代表第一秒）：<input id=' + "time" + data[i]['id'] + ' type="text"><br><button onclick="upload_time('+"'"+data[i]['id']+"'"+')">提交</button><button onclick="del('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
                         // '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['order']+'</td>'+
                         // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
                         // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
@@ -253,6 +253,32 @@
 <script>
     function check_chapter_inner(id) {
         window.location.href = "read_class_chapter_inner.jsp?id="+id;
+    }
+    function del(id) {
+        if (confirm("你确定要删除？删除之后不可恢复！")){
+            $.ajax({
+                url:url+"/admin/deleteBookInner.do",
+                type:'POST',
+                data:{
+                    id:id
+                },
+                dataType:'json',
+                success:function (result) {
+                    var code = result['code'];
+                    var msg = result['msg'];
+                    if (code != 200){
+                        alert(msg);
+                    }else {
+                        alert(msg);
+                        history.go(0);
+                    }
+                },
+                error:function (result) {
+                    console.log(result);
+                    alert("服务器出错！");
+                }
+            });
+        }
     }
 </script>
 </html>

@@ -105,6 +105,7 @@
                             '<td>'+month_retention+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_word_challenge_participants']+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_subscribe']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_wechat_platform_challenge_participants']+'</td>'+
                             '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
@@ -138,20 +139,6 @@
     <br>
     <table cellpadding="9" width="87%" border="1" cellspacing="0" id="daily_data">
         <tr>
-            <td style="border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;border-right: 0;"></td>
-            <td style="border-left: 0;">
-            </td>
-        </tr>
-        <tr>
             <td>日增用户数</td>
             <td>APP日启动次数</td>
             <td>日完成学习任务用户数</td>
@@ -162,6 +149,7 @@
             <td>30日留存率</td>
             <td>每日参加单词挑战人数</td>
             <td>日关注公众号人数</td>
+            <td>日报名万元挑战数</td>
             <td>日期</td>
         </tr>
     </table>

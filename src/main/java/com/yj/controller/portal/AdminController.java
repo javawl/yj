@@ -3206,6 +3206,27 @@ public class AdminController {
     }
 
 
+
+    /**
+     * 删除书籍下的内容
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteBookInner.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteBookInner(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        common_configMapper.deleteReadClassSeriesBookInner(id);
+        return ServerResponse.createBySuccessMessage("成功");
+
+    }
+
+
     /**
      * 删除阅读期数
      * @param id
@@ -3427,6 +3448,73 @@ public class AdminController {
 
 
     //-----------------------------------------------------微信公众号运营活动----------------------------------------------------------
+    /**
+     * 统计分享页数据
+     * @return  List
+     */
+    @RequestMapping(value = "addOfficialAccountShareDropDownUser.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addOfficialAccountShareDropDownUser(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            common_configMapper.addOfficialAccountShareDropDownUser(one);
+        }else {
+            common_configMapper.addOfficialAccountShareDropDownUser(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+    /**
+     * 统计分享页数据
+     * @return  List
+     */
+    @RequestMapping(value = "addOfficialAccountSharePagePv.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addOfficialAccountSharePagePv(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            common_configMapper.addOfficialAccountSharePagePv(one);
+        }else {
+            common_configMapper.addOfficialAccountSharePagePv(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+    /**
+     * 统计分享页数据
+     * @return  List
+     */
+    @RequestMapping(value = "addOfficialAccountSharePageQrCodeSweepTimes.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addOfficialAccountSharePageQrCodeSweepTimes(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            common_configMapper.addOfficialAccountSharePageQrCodeSweepTimes(one);
+        }else {
+            common_configMapper.addOfficialAccountSharePageQrCodeSweepTimes(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
     /**
      * 展示公众号的运营活动
      * @param page 页数

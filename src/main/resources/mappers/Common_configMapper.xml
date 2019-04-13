@@ -1443,6 +1443,11 @@
         WHERE series_id = #{series_id}
     </delete>
 
+    <delete id="deleteReadClassSeriesBookInner" parameterType="string" >
+        DELETE FROM `read_class_chapter_inner`
+        WHERE id = #{id}
+    </delete>
+
     <delete id="deleteReadClassSeriesTeacher" parameterType="string" >
         DELETE FROM `read_class_teacher`
         WHERE series_id = #{series_id}
@@ -1842,6 +1847,29 @@
     WHERE set_time = #{set_time}
   </update>
 
+  <update id="addOperatingChallengeParticipants">
+    UPDATE `data_info`
+    set `daily_wechat_platform_challenge_participants` = `daily_wechat_platform_challenge_participants` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addOfficialAccountShareDropDownUser">
+    UPDATE `data_info`
+    set `daily_wechat_platform_drop_down_user` = `daily_wechat_platform_drop_down_user` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addOfficialAccountSharePagePv">
+    UPDATE `data_info`
+    set `daily_wechat_platform_share_pv` = `daily_wechat_platform_share_pv` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addOfficialAccountSharePageQrCodeSweepTimes">
+    UPDATE `data_info`
+    set `daily_wechat_platform_sweep_code_times` = `daily_wechat_platform_sweep_code_times` + 1
+    WHERE set_time = #{set_time}
+  </update>
 
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
@@ -1920,6 +1948,35 @@
     DELETE FROM `game_share`
     WHERE `id` = #{id}
   </delete>
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>直播课程>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+  <select id="find_user_attend_course" resultType="map" parameterType="string">
+    SELECT tb.*,live_broadcast_course_contestants.insist_day,live_broadcast_course_contestants.id as live_broadcast_course_contestants_id
+    FROM live_broadcast_course_contestants,
+         (SELECT *
+          FROM live_broadcast_course
+          WHERE live_broadcast_course.et > #{now_time}) tb
+    WHERE live_broadcast_course_contestants.live_broadcast_course_id = tb.id
+    AND live_broadcast_course_contestants.user_id = #{user_id}
+    LIMIT 1
+  </select>
+
+
+    <select id="findCanAttendLiveCourse" resultType="map" parameterType="string">
+        SELECT *
+        FROM live_broadcast_course_contestants
+        WHERE live_broadcast_course_contestants.et > #{now_time}
+        LIMIT 1
+    </select>
+
+
+    <select id="getLiveCourseById" resultType="map">
+        SELECT  *
+        FROM `live_broadcast_course`
+        WHERE id = #{live_broadcast_course_id}
+    </select>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 

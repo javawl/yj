@@ -685,6 +685,9 @@ public interface Common_configMapper {
     //删除系列下的书
     int deleteReadClassSeriesBook(@Param("series_id") String series_id);
 
+    //删除系列下的书内容
+    int deleteReadClassSeriesBookInner(@Param("id") String id);
+
     //删除系列下的老师
     int deleteReadClassSeriesTeacher(@Param("series_id") String series_id);
 
@@ -825,6 +828,18 @@ public interface Common_configMapper {
     //单词挑战参加人数增加
     int addWordChallengeParticipants(@Param("set_time") String set_time);
 
+    //公众号万元挑战参加人数增加
+    int addOperatingChallengeParticipants(@Param("set_time") String set_time);
+
+    //公众号分享页下拉用户数
+    int addOfficialAccountShareDropDownUser(@Param("set_time") String set_time);
+
+    //公众号分享页pv
+    int addOfficialAccountSharePagePv(@Param("set_time") String set_time);
+
+    //公众号分享页内二维码扫码次数
+    int addOfficialAccountSharePageQrCodeSweepTimes(@Param("set_time") String set_time);
+
     //后台插入万元挑战
     int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
 
@@ -885,6 +900,18 @@ public interface Common_configMapper {
 
     //删除分享
     int deleteGameOperatingShare(@Param("id") String id);
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>直播课程>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // 查找是否报名课
+    Map<Object,Object> find_user_attend_course(@Param("now_time") String now_time, @Param("user_id") String user_id);
+
+    // 查找是否有可报名的课
+    Map<Object,Object> findCanAttendLiveCourse(@Param("now_time") String now_time);
+
+
+    Map<Object,Object> getLiveCourseById(@Param("live_broadcast_course_id") String live_broadcast_course_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

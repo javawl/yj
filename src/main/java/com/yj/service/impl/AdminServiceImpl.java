@@ -759,6 +759,7 @@ public class AdminServiceImpl implements IAdminService {
             feed.setCoverSelect(Integer.valueOf(select));
             feed.setFavours(0);
             feed.setLikes(0);
+            feed.setKind(kind);
             feed.setViews(0);
             feed.setPic(pic_url);
             feed.setSetTime(String.valueOf((new Date()).getTime()));
