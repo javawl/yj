@@ -813,7 +813,13 @@ public interface Common_configMapper {
     int mergeReadChallengeHelpSignUp(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
 
     //为了合并账号
+    int mergeLiveCourseContestants(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
     int mergeReadChallengeHelp(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
+
+    //为了合并账号
+    int mergeLiveCourseInviteRelation(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);
 
     //为了合并账号
     int mergeWordChallengeInviteRelation(@Param("new_user_id") String  new_user_id, @Param("user_id") String  user_id);

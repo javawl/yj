@@ -1810,6 +1810,30 @@
   </update>
 
 
+  <update id="mergeLiveCourseContestants" parameterType="string">
+    UPDATE live_broadcast_course_contestants
+    SET user_id = #{new_user_id}
+    WHERE id in
+          (SELECT tb.id
+           FROM (SELECT `id`
+                 FROM live_broadcast_course_contestants
+                 WHERE user_id = #{user_id}) tb
+          )
+  </update>
+
+
+  <update id="mergeLiveCourseInviteRelation" parameterType="string">
+    UPDATE live_broadcast_course_invite_relation
+    SET user_id = #{new_user_id}
+    WHERE id in
+          (SELECT tb.id
+           FROM (SELECT `id`
+                 FROM live_broadcast_course_invite_relation
+                 WHERE user_id = #{user_id}) tb
+          )
+  </update>
+
+
 
   <update id="mergeWordChallengeInviteRelation" parameterType="string">
     UPDATE word_challenge_invite_relation
