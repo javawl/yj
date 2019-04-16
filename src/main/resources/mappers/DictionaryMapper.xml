@@ -1223,6 +1223,16 @@
     FROM `word_challenge`
   </select>
 
+  <select id="countLiveCourse" resultType="string">
+    SELECT count(id)
+    FROM `live_broadcast_course`
+  </select>
+
+  <select id="countReadClass" resultType="string">
+    SELECT count(id)
+    FROM `read_class`
+  </select>
+
   <select id="countWechatPlatformChallenge" resultType="string">
     SELECT count(id)
     FROM `wechat_platform_challenge`

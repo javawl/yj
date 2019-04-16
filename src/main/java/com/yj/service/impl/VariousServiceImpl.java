@@ -3276,7 +3276,7 @@ public class VariousServiceImpl implements IVariousService {
                 Map<Object,Object> teacher = common_configMapper.getWxPlatformChallengeTeacher(wechat_challenge_challenge_id, "2");
                 response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
                 //这里先记录一下用户的支付情况
-                common_configMapper.insertPayRecord(uid,"1",now_time);
+                common_configMapper.insertPayRecord(uid,"h5OperatingChallenge",now_time);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -3421,7 +3421,7 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("appid", WxConfig.wx_platform_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
                 //这里先记录一下用户的支付情况
-                common_configMapper.insertPayRecord(uid,"1",now_time);
+                common_configMapper.insertPayRecord(uid,"h5WordChallenge",now_time);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -4152,8 +4152,8 @@ public class VariousServiceImpl implements IVariousService {
      * 发起微信支付
      * @param request  request
      */
-    public ServerResponse<Map<String, Object>> liveCoursePay(HttpServletRequest request){
-        String user_id = "no";
+    public ServerResponse<Map<String, Object>> liveCoursePay(String user_id, HttpServletRequest request){
+//        String user_id = "no";
         String token = request.getHeader("token");
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -4205,9 +4205,9 @@ public class VariousServiceImpl implements IVariousService {
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
             packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3));//商户订单号
-            packageParams.put("total_fee", "5990");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
             packageParams.put("spbill_create_ip", spbill_create_ip);
-            packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
+            packageParams.put("notify_url", WxPayConfig.liveCourseNotify);//支付成功后的回调地址
             packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
             packageParams.put("openid", openid);
 
@@ -4224,11 +4224,11 @@ public class VariousServiceImpl implements IVariousService {
                     + "<body><![CDATA[" + body + "]]></body>"
                     + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
-                    + "<notify_url>" + WxPayConfig.notify_url + "</notify_url>"
+                    + "<notify_url>" + WxPayConfig.liveCourseNotify + "</notify_url>"
                     + "<openid>" + openid + "</openid>"
                     + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
-                    + "<total_fee>" + "5990" + "</total_fee>"
+                    + "<total_fee>" + "1" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
@@ -4262,8 +4262,9 @@ public class VariousServiceImpl implements IVariousService {
                 response.put("paySign", paySign);
                 response.put("appid", WxConfig.wx_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
+                response.put("studentId", "2" + uid);
                 //这里先记录一下用户的支付情况
-                common_configMapper.insertPayRecord(uid,"1",now_time);
+                common_configMapper.insertPayRecord(uid,"miniProgramLiveCourse",now_time);
                 return ServerResponse.createBySuccess("成功",response);
             }else {
                 return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
@@ -4275,6 +4276,478 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createByErrorMessage("支付失败！");
         }
     }
+
+
+    /**
+     * 发起公众号支付
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> liveCourseOfficialAccountPay(String user_id, HttpServletRequest request){
+//        String user_id = "no";
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
+        }
+        String openid = userMapper.getWechatPlatformOpenId(uid);
+        if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        try{
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
+            //todo 做判断看看他到底能不能报名
+            //报过名不能报(任意一期)
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_course(now_time,uid);
+            if (word_challenge != null){
+                return ServerResponse.createByErrorMessage("已报名过不可再报！");
+            }
+            Map<Object,Object> word_challenge_capable= common_configMapper.findCanAttendLiveCourse(now_time);
+            if (word_challenge_capable == null){
+                return ServerResponse.createByErrorMessage("没有可报名的课程！");
+            }
+            String word_challenge_id = word_challenge_capable.get("id").toString();
+            //满人了不能报，报名人数>=报名上限
+            Map<Object,Object> selectWordChallenge = common_configMapper.getLiveCourseById(word_challenge_id);
+            //判断该挑战id的挑战是否符合条件
+            if (selectWordChallenge == null){
+                return ServerResponse.createByErrorMessage("未找到选择的课程！");
+            }
+
+            //生成的随机字符串
+            String nonce_str = CommonFunc.getRandomStringByLength(32);
+
+            //商品名称
+            String body = "公众号课程报名";
+            //获取客户端的ip地址
+            String spbill_create_ip = IpUtils.getIpAddr(request);
+
+            //组装参数，用户生成统一下单接口的签名
+            Map<String, String> packageParams = new HashMap<String, String>();
+            packageParams.put("appid", WxConfig.wx_platform_app_id);
+            packageParams.put("mch_id", WxPayConfig.mch_id);
+            packageParams.put("nonce_str", nonce_str);
+            packageParams.put("body", body);
+            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_m" + now_time.substring(0, now_time.length() - 3));//商户订单号
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("spbill_create_ip", spbill_create_ip);
+            packageParams.put("notify_url", WxPayConfig.liveCourseNotify);//支付成功后的回调地址
+            packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
+            packageParams.put("openid", openid);
+
+            String prestr = PayUtils.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+
+            //MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+            //文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+            System.out.println(prestr);
+            String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+            System.out.println(mysign);
+
+            //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+            String xml = "<xml>" + "<appid>" + WxConfig.wx_platform_app_id + "</appid>"
+                    + "<body><![CDATA[" + body + "]]></body>"
+                    + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
+                    + "<nonce_str>" + nonce_str + "</nonce_str>"
+                    + "<notify_url>" + WxPayConfig.liveCourseNotify + "</notify_url>"
+                    + "<openid>" + openid + "</openid>"
+                    + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
+                    + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
+                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
+                    + "<sign>" + mysign + "</sign>"
+                    + "</xml>";
+
+            System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+
+            //调用统一下单接口，并接受返回的结果
+            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+
+            System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
+
+            // 将解析结果存储在HashMap中
+            Map map = PayUtils.doXMLParse(result);
+
+            String return_code = (String) map.get("return_code");//返回状态码
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            logger.error(return_msg);
+
+            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            if(return_code.equals("SUCCESS")){
+                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
+                response.put("nonceStr", nonce_str);
+                response.put("package", "prepay_id=" + prepay_id);
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
+                //拼接签名需要的参数
+                String stringSignTemp = "appId=" + WxConfig.wx_platform_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
+                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
+
+                response.put("paySign", paySign);
+                response.put("appid", WxConfig.wx_platform_app_id);
+                response.put("signType", WxPayConfig.SIGNTYPE);
+                response.put("studentId", "2" + uid);
+                //这里先记录一下用户的支付情况
+                common_configMapper.insertPayRecord(uid,"officialAccountsLiveCourse",now_time);
+                return ServerResponse.createBySuccess("成功",response);
+            }else {
+                return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("支付失败",e.getStackTrace());
+            logger.error("支付失败",e);
+            return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+
+
+    /**
+     * 发起微信支付（助力）
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> liveCoursePayHelp(String user_id, HttpServletRequest request){
+//        String user_id = "no";
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
+        }
+        String openid = userMapper.getOpenId(uid);
+        if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        try{
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
+            //todo 做判断看看他到底能不能报名
+            //报过名不能报(任意一期)
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_course(now_time,uid);
+            if (word_challenge != null){
+                return ServerResponse.createByErrorMessage("已报名过不可再报！");
+            }
+            Map<Object,Object> word_challenge_capable= common_configMapper.findCanAttendLiveCourse(now_time);
+            if (word_challenge_capable == null){
+                return ServerResponse.createByErrorMessage("没有可报名的课程！");
+            }
+            String word_challenge_id = word_challenge_capable.get("id").toString();
+            //满人了不能报，报名人数>=报名上限
+            Map<Object,Object> selectWordChallenge = common_configMapper.getLiveCourseById(word_challenge_id);
+            //判断该挑战id的挑战是否符合条件
+            if (selectWordChallenge == null){
+                return ServerResponse.createByErrorMessage("未找到选择的课程！");
+            }
+
+            //生成的随机字符串
+            String nonce_str = CommonFunc.getRandomStringByLength(32);
+
+            //商品名称
+            String body = "课程报名";
+            //获取客户端的ip地址
+            String spbill_create_ip = IpUtils.getIpAddr(request);
+
+            //组装参数，用户生成统一下单接口的签名
+            Map<String, String> packageParams = new HashMap<String, String>();
+            packageParams.put("appid", WxConfig.wx_app_id);
+            packageParams.put("mch_id", WxPayConfig.mch_id);
+            packageParams.put("nonce_str", nonce_str);
+            packageParams.put("body", body);
+            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3));//商户订单号
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("spbill_create_ip", spbill_create_ip);
+            packageParams.put("notify_url", WxPayConfig.liveCourseHelpNotify);//支付成功后的回调地址
+            packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
+            packageParams.put("openid", openid);
+
+            String prestr = PayUtils.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+
+            //MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+            //文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+            System.out.println(prestr);
+            String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+            System.out.println(mysign);
+
+            //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+            String xml = "<xml>" + "<appid>" + WxConfig.wx_app_id + "</appid>"
+                    + "<body><![CDATA[" + body + "]]></body>"
+                    + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
+                    + "<nonce_str>" + nonce_str + "</nonce_str>"
+                    + "<notify_url>" + WxPayConfig.liveCourseHelpNotify + "</notify_url>"
+                    + "<openid>" + openid + "</openid>"
+                    + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
+                    + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
+                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
+                    + "<sign>" + mysign + "</sign>"
+                    + "</xml>";
+
+            System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+
+            //调用统一下单接口，并接受返回的结果
+            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+
+            System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
+
+            // 将解析结果存储在HashMap中
+            Map map = PayUtils.doXMLParse(result);
+
+            String return_code = (String) map.get("return_code");//返回状态码
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            logger.error(return_msg);
+
+            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            if(return_code.equals("SUCCESS")){
+                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
+                response.put("nonceStr", nonce_str);
+                response.put("package", "prepay_id=" + prepay_id);
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
+                //拼接签名需要的参数
+                String stringSignTemp = "appId=" + WxConfig.wx_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
+                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
+
+                response.put("paySign", paySign);
+                response.put("appid", WxConfig.wx_app_id);
+                response.put("signType", WxPayConfig.SIGNTYPE);
+                response.put("studentId", "2" + uid);
+                //这里先记录一下用户的支付情况
+                common_configMapper.insertPayRecord(uid,"miniProgramLiveCourse",now_time);
+                return ServerResponse.createBySuccess("成功",response);
+            }else {
+                return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("支付失败",e.getStackTrace());
+            logger.error("支付失败",e);
+            return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+
+    /**
+     * 发起公众号支付（助力）
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> liveCourseOfficialAccountPayHelp(String user_id, HttpServletRequest request){
+//        String user_id = "no";
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！" + token);
+        }
+        String openid = userMapper.getWechatPlatformOpenId(uid);
+        if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
+        try{
+            //时间戳
+            String now_time = String.valueOf((new Date()).getTime());
+            //todo 做判断看看他到底能不能报名
+            //报过名不能报(任意一期)
+            Map<Object,Object> word_challenge = common_configMapper.find_user_attend_course(now_time,uid);
+            if (word_challenge != null){
+                return ServerResponse.createByErrorMessage("已报名过不可再报！");
+            }
+            Map<Object,Object> word_challenge_capable= common_configMapper.findCanAttendLiveCourse(now_time);
+            if (word_challenge_capable == null){
+                return ServerResponse.createByErrorMessage("没有可报名的课程！");
+            }
+            String word_challenge_id = word_challenge_capable.get("id").toString();
+            //满人了不能报，报名人数>=报名上限
+            Map<Object,Object> selectWordChallenge = common_configMapper.getLiveCourseById(word_challenge_id);
+            //判断该挑战id的挑战是否符合条件
+            if (selectWordChallenge == null){
+                return ServerResponse.createByErrorMessage("未找到选择的课程！");
+            }
+
+            //生成的随机字符串
+            String nonce_str = CommonFunc.getRandomStringByLength(32);
+
+            //商品名称
+            String body = "公众号课程报名";
+            //获取客户端的ip地址
+            String spbill_create_ip = IpUtils.getIpAddr(request);
+
+            //组装参数，用户生成统一下单接口的签名
+            Map<String, String> packageParams = new HashMap<String, String>();
+            packageParams.put("appid", WxConfig.wx_platform_app_id);
+            packageParams.put("mch_id", WxPayConfig.mch_id);
+            packageParams.put("nonce_str", nonce_str);
+            packageParams.put("body", body);
+            packageParams.put("out_trade_no", word_challenge_id + "_" + uid + "_" + user_id + "_m" + now_time.substring(0, now_time.length() - 3));//商户订单号
+            packageParams.put("total_fee", "1");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+            packageParams.put("spbill_create_ip", spbill_create_ip);
+            packageParams.put("notify_url", WxPayConfig.liveCourseHelpNotify);//支付成功后的回调地址
+            packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
+            packageParams.put("openid", openid);
+
+            String prestr = PayUtils.createLinkString(packageParams); // 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+
+            //MD5运算生成签名，这里是第一次签名，用于调用统一下单接口
+            //文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+            System.out.println(prestr);
+            String mysign = PayUtils.sign(prestr, WxPayConfig.key, "utf-8").toUpperCase();
+            System.out.println(mysign);
+
+            //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
+            String xml = "<xml>" + "<appid>" + WxConfig.wx_platform_app_id + "</appid>"
+                    + "<body><![CDATA[" + body + "]]></body>"
+                    + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
+                    + "<nonce_str>" + nonce_str + "</nonce_str>"
+                    + "<notify_url>" + WxPayConfig.liveCourseHelpNotify + "</notify_url>"
+                    + "<openid>" + openid + "</openid>"
+                    + "<out_trade_no>" + word_challenge_id + "_" + uid + "_" + user_id + "_l" + now_time.substring(0, now_time.length() - 3) + "</out_trade_no>"
+                    + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>"
+                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>"
+                    + "<sign>" + mysign + "</sign>"
+                    + "</xml>";
+
+            System.out.println("调试模式_统一下单接口 请求XML数据：" + xml);
+
+            //调用统一下单接口，并接受返回的结果
+            String result = PayUtils.httpRequest(WxPayConfig.pay_url, "POST", xml);
+
+            System.out.println("调试模式_统一下单接口 返回XML数据：" + result);
+
+            // 将解析结果存储在HashMap中
+            Map map = PayUtils.doXMLParse(result);
+
+            String return_code = (String) map.get("return_code");//返回状态码
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            logger.error(return_msg);
+
+            Map<String, Object> response = new HashMap<String, Object>();//返回给小程序端需要的参数
+            if(return_code.equals("SUCCESS")){
+                String prepay_id = (String) map.get("prepay_id");//返回的预付单信息
+                response.put("nonceStr", nonce_str);
+                response.put("package", "prepay_id=" + prepay_id);
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
+                //拼接签名需要的参数
+                String stringSignTemp = "appId=" + WxConfig.wx_platform_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
+                String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
+
+                response.put("paySign", paySign);
+                response.put("appid", WxConfig.wx_platform_app_id);
+                response.put("signType", WxPayConfig.SIGNTYPE);
+                response.put("studentId", "2" + uid);
+                //这里先记录一下用户的支付情况
+                common_configMapper.insertPayRecord(uid,"officialAccountsLiveCourse",now_time);
+                return ServerResponse.createBySuccess("成功",response);
+            }else {
+                return ServerResponse.createByErrorMessage("支付失败！"+ return_msg);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("支付失败",e.getStackTrace());
+            logger.error("支付失败",e);
+            return ServerResponse.createByErrorMessage("支付失败！");
+        }
+    }
+
+
+    //直播课程报名页
+    public ServerResponse<Map<Object,Object>> liveCourseApplicationPage(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //展示单词挑战首页数据
+            String now_time_stamp = String.valueOf((new Date()).getTime());
+
+            //找出未结束的期数的最近的结束时间
+            Map<Object,Object> canAttendLiveCourse = common_configMapper.findCanAttendLiveCourse(now_time_stamp);
+
+            //判断有没有报名
+            Map<Object,Object> attendCourse = common_configMapper.find_user_attend_course(uid, now_time_stamp);
+
+
+            Map<Object,Object> result = new HashMap<>();
+//            if (canAttendLiveCourse == null){
+//                //因为没有可报名的活动，所以给一个预约的
+//                Map<Object,Object> wxPlatformChallengeReserved = common_configMapper.showWxPlatformChallengeReserved(now_time_stamp);
+//                Map<Object,Object> resultReserved = new HashMap<>();
+//                if (wxPlatformChallengeReserved == null){
+//                    return ServerResponse.createBySuccess("成功！", resultReserved);
+//                }
+//                resultReserved.put("periods", wxPlatformChallengeReserved.get("periods"));
+//                resultReserved.put("st", CommonFunc.getFormatTime(Long.valueOf(wxPlatformChallengeReserved.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+//                resultReserved.put("et", CommonFunc.getFormatTime(Long.valueOf(wxPlatformChallengeReserved.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+//                resultReserved.put("rest_number", Integer.valueOf(wxPlatformChallengeReserved.get("upper_limit").toString()) - Integer.valueOf(wxPlatformChallengeReserved.get("enrollment").toString()));
+//                resultReserved.put("type", "reserved");
+//                if (attendCourse == null){
+//                    resultReserved.put("status", "no");
+//                }else {
+//                    resultReserved.put("status", "yes");
+//                }
+//                return ServerResponse.createBySuccess("成功！", resultReserved);
+//            }
+            result.put("st", CommonFunc.getFormatTime(Long.valueOf(canAttendLiveCourse.get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            result.put("et", CommonFunc.getFormatTime(Long.valueOf(canAttendLiveCourse.get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+            result.put("periods", canAttendLiveCourse.get("periods"));
+//            result.put("type", "formal");
+            Long during = (new Date()).getTime() - Long.valueOf(canAttendLiveCourse.get("set_time").toString());
+            //计算有多少人报名
+            int number = Integer.valueOf(canAttendLiveCourse.get("enrollment").toString());
+            int all_people = 0;
+            Long ii = 0L;
+            while (ii < during){
+//                if (all_people + 3 > number){
+//                    all_people = number;
+//                    break;
+//                }
+//                all_people += 3;
+                number += 1;
+                ii+=90000;
+            }
+            if (attendCourse == null){
+                result.put("status", "no");
+            }else {
+                result.put("status", "yes");
+            }
+            result.put("people", number);
+            //弄一个虚拟用户
+            List<Map<Object,Object>> head_user_portrait = common_configMapper.getVirtualPortraitRandom(1);
+            for (int i=0;i<head_user_portrait.size();i++) {
+                head_user_portrait.get(i).put("portrait", CommonFunc.judgePicPath(head_user_portrait.get(i).get("portrait").toString()));
+            }
+            result.put("virtualUser", head_user_portrait);
+            return ServerResponse.createBySuccess("成功！", result);
+        }
+    }
+
 
     //------------------------------------------------------------------------------------------------------
 }

@@ -373,6 +373,12 @@ public interface DictionaryMapper {
     //后台
     String countWordChallenge();
 
+    //后台
+    String countLiveCourse();
+
+    //后台
+    String countReadClass();
+
 
     String countWechatPlatformChallenge();
 

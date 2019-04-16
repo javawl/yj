@@ -910,8 +910,39 @@ public interface Common_configMapper {
     // 查找是否有可报名的课
     Map<Object,Object> findCanAttendLiveCourse(@Param("now_time") String now_time);
 
-
     Map<Object,Object> getLiveCourseById(@Param("live_broadcast_course_id") String live_broadcast_course_id);
+
+    List<Map<Object,Object>> showLiveCourse(@Param("start") int start,@Param("size") int size);
+
+    //展现直播的用户
+    List<Map<Object,Object>> showLiveCourseUserInfo(@Param("live_broadcast_course_id") String live_broadcast_course_id);
+
+    //随机获取几个虚拟用户头像
+    List<Map<Object,Object>> getVirtualPortraitRandom(@Param("size") int size);
+
+    //插入参与直播的表
+    int insertLiveBroadcastContestantsReal(@Param("user_id") String user_id, @Param("live_broadcast_course_id") String live_broadcast_course_id, @Param("set_time") String set_time, @Param("whether_help") String whether_help);
+
+    //建立直播邀请
+    int insertLiveBroadcastInviteRelation(@Param("user_id") String user_id,@Param("invited_user_id") String invited_user_id,@Param("live_broadcast_course_id") String live_broadcast_course_id,@Param("set_time") String set_tim);
+
+    //插入参与助力的表
+    int insertLiveBroadcastContestantsHelp(@Param("user_id") String user_id, @Param("live_broadcast_course_id") String live_broadcast_course_id, @Param("set_time") String set_time);
+
+    //后台插入直播课程
+    int insertLiveCourse(@Param("st") String st,@Param("et") String et, @Param("set_time") String set_time);
+
+    //修改参与人数
+    int changeLiveBroadcastCourseEnroll(@Param("id") String id);
+
+    //删除直播
+    int deleteLiveCourse(@Param("id") String id);
+
+    //删除直播用户
+    int deleteLiveCourseContestants(@Param("id") String id);
+
+    //删除直播邀请关系
+    int deleteLiveCourseInviteRelation(@Param("id") String id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

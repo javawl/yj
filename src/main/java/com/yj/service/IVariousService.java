@@ -186,4 +186,20 @@ public interface IVariousService {
 
     //运营活动报名成功老师页
     ServerResponse<Map<String, Object>> wxPlatformChallengePayTeacherPage(HttpServletRequest request);
+
+    //小程序直播课程支付
+    ServerResponse<Map<String, Object>> liveCoursePay(String user_id, HttpServletRequest request);
+
+    //公众号直播课程支付
+    ServerResponse<Map<String, Object>> liveCourseOfficialAccountPay(String user_id, HttpServletRequest request);
+
+
+    //小程序直播课程支付（助力）
+    ServerResponse<Map<String, Object>> liveCoursePayHelp(String user_id, HttpServletRequest request);
+
+    //公众号直播课程支付（助力）
+    ServerResponse<Map<String, Object>> liveCourseOfficialAccountPayHelp(String user_id, HttpServletRequest request);
+
+    //报名页
+    ServerResponse<Map<Object,Object>> liveCourseApplicationPage(HttpServletRequest request);
 }

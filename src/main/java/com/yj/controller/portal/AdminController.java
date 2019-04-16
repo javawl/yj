@@ -636,7 +636,7 @@ public class AdminController {
             Info.get(i).put("reserved_number", common_configMapper.countReadClassReserved(Info.get(i).get("id").toString()));
         }
 
-        return ServerResponse.createBySuccess(dictionaryMapper.countWordChallenge(),Info);
+        return ServerResponse.createBySuccess(dictionaryMapper.countReadClass(),Info);
     }
 
 
@@ -4065,4 +4065,149 @@ public class AdminController {
 
 
     //-----------------------------------------------------小游戏（下闭合线）----------------------------------------------------------
+    //-------------------------------------------------------运营直播课程-------------------------------------------------------------
+    /**
+     * 展示多条直播课程
+     * @param page  页号
+     * @param size  页大小
+     * @return
+     */
+    @RequestMapping(value = "showLiveCourse.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showLiveCourse(String page,String size){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        //获取抽奖信息
+        List<Map<Object,Object>> Info = common_configMapper.showLiveCourse(start,Integer.valueOf(size));
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("st",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("st").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("et",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("et").toString()),"yyyy/MM/dd HH:mm:ss"));
+        }
+
+        return ServerResponse.createBySuccess(dictionaryMapper.countLiveCourse(),Info);
+    }
+
+
+    /**
+     * 上传直播课程
+     * @param st       开始时间  格式  xxxx-xx-xx
+     * @param et       结束时间  格式如上
+     * @return         string
+     */
+    @RequestMapping(value = "uploadLiveCourse.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadLiveCourse(String st, String et, HttpServletRequest request){
+        String st_str;
+        String et_str;
+        try {
+            //获取时间错
+            st_str =  CommonFunc.date2TimeStamp(st+" 00:00:01");
+            et_str =  CommonFunc.date2TimeStamp(et+" 23:59:59");
+        }catch (ParseException e){
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("传入日期有误");
+        }
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            String now_time = String.valueOf((new Date()).getTime());
+            //存到数据库
+            int result = common_configMapper.insertLiveCourse(st_str, et_str, now_time);
+            if (result == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
+
+    /**
+     * 删除直播课程
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "deleteLiveCourse.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> deleteLiveCourse(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            //删除直播
+            int delResult = common_configMapper.deleteLiveCourse(id);
+            if (delResult == 0){
+                return ServerResponse.createByErrorMessage("更新失败");
+            }
+            //删直播的相关关系
+            common_configMapper.deleteLiveCourseContestants(id);
+            common_configMapper.deleteLiveCourseInviteRelation(id);
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+
+    }
+
+    /**
+     * 展示直播课程用户
+     * @return  List
+     */
+    @RequestMapping(value = "showLiveCourseUserInfo.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<List<Map<Object,Object>>> showLiveCourseUserInfo(String courseId){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(courseId);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //获取用户在该系列打卡情况
+        List<Map<Object,Object>> Info = common_configMapper.showLiveCourseUserInfo(courseId);
+
+        for(int i = 0; i < Info.size(); i++){
+            Info.get(i).put("set_time",CommonFunc.getFormatTime(Long.valueOf(Info.get(i).get("set_time").toString()),"yyyy/MM/dd HH:mm:ss"));
+            Info.get(i).put("portrait", CommonFunc.judgePicPath(Info.get(i).get("portrait").toString()));
+            //查看是否是报名价
+            if (Integer.valueOf(Info.get(i).get("whether_help").toString()) == 1){
+                Info.get(i).put("whether_help", "59.9");
+            }else {
+                Info.get(i).put("whether_help", "199.9");
+            }
+        }
+
+        return ServerResponse.createBySuccess("成功",Info);
+    }
+
+
+    //-----------------------------------------------------运营直播课程（下闭合线）----------------------------------------------------------
 }

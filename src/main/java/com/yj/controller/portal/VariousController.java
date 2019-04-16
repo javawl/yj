@@ -1555,19 +1555,19 @@ public class VariousController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value="liveCoursePay.do")
+    @RequestMapping(value="liveCoursePayNotify.do")
     @ResponseBody
-    public void liveCoursePay(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public void liveCoursePayNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
         logger.error("回调开始");
-        //获取当天0点多一秒时间戳
-        String one = CommonFunc.getOneDate();
-        //获取当月一号零点的时间戳
-        String Month_one = CommonFunc.getMonthOneDate();
-        String uid_copy = "";
-        String word_challenge_id_copy = "";
-        String now_time_copy = "";
-        //先判断当天有没有数据，有的话更新
-        Map is_exist = userMapper.getDailyDataInfo(one);
+//        //获取当天0点多一秒时间戳
+//        String one = CommonFunc.getOneDate();
+//        //获取当月一号零点的时间戳
+//        String Month_one = CommonFunc.getMonthOneDate();
+//        String uid_copy = "";
+//        String word_challenge_id_copy = "";
+//        String now_time_copy = "";
+//        //先判断当天有没有数据，有的话更新
+//        Map is_exist = userMapper.getDailyDataInfo(one);
         //事务
         DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -1604,29 +1604,40 @@ public class VariousController {
                     /**此处添加自己的业务逻辑代码start**/
                     String[] str_list = out_trade_no.split("_");
                     String challenge_id = str_list[0];
-                    word_challenge_id_copy = challenge_id;
                     String now_time = String.valueOf((new Date()).getTime());
-                    now_time_copy = now_time;
                     //获取用户id
                     String uid = str_list[1];
-                    uid_copy = uid;
+                    //获取邀请人id
+                    String invite_id = str_list[2];
+//                    word_challenge_id_copy = challenge_id;
+//                    now_time_copy = now_time;
+//                    uid_copy = uid;
                     //判断是否报过名
                     //报过名不能报(任意未结束一期)
-                    Map<Object,Object> wechat_challenge = common_configMapper.find_user_attend_wx_platform_challenge(now_time,uid);
+                    Map<Object,Object> wechat_challenge = common_configMapper.find_user_attend_course(now_time,uid);
                     if (wechat_challenge != null){
                         logger.error("微信支付成功，但是已经报过名了不可再报！");
                         throw new Exception("微信支付成功，但是已经报过名了不可再报！");
                     }
                     //插入参与数据库
-                    common_configMapper.insertWechatChallengeContestantsReal(uid,challenge_id,now_time);
-                    //插入单词挑战总数据库
-                    common_configMapper.changeWechatPlatformChallengeEnroll(challenge_id);
+                    common_configMapper.insertLiveBroadcastContestantsReal(uid,challenge_id,now_time, "0");
+                    //插入总数据库
+                    common_configMapper.changeLiveBroadcastCourseEnroll(challenge_id);
 
-                    if (is_exist == null){
-                        common_configMapper.insertDataInfo(1,0,one, Month_one);
-                        common_configMapper.addOperatingChallengeParticipants(one);
-                    }else {
-                        common_configMapper.addOperatingChallengeParticipants(one);
+//                    if (is_exist == null){
+//                        common_configMapper.insertDataInfo(1,0,one, Month_one);
+//                        common_configMapper.addOperatingChallengeParticipants(one);
+//                    }else {
+//                        common_configMapper.addOperatingChallengeParticipants(one);
+//                    }
+                    //记录是谁邀请的
+                    if (!invite_id.equals("no")){
+                        if (!CommonFunc.isInteger(invite_id)){
+                            logger.error("传入user_id非法！");
+                        }else {
+                            //通过邀请进来的
+                            common_configMapper.insertLiveBroadcastInviteRelation(uid,invite_id,challenge_id,now_time);
+                        }
                     }
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
@@ -1651,14 +1662,14 @@ public class VariousController {
             transactionManager.commit(status);
         } catch (Exception e) {
             transactionManager.rollback(status);
-            logger.error("微信公众号报名失败",e.getStackTrace());
-            logger.error("微信公众号报名失败",e);
-            if (!uid_copy.equals("") && !word_challenge_id_copy.equals("") && !now_time_copy.equals("")){
-                //插入参与数据库
-                common_configMapper.insertWechatChallengeContestantsReal(uid_copy,word_challenge_id_copy,now_time_copy);
-                //插入单词挑战总数据库
-                common_configMapper.changeWechatPlatformChallengeEnroll(word_challenge_id_copy);
-            }
+            logger.error("小程序直播报名失败",e.getStackTrace());
+            logger.error("小程序直播报名失败",e);
+//            if (!uid_copy.equals("") && !word_challenge_id_copy.equals("") && !now_time_copy.equals("")){
+//                //插入参与数据库
+//                common_configMapper.insertWechatChallengeContestantsReal(uid_copy,word_challenge_id_copy,now_time_copy);
+//                //插入单词挑战总数据库
+//                common_configMapper.changeWechatPlatformChallengeEnroll(word_challenge_id_copy);
+//            }
             e.printStackTrace();
             //出现错误抛错
             String resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
@@ -1671,6 +1682,199 @@ public class VariousController {
         }
     }
 
+
+    /**
+     * 助力支付回调（帮助）
+     * @Description:微信支付
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="liveCoursePayHelpNotify.do")
+    @ResponseBody
+    public void liveCoursePayHelpNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        logger.error("回调开始");
+//        //获取当天0点多一秒时间戳
+//        String one = CommonFunc.getOneDate();
+//        //获取当月一号零点的时间戳
+//        String Month_one = CommonFunc.getMonthOneDate();
+//        String uid_copy = "";
+//        String word_challenge_id_copy = "";
+//        String now_time_copy = "";
+//        //先判断当天有没有数据，有的话更新
+//        Map is_exist = userMapper.getDailyDataInfo(one);
+        //事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        logger.error("测试事务");
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader((ServletInputStream)request.getInputStream()));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            while((line = br.readLine()) != null){
+                sb.append(line);
+            }
+            br.close();
+            //sb为微信返回的xml
+            String notityXml = sb.toString();
+            String resXml = "";
+            System.out.println("接收到的报文：" + notityXml);
+
+            Map map = PayUtils.doXMLParse(notityXml);
+
+            String returnCode = (String) map.get("return_code");
+            String out_trade_no = (String) map.get("out_trade_no");
+            logger.error(out_trade_no);
+            String return_msg = (String) map.get("return_msg"); //返回信息
+            if("SUCCESS".equals(returnCode)){
+                //验证签名是否正确
+                Map<String, String> validParams = PayUtils.paraFilter(map);  //回调验签时需要去除sign和空值参数
+                String validStr = PayUtils.createLinkString(validParams);//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+                String sign = PayUtils.sign(validStr, WxPayConfig.key, "utf-8").toUpperCase();//拼装生成服务器端验证的签名
+                //根据微信官网的介绍，此处不仅对回调的参数进行验签，还需要对返回的金额与系统订单的金额进行比对等
+                if(sign.equals(map.get("sign"))){
+                    /**此处添加自己的业务逻辑代码start**/
+                    String[] str_list = out_trade_no.split("_");
+                    String challenge_id = str_list[0];
+                    String now_time = String.valueOf((new Date()).getTime());
+                    //获取用户id
+                    String uid = str_list[1];
+                    //获取邀请人id
+                    String invite_id = str_list[2];
+//                    word_challenge_id_copy = challenge_id;
+//                    now_time_copy = now_time;
+//                    uid_copy = uid;
+                    //判断是否报过名
+                    //报过名不能报(任意未结束一期)
+                    Map<Object,Object> wechat_challenge = common_configMapper.find_user_attend_course(now_time,uid);
+                    if (wechat_challenge != null){
+                        logger.error("微信支付成功，但是已经报过名了不可再报！");
+                        throw new Exception("微信支付成功，但是已经报过名了不可再报！");
+                    }
+                    //不管有没有助力成功都先插
+                    common_configMapper.insertLiveBroadcastContestantsReal(uid,challenge_id,now_time, "1");
+                    //插入总数据库
+                    common_configMapper.changeLiveBroadcastCourseEnroll(challenge_id);
+                    //todo 插入帮助表
+                    //插入助力数据库
+                    common_configMapper.insertLiveBroadcastContestantsHelp(uid,challenge_id,now_time);
+
+//                    if (is_exist == null){
+//                        common_configMapper.insertDataInfo(1,0,one, Month_one);
+//                        common_configMapper.addOperatingChallengeParticipants(one);
+//                    }else {
+//                        common_configMapper.addOperatingChallengeParticipants(one);
+//                    }
+                    //记录是谁邀请的
+                    if (!invite_id.equals("no")){
+                        if (!CommonFunc.isInteger(invite_id)){
+                            logger.error("传入user_id非法！");
+                        }else {
+                            //通过邀请进来的
+                            common_configMapper.insertLiveBroadcastInviteRelation(uid,invite_id,challenge_id,now_time);
+                        }
+                    }
+                    /**此处添加自己的业务逻辑代码end**/
+                    //通知微信服务器已经支付成功
+                    resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"
+                            + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
+                }
+            }else{
+                resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                        + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+                logger.error(return_msg);
+            }
+            System.out.println(resXml);
+            System.out.println("微信支付回调数据结束");
+            logger.error("微信支付回调数据结束");
+
+
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            logger.error("小程序直播助力报名失败",e.getStackTrace());
+            logger.error("小程序直播助力报名失败",e);
+//            if (!uid_copy.equals("") && !word_challenge_id_copy.equals("") && !now_time_copy.equals("")){
+//                //插入参与数据库
+//                common_configMapper.insertWechatChallengeContestantsReal(uid_copy,word_challenge_id_copy,now_time_copy);
+//                //插入单词挑战总数据库
+//                common_configMapper.changeWechatPlatformChallengeEnroll(word_challenge_id_copy);
+//            }
+            e.printStackTrace();
+            //出现错误抛错
+            String resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"
+                    + "<return_msg><![CDATA[报文为空]]></return_msg>" + "</xml> ";
+            BufferedOutputStream out = new BufferedOutputStream(
+                    response.getOutputStream());
+            out.write(resXml.getBytes());
+            out.flush();
+            out.close();
+        }
+    }
+
+
+    /**
+     * 发起微信支付
+     */
+    @RequestMapping(value="liveCoursePay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> liveCoursePay(String user_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.liveCoursePay(user_id, request);
+    }
+
+
+
+    /**
+     * 公众号直播课程支付
+     */
+    @RequestMapping(value="liveCourseOfficialAccountPay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> liveCourseOfficialAccountPay(String user_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.liveCourseOfficialAccountPay(user_id, request);
+    }
+
+
+    /**
+     * 发起微信支付(助力)
+     */
+    @RequestMapping(value="liveCoursePayHelp.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> liveCoursePayHelp(String user_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.liveCoursePayHelp(user_id, request);
+    }
+
+
+
+    /**
+     * 公众号直播课程支付(助力)
+     */
+    @RequestMapping(value="liveCourseOfficialAccountPayHelp.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> liveCourseOfficialAccountPayHelp(String user_id, HttpServletRequest request){
+        //调用service层
+        return iVariousService.liveCourseOfficialAccountPayHelp(user_id, request);
+    }
+
+
+    /**
+     * 直播课程报名页
+     */
+    @RequestMapping(value="liveCourseApplicationPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<Object,Object>> liveCourseApplicationPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.liveCourseApplicationPage(request);
+    }
 
 
     //------------------------------------------------------------------------------------------------------

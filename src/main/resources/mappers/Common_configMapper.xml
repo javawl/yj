@@ -1953,7 +1953,7 @@
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>直播课程>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
   <select id="find_user_attend_course" resultType="map" parameterType="string">
-    SELECT tb.*,live_broadcast_course_contestants.insist_day,live_broadcast_course_contestants.id as live_broadcast_course_contestants_id
+    SELECT tb.*,live_broadcast_course_contestants.id as live_broadcast_course_contestants_id
     FROM live_broadcast_course_contestants,
          (SELECT *
           FROM live_broadcast_course
@@ -1964,19 +1964,92 @@
   </select>
 
 
-    <select id="findCanAttendLiveCourse" resultType="map" parameterType="string">
-        SELECT *
-        FROM live_broadcast_course_contestants
-        WHERE live_broadcast_course_contestants.et > #{now_time}
-        LIMIT 1
-    </select>
+  <select id="findCanAttendLiveCourse" resultType="map" parameterType="string">
+      SELECT *
+      FROM live_broadcast_course
+      WHERE live_broadcast_course.et > #{now_time}
+      ORDER BY live_broadcast_course.et ASC
+      LIMIT 1
+  </select>
 
 
-    <select id="getLiveCourseById" resultType="map">
-        SELECT  *
-        FROM `live_broadcast_course`
-        WHERE id = #{live_broadcast_course_id}
-    </select>
+  <select id="getLiveCourseById" resultType="map">
+      SELECT  *
+      FROM `live_broadcast_course`
+      WHERE id = #{live_broadcast_course_id}
+  </select>
+
+
+  <select id="showLiveCourse" resultType="map">
+    SELECT *
+    FROM `live_broadcast_course`
+    ORDER BY et DESC
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id="showLiveCourseUserInfo" resultType="map">
+    SELECT `user`.username, `user`.portrait, tb.*
+    FROM `user`,
+    (SELECT *
+    FROM `live_broadcast_course_contestants`
+    WHERE live_broadcast_course_id = #{live_broadcast_course_id}) tb
+    WHERE `user`.id = tb.user_id
+  </select>
+
+  <select id="getVirtualPortraitRandom" resultType="map" parameterType="int">
+    SELECT portrait,username
+    FROM `user`,
+         (SELECT user_id
+          FROM virtual_user_challenge
+          ) tb
+    WHERE `user`.id = tb.user_id
+    order by rand() limit #{size}
+  </select>
+
+  <insert id="insertLiveBroadcastContestantsReal" parameterType="string">
+      INSERT INTO live_broadcast_course_contestants (user_id,live_broadcast_course_id,set_time,whether_help)
+      values (#{user_id},#{live_broadcast_course_id},#{set_time},#{whether_help})
+  </insert>
+
+  <insert id="insertLiveBroadcastInviteRelation" parameterType="string">
+    INSERT INTO live_broadcast_course_invite_relation (user_id,invited_user_id,live_broadcast_course_id,set_time)
+    values (#{user_id},#{invited_user_id},#{live_broadcast_course_id},#{set_time})
+  </insert>
+
+  <insert id="insertLiveBroadcastContestantsHelp" parameterType="string">
+    INSERT INTO live_broadcast_course_help_sign_up (user_id,live_broadcast_course_id,set_time)
+    values (#{user_id},#{live_broadcast_course_id},#{set_time})
+  </insert>
+
+  <insert id="insertLiveCourse" parameterType="string">
+    INSERT INTO live_broadcast_course (st, et, set_time, periods)
+    values (#{st}, #{et}, #{set_time}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM live_broadcast_course) tb),0)+1)
+  </insert>
+
+
+  <update id="changeLiveBroadcastCourseEnroll">
+      UPDATE `live_broadcast_course`
+      set `enrollment` = `enrollment` + 1
+      WHERE id = #{id}
+  </update>
+
+
+  <delete id="deleteLiveCourse" parameterType="string" >
+    DELETE FROM `live_broadcast_course`
+    WHERE `id` = #{id}
+  </delete>
+
+
+  <delete id="deleteLiveCourseContestants" parameterType="string" >
+    DELETE FROM `live_broadcast_course_contestants`
+    WHERE `id` = #{id}
+  </delete>
+
+
+  <delete id="deleteLiveCourseInviteRelation" parameterType="string" >
+    DELETE FROM `live_broadcast_course_invite_relation`
+    WHERE `id` = #{id}
+  </delete>
 
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 
