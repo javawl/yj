@@ -1070,11 +1070,11 @@ public class VariousController {
         Map<String,Object> mapToJson = new HashMap<>();
         List<Map<Object,Object>> ButtonList = new ArrayList<>();
         Map<Object,Object> Button1Map = new HashMap<>();
-        Button1Map.put("name", "福利");
+        Button1Map.put("name", "学习");
         List<Map<Object,Object>> Button1 = new ArrayList<>();
         Map<Object,Object> Button1Children1 = new HashMap<>();
         Button1Children1.put("type", "view");
-        Button1Children1.put("name", "挑战赛");
+        Button1Children1.put("name", "万元挑战赛");
         Button1Children1.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_sign_up.html");
         Button1.add(Button1Children1);
         Map<Object,Object> Button1Children2 = new HashMap<>();
