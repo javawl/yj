@@ -846,6 +846,9 @@ public interface Common_configMapper {
     //公众号分享页内二维码扫码次数
     int addOfficialAccountSharePageQrCodeSweepTimes(@Param("set_time") String set_time);
 
+    //公众号分享出去的人数
+    int addOfficialAccountSharePeople(@Param("set_time") String set_time);
+
     //后台插入万元挑战
     int insertWechatPlatformChallenge(@Param("st") String st,@Param("et") String et,@Param("upper_limit") String upper_limit,@Param("set_time") String set_time,@Param("virtual_number") String virtual_number);
 

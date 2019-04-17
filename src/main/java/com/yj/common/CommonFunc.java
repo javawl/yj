@@ -13,7 +13,9 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.yj.cache.LRULocalCache;
 import com.yj.dao.DictionaryMapper;
+import com.yj.util.HttpsUtil;
 import com.yj.util.MD5Util;
+import com.yj.util.OfficialAccountTmpMessage;
 import com.yj.util.UrlUtil;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -1117,6 +1119,47 @@ public class CommonFunc {
             reader.close();
             // 断开连接
             connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return info;
+    }
+
+
+    //发送公众号模板消息
+    public static String sendOfficialAccountsTemplateMessage(OfficialAccountTmpMessage officialAccountTmpMessage) {
+        String info = "";
+        try {
+            JSONObject obj = new JSONObject();
+
+            obj.put("touser", officialAccountTmpMessage.getTouser());
+            obj.put("template_id", officialAccountTmpMessage.getTemplate_id());
+            obj.put("url", officialAccountTmpMessage.getUrl());
+
+            JSONObject jsonObject = new JSONObject();
+
+            //开头的first
+            JSONObject dataInfoBegin = new JSONObject();
+            dataInfoBegin.put("value", officialAccountTmpMessage.getParams().get(0).getValue());
+            dataInfoBegin.put("color", officialAccountTmpMessage.getParams().get(0).getColor());
+            jsonObject.put("first", dataInfoBegin);
+
+            for (int i = 1; i < officialAccountTmpMessage.getParams().size()-1; i++) {
+                JSONObject dataInfo = new JSONObject();
+                dataInfo.put("value", officialAccountTmpMessage.getParams().get(i).getValue());
+                dataInfo.put("color", officialAccountTmpMessage.getParams().get(i).getColor());
+                jsonObject.put("keyword" + (i), dataInfo);
+            }
+
+            //结尾的remark
+            JSONObject dataInfoEnd = new JSONObject();
+            dataInfoEnd.put("value", officialAccountTmpMessage.getParams().get(officialAccountTmpMessage.getParams().size()-1).getValue());
+            dataInfoEnd.put("color", officialAccountTmpMessage.getParams().get(officialAccountTmpMessage.getParams().size()-1).getColor());
+            jsonObject.put("remark", dataInfoEnd);
+
+            obj.put("data", jsonObject);
+            //post过去
+            info = JSONObject.toJSONString(HttpsUtil.doPost(officialAccountTmpMessage.getRequest_url(), obj.toString(), "UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }

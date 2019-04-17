@@ -10,6 +10,7 @@ import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
+import com.yj.util.OfficialAccountTmpMessage;
 import com.yj.util.UrlUtil;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -1728,6 +1729,68 @@ public class AdminController {
         }catch (Exception e){
             logger.error("挑战邀请成功领红包异常",e.getStackTrace());
             logger.error("挑战邀请成功领红包异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 微信公众号万元挑战赛每日提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "officialAccountsRemindChallenge.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String officialAccountsRemindChallenge(String token, HttpServletResponse response){
+        if (!token.equals("officialAccountsRemindChallenge")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+//            //给所有用户发送
+//            List<Map<Object,Object>> all_user =  common_configMapper.getChallengeInviteWxUser();
+//            for(int i = 0; i < all_user.size(); i++){
+//                //查没过期的from_id
+//                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+//
+//                if (info != null){
+//                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+//                    //发送模板消息
+//                    WxMssVo wxMssVo = new WxMssVo();
+//                    wxMssVo.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
+//                    wxMssVo.setTouser(info.get("wechat").toString());
+//                    wxMssVo.setPage(Const.WX_CHALLENGE_INVITE_RED_PACKET);
+//                    wxMssVo.setAccess_token(access_token);
+//                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token);
+//                    wxMssVo.setForm_id(info.get("form_id").toString());
+//                    List<TemplateData> list = new ArrayList<>();
+//                    list.add(new TemplateData("30天单词挑战","#ffffff"));
+//                    list.add(new TemplateData("你邀请的用户棒棒哒，自己挑战成功还为你赢得一份奖励金，还来领取吧~~" ,"#ffffff"));
+//                    wxMssVo.setParams(list);
+//                    CommonFunc.sendTemplateMessage(wxMssVo);
+//                }
+//            }
+            //发送模板消息
+            OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+            officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
+            officialAccountTmpMessage.setTouser("oyXWR0YIc4OP-Q-jdXamBwNG0lrA");
+            officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE);
+            officialAccountTmpMessage.setAccess_token(access_token);
+            officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+            List<TemplateData> list = new ArrayList<>();
+            list.add(new TemplateData("Hi~大佬完成今天挑战了吗？","#FF8C00"));
+            list.add(new TemplateData("万元挑战赛" ,"#FF8C00"));
+            list.add(new TemplateData("四级计划" ,"#FF8C00"));
+            list.add(new TemplateData("第五天" ,"#FF8C00"));
+            list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#FF8C00"));
+            officialAccountTmpMessage.setParams(list);
+            CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+        }catch (Exception e){
+            logger.error("公众号给万元挑战用户发送通知异常",e.getStackTrace());
+            logger.error("公众号给万元挑战用户发送通知异常",e);
             e.printStackTrace();
         }
         return "success";
@@ -3510,6 +3573,29 @@ public class AdminController {
             common_configMapper.addOfficialAccountSharePageQrCodeSweepTimes(one);
         }else {
             common_configMapper.addOfficialAccountSharePageQrCodeSweepTimes(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+    /**
+     * 统计分享出去的人数
+     * @return  List
+     */
+    @RequestMapping(value = "addOfficialAccountSharePeople.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addOfficialAccountSharePeople(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            common_configMapper.addOfficialAccountSharePeople(one);
+        }else {
+            common_configMapper.addOfficialAccountSharePeople(one);
         }
         return ServerResponse.createBySuccessMessage("成功");
     }

@@ -1895,6 +1895,12 @@
     WHERE set_time = #{set_time}
   </update>
 
+  <update id="addOfficialAccountSharePeople">
+    UPDATE `data_info`
+    set `daily_wechat_platform_share_people` = `daily_wechat_platform_share_people` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
   <insert id="insertWechatPlatformChallenge" parameterType="string">
     INSERT INTO wechat_platform_challenge (st, et, upper_limit, set_time, virtual_number, periods)
     values (#{st}, #{et}, #{upper_limit}, #{set_time}, #{virtual_number}, IFNULL((SELECT max_periods FROM (SELECT MAX(`periods`) as max_periods FROM wechat_platform_challenge) tb),0)+1)

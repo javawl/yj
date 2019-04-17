@@ -4747,6 +4747,7 @@ public class VariousServiceImpl implements IVariousService {
                 head_user_portrait.get(i).put("portrait", CommonFunc.judgePicPath(head_user_portrait.get(i).get("portrait").toString()));
             }
             result.put("virtualUser", head_user_portrait);
+            result.put("user_id", uid);
             return ServerResponse.createBySuccess("成功！", result);
         }
     }

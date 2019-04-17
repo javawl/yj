@@ -2,24 +2,13 @@ package com.yj.util;
 
 import com.alibaba.fastjson.JSONObject;
 
-import java.net.*;
-import java.util.ArrayList;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
+import javax.net.ssl.*;
+import javax.net.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -191,6 +180,5 @@ public class UrlUtil {
         }
         return returnJson;
     }
-
 
 }
