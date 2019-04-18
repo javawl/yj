@@ -412,6 +412,9 @@ public interface DictionaryMapper {
     //更新已背单词数
     int updateLearnedWord(@Param("learned_word_number") int learned_word_number,@Param("id") String id,@Param("plan") String plan);
 
+    //更新已背单词数
+    int uploadAdvertisingTime(@Param("advertising_time") String advertising_time,@Param("id") String id);
+
     //后台
     int deleteWordInfo(@Param("word") String word);
 

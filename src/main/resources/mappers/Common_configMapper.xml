@@ -460,6 +460,19 @@
     WHERE `word_challenge_contestants`.word_challenge_id = tb.id
   </select>
 
+  <select id="getInBeginningOfficialAccountChallengeUser" resultType="map" parameterType="string">
+    SELECT `user`.wechat_platform_openid,`user`.my_plan
+    FROM `user`,
+    (SELECT wechat_platform_challenge_contestants.user_id
+    FROM `wechat_platform_challenge_contestants`,(SELECT id
+                                       FROM `wechat_platform_challenge`
+                                       WHERE `wechat_platform_challenge`.st &lt; #{now_time}
+                                       AND `wechat_platform_challenge`.et > #{now_time}) tb
+    WHERE `wechat_platform_challenge_contestants`.wechat_platform_challenge_id = tb.id
+    AND `wechat_platform_challenge_contestants`.virtual = 0) tb2
+    WHERE `user`.id = tb2.user_id
+  </select>
+
   <select id="getBeginningWordChallenge" resultType="map" parameterType="string">
     SELECT id,periods
     FROM `word_challenge`

@@ -1,6 +1,7 @@
 package com.yj.util;
 
 import com.yj.common.TemplateData;
+import com.yj.common.WxConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ public class OfficialAccountTmpMessage {
     private String form_id;
     private String access_token;
     private String request_url;
+    private String miniprogram_appid;
+    private String miniprogram_pagepath;
 
     public void setTouser(String touser) {
         this.touser = touser;
@@ -69,5 +72,21 @@ public class OfficialAccountTmpMessage {
 
     public List<TemplateData> getParams() {
         return params;
+    }
+
+    public String getMiniprogram_appid() {
+        return miniprogram_appid;
+    }
+
+    public void setMiniprogram_appid(String miniprogram_appid) {
+        this.miniprogram_appid = miniprogram_appid;
+    }
+
+    public String getMiniprogram_pagepath() {
+        return miniprogram_pagepath;
+    }
+
+    public void setMiniprogram_pagepath(String miniprogram_pagepath) {
+        this.miniprogram_pagepath = miniprogram_pagepath;
     }
 }

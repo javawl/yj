@@ -307,6 +307,9 @@ public interface Common_configMapper {
     //获取单词挑战开始所有用户
     List<Map<Object,Object>> getInBeginningWordChallengeUser(@Param("now_time") String now_time);
 
+    //获取万元挑战挑战开始所有用户
+    List<Map<Object,Object>> getInBeginningOfficialAccountChallengeUser(@Param("now_time") String now_time);
+
     //获取开始的单词挑战
     List<Map<Object,Object>> getBeginningWordChallenge(@Param("now_time") String now_time);
 

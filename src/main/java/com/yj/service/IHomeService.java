@@ -93,6 +93,9 @@ public interface IHomeService {
     //上传单词笔记
     ServerResponse<String> upload_word_note(String word_id, String word_note,HttpServletRequest request);
 
+    //上传看广告时间
+    ServerResponse<String> uploadAdvertisingTime(HttpServletRequest request);
+
     //展示笔记
     ServerResponse<String> show_word_note(String word_id,HttpServletRequest request);
 }

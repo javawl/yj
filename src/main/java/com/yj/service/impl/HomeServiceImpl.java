@@ -65,6 +65,8 @@ public class HomeServiceImpl implements IHomeService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             try {
+                //获取当天0点时间戳
+                String zero = CommonFunc.getZeroDate();
                 List<Map> SelectPlan = userMapper.getUserPlanDaysNumber(id);
                 //取剩余天数和坚持天数
                 Object insist_days;
@@ -76,6 +78,7 @@ public class HomeServiceImpl implements IHomeService {
                 Object rest_days = SelectPlan.get(0).get("plan_days");
                 Object plan = SelectPlan.get(0).get("my_plan");
                 Object unionid = SelectPlan.get(0).get("unionid");
+                Object advertising_time = SelectPlan.get(0).get("advertising_time");
                 //立个flag返回用户是否有计划，0代表没有
                 int flag = 0;
                 //取我的计划的单词数
@@ -147,6 +150,17 @@ public class HomeServiceImpl implements IHomeService {
                 m1.put("challenge_red_packet",SelectPlan.get(0).get("challenge_red_packet"));
                 m1.put("whether_invite_challenge_success",SelectPlan.get(0).get("whether_invite_challenge_success"));
                 m1.put("invite_challenge_red_packet",SelectPlan.get(0).get("invite_challenge_red_packet"));
+                //判断用户是否需要看视频
+                if (advertising_time == null){
+                    m1.put("need_advertising", 1);
+                }else {
+                    if (Long.valueOf(advertising_time.toString()) >= Long.valueOf(zero)){
+                        m1.put("need_advertising", 0);
+                    }else {
+                        m1.put("need_advertising", 1);
+                    }
+                }
+
 
                 //todo 给出用户单词挑战的三个状态（没挑战，有挑战没开始，有挑战开始了）
                 //找出所有结束时间还没到的挑战，判断用户是否参加
@@ -248,8 +262,6 @@ public class HomeServiceImpl implements IHomeService {
 
                 //在这里更新那些后台需要查看的数据（app日启动次数，dau）
                 //计算上次登录时间有没有比今日零点大
-                //获取当天0点时间戳
-                String zero = CommonFunc.getZeroDate();
                 //获取当月一号零点的时间戳
                 String Month_one = CommonFunc.getMonthOneDate();
                 //先判断当天有没有数据，有的话更新
@@ -2223,6 +2235,29 @@ public class HomeServiceImpl implements IHomeService {
                     return ServerResponse.createByErrorMessage("上传失败!");
                 }
             }
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+
+    //上传看广告时间
+    public ServerResponse<String> uploadAdvertisingTime(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            //上传
+            dictionaryMapper.uploadAdvertisingTime(String.valueOf((new Date()).getTime()), uid);
             return ServerResponse.createBySuccessMessage("成功");
         }
     }

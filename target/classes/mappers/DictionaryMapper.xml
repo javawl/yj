@@ -862,6 +862,13 @@
     AND user_id = #{id}
   </update>
 
+
+  <update id="uploadAdvertisingTime">
+    UPDATE `user` SET
+    `advertising_time`= #{advertising_time}
+    WHERE id = #{id}
+  </update>
+
   <insert id="insertFeedsComment" parameterType="string">
     INSERT INTO feeds_comment (user_id, comment, feeds_id, set_time)
     values (#{user_id}, #{comment}, #{feeds_id}, #{set_time})

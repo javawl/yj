@@ -406,6 +406,19 @@ public class homeController {
 
 
     /**
+     * 记录用户查看广告的时间
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "uploadAdvertisingTime.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> uploadAdvertisingTime(HttpServletRequest request){
+        //调用service层
+        return iHomeService.uploadAdvertisingTime(request);
+    }
+
+
+    /**
      * 展示笔记
      * @param word_id
      * @param request

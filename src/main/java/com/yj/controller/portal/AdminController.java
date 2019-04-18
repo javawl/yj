@@ -1750,44 +1750,36 @@ public class AdminController {
         try{
             //获取accessToken
             String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
-//            //给所有用户发送
-//            List<Map<Object,Object>> all_user =  common_configMapper.getChallengeInviteWxUser();
-//            for(int i = 0; i < all_user.size(); i++){
-//                //查没过期的from_id
-//                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
-//
-//                if (info != null){
-//                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
-//                    //发送模板消息
-//                    WxMssVo wxMssVo = new WxMssVo();
-//                    wxMssVo.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
-//                    wxMssVo.setTouser(info.get("wechat").toString());
-//                    wxMssVo.setPage(Const.WX_CHALLENGE_INVITE_RED_PACKET);
-//                    wxMssVo.setAccess_token(access_token);
-//                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token);
-//                    wxMssVo.setForm_id(info.get("form_id").toString());
-//                    List<TemplateData> list = new ArrayList<>();
-//                    list.add(new TemplateData("30天单词挑战","#ffffff"));
-//                    list.add(new TemplateData("你邀请的用户棒棒哒，自己挑战成功还为你赢得一份奖励金，还来领取吧~~" ,"#ffffff"));
-//                    wxMssVo.setParams(list);
-//                    CommonFunc.sendTemplateMessage(wxMssVo);
-//                }
-//            }
-            //发送模板消息
-            OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
-            officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
-            officialAccountTmpMessage.setTouser("oyXWR0YIc4OP-Q-jdXamBwNG0lrA");
-            officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE);
-            officialAccountTmpMessage.setAccess_token(access_token);
-            officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
-            List<TemplateData> list = new ArrayList<>();
-            list.add(new TemplateData("Hi~大佬完成今天挑战了吗？","#FF8C00"));
-            list.add(new TemplateData("万元挑战赛" ,"#FF8C00"));
-            list.add(new TemplateData("四级计划" ,"#FF8C00"));
-            list.add(new TemplateData("第五天" ,"#FF8C00"));
-            list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#FF8C00"));
-            officialAccountTmpMessage.setParams(list);
-            CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getInBeginningOfficialAccountChallengeUser(String.valueOf((new Date()).getTime()));
+            for(int i = 0; i < all_user.size(); i++){
+                String plan;
+                if (all_user.get(i).get("wechat_platform_openid") != null){
+                    //发送模板消息
+                    OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                    officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
+                    officialAccountTmpMessage.setTouser(all_user.get(i).get("wechat_platform_openid").toString());
+                    officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE);
+                    officialAccountTmpMessage.setAccess_token(access_token);
+                    officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                    officialAccountTmpMessage.setMiniprogram_appid(WxConfig.wx_app_id);
+                    officialAccountTmpMessage.setMiniprogram_pagepath(Const.WX_HOME_PATH);
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("Hi~大佬完成今天挑战了吗？","#173177"));
+                    list.add(new TemplateData("万元挑战赛" ,"#173177"));
+                    //判空
+                    if (all_user.get(i).get("my_plan") == null){
+                        plan = "暂无";
+                    }else {
+                        plan = all_user.get(i).get("my_plan").toString();
+                    }
+                    list.add(new TemplateData( plan,"#173177"));
+                    list.add(new TemplateData("99天" ,"#173177"));
+                    list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
+                    officialAccountTmpMessage.setParams(list);
+                    CommonFunc.sendOfficialAccountsTemplateMessageJumpMiniProgram(officialAccountTmpMessage);
+                }
+            }
         }catch (Exception e){
             logger.error("公众号给万元挑战用户发送通知异常",e.getStackTrace());
             logger.error("公众号给万元挑战用户发送通知异常",e);

@@ -1126,7 +1126,7 @@ public class CommonFunc {
     }
 
 
-    //发送公众号模板消息
+    //发送公众号模板消息(跳公众号页面)
     public static String sendOfficialAccountsTemplateMessage(OfficialAccountTmpMessage officialAccountTmpMessage) {
         String info = "";
         try {
@@ -1135,6 +1135,54 @@ public class CommonFunc {
             obj.put("touser", officialAccountTmpMessage.getTouser());
             obj.put("template_id", officialAccountTmpMessage.getTemplate_id());
             obj.put("url", officialAccountTmpMessage.getUrl());
+
+            JSONObject jsonObject = new JSONObject();
+
+            //开头的first
+            JSONObject dataInfoBegin = new JSONObject();
+            dataInfoBegin.put("value", officialAccountTmpMessage.getParams().get(0).getValue());
+            dataInfoBegin.put("color", officialAccountTmpMessage.getParams().get(0).getColor());
+            jsonObject.put("first", dataInfoBegin);
+
+            for (int i = 1; i < officialAccountTmpMessage.getParams().size()-1; i++) {
+                JSONObject dataInfo = new JSONObject();
+                dataInfo.put("value", officialAccountTmpMessage.getParams().get(i).getValue());
+                dataInfo.put("color", officialAccountTmpMessage.getParams().get(i).getColor());
+                jsonObject.put("keyword" + (i), dataInfo);
+            }
+
+            //结尾的remark
+            JSONObject dataInfoEnd = new JSONObject();
+            dataInfoEnd.put("value", officialAccountTmpMessage.getParams().get(officialAccountTmpMessage.getParams().size()-1).getValue());
+            dataInfoEnd.put("color", officialAccountTmpMessage.getParams().get(officialAccountTmpMessage.getParams().size()-1).getColor());
+            jsonObject.put("remark", dataInfoEnd);
+
+            obj.put("data", jsonObject);
+            //post过去
+            info = JSONObject.toJSONString(HttpsUtil.doPost(officialAccountTmpMessage.getRequest_url(), obj.toString(), "UTF-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return info;
+    }
+
+
+    //发送公众号模板消息(跳小程序页面)
+    public static String sendOfficialAccountsTemplateMessageJumpMiniProgram(OfficialAccountTmpMessage officialAccountTmpMessage) {
+        String info = "";
+        try {
+            JSONObject obj = new JSONObject();
+
+            obj.put("touser", officialAccountTmpMessage.getTouser());
+            obj.put("template_id", officialAccountTmpMessage.getTemplate_id());
+            obj.put("url", officialAccountTmpMessage.getUrl());
+
+            //跳转下程序
+            JSONObject miniProgram = new JSONObject();
+            miniProgram.put("appid", officialAccountTmpMessage.getMiniprogram_appid());
+            miniProgram.put("pagepath", officialAccountTmpMessage.getMiniprogram_pagepath());
+            obj.put("miniprogram", miniProgram);
+
 
             JSONObject jsonObject = new JSONObject();
 
