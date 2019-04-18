@@ -1092,8 +1092,24 @@ public class VariousController {
         Button1Children4.put("name", "挑战赛排行榜");
         Button1Children4.put("url", "https://file.ourbeibei.com/l_e/static/html/rank.html");
         Button1.add(Button1Children4);
+
+        Map<Object,Object> Button1Children5 = new HashMap<>();
+        Button1Children5.put("type", "view");
+        Button1Children5.put("name", "学习分享");
+        Button1Children5.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
+        Button1.add(Button1Children5);
         Button1Map.put("sub_button", Button1);
 
+
+
+
+        //背单词
+        Map<Object,Object> Button3 = new HashMap<>();
+        Button3.put("type", "miniprogram");
+        Button3.put("name", "背单词");
+        Button3.put("url", "http://mp.weixin.qq.com");
+        Button3.put("appid", WxConfig.wx_app_id);
+        Button3.put("pagepath", Const.WX_HOME_PATH);
 
 
 
@@ -1102,17 +1118,17 @@ public class VariousController {
         Map<Object,Object> Button2Map = new HashMap<>();
         Button2Map.put("name", "背呗");
         List<Map<Object,Object>> Button2 = new ArrayList<>();
-        Map<Object,Object> Button2Children1 = new HashMap<>();
-        Button2Children1.put("type", "miniprogram");
-        Button2Children1.put("name", "背呗背单词");
-        Button2Children1.put("url", "http://mp.weixin.qq.com");
-        Button2Children1.put("appid", WxConfig.wx_app_id);
-        Button2Children1.put("pagepath", Const.WX_HOME_PATH);
-        Button2.add(Button2Children1);
+//        Map<Object,Object> Button2Children1 = new HashMap<>();
+//        Button2Children1.put("type", "miniprogram");
+//        Button2Children1.put("name", "背呗背单词");
+//        Button2Children1.put("url", "http://mp.weixin.qq.com");
+//        Button2Children1.put("appid", WxConfig.wx_app_id);
+//        Button2Children1.put("pagepath", Const.WX_HOME_PATH);
+//        Button2.add(Button2Children1);
         Map<Object,Object> Button2Children2 = new HashMap<>();
         Button2Children2.put("type", "view");
-        Button2Children2.put("name", "学习分享");
-        Button2Children2.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
+        Button2Children2.put("name", "意见反馈");
+        Button2Children2.put("url", "https://www.wjx.cn/m/34594147.aspx");
         Button2.add(Button2Children2);
 //        Map<Object,Object> Button2Children3 = new HashMap<>();
 //        Button2Children3.put("type", "view");
@@ -1124,15 +1140,16 @@ public class VariousController {
 //        Button2Children4.put("name", "商务合作");
 //        Button2Children4.put("url", "");
 //        Button2.add(Button2Children4);
-//        Map<Object,Object> Button2Children5 = new HashMap<>();
-//        Button2Children5.put("type", "click");
-//        Button2Children5.put("name", "关于背呗");
-//        Button2Children5.put("key", "about_beibei");
-//        Button2.add(Button2Children5);
+        Map<Object,Object> Button2Children5 = new HashMap<>();
+        Button2Children5.put("type", "click");
+        Button2Children5.put("name", "了解更多");
+        Button2Children5.put("key", "about_beibei");
+        Button2.add(Button2Children5);
         Button2Map.put("sub_button", Button2);
 
         //最终插入
         ButtonList.add(Button1Map);
+        ButtonList.add(Button3);
         ButtonList.add(Button2Map);
         mapToJson.put("button", ButtonList);
 

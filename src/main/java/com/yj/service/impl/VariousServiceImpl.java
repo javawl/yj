@@ -4694,7 +4694,7 @@ public class VariousServiceImpl implements IVariousService {
             Map<Object,Object> canAttendLiveCourse = common_configMapper.findCanAttendLiveCourse(now_time_stamp);
 
             //判断有没有报名
-            Map<Object,Object> attendCourse = common_configMapper.find_user_attend_course(uid, now_time_stamp);
+            Map<Object,Object> attendCourse = common_configMapper.find_user_attend_course(now_time_stamp, uid);
 
 
             Map<Object,Object> result = new HashMap<>();
