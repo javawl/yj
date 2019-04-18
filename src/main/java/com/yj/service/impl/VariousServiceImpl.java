@@ -4742,7 +4742,7 @@ public class VariousServiceImpl implements IVariousService {
             }
             result.put("people", number);
             //弄一个虚拟用户
-            List<Map<Object,Object>> head_user_portrait = common_configMapper.getVirtualPortraitRandom(1);
+            List<Map<Object,Object>> head_user_portrait = common_configMapper.getVirtualPortraitRandom(15);
             for (int i=0;i<head_user_portrait.size();i++) {
                 head_user_portrait.get(i).put("portrait", CommonFunc.judgePicPath(head_user_portrait.get(i).get("portrait").toString()));
             }
