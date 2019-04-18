@@ -364,23 +364,23 @@
       <version>0.4.8</version>
     </dependency>
 
-    <!-- 跨域过滤器相关 -->
-    <dependency>
-      <groupId>com.thetransactioncompany</groupId>
-      <artifactId>java-property-utils</artifactId>
-      <version>1.9.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.6.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.thetransactioncompany</groupId>
-      <artifactId>cors-filter</artifactId>
-      <version>2.5</version>
-    </dependency>
-    <!-- 跨域过滤器相关 -->
+    <!--&lt;!&ndash; 跨域过滤器相关 &ndash;&gt;-->
+    <!--<dependency>-->
+      <!--<groupId>com.thetransactioncompany</groupId>-->
+      <!--<artifactId>java-property-utils</artifactId>-->
+      <!--<version>1.9.1</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.google.code.gson</groupId>-->
+      <!--<artifactId>gson</artifactId>-->
+      <!--<version>2.6.2</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.thetransactioncompany</groupId>-->
+      <!--<artifactId>cors-filter</artifactId>-->
+      <!--<version>2.5</version>-->
+    <!--</dependency>-->
+    <!--&lt;!&ndash; 跨域过滤器相关 &ndash;&gt;-->
     <!--微信公众号自动回复-->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
