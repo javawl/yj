@@ -11,8 +11,8 @@ public class Const {
     public static final String LOGIN_SALT = "login_salt";               //密码的加密盐
     public static final String TOKEN_LOGIN_SALT = "token_login_salt";   //用户token的加密盐
 //    public static final String DOMAIN_NAME = "http://localhost:8088";   //域名
-//    public static final String DOMAIN_NAME = "http://47.107.62.22:8080";   //域名
-    public static final String DOMAIN_NAME = "https://www.ourbeibei.com";   //域名
+    public static final String DOMAIN_NAME = "http://47.107.62.22:8080";   //域名
+//    public static final String DOMAIN_NAME = "https://www.ourbeibei.com";   //域名
 //    public static final String DOMAIN_NAME = "http://123.207.85.37:8080";   //域名
     public static final String FTP_PREFIX = "http://47.107.62.22/l_e/";   //文件服务器域名前缀
     public static final String TMP_ID1 = "qJ2eNCoVi2gL2cXa3UP0nBfaeJ3pGPHrLAtsaWFSyv0";   //第一条提醒的tmp_id
