@@ -450,7 +450,6 @@
     WHERE `word_challenge_contestants`.word_challenge_id = tb.id
   </select>
 
-
   <select id="getInBeginningWordChallengeUser" resultType="map" parameterType="string">
     SELECT word_challenge_contestants.user_id,tb.periods
     FROM `word_challenge_contestants`,(SELECT id,periods
@@ -481,7 +480,7 @@
   </select>
 
   <select id="getBeginningWxPlatformChallenge" resultType="map" parameterType="string">
-    SELECT id,periods
+    SELECT id,periods,`wechat_platform_challenge`.st,`wechat_platform_challenge`.et
     FROM `wechat_platform_challenge`
     WHERE `wechat_platform_challenge`.st &lt; #{now_time}
     AND `wechat_platform_challenge`.et > #{now_time}
@@ -1550,7 +1549,7 @@
   </select>
 
   <select id="showWxPlatformChallengeContestants" resultType="map" parameterType="string">
-    SELECT `user`.username, tb.*
+    SELECT `user`.username,`user`.wechat_platform_openid, tb.*
     FROM `user`,
     (SELECT word_number,user_id
     FROM wechat_platform_challenge_contestants
@@ -1890,6 +1889,12 @@
     WHERE set_time = #{set_time}
   </update>
 
+  <update id="addAdvertisementClickNum">
+    UPDATE `data_info`
+    set `daily_advertisement_click_num` = `daily_advertisement_click_num` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
   <update id="addOfficialAccountShareDropDownUser">
     UPDATE `data_info`
     set `daily_wechat_platform_drop_down_user` = `daily_wechat_platform_drop_down_user` + 1
@@ -2037,6 +2042,17 @@
     FROM `live_broadcast_course_contestants`
     WHERE live_broadcast_course_id = #{live_broadcast_course_id}) tb
     WHERE `user`.id = tb.user_id
+  </select>
+
+  <select id="showLiveCourseInvite" resultType="map">
+    SELECT `user`.username,`user`.portrait, tb.invited_user_id
+    FROM `user`,
+    (SELECT invited_user_id
+    FROM `live_broadcast_course_invite_relation`
+    WHERE `live_broadcast_course_invite_relation`.user_id = #{user_id}
+    ORDER BY `id` DESC
+    LIMIT 1) tb
+    WHERE tb.invited_user_id = `user`.id
   </select>
 
   <select id="getVirtualPortraitRandom" resultType="map" parameterType="int">

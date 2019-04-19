@@ -3117,7 +3117,7 @@ public class VariousServiceImpl implements IVariousService {
             result.put("type", "formal");
             Long during = (new Date()).getTime() - Long.valueOf(wxPlatformChallenge.get("set_time").toString());
             //计算有多少人报名
-            int number = Integer.valueOf(wxPlatformChallenge.get("enrollment").toString()) + Integer.valueOf(wxPlatformChallenge.get("virtual_number").toString());
+            int number = Integer.valueOf(wxPlatformChallenge.get("enrollment").toString()) * 4 + Integer.valueOf(wxPlatformChallenge.get("virtual_number").toString());
             int all_people = 0;
             Long ii = 0L;
             while (ii < during){
@@ -4107,6 +4107,186 @@ public class VariousServiceImpl implements IVariousService {
             response.put("qr_code", CommonFunc.judgePicPath(teacher.get("qr_code").toString()));
             response.put("studentId", "1" + uid);
             return ServerResponse.createBySuccess("成功！",response);
+        }
+    }
+
+
+    //退出万元挑战报名页
+    public ServerResponse<Map<String,Object>> exitWxPlatformChallengeApplicationPage(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> exitPayOfficialAccountUserTmp = userMapper.sentExitPayOfficialAccountUserTmp(uid);
+            //最终状态
+            String flag = "";
+            if (exitPayOfficialAccountUserTmp.get("exit_application_page") == null){
+                flag = "1";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("0")){
+                flag = "1";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("1") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("4") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("5") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("7")){
+                flag = "no";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("2")){
+                flag = "4";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("3")){
+                flag = "5";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("6")){
+                flag = "7";
+            }
+            //更新退出记录状态
+            if (!flag.equals("no") && !flag.equals("")){
+                userMapper.changeExitApplicationPage(uid, flag);
+            }
+            //给他发通知
+            if (exitPayOfficialAccountUserTmp.get("wechat_platform_openid")!=null){
+                //获取accessToken
+                String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+                //发送模板消息
+                OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                officialAccountTmpMessage.setTouser(exitPayOfficialAccountUserTmp.get("wechat_platform_openid").toString());
+                officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE);
+                officialAccountTmpMessage.setAccess_token(access_token);
+                officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("来抢个名额吧，背单词还能领100元奖金呢","#173177"));
+                list.add(new TemplateData("万元挑战赛" ,"#173177"));
+                list.add(new TemplateData( CommonFunc.getFormatTime((new Date().getTime()),"yyyy/MM/dd"),"#173177"));
+                list.add(new TemplateData("尚未报名【29.9元坚持背单词返100元】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                officialAccountTmpMessage.setParams(list);
+                CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+            }
+            return ServerResponse.createBySuccessMessage("成功！");
+        }
+    }
+
+
+    //退出单词挑战报名页
+    public ServerResponse<Map<String,Object>> exitWxWordChallengePage(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> exitPayOfficialAccountUserTmp = userMapper.sentExitPayOfficialAccountUserTmp(uid);
+            //最终状态
+            String flag = "";
+            if (exitPayOfficialAccountUserTmp.get("exit_application_page") == null){
+                flag = "2";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("0")){
+                flag = "2";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("2") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("4") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("6") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("7")){
+                flag = "no";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("1")){
+                flag = "4";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("3")){
+                flag = "6";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("5")){
+                flag = "7";
+            }
+            //更新退出记录状态
+            if (!flag.equals("no") && !flag.equals("")){
+                userMapper.changeExitApplicationPage(uid, flag);
+            }
+            //给他发通知
+            if (exitPayOfficialAccountUserTmp.get("wechat_platform_openid")!=null){
+                //获取accessToken
+                String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+                //发送模板消息
+                OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                officialAccountTmpMessage.setTouser(exitPayOfficialAccountUserTmp.get("wechat_platform_openid").toString());
+                officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_WORD_CHALLENGE);
+                officialAccountTmpMessage.setAccess_token(access_token);
+                officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("来抢个名额吧，坚持背单词还有机会获得奖励金","#173177"));
+                list.add(new TemplateData("单词挑战" ,"#173177"));
+                list.add(new TemplateData( CommonFunc.getFormatTime((new Date().getTime()),"yyyy/MM/dd"),"#173177"));
+                list.add(new TemplateData("尚未报名【9.9元坚持背单词返本金和奖励金】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                officialAccountTmpMessage.setParams(list);
+                CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+            }
+            return ServerResponse.createBySuccessMessage("成功！");
+        }
+    }
+
+
+    //退出阅读报名页
+    public ServerResponse<Map<String,Object>> exitReadClassApplicationPage(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else{
+            Map<Object,Object> exitPayOfficialAccountUserTmp = userMapper.sentExitPayOfficialAccountUserTmp(uid);
+            //最终状态
+            String flag = "";
+            if (exitPayOfficialAccountUserTmp.get("exit_application_page") == null){
+                flag = "3";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("0")){
+                flag = "3";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("3") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("5") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("6") || exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("7")){
+                flag = "no";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("1")){
+                flag = "5";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("2")){
+                flag = "6";
+            }else if (exitPayOfficialAccountUserTmp.get("exit_application_page").toString().equals("4")){
+                flag = "7";
+            }
+            //更新退出记录状态
+            if (!flag.equals("no") && !flag.equals("")){
+                userMapper.changeExitApplicationPage(uid, flag);
+            }
+            //给他发通知
+            if (exitPayOfficialAccountUserTmp.get("wechat_platform_openid")!=null){
+                //获取accessToken
+                String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+                //发送模板消息
+                OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                officialAccountTmpMessage.setTouser(exitPayOfficialAccountUserTmp.get("wechat_platform_openid").toString());
+                officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_READ_CHALLENGE);
+                officialAccountTmpMessage.setAccess_token(access_token);
+                officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("来抢个名额吧，坚持阅读极速提高英语水平","#173177"));
+                list.add(new TemplateData("阅读活动" ,"#173177"));
+                list.add(new TemplateData( CommonFunc.getFormatTime((new Date().getTime()),"yyyy/MM/dd"),"#173177"));
+                list.add(new TemplateData("尚未报名【阅读各大英语演讲、名著】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                officialAccountTmpMessage.setParams(list);
+                CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+            }
+            return ServerResponse.createBySuccessMessage("成功！");
         }
     }
 

@@ -184,6 +184,15 @@ public interface IVariousService {
     //预约成功老师页
     ServerResponse<Map<String,Object>> reservedWxPlatformChallengeTeacherPage(HttpServletRequest request);
 
+    //退出万元挑战
+    ServerResponse<Map<String,Object>> exitWxPlatformChallengeApplicationPage(HttpServletRequest request);
+
+    //退出单词挑战
+    ServerResponse<Map<String,Object>> exitWxWordChallengePage(HttpServletRequest request);
+
+    //退出阅读
+    ServerResponse<Map<String,Object>> exitReadClassApplicationPage(HttpServletRequest request);
+
     //运营活动报名成功老师页
     ServerResponse<Map<String, Object>> wxPlatformChallengePayTeacherPage(HttpServletRequest request);
 

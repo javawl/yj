@@ -1561,6 +1561,39 @@ public class VariousController {
     }
 
 
+    /**
+     * 退出万元挑战
+     */
+    @RequestMapping(value="exitWxPlatformChallengeApplicationPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> exitWxPlatformChallengeApplicationPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.exitWxPlatformChallengeApplicationPage(request);
+    }
+
+
+    /**
+     * 退出单词挑战
+     */
+    @RequestMapping(value="exitWxWordChallengePage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> exitWxWordChallengePage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.exitWxWordChallengePage(request);
+    }
+
+
+    /**
+     * 退出阅读
+     */
+    @RequestMapping(value="exitReadClassApplicationPage.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String,Object>> exitReadClassApplicationPage(HttpServletRequest request){
+        //调用service层
+        return iVariousService.exitReadClassApplicationPage(request);
+    }
+
+
 
     //------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------

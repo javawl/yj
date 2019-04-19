@@ -2,6 +2,7 @@ package com.yj.service.impl;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.vdurmont.emoji.EmojiParser;
+import com.yj.common.TemplateData;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.UserMapper;
@@ -12,6 +13,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
+import com.yj.util.OfficialAccountTmpMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1849,6 +1851,7 @@ public class HomeServiceImpl implements IHomeService {
             String plan = user_info.get("my_plan").toString();
             //获取当天0点多一秒时间戳
             String one = CommonFunc.getOneDate();
+            String timeStamp = String.valueOf((new Date()).getTime());
             //查看坚持天数表中有没有数据
 //            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
             Map getInsistDay = dictionaryMapper.checkInsistDayMessage(id, one);
@@ -1869,6 +1872,9 @@ public class HomeServiceImpl implements IHomeService {
 //                    return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
 //                }
 //            }
+            //运营活动挑战
+            Map<Object,Object> userAttendWxPlatformChallenge = common_config.findClockWxPlatformChallenge(timeStamp,id);
+
             //开启事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             TransactionStatus status = CommonFunc.starTransaction(transactionManager);
@@ -1895,16 +1901,16 @@ public class HomeServiceImpl implements IHomeService {
                 common_config.changeDailyFinishWork(1,one);
 
                 //如果是微信用户的话加进抽奖名单
-                if (token.length() > 32){
-                    String act = common_config.getDrawId(CommonFunc.getNextDate12());
-                    if (act != null){
-                        common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
-                    }
-                }
+//                if (token.length() > 32){
+//                    String act = common_config.getDrawId(CommonFunc.getNextDate12());
+//                    if (act != null){
+//                        common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
+//                    }
+//                }
 
                 //如果参加了正在进行的单词挑战的话坚持天数加一
                 //找出是否有正在进行的计划并且该用户参加了
-                Map<Object,Object> userAttendWordChallenge = common_config.findClockWordChallenge(String.valueOf((new Date()).getTime()),id);
+                Map<Object,Object> userAttendWordChallenge = common_config.findClockWordChallenge(timeStamp,id);
                 if (userAttendWordChallenge != null){
                     String wordChallengeId = userAttendWordChallenge.get("id").toString();
                     common_config.addNormalChallengeInsistDay(wordChallengeId,id);
@@ -1912,13 +1918,33 @@ public class HomeServiceImpl implements IHomeService {
 
                 //如果参加了正在进行的运营活动挑战的话坚持天数加一
                 //找出是否有正在进行的计划并且该用户参加了
-                Map<Object,Object> userAttendWxPlatformChallenge = common_config.findClockWxPlatformChallenge(String.valueOf((new Date()).getTime()),id);
                 if (userAttendWxPlatformChallenge != null){
                     String WxPlatformChallengeId = userAttendWxPlatformChallenge.get("id").toString();
                     common_config.changeWechatPlatformChallengeAddDay(WxPlatformChallengeId,id);
                 }
 
                 transactionManager.commit(status);
+                if (userAttendWxPlatformChallenge != null){
+                    if (user_info.get("wechat_platform_openid") != null){
+                        //获取accessToken
+                        String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+                        //发送模板消息
+                        OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                        officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND);
+                        officialAccountTmpMessage.setTouser(user_info.get("wechat_platform_openid").toString());
+                        officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE_SHARE);
+                        officialAccountTmpMessage.setAccess_token(access_token);
+                        officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("恭喜大可爱完成了今日的学习内容","#173177"));
+                        list.add(new TemplateData("万元挑战赛" ,"#173177"));
+                        list.add(new TemplateData( plan,"#173177"));
+                        list.add(new TemplateData("99天" ,"#173177"));
+                        list.add(new TemplateData("点击分享至朋友圈就可以完成今日的挑战任务啦~~~" ,"#173177"));
+                        officialAccountTmpMessage.setParams(list);
+                        CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                    }
+                }
                 return ServerResponse.createBySuccessMessage("成功");
             } catch (Exception e) {
                 System.out.println(e.getMessage());

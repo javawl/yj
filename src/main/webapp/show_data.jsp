@@ -109,6 +109,7 @@
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_share_pv']+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_drop_down_user']+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_share_people']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_advertisement_click_num']+'</td>'+
                             '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
@@ -156,6 +157,7 @@
             <td>分享页pv</td>
             <td>分享页下拉用户数</td>
             <td>分享出去人数</td>
+            <td>每日获取激励视频数</td>
             <td>日期</td>
         </tr>
     </table>

@@ -840,6 +840,9 @@ public interface Common_configMapper {
     //公众号万元挑战参加人数增加
     int addOperatingChallengeParticipants(@Param("set_time") String set_time);
 
+    //每日获取激励视频次数
+    int addAdvertisementClickNum(@Param("set_time") String set_time);
+
     //公众号分享页下拉用户数
     int addOfficialAccountShareDropDownUser(@Param("set_time") String set_time);
 
@@ -928,6 +931,9 @@ public interface Common_configMapper {
 
     //展现直播的用户
     List<Map<Object,Object>> showLiveCourseUserInfo(@Param("live_broadcast_course_id") String live_broadcast_course_id);
+
+    //展现直播的用户邀请者
+    Map<Object,Object> showLiveCourseInvite(@Param("user_id") String user_id);
 
     //随机获取几个虚拟用户头像
     List<Map<Object,Object>> getVirtualPortraitRandom(@Param("size") int size);

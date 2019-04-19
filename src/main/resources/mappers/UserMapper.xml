@@ -609,11 +609,29 @@
   </select>
 
   <select id="getUserPlanNumber" resultType="map" parameterType="string">
-    SELECT my_plan,plan_days,plan_words_number,insist_day
+    SELECT my_plan,plan_days,plan_words_number,insist_day,wechat_platform_openid
     FROM user
     WHERE id = #{id}
     LIMIT 1
   </select>
+
+
+  <select id="sentExitPayOfficialAccountUserTmp" resultType="map" parameterType="string">
+    SELECT wechat_platform_openid,exit_application_page
+    FROM `user`
+    WHERE id = #{id}
+    LIMIT 1
+  </select>
+
+
+  <select id="needToSentPayRemindUsers" resultType="map" parameterType="string">
+    SELECT id,wechat_platform_openid,exit_application_page
+    FROM `user`
+    WHERE exit_application_page is NOT NULL
+    AND exit_application_page != 0
+  </select>
+
+
   <update id="decide_plan_days" parameterType="string">
     UPDATE user
     set plan_days = #{days},
@@ -630,6 +648,12 @@
   <update id="change_open_status">
     UPDATE `user`
     set whether_open = #{number}
+    WHERE id = #{id}
+  </update>
+
+  <update id="changeExitApplicationPage">
+    UPDATE `user`
+    set exit_application_page = #{exit_application_page}
     WHERE id = #{id}
   </update>
 

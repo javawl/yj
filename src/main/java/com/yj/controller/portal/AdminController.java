@@ -1775,7 +1775,7 @@ public class AdminController {
                     }
                     list.add(new TemplateData( plan,"#173177"));
                     list.add(new TemplateData("99天" ,"#173177"));
-                    list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
+                    list.add(new TemplateData("点击进入小程序~~~" ,"#173177"));
                     officialAccountTmpMessage.setParams(list);
                     CommonFunc.sendOfficialAccountsTemplateMessageJumpMiniProgram(officialAccountTmpMessage);
                 }
@@ -1783,6 +1783,150 @@ public class AdminController {
         }catch (Exception e){
             logger.error("公众号给万元挑战用户发送通知异常",e.getStackTrace());
             logger.error("公众号给万元挑战用户发送通知异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 微信公众号万元挑战赛每日提醒用户看排行榜
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "officialAccountsRemindRank.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String officialAccountsRemindRank(String token, HttpServletResponse response){
+        if (!token.equals("officialAccountsRemindRank")){
+            return "false";
+        }
+        try{
+            String timeStamp = String.valueOf((new Date()).getTime());
+            //获取accessToken
+            String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+            //找出所有开始的万元挑战
+            List<Map<Object,Object>> beginningWxPlatformChallenge = common_configMapper.getBeginningWxPlatformChallenge(timeStamp);
+            for (int i = 0; i < beginningWxPlatformChallenge.size(); i++){
+                //给所有用户发送
+                List<Map<Object,Object>> rank = common_configMapper.showWxPlatformChallengeContestants(beginningWxPlatformChallenge.get(i).get("id").toString());
+                for(int j = 0; j < rank.size(); j++){
+                    String plan;
+                    if (rank.get(j).get("wechat_platform_openid") != null){
+                        //发送模板消息
+                        OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                        officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_CHALLENGE_RANK_REMIND);
+                        officialAccountTmpMessage.setTouser(rank.get(j).get("wechat_platform_openid").toString());
+                        officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE_RANK);
+                        officialAccountTmpMessage.setAccess_token(access_token);
+                        officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("今天快结束啦~快来看看自己挤进前100名了吗？","#173177"));
+                        list.add(new TemplateData("万元挑战赛" ,"#173177"));
+                        list.add(new TemplateData( CommonFunc.getFormatTime(Long.valueOf(rank.get(i).get("st").toString()),"yyyy/MM/dd") + " - " + CommonFunc.getFormatTime(Long.valueOf(rank.get(i).get("et").toString()),"yyyy/MM/dd"),"#173177"));
+                        list.add(new TemplateData("第" + String.valueOf(j + 1) + "名" ,"#173177"));
+                        list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
+                        officialAccountTmpMessage.setParams(list);
+                        CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                    }
+                }
+            }
+        }catch (Exception e){
+            logger.error("公众号给万元挑战用户发送排行榜提醒通知异常",e.getStackTrace());
+            logger.error("公众号给万元挑战用户发送排行榜提醒通知异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 微信公众号万元提醒用户支付
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "officialAccountsRemindPay.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String officialAccountsRemindPay(String token, HttpServletResponse response){
+        if (!token.equals("officialAccountsRemindPay")){
+            return "false";
+        }
+        try{
+            Long timeStamp = (new Date()).getTime();
+            //获取accessToken
+            String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+            //找出所有开始的万元挑战
+            List<Map<Object,Object>> needToSentPayRemindUsers = userMapper.needToSentPayRemindUsers();
+            for (int i = 0; i < needToSentPayRemindUsers.size(); i++){
+                //给所有用户发送
+                if (needToSentPayRemindUsers.get(i).get("wechat_platform_openid") != null && needToSentPayRemindUsers.get(i).get("exit_application_page") != null){
+                    if (!needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("0")){
+                        if (needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("1") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("4") ||
+                                needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("5") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("7")){
+                            //发送模板消息
+                            OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                            officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                            officialAccountTmpMessage.setTouser(needToSentPayRemindUsers.get(i).get("wechat_platform_openid").toString());
+                            officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_CHALLENGE);
+                            officialAccountTmpMessage.setAccess_token(access_token);
+                            officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                            List<TemplateData> list = new ArrayList<>();
+                            list.add(new TemplateData("来抢个名额吧，背单词还能领100元奖金呢","#173177"));
+                            list.add(new TemplateData("万元挑战赛" ,"#173177"));
+                            list.add(new TemplateData( CommonFunc.getFormatTime(timeStamp,"yyyy/MM/dd"),"#173177"));
+                            list.add(new TemplateData("尚未报名【29.9元坚持背单词返100元】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                            list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                            officialAccountTmpMessage.setParams(list);
+                            CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        }
+
+                        if (needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("2") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("4") ||
+                                needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("6") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("7")){
+                            //发送模板消息
+                            OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                            officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                            officialAccountTmpMessage.setTouser(needToSentPayRemindUsers.get(i).get("wechat_platform_openid").toString());
+                            officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_WORD_CHALLENGE);
+                            officialAccountTmpMessage.setAccess_token(access_token);
+                            officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                            List<TemplateData> list = new ArrayList<>();
+                            list.add(new TemplateData("来抢个名额吧，坚持背单词还有机会获得奖励金","#173177"));
+                            list.add(new TemplateData("单词挑战" ,"#173177"));
+                            list.add(new TemplateData( CommonFunc.getFormatTime(timeStamp,"yyyy/MM/dd"),"#173177"));
+                            list.add(new TemplateData("尚未报名【9.9元坚持背单词返本金和奖励金】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                            list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                            officialAccountTmpMessage.setParams(list);
+                            CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        }
+
+                        if (needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("3") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("5") ||
+                                needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("6") || needToSentPayRemindUsers.get(i).get("exit_application_page").toString().equals("7")){
+                            //发送模板消息
+                            OfficialAccountTmpMessage officialAccountTmpMessage = new OfficialAccountTmpMessage();
+                            officialAccountTmpMessage.setTemplate_id(Const.TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND);
+                            officialAccountTmpMessage.setTouser(needToSentPayRemindUsers.get(i).get("wechat_platform_openid").toString());
+                            officialAccountTmpMessage.setUrl(Const.OFFICIAL_ACCOUNTS_READ_CHALLENGE);
+                            officialAccountTmpMessage.setAccess_token(access_token);
+                            officialAccountTmpMessage.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + access_token);
+                            List<TemplateData> list = new ArrayList<>();
+                            list.add(new TemplateData("来抢个名额吧，坚持阅读极速提高英语水平","#173177"));
+                            list.add(new TemplateData("阅读活动" ,"#173177"));
+                            list.add(new TemplateData( CommonFunc.getFormatTime(timeStamp,"yyyy/MM/dd"),"#173177"));
+                            list.add(new TemplateData("尚未报名【阅读各大英语演讲、名著】活动，给自己一个机会，让坚持成就优秀！！！" ,"#173177"));
+                            list.add(new TemplateData("点击进入报名页~~~" ,"#173177"));
+                            officialAccountTmpMessage.setParams(list);
+                            CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        }
+
+                        //拨正
+                        userMapper.changeExitApplicationPage(needToSentPayRemindUsers.get(i).toString(), "0");
+                    }
+                }
+            }
+        }catch (Exception e){
+            logger.error("公众号给万元挑战用户发送排行榜提醒通知异常",e.getStackTrace());
+            logger.error("公众号给万元挑战用户发送排行榜提醒通知异常",e);
             e.printStackTrace();
         }
         return "success";
@@ -3525,6 +3669,29 @@ public class AdminController {
         return ServerResponse.createBySuccessMessage("成功");
     }
 
+
+    /**
+     * 获取广告次数
+     * @return  List
+     */
+    @RequestMapping(value = "addAdvertisementClickNum.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addAdvertisementClickNum(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            common_configMapper.addAdvertisementClickNum(one);
+        }else {
+            common_configMapper.addAdvertisementClickNum(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
     /**
      * 统计分享页数据
      * @return  List
@@ -4280,6 +4447,17 @@ public class AdminController {
                 Info.get(i).put("whether_help", "59.9");
             }else {
                 Info.get(i).put("whether_help", "199.9");
+            }
+            //查看是否有邀请者
+            Map<Object,Object> liveCourseInvite = common_configMapper.showLiveCourseInvite(Info.get(i).get("user_id").toString());
+            if (liveCourseInvite == null){
+                Info.get(i).put("invite_user_id", "null");
+                Info.get(i).put("invite_username", "null");
+                Info.get(i).put("invite_portrait", "null");
+            }else {
+                Info.get(i).put("invite_user_id", liveCourseInvite.get("invited_user_id").toString());
+                Info.get(i).put("invite_username", liveCourseInvite.get("username"));
+                Info.get(i).put("invite_portrait", CommonFunc.judgePicPath(liveCourseInvite.get("portrait").toString()));
             }
         }
 

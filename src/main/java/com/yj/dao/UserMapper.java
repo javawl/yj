@@ -120,6 +120,9 @@ public interface UserMapper {
     //决定天数和单词数
     int change_open_status(@Param("id") String id, @Param("number") int number);
 
+    //改变退出支付的状态
+    int changeExitApplicationPage(@Param("id") String id, @Param("exit_application_page") String exit_application_page);
+
     //微信公众号上传unionid
     int wxPlatformSetUnionId(@Param("id") String id, @Param("gender") String gender, @Param("username") String username, @Param("portrait") String portrait, @Param("unionid") String unionid);
 
@@ -204,6 +207,12 @@ public interface UserMapper {
     List<Map<Object,Object>> getUserAllInsistDay(@Param("id") String id);
 
     Map getUserPlanNumber(@Param("id") String id);
+
+    //找出是否要给公众号用户发送提醒支付的信息
+    Map<Object,Object> sentExitPayOfficialAccountUserTmp(@Param("id") String id);
+
+    //找出要给公众号用户发送提醒支付的信息的用户
+    List<Map<Object,Object>> needToSentPayRemindUsers();
 
     //根据计划名获取总数
     String getPlanWordsNumberByPlan(@Param("plan") String plan);

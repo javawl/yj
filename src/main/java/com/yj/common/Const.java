@@ -33,6 +33,8 @@ public class Const {
     public static final String TMP_ID_READ_CLASS_RED_PACKET_REMIND = "WU2whMFaiAwwnEcyMKLTg52KjFEzQAK7xS6kgZXfVDk";   //阅读挑战红包领取提醒
     public static final String TMP_HELP_THREE_TIMES_SUCCESS = "9_9krYt0xQqqK3fIJpVIoH_qQnvO0qYJaQevzoC05KY";   //阅读助力成功提醒
     public static final String TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND = "8x5cpavEtgA54Qopgehy5FJSJ2piRxNcS4gbO_QpZgo";   //微信公众号万元挑战赛提醒
+    public static final String TMP_OFFICIAL_ACCOUNTS_CHALLENGE_RANK_REMIND = "hs_jV9Y3U-WAXMm5LXDUQZYmzFvf2ywWFNnuLfQ_VXQ";   //微信公众号万元挑战赛排名查看提醒
+    public static final String TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND = "a63NGuotsD6qeOvpy22c2p2pyEPbnB46NYgnmi3Ubcg";   //微信公众号退出报名页报名提醒
     public static final String DRAW_RESULT_PATH = "page/home/pages/prize/prize_result";   //抽奖结果的路径
     public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页
     public static final String WX_HOME_PATH = "page/tabBar/home/home";   //home的路径
@@ -44,6 +46,10 @@ public class Const {
     public static final String WX_CHALLENGE_INVITE_RED_PACKET = "page/tabBar/home/home?method=challenge_invite_red_packet";   //展示单词挑战邀请提醒的路径
     public static final String WX_READ_CHALLENGE_TEACHER = "page/discover/pages/teacher/teacher";   //阅读挑战老师页
     public static final String OFFICIAL_ACCOUNTS_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/challenge_sign_up.html";   //公众号万元挑战赛
+    public static final String OFFICIAL_ACCOUNTS_WORD_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/word_sign_up.html";   //公众号单词挑战
+    public static final String OFFICIAL_ACCOUNTS_READ_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/book_sign_up.html";   //公众号阅读
+    public static final String OFFICIAL_ACCOUNTS_CHALLENGE_RANK = "https://file.ourbeibei.com/l_e/static/html/rank.html";   //公众号万元挑战赛排行榜
+    public static final String OFFICIAL_ACCOUNTS_CHALLENGE_SHARE = "https://file.ourbeibei.com/l_e/static/html/challenge_share.html";   //公众号万元挑战赛分享页
 //    public static final String WX_CHALLENGE_SIGNUP = "pages/discover/WordChallenge/SignUp/SignUp";   //挑战报名页
     public static final String WX_CHALLENGE_SIGNUP = "page/tabBar/home/home";   //挑战报名页 (为了应对ios举报)
     public static final String XUNFEI_APPID = "5b90c40a";   //科大讯飞java appid

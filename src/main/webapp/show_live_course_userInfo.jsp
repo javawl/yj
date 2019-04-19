@@ -50,11 +50,21 @@
                     }else {
                         string2 = '<img style="max-width: 50px; max-height: 50px;" src="'+data[i]['portrait']+'">';
                     }
+
+                    var string3;
+                    if (data[i]['invite_portrait']=='null'){
+                        string3 = '此资源为空'
+                    }else {
+                        string3 = '<img style="max-width: 50px; max-height: 50px;" src="'+data[i]['invite_portrait']+'">';
+                    }
                     $("#author_info").append('<tr>'+
                         '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['whether_help']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['set_time']+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['invite_user_id']+'</td>'+
+                        '<td style="width: 4%;">'+string3+'</td>'+
+                        '<td style="width: 4%;">'+data[i]['invite_username']+'</td>'+
                         '</tr>');
                 }
             },
@@ -75,6 +85,9 @@
             <td>昵称</td>
             <td>报名价格</td>
             <td>报名时间</td>
+            <td>邀请者id</td>
+            <td>邀请者头像</td>
+            <td>邀请者名字</td>
         </tr>
     </table>
     <table id="page">
