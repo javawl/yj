@@ -1823,7 +1823,7 @@ public class AdminController {
                         List<TemplateData> list = new ArrayList<>();
                         list.add(new TemplateData("今天快结束啦~快来看看自己挤进前100名了吗？","#173177"));
                         list.add(new TemplateData("万元挑战赛" ,"#173177"));
-                        list.add(new TemplateData( CommonFunc.getFormatTime(Long.valueOf(rank.get(i).get("st").toString()),"yyyy/MM/dd") + " - " + CommonFunc.getFormatTime(Long.valueOf(rank.get(i).get("et").toString()),"yyyy/MM/dd"),"#173177"));
+                        list.add(new TemplateData( CommonFunc.getFormatTime(Long.valueOf(beginningWxPlatformChallenge.get(i).get("st").toString()),"yyyy/MM/dd") + " - " + CommonFunc.getFormatTime(Long.valueOf(beginningWxPlatformChallenge.get(i).get("et").toString()),"yyyy/MM/dd"),"#173177"));
                         list.add(new TemplateData("第" + String.valueOf(j + 1) + "名" ,"#173177"));
                         list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
                         officialAccountTmpMessage.setParams(list);
