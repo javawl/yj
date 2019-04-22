@@ -1777,7 +1777,8 @@ public class AdminController {
                     list.add(new TemplateData("99天" ,"#173177"));
                     list.add(new TemplateData("点击进入小程序~~~" ,"#173177"));
                     officialAccountTmpMessage.setParams(list);
-                    CommonFunc.sendOfficialAccountsTemplateMessageJumpMiniProgram(officialAccountTmpMessage);
+                    String info = CommonFunc.sendOfficialAccountsTemplateMessageJumpMiniProgram(officialAccountTmpMessage);
+                    logger.error("公众号模板消息1：" + info);
                 }
             }
         }catch (Exception e){
@@ -1827,7 +1828,8 @@ public class AdminController {
                         list.add(new TemplateData("第" + String.valueOf(j + 1) + "名" ,"#173177"));
                         list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
                         officialAccountTmpMessage.setParams(list);
-                        CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        String info = CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        logger.error("公众号模板消息2：" + info);
                     }
                 }
             }

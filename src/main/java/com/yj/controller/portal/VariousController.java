@@ -1093,11 +1093,17 @@ public class VariousController {
         Button1Children4.put("url", "https://file.ourbeibei.com/l_e/static/html/rank.html");
         Button1.add(Button1Children4);
 
-        Map<Object,Object> Button1Children5 = new HashMap<>();
-        Button1Children5.put("type", "view");
-        Button1Children5.put("name", "学习分享");
-        Button1Children5.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
-        Button1.add(Button1Children5);
+//        Map<Object,Object> Button1Children5 = new HashMap<>();
+//        Button1Children5.put("type", "view");
+//        Button1Children5.put("name", "学习分享");
+//        Button1Children5.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
+//        Button1.add(Button1Children5);
+
+        Map<Object,Object> Button1Children6 = new HashMap<>();
+        Button1Children6.put("type", "view");
+        Button1Children6.put("name", "必过四六级");
+        Button1Children6.put("url", "https://file.ourbeibei.com/l_e/static/html/cet_sign_up.html");
+        Button1.add(Button1Children6);
         Button1Map.put("sub_button", Button1);
 
 
