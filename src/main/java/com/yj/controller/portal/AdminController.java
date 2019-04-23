@@ -4469,4 +4469,33 @@ public class AdminController {
 
 
     //-----------------------------------------------------运营直播课程（下闭合线）----------------------------------------------------------
+
+
+    /**
+     * 展示直播课程用户
+     * @return  List
+     */
+    @RequestMapping(value = "testCache.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> testCache(String key, String value){
+        LocalCache.put(key, value, 10);
+
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+
+    /**
+     * 展示直播课程用户
+     * @return  List
+     */
+    @RequestMapping(value = "testGetCache.do", method = RequestMethod.GET)
+    @ResponseBody
+    public String testGetCache(String key){
+        if (!LocalCache.containsKey(key)){
+            return "fail";
+        }else {
+            return LocalCache.get(key).toString();
+        }
+    }
 }
