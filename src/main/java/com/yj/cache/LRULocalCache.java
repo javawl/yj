@@ -181,7 +181,7 @@ public class LRULocalCache {
      */
     public static void add(String key, Object value) {
         map.put(key, value);
-        timer.schedule(new LocalCache.CleanWorkerTask(key), DEFUALT_TIMEOUT);
+        timer.schedule(new LRULocalCache.CleanWorkerTask(key), DEFUALT_TIMEOUT);
 
     }
 
@@ -194,7 +194,7 @@ public class LRULocalCache {
      */
     public static void put(String key, Object value, int timeout) {
         map.put(key, value);
-        timer.schedule(new LocalCache.CleanWorkerTask(key), timeout * SECOND_TIME);
+        timer.schedule(new LRULocalCache.CleanWorkerTask(key), timeout * SECOND_TIME);
     }
 
     /**
@@ -206,7 +206,7 @@ public class LRULocalCache {
      */
     public static void put(String key, Object value, Date expireTime) {
         map.put(key, value);
-        timer.schedule(new LocalCache.CleanWorkerTask(key), expireTime);
+        timer.schedule(new LRULocalCache.CleanWorkerTask(key), expireTime);
     }
 
 

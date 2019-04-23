@@ -12,6 +12,7 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.yj.cache.LRULocalCache;
+import com.yj.cache.LocalCache;
 import com.yj.dao.DictionaryMapper;
 import com.yj.util.HttpsUtil;
 import com.yj.util.MD5Util;
@@ -1335,9 +1336,9 @@ public class CommonFunc {
     public static Map<String, Object> wxPlatformNormlaAccessToken() {
         Map<String, Object> result = new HashMap<>();
         //判断如果session里有的话直接返回
-        if (LRULocalCache.containsKey("wxplatformaccesstoken")){
+        if (LocalCache.containsKey("wxplatformaccesstoken")){
             result.put("status", "1");
-            result.put("access_token", LRULocalCache.get("wxplatformaccesstoken"));
+            result.put("access_token", LocalCache.get("wxplatformaccesstoken"));
             System.out.println("缓存");
             return result;
         }
@@ -1362,7 +1363,7 @@ public class CommonFunc {
                 result.put("status", "1");
                 result.put("access_token", normalAccessToken);
                 //存入缓存
-                LRULocalCache.put("wxplatformaccesstoken", normalAccessToken, 7100);
+                LocalCache.put("wxplatformaccesstoken", normalAccessToken, 7100);
                 System.out.println("生成");
                 return result;
             }

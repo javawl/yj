@@ -2,6 +2,7 @@ package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yj.cache.LRULocalCache;
 import com.yj.cache.LocalCache;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
@@ -4478,7 +4479,7 @@ public class AdminController {
     @RequestMapping(value = "testCache.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> testCache(String key, String value){
-        LocalCache.put(key, value, 10);
+        LRULocalCache.put(key, value, 10);
 
         return ServerResponse.createBySuccessMessage("成功");
     }
@@ -4492,10 +4493,10 @@ public class AdminController {
     @RequestMapping(value = "testGetCache.do", method = RequestMethod.GET)
     @ResponseBody
     public String testGetCache(String key){
-        if (!LocalCache.containsKey(key)){
+        if (!LRULocalCache.containsKey(key)){
             return "fail";
         }else {
-            return LocalCache.get(key).toString();
+            return LRULocalCache.get(key).toString();
         }
     }
 }
