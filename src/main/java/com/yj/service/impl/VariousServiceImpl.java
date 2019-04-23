@@ -2844,6 +2844,12 @@ public class VariousServiceImpl implements IVariousService {
             textMessage.setContent("Hello~小可爱~~\n" +
                     "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
                     "\n" +
+                    "【四六级必过】\n" +
+                    "每天不到2块钱，大神带你轻松过四六级。\n" +
+                    "42天直播互动教学，28小时全程干货分享，\n" +
+                    "4大模块，助你全面提升，一次性过四六级。\n" +
+                    "点击报名优惠链接<a href='https://file.ourbeibei.com/l_e/static/html/cet_sign_up.html'>点击进入报名链接</a>，立即报名学习，高效过级" +
+                    "\n" +
                     "【背呗挑战赛】\n" +
                     "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +
                     "30万现金补贴，29.9元保证金，坚持打卡可领回100元！！！\n" +
@@ -2917,6 +2923,12 @@ public class VariousServiceImpl implements IVariousService {
                 textMessage.setCreateTime(System.currentTimeMillis());
                 textMessage.setContent("Hello~小可爱~~\n" +
                         "背呗朝思暮想终于把你盼来了，快跟背呗一起学习吧~~\n" +
+                        "\n" +
+                        "【四六级必过】\n" +
+                        "每天不到2块钱，大神带你轻松过四六级。\n" +
+                        "42天直播互动教学，28小时全程干货分享，\n" +
+                        "4大模块，助你全面提升，一次性过四六级。\n" +
+                        "点击报名优惠链接<a href='https://file.ourbeibei.com/l_e/static/html/cet_sign_up.html'>点击进入报名链接</a>，立即报名学习，高效过级" +
                         "\n" +
                         "【背呗挑战赛】\n" +
                         "用科学的单词学习方式，不死记硬背，轻松记住单词！\n" +

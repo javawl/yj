@@ -2,6 +2,7 @@ package com.yj.controller.portal;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yj.cache.LocalCache;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;

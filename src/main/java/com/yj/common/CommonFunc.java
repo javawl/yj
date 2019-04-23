@@ -1362,7 +1362,7 @@ public class CommonFunc {
                 result.put("status", "1");
                 result.put("access_token", normalAccessToken);
                 //存入缓存
-                LRULocalCache.put("wxplatformaccesstoken", normalAccessToken, 7200);
+                LRULocalCache.put("wxplatformaccesstoken", normalAccessToken, 7100);
                 System.out.println("生成");
                 return result;
             }

@@ -1093,11 +1093,7 @@ public class VariousController {
         Button1Children4.put("url", "https://file.ourbeibei.com/l_e/static/html/rank.html");
         Button1.add(Button1Children4);
 
-//        Map<Object,Object> Button1Children5 = new HashMap<>();
-//        Button1Children5.put("type", "view");
-//        Button1Children5.put("name", "学习分享");
-//        Button1Children5.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
-//        Button1.add(Button1Children5);
+
 
         Map<Object,Object> Button1Children6 = new HashMap<>();
         Button1Children6.put("type", "view");
@@ -1151,6 +1147,11 @@ public class VariousController {
         Button2Children5.put("name", "了解更多");
         Button2Children5.put("key", "about_beibei");
         Button2.add(Button2Children5);
+        Map<Object,Object> Button2Children6 = new HashMap<>();
+        Button2Children6.put("type", "view");
+        Button2Children6.put("name", "学习分享");
+        Button2Children6.put("url", "https://file.ourbeibei.com/l_e/static/html/challenge_share.html");
+        Button2.add(Button2Children6);
         Button2Map.put("sub_button", Button2);
 
         //最终插入
@@ -1162,7 +1163,9 @@ public class VariousController {
         //获取AccessToken
         String normalAccessToken = "";
         //将access_token取出
-        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+//        String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+        //判断缓存取法
+        String requestNormalAccessTokenUrlParam = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
         //发送post请求读取调用微信接口获取openid用户唯一标识
         JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
         if (normalAccessTokenJsonObject.isEmpty()){

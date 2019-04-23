@@ -211,7 +211,9 @@ public class TokenServiceImpl implements ITokenService {
             }else {
                 String normalAccessToken = "";
                 //将access_token取出
-                String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+//                String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
+                //判断缓存取法
+                String requestNormalAccessTokenUrlParam = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
                 //发送post请求读取调用微信接口获取openid用户唯一标识
                 JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( this.wxPlatformNormalAccessTokenUrl, requestNormalAccessTokenUrlParam ));
                 if (normalAccessTokenJsonObject.isEmpty()){
