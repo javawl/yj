@@ -2,7 +2,7 @@ package com.yj.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.yj.cache.LRULocalCache;
+import com.yj.cache.LocalCache;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.TextMessage;
 
@@ -68,9 +68,9 @@ public class SocketHandler implements WebSocketHandler {
         //本用户的信息
         Map<String, Object> pk_info = (Map<String, Object>)session.getHandshakeAttributes().get("pk_info");
         //将缓存中的id拿掉
-        List<Object> WebSocketUserList = (List<Object>)LRULocalCache.get("WebSocketUserList");
+        List<Object> WebSocketUserList = (List<Object>)LocalCache.get("WebSocketUserList");
         WebSocketUserList.remove(pk_info.get("user_id").toString() + "_" + pk_info.get("PkField").toString());
-        LRULocalCache.put("WebSocketUserList", WebSocketUserList, -1);
+        LocalCache.put("WebSocketUserList", WebSocketUserList, -1);
         System.out.println("安全退出了系统");
 
     }

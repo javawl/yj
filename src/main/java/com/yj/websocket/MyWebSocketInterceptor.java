@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.yj.cache.LRULocalCache;
+import com.yj.cache.LocalCache;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -53,15 +54,15 @@ public class MyWebSocketInterceptor implements HandshakeInterceptor {
             Cache.put("PkField", field);
             map.put("pk_info", Cache);
 
-            if (LRULocalCache.containsKey("WebSocketUserList")){
+            if (LocalCache.containsKey("WebSocketUserList")){
                 //加入用户id
-                List<Object> WebSocketUserList = (List<Object>)LRULocalCache.get("WebSocketUserList");
+                List<Object> WebSocketUserList = (List<Object>)LocalCache.get("WebSocketUserList");
                 WebSocketUserList.add(user_id + "_" + field);
-                LRULocalCache.put("WebSocketUserList", WebSocketUserList, -1);
+                LocalCache.put("WebSocketUserList", WebSocketUserList, -1);
             }else {
                 List<Object> WebSocketUserList = new ArrayList<>();
                 WebSocketUserList.add(user_id + "_" + field);
-                LRULocalCache.put("WebSocketUserList", WebSocketUserList, -1);
+                LocalCache.put("WebSocketUserList", WebSocketUserList, -1);
             }
         }
 

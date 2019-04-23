@@ -1,5 +1,6 @@
 package com.yj.service.impl;
 import com.yj.cache.LRULocalCache;
+import com.yj.cache.LocalCache;
 import com.yj.common.CommonFunc;
 import com.yj.common.Const;
 import com.yj.common.ServerResponse;
@@ -636,7 +637,7 @@ public class GameServiceImpl implements IGameService {
             if (correct.equals(sourceSent)){
                 String newToken = CommonFunc.generateGameToken(aes.getGameOnlineKey(), uid);
                 //存入缓存 (1分钟过期)
-                LRULocalCache.put(newToken, "1", 60);
+                LocalCache.put(newToken, "1", 60);
                 return ServerResponse.createBySuccess("成功！", newToken);
             }else {
                 return ServerResponse.createByErrorMessage("输入格式有误！");
@@ -670,7 +671,7 @@ public class GameServiceImpl implements IGameService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }
         //查看缓存 (1分钟过期)
-        if (!LRULocalCache.containsKey(online_token)){
+        if (!LocalCache.containsKey(online_token)){
             //没有token
             return ServerResponse.createByErrorMessage("增加经验验证错误！");
         }
@@ -782,7 +783,7 @@ public class GameServiceImpl implements IGameService {
             if (correct.equals(sourceSent)){
                 String newToken = CommonFunc.generateGameToken(aes.getGameOnlineKey(), uid);
                 //存入缓存 (1分钟过期)
-                LRULocalCache.put(newToken, "1", 60);
+                LocalCache.put(newToken, "1", 60);
                 return ServerResponse.createBySuccess("成功！", newToken);
             }else {
                 return ServerResponse.createByErrorMessage("输入格式有误！");
@@ -818,7 +819,7 @@ public class GameServiceImpl implements IGameService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }
         //查看缓存 (1分钟过期)
-        if (!LRULocalCache.containsKey(exp_token)){
+        if (!LocalCache.containsKey(exp_token)){
             //没有token
             return ServerResponse.createByErrorMessage("增加经验验证错误！");
         }
@@ -918,7 +919,7 @@ public class GameServiceImpl implements IGameService {
 
         Map<String, Integer> onlinePeople = new HashMap<>();
         //取出游戏在线的人
-        List<Object> WebSocketUserList = (List<Object>)LRULocalCache.get("WebSocketUserList");
+        List<Object> WebSocketUserList = (List<Object>)LocalCache.get("WebSocketUserList");
         for (int i = 0; i < WebSocketUserList.size(); i++){
             String[] str_list = WebSocketUserList.get(i).toString().split("_");
             String field = str_list[1];
