@@ -58,7 +58,7 @@
                         string3 = '<img style="max-width: 50px; max-height: 50px;" src="'+data[i]['invite_portrait']+'">';
                     }
                     $("#author_info").append('<tr>'+
-                        '<td style="width: 4%;">'+data[i]['user_id']+'</td>'+
+                        '<td style="width: 4%;">'+ '2' + data[i]['user_id']+'</td>'+
                         '<td style="width: 4%;">'+string2+'</td>'+
                         '<td style="width: 4%;">'+data[i]['username']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['whether_help']+'</td>'+
