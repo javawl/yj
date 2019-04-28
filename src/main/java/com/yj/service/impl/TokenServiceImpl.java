@@ -11,6 +11,7 @@ import com.yj.pojo.User;
 import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
 import com.yj.util.PayUtils;
+import com.yj.util.RedisPoolUtil;
 import com.yj.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -787,9 +788,11 @@ public class TokenServiceImpl implements ITokenService {
     private String saveToCache(HttpSession session, Map<Object,Object> cacheValue){
         //生成钥匙
         String key = CommonFunc.generateToken(Const.TOKEN_LOGIN_SALT);
-        //存入session
-        session.setAttribute(key, cacheValue);
-        session.setMaxInactiveInterval(Const.WX_TOKEN_EXIST_TIME);     //以秒为单位
+//        //存入session
+//        session.setAttribute(key, cacheValue);
+//        session.setMaxInactiveInterval(Const.WX_TOKEN_EXIST_TIME);     //以秒为单位
+        //存入redis
+        RedisPoolUtil.setEx(key, JSONObject.toJSONString(cacheValue), Const.WX_TOKEN_EXIST_TIME);
         //获取session_id
         String session_id = session.getId();
         return session_id + key;

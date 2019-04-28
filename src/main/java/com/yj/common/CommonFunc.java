@@ -14,10 +14,7 @@ import com.aliyuncs.profile.IClientProfile;
 import com.yj.cache.LRULocalCache;
 import com.yj.cache.LocalCache;
 import com.yj.dao.DictionaryMapper;
-import com.yj.util.HttpsUtil;
-import com.yj.util.MD5Util;
-import com.yj.util.OfficialAccountTmpMessage;
-import com.yj.util.UrlUtil;
+import com.yj.util.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
@@ -329,91 +326,65 @@ public class CommonFunc {
         return half / totalNumber;
     }
 
-    //获取cookie中某个键值的值，没有的话返回null
-    public String getCookieValueBykey(HttpServletRequest request,String key){
-        //这里获取session_id
-        //key = session_id + token  其中token是32位的
-        if (key.length() != 32 && key.length() != 64){
+    private static String getToken(HttpServletRequest request,String key){
+//        //这里获取session_id
+//        //key = session_id + token  其中token是32位的
+//        if (key.length() != 32 && key.length() != 64){
+//            return null;
+//        }
+//        String session_id = key.substring(0,key.length() - 32);
+//        //获取token
+//        String token = key.substring(key.length()-32);
+//        MySessionContext myc= MySessionContext.getInstance();
+//        HttpSession session = myc.getSession(session_id);
+//        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+//        if(null == cookies && session == null) {
+//            //没有cookie
+//            return null;
+//        }else{
+//            if (cookies != null){
+//                String value = "";
+//                for(Cookie cookie : cookies){
+//                    //找到
+//                    if (cookie.getName().equals(key)) {
+//                        // 取出cookie的值
+//                        value = cookie.getValue();
+//                        return value;
+//                    }
+//                }
+//            }
+//
+//            if (session != null){
+//                Map user_info = (Map) session.getAttribute(token);
+//                if (user_info != null){
+//                    return user_info.get("uid").toString();
+//                }
+//            }
+//
+//            //没找到返回null
+//            return null;
+//        }
+        if (key.length() != 64){
             return null;
         }
-        String session_id = key.substring(0,key.length() - 32);
         //获取token
         String token = key.substring(key.length()-32);
-        MySessionContext myc= MySessionContext.getInstance();
-        HttpSession session = myc.getSession(session_id);
-        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
-        if(null == cookies && session == null) {
-            //没有cookie
-            return null;
-        }else{
-            if (cookies != null){
-                String value = "";
-                for(Cookie cookie : cookies){
-                    //找到
-                    if (cookie.getName().equals(key)) {
-                        // 取出cookie的值
-                        value = cookie.getValue();
-                        return value;
-                    }
-                }
-            }
+        return RedisPoolUtil.get(token);
+    }
 
-            if (session != null){
-                Map user_info = (Map) session.getAttribute(token);
-                if (user_info != null){
-                    return user_info.get("uid").toString();
-                }
-            }
+    //获取cookie中某个键值的值，没有的话返回null
+    public String getCookieValueBykey(HttpServletRequest request,String key){
+        return getToken(request, key);
+    }
 
-            //没找到返回null
-            return null;
-        }
+    //获取cookie中某个键值的值，没有的话返回null
+    public static String CheckToken(HttpServletRequest request,String key){
+        return getToken(request, key);
     }
 
     //获取图片或视频完整路径
     public static String getResourcePath(String fileName){
         return Const.DOMAIN_NAME + fileName;
-    }
-
-    //获取cookie中某个键值的值，没有的话返回null
-    public static String CheckToken(HttpServletRequest request,String key){
-        //这里获取session_id
-        //key = session_id + token  其中token是32位的
-        if (key.length() != 32 && key.length() != 64){
-            return null;
-        }
-        String session_id = key.substring(0,key.length() - 32);
-        //获取token
-        String token = key.substring(key.length()-32);
-        MySessionContext myc= MySessionContext.getInstance();
-        HttpSession session = myc.getSession(session_id);
-        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
-        if(null == cookies && session == null) {
-            //没有cookie
-            return null;
-        }else{
-            if (cookies != null){
-                String value = "";
-                for(Cookie cookie : cookies){
-                    //找到
-                    if (cookie.getName().equals(key)) {
-                        // 取出cookie的值
-                        value = cookie.getValue();
-                        return value;
-                    }
-                }
-            }
-
-            if (session != null){
-                Map user_info = (Map) session.getAttribute(token);
-                if (user_info != null){
-                    return user_info.get("uid").toString();
-                }
-            }
-
-            //没找到返回null
-            return null;
-        }
     }
 
 
