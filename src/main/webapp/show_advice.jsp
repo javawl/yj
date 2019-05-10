@@ -86,6 +86,7 @@
                             '<td>'+data[i]['set_time']+'</td>'+
                             '<td>'+data[i]['advice']+'</td>'+
                             '<td>'+data[i]['level']+'</td>'+
+                            '<td>'+data[i]['contact']+'</td>'+
                             '</tr>');
                 }
 //                if (result.status == 200){
@@ -120,6 +121,7 @@
             <td>日期</td>
             <td>反馈</td>
             <td>评分</td>
+            <td>联系方式</td>
         </tr>
     </table>
     <table id="page">

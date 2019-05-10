@@ -166,7 +166,7 @@ public interface UserMapper {
     int error_correction(@Param("word_id") String word_id, @Param("user_id") String user_id,@Param("paraphrase") String paraphrase, @Param("real_meaning") String real_meaning,@Param("sentence") String sentence, @Param("other_sentence") String other_sentence,@Param("other") String other);
 
     //意见反馈
-    int advice(@Param("advice") String advice, @Param("level") String level, @Param("time") String time);
+    int advice(@Param("advice") String advice, @Param("level") String level, @Param("time") String time, @Param("contact") String contact);
 
     //查一下用户是否已经添加这个计划了
     Map selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);

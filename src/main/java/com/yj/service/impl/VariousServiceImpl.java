@@ -444,7 +444,7 @@ public class VariousServiceImpl implements IVariousService {
 
 
     @Override
-    public ServerResponse<String> advice(String advice,String level,HttpServletRequest request){
+    public ServerResponse<String> advice(String advice,String level,String contact, HttpServletRequest request){
         //意见反馈
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
@@ -468,7 +468,7 @@ public class VariousServiceImpl implements IVariousService {
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else{
             //插入
-            int result = userMapper.advice(advice,level,String.valueOf(new Date().getTime()));
+            int result = userMapper.advice(advice,level,String.valueOf(new Date().getTime()), contact);
             if (result == 0){
                 return ServerResponse.createByErrorMessage("提交失败！");
             }

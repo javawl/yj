@@ -86,9 +86,9 @@ public class VariousController {
 
     @RequestMapping(value = "advice.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> advice(String advice,String level,HttpServletRequest request){
+    public ServerResponse<String> advice(String advice,String level,String contact,HttpServletRequest request){
         //调用service层
-        return iVariousService.advice(advice,level,request);
+        return iVariousService.advice(advice,level,contact,request);
     }
 
 
@@ -1108,7 +1108,7 @@ public class VariousController {
         //背单词
         Map<Object,Object> Button3 = new HashMap<>();
         Button3.put("type", "miniprogram");
-        Button3.put("name", "背单词");
+        Button3.put("name", "进入小程序");
         Button3.put("url", "http://mp.weixin.qq.com");
         Button3.put("appid", WxConfig.wx_app_id);
         Button3.put("pagepath", Const.WX_HOME_PATH);
@@ -1130,7 +1130,7 @@ public class VariousController {
         Map<Object,Object> Button2Children2 = new HashMap<>();
         Button2Children2.put("type", "view");
         Button2Children2.put("name", "意见反馈");
-        Button2Children2.put("url", "https://www.wjx.cn/m/34594147.aspx");
+        Button2Children2.put("url", "https://www.wjx.cn/m/38611345.aspx");
         Button2.add(Button2Children2);
 //        Map<Object,Object> Button2Children3 = new HashMap<>();
 //        Button2Children3.put("type", "view");
@@ -1182,8 +1182,9 @@ public class VariousController {
         String normalAccessToken = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
 
         //发送post请求读取调用微信接口获取openid用户唯一标识
-        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken, JSONObject.parseObject(JSON.toJSONString(mapToJson)));
-        return ServerResponse.createBySuccess("成功", JSONObject.toJSONString(test));
+//        JSONObject test = UrlUtil.postJson( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken, JSONObject.parseObject(JSON.toJSONString(mapToJson)));
+        String test = JSONObject.toJSONString(HttpsUtil.doPost( WxConfig.wx_platform_set_menu_url + "?access_token=" + normalAccessToken, JSON.toJSONString(mapToJson), "UTF-8"));
+        return ServerResponse.createBySuccess("成功", test);
     }
 
 

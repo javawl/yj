@@ -347,6 +347,13 @@
     order by rand() limit #{number}
   </select>
 
+
+  <!--SELECT id,my_plan,last_login-->
+  <!--FROM `user`-->
+  <!--WHERE wechat is NOT NULL-->
+  <!--AND (`last_login` &lt; #{last_login}-->
+  <!--OR `last_login` is NULL)-->
+  <!--AND whether_template = 1-->
   <select id="getAllWxUser" resultType="map">
     SELECT id,my_plan,last_login
     FROM `user`
@@ -357,11 +364,30 @@
   </select>
 
 
+  <select id="getHaveChangeAllWxUser" resultType="map">
+    SELECT id,form_id,wechat,set_time,tb.*
+    FROM `template_msg`,
+         (SELECT id as user_id,my_plan,last_login
+          FROM `user`
+          WHERE wechat is NOT NULL
+          AND (`last_login` &lt; #{last_login}
+          OR `last_login` is NULL)
+          AND whether_template = 1) tb
+    WHERE `template_msg`.set_time > #{set_time}
+    AND `template_msg`.user_id = tb.user_id
+    GROUP BY user_id
+    ORDER BY set_time ASC
+  </select>
+
+
+  <!--SELECT id,my_plan,last_login-->
+  <!--FROM `user`-->
+  <!--WHERE wechat is NOT NULL-->
+  <!--AND whether_reminder = 1-->
   <select id="getAllAppointmentWxUser" resultType="map">
     SELECT id,my_plan,last_login
     FROM `user`
     WHERE wechat is NOT NULL
-    AND whether_reminder = 1
   </select>
 
   <select id="getChallengeSuccessWxUser" resultType="map">

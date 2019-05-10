@@ -1,5 +1,7 @@
 package com.yj.common;
 
+import com.yj.cache.LocalCache;
+
 public class AccessToken {
     //接口访问凭证
     private String accessToken;

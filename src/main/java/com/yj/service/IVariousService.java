@@ -19,7 +19,7 @@ public interface IVariousService {
     ServerResponse<List<Map<Object,Object>>> daily_pic(String page,String size,HttpServletRequest request);
 
     //意见反馈
-    ServerResponse<String> advice(String advice,String level,HttpServletRequest request);
+    ServerResponse<String> advice(String advice,String level,String contact,HttpServletRequest request);
 
     //收集form_id
     ServerResponse<String> collect_form_id(String form_id,HttpServletRequest request);

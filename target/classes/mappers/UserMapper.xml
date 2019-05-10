@@ -758,8 +758,8 @@
 
 
   <insert id="advice" parameterType="string">
-    INSERT INTO advice (advice, `level`, set_time)
-    values (#{advice}, #{level}, #{time})
+    INSERT INTO advice (advice, `level`, `contact`, set_time)
+    values (#{advice}, #{level}, #{contact}, #{time})
   </insert>
 
   <select id="check_plan" resultType="int" parameterType="string" >

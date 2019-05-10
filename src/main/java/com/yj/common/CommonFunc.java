@@ -327,49 +327,49 @@ public class CommonFunc {
     }
 
     private static String getToken(HttpServletRequest request,String key){
-//        //这里获取session_id
-//        //key = session_id + token  其中token是32位的
-//        if (key.length() != 32 && key.length() != 64){
-//            return null;
-//        }
-//        String session_id = key.substring(0,key.length() - 32);
-//        //获取token
-//        String token = key.substring(key.length()-32);
-//        MySessionContext myc= MySessionContext.getInstance();
-//        HttpSession session = myc.getSession(session_id);
-//        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
-//        if(null == cookies && session == null) {
-//            //没有cookie
-//            return null;
-//        }else{
-//            if (cookies != null){
-//                String value = "";
-//                for(Cookie cookie : cookies){
-//                    //找到
-//                    if (cookie.getName().equals(key)) {
-//                        // 取出cookie的值
-//                        value = cookie.getValue();
-//                        return value;
-//                    }
-//                }
-//            }
-//
-//            if (session != null){
-//                Map user_info = (Map) session.getAttribute(token);
-//                if (user_info != null){
-//                    return user_info.get("uid").toString();
-//                }
-//            }
-//
-//            //没找到返回null
-//            return null;
-//        }
-        if (key.length() != 64){
+        //这里获取session_id
+        //key = session_id + token  其中token是32位的
+        if (key.length() != 32 && key.length() != 64){
             return null;
         }
+        String session_id = key.substring(0,key.length() - 32);
         //获取token
         String token = key.substring(key.length()-32);
-        return RedisPoolUtil.get(token);
+        MySessionContext myc= MySessionContext.getInstance();
+        HttpSession session = myc.getSession(session_id);
+        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+        if(null == cookies && session == null) {
+            //没有cookie
+            return null;
+        }else{
+            if (cookies != null){
+                String value = "";
+                for(Cookie cookie : cookies){
+                    //找到
+                    if (cookie.getName().equals(key)) {
+                        // 取出cookie的值
+                        value = cookie.getValue();
+                        return value;
+                    }
+                }
+            }
+
+            if (session != null){
+                Map user_info = (Map) session.getAttribute(token);
+                if (user_info != null){
+                    return user_info.get("uid").toString();
+                }
+            }
+
+            //没找到返回null
+            return null;
+        }
+//        if (key.length() != 64){
+//            return null;
+//        }
+//        //获取token
+//        String token = key.substring(key.length()-32);
+//        return RedisPoolUtil.get(token);
     }
 
     //获取cookie中某个键值的值，没有的话返回null
@@ -1015,21 +1015,32 @@ public class CommonFunc {
         AccessToken token = null;
         String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
         String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
-        // 发起GET请求获取凭证
-        JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
-
-        if (null != jsonObject) {
+        String access_token;
+        //判断如果缓存里有的话直接返回
+        if (LocalCache.containsKey("wxminiprogramaccesstoken")){
+            access_token = LocalCache.get("wxminiprogramaccesstoken").toString();
+            System.out.println("缓存");
+        }else{
+            // 发起GET请求获取凭证
+            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
             try {
-                token = new AccessToken();
-                token.setAccessToken(jsonObject.getString("access_token"));
-                token.setExpiresIn(jsonObject.getInteger("expires_in"));
+                access_token = jsonObject.getString("access_token");
+                //存入缓存
+                LocalCache.put("wxminiprogramaccesstoken", access_token, 7100);
+                System.out.println("生成");
             } catch (JSONException e) {
                 token = null;
                 // 获取token失败
                 System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
-//                log.error("获取token失败 errcode:{} errmsg:{}", jsonObject.getInteger("errcode"), jsonObject.getString("errmsg"));
+                return token;
             }
         }
+
+//        if (null != jsonObject) {
+        token = new AccessToken();
+        token.setAccessToken(access_token);
+        token.setExpiresIn(7200);
+//        }
         return token;
     }
 
