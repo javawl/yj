@@ -1940,7 +1940,7 @@ public class HomeServiceImpl implements IHomeService {
                         list.add(new TemplateData("万元挑战赛" ,"#173177"));
                         list.add(new TemplateData( plan,"#173177"));
                         list.add(new TemplateData("99天" ,"#173177"));
-                        list.add(new TemplateData("点击分享至朋友圈就可以完成今日的挑战任务啦~~~" ,"#173177"));
+                        list.add(new TemplateData("分享到朋友圈秀秀自己的学习成果吧~~~" ,"#173177"));
                         officialAccountTmpMessage.setParams(list);
                         CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
                     }
