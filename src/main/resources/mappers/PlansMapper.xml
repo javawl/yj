@@ -92,4 +92,18 @@
       dictionary_type = #{dictionaryType,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  
+
+
+  <!--///////////////////////////////////下面是自己添加的实现/////////////////////////////////////////////////-->
+  <!--////////////////////////////////版本0.3Dao层实现/////////////////////////////////////////-->
+  
+  <insert id="insertIntimateRelationship" parameterType="string">
+    INSERT INTO `intimate_relationship` (user_id_one, user_id_two)
+    VALUES (#{user_id_one}, #{user_id_two})
+  </insert>
+
+
+  <!--////////////////////////////////////版本0.3Dao层实现下闭合线/////////////////////////////////////-->
 </mapper>
