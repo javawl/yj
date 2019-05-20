@@ -92,6 +92,9 @@ public interface DictionaryMapper {
     //判断今天是否打卡
     Map<Object,Object> checkInsistDayMessage(@Param("user_id") String user_id,@Param("time") String time);
 
+    //判断今天是否已经打卡
+    Map<Object,Object> checkInsistDayClockInMessage(@Param("user_id") String user_id,@Param("time") String time);
+
     //取出回复评论的
     Map getLikeOfFeedsReplyComment(@Param("id") String id);
 

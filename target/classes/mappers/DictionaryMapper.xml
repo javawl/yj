@@ -536,6 +536,15 @@
     LIMIT 1
   </select>
 
+  <select id="checkInsistDayClockInMessage" resultType="map">
+    SELECT *
+    FROM insist_day
+    WHERE user_id = #{user_id}
+    AND set_time = #{time}
+    AND is_correct = 2
+    LIMIT 1
+  </select>
+
   <select id="getLikeOfFeedsReplyComment" resultType="map">
     SELECT likes
     FROM feeds_reply_comments

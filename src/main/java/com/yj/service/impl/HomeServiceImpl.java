@@ -152,6 +152,12 @@ public class HomeServiceImpl implements IHomeService {
                 m1.put("challenge_red_packet",SelectPlan.get(0).get("challenge_red_packet"));
                 m1.put("whether_invite_challenge_success",SelectPlan.get(0).get("whether_invite_challenge_success"));
                 m1.put("invite_challenge_red_packet",SelectPlan.get(0).get("invite_challenge_red_packet"));
+                //判断所有计划中是否已经有打过卡的计划
+                if (dictionaryMapper.checkInsistDayClockInMessage(id, one) != null){
+                    m1.put("whether_clock_in", 1);
+                }else {
+                    m1.put("whether_clock_in", 0);
+                }
                 //判断用户是否需要看视频
                 if (advertising_time == null){
                     m1.put("need_advertising", 1);
@@ -1393,7 +1399,7 @@ public class HomeServiceImpl implements IHomeService {
                 //取出状态
                 int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
                 //计算总的
-                if (is_correct == 0 || is_correct == 1) {
+                if (is_correct == 0) {
                     //完成任务
                     if (today_learned_number >= number) {
                         number = 0;
@@ -1402,7 +1408,7 @@ public class HomeServiceImpl implements IHomeService {
                     }
                 } else{
                     //用户需要完成第二次任务
-                    if (is_correct == 2){
+                    if (is_correct == 1){
                         if (today_learned_number >= (2 * number)) {
                             number = 0;
                         } else {
@@ -1853,12 +1859,13 @@ public class HomeServiceImpl implements IHomeService {
             String one = CommonFunc.getOneDate();
             String timeStamp = String.valueOf((new Date()).getTime());
             //查看坚持天数表中有没有数据
+            Map getInsistDay = dictionaryMapper.checkInsistDayClockInMessage(id, one);
 //            Map getInsistDay = dictionaryMapper.getInsistDayMessage(id,plan,one);
-            Map getInsistDay = dictionaryMapper.checkInsistDayMessage(id, one);
-            if (getInsistDay == null){
-                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
-            }
+//            if (getInsistDay == null){
+//                return ServerResponse.createByErrorMessage("您还未完成任务，不可打卡！");
+//            }
             //取出状态
+            //防止其他计划打卡
             int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
             if (is_correct >= 2){
                 return ServerResponse.createByErrorMessage("您已经打过卡了！");
