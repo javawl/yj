@@ -1866,10 +1866,14 @@ public class HomeServiceImpl implements IHomeService {
 //            }
             //取出状态
             //防止其他计划打卡
-            int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
-            if (is_correct >= 2){
+//            int is_correct = Integer.valueOf(getInsistDay.get("is_correct").toString());
+//            if (is_correct >= 2){
+//                return ServerResponse.createByErrorMessage("您已经打过卡了！");
+//            }
+            if (getInsistDay != null){
                 return ServerResponse.createByErrorMessage("您已经打过卡了！");
             }
+
             //应急万能打卡
 //            if (is_correct == 0){
 //                //每日计划单词数
