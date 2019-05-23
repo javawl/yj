@@ -1712,9 +1712,9 @@ public class HomeServiceImpl implements IHomeService {
                             String level = job.get("level").toString();
                             String word = job.get("word").toString();
                             String word_type = job.get("word_type").toString();
-                            int newOldFlag = 0;
                             if (word_type.equals("new")){
-                                newOldFlag = 1;
+                                //传入标识是 new表示是新单词
+                                learned_word+=1;
                             }
                             //判断不重复
                             if (notCoverList.containsKey(word_id)){
@@ -1732,18 +1732,12 @@ public class HomeServiceImpl implements IHomeService {
                                 //删除已背
                                 dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
                                 if (selectMaster == null){
-                                    if (newOldFlag == 1){
-                                        //传入标识是 new表示是新单词
-                                        learned_word+=1;
-                                    }
                                     int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
                                     if (resultMaster == 0){
                                         throw new Exception();
                                     }
                                 }
                             }else {
-                                //传入标识是 new表示是新单词
-                                if (newOldFlag == 1){ learned_word+=1; }
                                 //判断是否已背单词状态表里已有
                                 int isOld = 0;
                                 for (int tmp = 0; tmp < selectReciting.size(); tmp++){
