@@ -1666,6 +1666,9 @@ public class HomeServiceImpl implements IHomeService {
     //背单词清算
     public ServerResponse<String> liquidation_word(String word_list,HttpServletRequest request){
         String token = request.getHeader("token");
+        //判断前端是否是新版本，旧版本的话继续使用旧的
+        String version = request.getHeader("version");
+        if (version == null || version.equals("")){  version = "0"; }
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(token);
@@ -1698,51 +1701,114 @@ public class HomeServiceImpl implements IHomeService {
                     int plan_words_number = Integer.valueOf(user_info.get("plan_words_number").toString());
                     //防重复
                     Map<String,String> notCoverList = new HashMap<>();
-                    for(int i=0;i<word_list_json.size();i++){
-                        net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
-                        String word_id = job.get("id").toString();
-                        String right_time = String.valueOf(new Date().getTime());
-                        String level = job.get("level").toString();
-                        String word = job.get("word").toString();
-                        //判断不重复
-                        if (notCoverList.containsKey(word_id)){
-                            logger.error("上传单词出现重复单词");
-                            continue;
-                        }else {
-                            notCoverList.put(word_id, "1");
-                        }
-                        String meaning = job.get("meaning").toString();
-                        //判断是否掌握
-                        if (Integer.valueOf(level) == 5){
-                            String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
-                            if (selectMaster == null){
-                                //删除已背单词
-                                int deleteMaster = dictionaryMapper.deleteRecitingWord(word_id,id,plan,word);
-                                if (deleteMaster == 0){
-                                    //删不了说明没有，是点pass进来的背单词数加一
-                                    learned_word+=1;
-                                }
-                                int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
-                                if (resultMaster == 0){
-                                    throw new Exception();
-                                }
+                    //判断是那个版本的
+                    if (version.equals("1")){
+                        //查出用户所有已背状态的单词
+                        List<Map<Object,Object>> selectReciting = dictionaryMapper.selectUserAllRecitingWord(id,plan);
+                        for(int i=0;i<word_list_json.size();i++){
+                            net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
+                            String word_id = job.get("id").toString();
+                            String right_time = String.valueOf(new Date().getTime());
+                            String level = job.get("level").toString();
+                            String word = job.get("word").toString();
+                            String word_type = job.get("word_type").toString();
+                            int newOldFlag = 0;
+                            if (word_type.equals("new")){
+                                newOldFlag = 1;
                             }
-                        }else {
-                            String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
-                            if (selectReciting == null){
-                                learned_word+=1;
-                                int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning, right_time);
-                                if (resultReciting == 0){
-                                    throw new Exception();
+                            //判断不重复
+                            if (notCoverList.containsKey(word_id)){
+                                logger.error("上传单词出现重复单词");
+                                continue;
+                            }else {
+                                notCoverList.put(word_id, "1");
+                            }
+                            String meaning = job.get("meaning").toString();
+
+
+                            //判断是否掌握
+                            if (Integer.valueOf(level) == 5){
+                                String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
+                                //删除已背
+                                dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
+                                if (selectMaster == null){
+                                    if (newOldFlag == 1){
+                                        //传入标识是 new表示是新单词
+                                        learned_word+=1;
+                                    }
+                                    int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
+                                    if (resultMaster == 0){
+                                        throw new Exception();
+                                    }
                                 }
                             }else {
-                                int resultReciting = dictionaryMapper.updateRecitingWord(word_id,id,right_time,plan,word,level);
-                                if (resultReciting == 0){
-                                    throw new Exception();
+                                //传入标识是 new表示是新单词
+                                if (newOldFlag == 1){ learned_word+=1; }
+                                //判断是否已背单词状态表里已有
+                                int isOld = 0;
+                                for (int tmp = 0; tmp < selectReciting.size(); tmp++){
+                                    if (selectReciting.get(tmp).get("word_id").toString().equals("word_id")){ isOld = 1; }
+                                }
+                                //没有记录直接插
+                                if (isOld == 0){
+                                    int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning, right_time);
+                                    if (resultReciting == 0){
+                                        throw new Exception();
+                                    }
+                                }else {
+                                    //有记录更改
+                                    dictionaryMapper.updateRecitingWord(word_id,id,right_time,plan,word,level);
+                                }
+                            }
+                        }
+                    }else {
+                        for(int i=0;i<word_list_json.size();i++){
+                            net.sf.json.JSONObject job = word_list_json.getJSONObject(i);
+                            String word_id = job.get("id").toString();
+                            String right_time = String.valueOf(new Date().getTime());
+                            String level = job.get("level").toString();
+                            String word = job.get("word").toString();
+                            //判断不重复
+                            if (notCoverList.containsKey(word_id)){
+                                logger.error("上传单词出现重复单词");
+                                continue;
+                            }else {
+                                notCoverList.put(word_id, "1");
+                            }
+                            String meaning = job.get("meaning").toString();
+                            //判断是否掌握
+                            if (Integer.valueOf(level) == 5){
+                                String selectMaster = dictionaryMapper.selectMasteredWord(word_id,id,right_time,plan,word);
+                                if (selectMaster == null){
+                                    //删除已背单词
+                                    int deleteMaster = dictionaryMapper.deleteRecitingWord(word_id,id,plan,word);
+                                    if (deleteMaster == 0){
+                                        //删不了说明没有，是点pass进来的背单词数加一
+                                        learned_word+=1;
+                                    }
+                                    int resultMaster = dictionaryMapper.insertMasteredWord(word_id,id,right_time,plan,word,meaning);
+                                    if (resultMaster == 0){
+                                        throw new Exception();
+                                    }
+                                }
+                            }else {
+                                String selectReciting = dictionaryMapper.selectRecitingWord(word_id,id,right_time,plan,word,level);
+                                if (selectReciting == null){
+                                    learned_word+=1;
+                                    int resultReciting = dictionaryMapper.insertRecitingWord(word_id,id,right_time,plan,word,level,meaning, right_time);
+                                    if (resultReciting == 0){
+                                        throw new Exception();
+                                    }
+                                }else {
+                                    int resultReciting = dictionaryMapper.updateRecitingWord(word_id,id,right_time,plan,word,level);
+                                    if (resultReciting == 0){
+                                        throw new Exception();
+                                    }
                                 }
                             }
                         }
                     }
+
                     int resultUpdate = dictionaryMapper.updateLearnedWord(learned_word,id,plan);
                     if (resultUpdate == 0){
                         throw new Exception();
@@ -1774,14 +1840,14 @@ public class HomeServiceImpl implements IHomeService {
                         //插入
                         if (learned_word >= plan_words_number){
                             //已经完成任务，状态改为1
-                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,1);
+                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,1, version);
                             if (insertResult == 0){
                                 throw new Exception();
                             }
 //                            common_config.changeDailyFinishWork(1,one);
 
                         }else {
-                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,0);
+                            int insertResult = dictionaryMapper.insertInsistDay(id,plan,learned_word,one,0, version);
                             if (insertResult == 0){
                                 throw new Exception();
                             }
@@ -1796,7 +1862,7 @@ public class HomeServiceImpl implements IHomeService {
                         //计算总的
                         if (((today_learned_number + learned_word) >= plan_words_number )&& is_correct == 0){
                             //完成任务
-                            int updateResult = dictionaryMapper.changeInsistDayStatus(1,learned_word,plan,one,id);
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(1,learned_word,plan,one,id, version);
                             if (updateResult == 0){
                                 throw new Exception();
                             }
@@ -1805,7 +1871,7 @@ public class HomeServiceImpl implements IHomeService {
                         }
                         if (((today_learned_number + learned_word) >= (2 * plan_words_number)) && is_correct == 2){
                             //完成双倍任务
-                            int updateResult = dictionaryMapper.changeInsistDayStatus(3,learned_word,plan,one,id);
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(3,learned_word,plan,one,id, version);
                             if (updateResult == 0){
                                 throw new Exception();
                             }
@@ -1814,7 +1880,7 @@ public class HomeServiceImpl implements IHomeService {
 
                         if (flag == 0){
                             //没完成不变
-                            int updateResult = dictionaryMapper.changeInsistDayStatus(is_correct,learned_word,plan,one,id);
+                            int updateResult = dictionaryMapper.changeInsistDayStatus(is_correct,learned_word,plan,one,id, version);
                             if (updateResult == 0){
                                 throw new Exception();
                             }

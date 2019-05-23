@@ -756,6 +756,7 @@
     WHERE plan = #{plan}
     AND set_time = #{set_time}
     AND user_id = #{user_id}
+    AND version = #{version}
   </update>
 
   <update id="changeUserInsistDayStatus" parameterType="string">
@@ -918,8 +919,8 @@
   </insert>
 
   <insert id="insertInsistDay">
-    INSERT INTO insist_day (user_id, plan, set_time,today_word_number,is_correct)
-    values (#{user_id}, #{plan}, #{set_time},#{today_word_number},#{is_correct})
+    INSERT INTO insist_day (user_id, plan, set_time,today_word_number,is_correct, version)
+    values (#{user_id}, #{plan}, #{set_time},#{today_word_number},#{is_correct}, #{version})
   </insert>
 
   <update id="updateInsistDay">
@@ -1401,6 +1402,11 @@
   <select id="selectRecitingWord" parameterType="string" resultType="string">
     SELECT id FROM reciting_words WHERE word_id=#{word_id} AND user_id = #{user_id} AND plan = #{plan}
     LIMIT 1
+  </select>
+
+
+  <select id="selectUserAllRecitingWord" parameterType="string" resultType="map">
+    SELECT word_id FROM reciting_words WHERE user_id = #{user_id} AND plan = #{plan}
   </select>
 
   <select id="getVideoInfoByWordId" resultType="map" parameterType="string">

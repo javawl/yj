@@ -142,7 +142,7 @@ public interface DictionaryMapper {
     int changeYJFavour(@Param("favours") String favours,@Param("id") String id);
 
     //修改打卡表信息
-    int changeInsistDayStatus(@Param("is_correct") int is_correct,@Param("today_word_number") int today_word_number,@Param("plan") String plan,@Param("set_time") String set_time,@Param("user_id") String user_id);
+    int changeInsistDayStatus(@Param("is_correct") int is_correct,@Param("today_word_number") int today_word_number,@Param("plan") String plan,@Param("set_time") String set_time,@Param("user_id") String user_id,@Param("version") String version);
 
     //修改用户打卡表信息
     int changeUserInsistDayStatus(@Param("id") String id);
@@ -172,7 +172,7 @@ public interface DictionaryMapper {
     int insertVideoComment(@Param("comment") String comment,@Param("user_id") String user_id,@Param("video_id") String video_id,@Param("set_time") String set_time);
 
     //打卡表插入数据
-    int insertInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("today_word_number") int today_word_number,@Param("set_time") String set_time,@Param("is_correct") int is_correct);
+    int insertInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("today_word_number") int today_word_number,@Param("set_time") String set_time,@Param("is_correct") int is_correct,@Param("version") String version);
 
     //打卡表更改数据
     int updateInsistDay(@Param("user_id") String user_id,@Param("plan") String plan,@Param("set_time") String set_time,@Param("is_correct") int is_correct);
@@ -554,6 +554,9 @@ public interface DictionaryMapper {
 
     //查一下已背单词
     String selectRecitingWord(@Param("word_id") String word_id,@Param("user_id") String user_id,@Param("right_time") String right_time,@Param("plan") String plan,@Param("word") String word,@Param("level") String level);
+
+    //查出用户所有已背单词
+    List<Map<Object,Object>> selectUserAllRecitingWord(@Param("user_id") String user_id,@Param("plan") String plan);
 
     //更新已背单词
     int insertRecitingWord(@Param("word_id") String word_id, @Param("user_id") String user_id, @Param("right_time") String right_time, @Param("plan") String plan, @Param("word") String word, @Param("level") String level, @Param("meaning") String meaning, @Param("register_time") String register_time);
