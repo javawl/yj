@@ -1938,4 +1938,43 @@ public class VariousController {
 
 
     //------------------------------------------------------------------------------------------------------
+
+
+
+    //-----------------------------------------------------------小程序客服---------------------------------------------------------------
+    /**
+     * 接受信息发送信息
+     */
+    @RequestMapping(value="wxMiniProgramCustomerServer.do", method = RequestMethod.POST)
+    @ResponseBody
+    public void wxMiniProgramCustomerServer(PrintWriter out, HttpServletRequest request){
+        //调用service层
+        ServerResponse<String> responseMessage = iVariousService.wxMiniProgramCustomerServer(request);
+    }
+
+
+
+    /**
+     * 测试上传图片
+     */
+    @RequestMapping(value="testUploadPic.do", method = RequestMethod.POST)
+    @ResponseBody
+    public void testUploadPic(String filePath, HttpServletRequest request){
+
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String normalAccessToken =  access_token.getAccessToken();
+//            String url = String.format("https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image", normalAccessToken);
+//            Map<String, String> params = new HashMap<>();
+//            params.put("access_token", normalAccessToken);
+//            params.put("type", "image");
+//            System.out.println(HttpsUtil.doPostFile(url, JSON.toJSONString(params), "https://file.ourbeibei.com/l_e/common/share_img11.png"));
+            System.out.println(HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/share_img11.png", normalAccessToken, "image"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //-----------------------------------------------------小程序客服（下闭合线）----------------------------------------------------------
 }

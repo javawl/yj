@@ -211,4 +211,8 @@ public interface IVariousService {
 
     //报名页
     ServerResponse<Map<Object,Object>> liveCourseApplicationPage(HttpServletRequest request);
+
+
+    //小程序客服自动回复
+    ServerResponse<String> wxMiniProgramCustomerServer(HttpServletRequest request);
 }

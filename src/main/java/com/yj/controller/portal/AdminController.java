@@ -1925,7 +1925,7 @@ public class AdminController {
                         }
 
                         //拨正
-                        userMapper.changeExitApplicationPage(needToSentPayRemindUsers.get(i).toString(), "0");
+                        userMapper.changeExitApplicationPage(needToSentPayRemindUsers.get(i).get("id").toString(), "0");
                     }
                 }
             }
@@ -4500,4 +4500,5 @@ public class AdminController {
             return LRULocalCache.get(key).toString();
         }
     }
+
 }

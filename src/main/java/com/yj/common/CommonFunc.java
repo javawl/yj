@@ -1351,4 +1351,38 @@ public class CommonFunc {
             }
         }
     }
+
+    /**
+     * 缓存统一接口设置
+     *
+     * @param key
+     * @param value
+     * @param timeout 有效时长
+     */
+    public static void setCache(String key, Object value, int timeout) {
+        //存入缓存
+        LocalCache.put(key, value, timeout);
+        System.out.println("生成");
+    }
+
+
+    /**
+     * 缓存统一接口判断
+     *
+     * @param key
+     */
+    public static boolean cacheContainsKey(String key)  {
+        return LocalCache.containsKey(key);
+    }
+
+
+    /**
+     * 缓存统一接口取出
+     *
+     * @param key
+     */
+    public static Object getCache(String key)  {
+        return LocalCache.get(key);
+    }
+
 }
