@@ -1224,27 +1224,30 @@ public class AdminController {
         try {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
             //给所有用户发送
-            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), String.valueOf((new Date()).getTime()));
+            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), nowTime);
             for(int i = 0; i < all_user.size(); i++){
 //                //查没过期的from_id
 //                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
 //
 //                if (info != null){
-                    common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
-                    //发送模板消息
-                    WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_ID1);
-                    wxMssVo.setAccess_token(access_token.getAccessToken());
-                    wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_HOME_PATH);
-                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                    wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
-                    List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
-                    list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
-                    wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_ID1);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
+                wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                wxMssVo.setPage(Const.WX_HOME_PATH);
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
+                list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
+                wxMssVo.setParams(list);
+                CommonFunc.sendTemplateMessage(wxMssVo);
+                //记录发送的情况
+                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "大佬您的xxx还没完成", nowTime);
 //                }
             }
         }catch (Exception e){
@@ -1271,8 +1274,9 @@ public class AdminController {
         try {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
             //给所有用户发送
-            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), String.valueOf((new Date()).getTime()));
+            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), nowTime);
             //查找明天奖品
             String prize = common_configMapper.getDrawName(CommonFunc.getNextDate12());
             for(int i = 0; i < all_user.size(); i++){
@@ -1295,7 +1299,8 @@ public class AdminController {
                 list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
                 wxMssVo.setParams(list);
                 CommonFunc.sendTemplateMessage(wxMssVo);
-
+                //记录发送的情况
+                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "完成学习任务就可参加抽奖获XXX", nowTime);
 //                }
             }
         }catch (Exception e){
@@ -1322,8 +1327,9 @@ public class AdminController {
         try{
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
             //给所有用户发送
-            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), String.valueOf((new Date()).getTime()));
+            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), nowTime);
             for(int i = 0; i < all_user.size(); i++){
                 //查没过期的from_id
 //                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
@@ -1343,6 +1349,8 @@ public class AdminController {
                     list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
                     CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "每天起床第一句", nowTime);
 //                }
             }
         }catch (Exception e){
@@ -1401,11 +1409,12 @@ public class AdminController {
         try {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
             //给所有用户发送
             List<Map<Object,Object>> all_user =  common_configMapper.getAllDrawWxUser(String.valueOf(prize_id));
             for(int i = 0; i < all_user.size(); i++){
                 //查没过期的from_id
-                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(), nowTime);
                 if (info != null){
                     //删除这个form_id
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
@@ -1422,6 +1431,8 @@ public class AdminController {
                     list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
                     CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "今天的幸运儿已经诞生了", nowTime);
                 }
             }
         }catch (Exception e){
