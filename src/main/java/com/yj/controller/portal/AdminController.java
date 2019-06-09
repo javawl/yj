@@ -1353,6 +1353,7 @@ public class AdminController {
                     common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "每天起床第一句", nowTime);
 //                }
             }
+            return JSON.toJSONString(all_user);
         }catch (Exception e){
             logger.error("发送模板消息三异常",e.getStackTrace());
             logger.error("发送模板消息三异常",e);
