@@ -1225,30 +1225,36 @@ public class AdminController {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
             String nowTime = String.valueOf((new Date()).getTime());
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
             //给所有用户发送
-            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUser(CommonFunc.getOneDate(), nowTime);
+            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUserLoginAndNotLogin(one, nowTime);
             for(int i = 0; i < all_user.size(); i++){
 //                //查没过期的from_id
 //                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("id").toString(),String.valueOf((new Date()).getTime()));
 //
 //                if (info != null){
-                common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
-                //发送模板消息
-                WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_ID1);
-                wxMssVo.setAccess_token(access_token.getAccessToken());
-                wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
-                wxMssVo.setPage(Const.WX_HOME_PATH);
-                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
-                List<TemplateData> list = new ArrayList<>();
-                list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
-                list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
-                wxMssVo.setParams(list);
-                CommonFunc.sendTemplateMessage(wxMssVo);
-                //记录发送的情况
-                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "大佬您的xxx还没完成", nowTime);
+                //查看是否完成计划
+                //判断所有计划中是否已经有打过卡的计划
+                if (dictionaryMapper.checkInsistDayClockInMessage(all_user.get(i).get("user_id").toString(), one) == null){
+                    common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID1);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
+                    list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
+                    wxMssVo.setParams(list);
+                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "大佬您的xxx还没完成", nowTime);
 //                }
+                }
             }
         }catch (Exception e){
             logger.error("发送模板消息一异常",e.getStackTrace());
@@ -1300,7 +1306,7 @@ public class AdminController {
                 wxMssVo.setParams(list);
                 CommonFunc.sendTemplateMessage(wxMssVo);
                 //记录发送的情况
-                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "完成学习任务就可参加抽奖获XXX", nowTime);
+                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "完成学习任务就可参加抽奖获XXX", nowTime);
 //                }
             }
         }catch (Exception e){
@@ -1350,7 +1356,7 @@ public class AdminController {
                     wxMssVo.setParams(list);
                     CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "每天起床第一句", nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "每天起床第一句", nowTime);
 //                }
             }
             return JSON.toJSONString(all_user);

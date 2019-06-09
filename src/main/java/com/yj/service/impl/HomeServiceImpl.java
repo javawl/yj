@@ -1972,12 +1972,12 @@ public class HomeServiceImpl implements IHomeService {
                 common_config.changeDailyFinishWork(1,one);
 
                 //如果是微信用户的话加进抽奖名单
-//                if (token.length() > 32){
-//                    String act = common_config.getDrawId(CommonFunc.getNextDate12());
-//                    if (act != null){
-//                        common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
-//                    }
-//                }
+                if (token.length() > 32){
+                    String act = common_config.getDrawId(CommonFunc.getNextDate12());
+                    if (act != null){
+                        common_config.insertLotteryDrawReal(id,act,CommonFunc.getNextDate12(),"0");
+                    }
+                }
 
                 //如果参加了正在进行的单词挑战的话坚持天数加一
                 //找出是否有正在进行的计划并且该用户参加了
