@@ -2417,10 +2417,17 @@
     where feeds_id = #{id}))
   </delete>
 
-
-
   <insert id="insertTmpSendMsgRecord" parameterType="string">
-    INSERT INTO tmp_send_msg_record (user_id,remarks,set_time)
-    values (#{user_id},#{remarks},#{set_time})
+    INSERT INTO tmp_send_msg_record (user_id,remarks,info,set_time)
+    values (#{user_id},#{remarks},#{info},#{set_time})
   </insert>
+
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>运营0.3>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <select id="checkUserDatingVip" parameterType="string" resultType="string">
+    SELECT dating_vip
+    FROM `user`
+    WHERE user_id = #{user_id}
+  </select>
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 </mapper>

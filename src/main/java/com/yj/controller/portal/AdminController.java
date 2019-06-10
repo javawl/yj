@@ -1250,9 +1250,9 @@ public class AdminController {
                     list.add(new TemplateData(all_user.get(i).get("my_plan").toString(),"#ffffff"));
                     list.add(new TemplateData("大佬您的《"+ all_user.get(i).get("my_plan").toString() +"》还没有做完噢！","#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "大佬您的xxx还没完成", nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "大佬您的xxx还没完成", info, nowTime);
 //                }
                 }
             }
@@ -1307,9 +1307,9 @@ public class AdminController {
                     list.add(new TemplateData("完成学习任务就可参加抽奖获" + prize, "#ffffff"));
                     list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~", "#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "完成学习任务就可参加抽奖获XXX", nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "完成学习任务就可参加抽奖获XXX", info, nowTime);
 //                }
                 }
             }
@@ -1358,9 +1358,9 @@ public class AdminController {
                     list.add(new TemplateData("每天起床第一句，宝贝快来背呗背单词嘛~~","#ffffff"));
                     list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "每天起床第一句", nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "每天起床第一句", info, nowTime);
 //                }
             }
             return JSON.toJSONString(all_user);
@@ -1441,9 +1441,9 @@ public class AdminController {
                     list.add(new TemplateData("今天的幸运儿已经诞生啦，快来看看是不是你吧~~","#ffffff"));
                     list.add(new TemplateData("如果不想再收到背呗的提醒了，在“我的”就可以进行设置啦~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "今天的幸运儿已经诞生了", nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "今天的幸运儿已经诞生了", wx_info, nowTime);
                 }
             }
         }catch (Exception e){
@@ -1487,7 +1487,7 @@ public class AdminController {
                 }
 
                 //查没过期的from_id
-                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),nowTime);
 
                 if (info != null){
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
@@ -1503,7 +1503,9 @@ public class AdminController {
                     list.add(new TemplateData("第" + all_user.get(i).get("periods").toString() + "期单词挑战","#ffffff"));
                     list.add(new TemplateData("口喜口喜明天单词挑战就要开始啦~你准备好了吗~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "口喜口喜明天单词挑战就要开始啦", wx_info, nowTime);
                 }
             }
         }catch (Exception e){
@@ -1534,7 +1536,7 @@ public class AdminController {
             List<Map<Object,Object>> all_user =  common_configMapper.getInBeginningWordChallengeUser(nowTime);
             for(int i = 0; i < all_user.size(); i++){
                 //查没过期的from_id
-                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),nowTime);
 
                 if (info != null){
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
@@ -1550,7 +1552,9 @@ public class AdminController {
                     list.add(new TemplateData("第" + all_user.get(i).get("periods").toString() + "期单词挑战","#ffffff"));
                     list.add(new TemplateData("嘿~你的挑战金还在背呗这里呢~~不背单词背呗就拿去买奶茶啦~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "你的挑战金还在背呗这里呢", wx_info, nowTime);
                 }
             }
         }catch (Exception e){
@@ -1606,9 +1610,9 @@ public class AdminController {
                     //不能使用免死金牌
                     continue;
                 }
-
+                String nowTime = String.valueOf((new Date()).getTime());
                 //查没过期的from_id
-                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),String.valueOf((new Date()).getTime()));
+                Map<Object,Object> info = common_configMapper.getTmpInfo(all_user.get(i).get("user_id").toString(),nowTime);
 
                 if (info != null){
                     common_configMapper.deleteTemplateMsg(info.get("id").toString());
@@ -1625,7 +1629,9 @@ public class AdminController {
                     list.add(new TemplateData("哎呀~宝贝你已经3天忘记打卡啦！！" ,"#ffffff"));
                     list.add(new TemplateData("背呗悄悄送你一张免死金牌，下次可不能再偷懒了哟！快快点击领取吧~~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "背呗悄悄送你一张免死金牌", wx_info, nowTime);
                 }
             }
         }catch (Exception e){

@@ -24,6 +24,7 @@
     <bean id="iGameService" class="com.yj.service.impl.GameServiceImpl"></bean>
     <bean id="iZbh1Service" class="com.yj.service.impl.Zbh1ServiceImpl"></bean>
     <bean id="iLzy1Service" class="com.yj.service.impl.Lzy1ServiceImpl"></bean>
+    <bean id="iOperationService" class="com.yj.service.impl.OperationServiceImpl"></bean>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>
