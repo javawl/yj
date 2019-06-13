@@ -4997,10 +4997,11 @@ public class VariousServiceImpl implements IVariousService {
 
                 miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
 
-//                String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
-//                System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
+                String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
+                String result = HttpsUtil.doPost(requestURL, jsonStr, "UTF-8");
+                logger.error("测试客服", result);
 
-                responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
+//                responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
             }catch (Exception e){
                 logger.error("回复客服消息失败", e.getStackTrace());
                 logger.error("回复客服消息失败", e);
