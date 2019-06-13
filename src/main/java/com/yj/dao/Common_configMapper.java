@@ -978,4 +978,24 @@ public interface Common_configMapper {
     String checkUserDatingVip(@Param("user_id") String user_id);
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>脚本>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    //在目标词汇表里查出本词汇表没有的单词
+    List<Map<String, Object>> findWordNotExistInThisDictionary(@Param("sourceDictionaryType") String sourceDictionaryType, @Param("targetDictionaryType") String targetDictionaryType, @Param("size") int size);
+
+
+    //找出原词汇表的重复单词，除了第一次出现的，后面不管出现多少词都算入重复单词表
+    List<Map<String, Object>> findDictionaryRepeatWord(@Param("sourceDictionaryType") String sourceDictionaryType);
+
+
+    //删除视频表中该单词的视频信息
+    int deleteWordVideoInformationByWordId(@Param("word_id") String word_id);
+
+    //删除字幕表中该单词的字幕信息
+    int deleteSubtitlesByVideoId(@Param("video_id") String video_id);
+
+    //删除某单词所有的单词笔记
+    int deleteWordNoteByWordId(@Param("word_id") String word_id);
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }

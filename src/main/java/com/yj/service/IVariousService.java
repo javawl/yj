@@ -214,5 +214,8 @@ public interface IVariousService {
 
 
     //小程序客服自动回复
-    ServerResponse<String> wxMiniProgramCustomerServer(HttpServletRequest request);
+    String wxMiniProgramCustomerServer(HttpServletRequest request);
+
+
+    void checkWechatMiniProgramCustomerServer(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response);
 }

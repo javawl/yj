@@ -124,6 +124,20 @@ public class WechatMessageUtil {
 
 
     /**
+     * 文本消息转化为xml
+     *
+     * @param textMessage
+     * @return
+     */
+    public static String miniProgramCustomerServerMessageToXml(MiniProgramCustomerServerImage textMessage) {
+        XStream xstream = new XStream();
+        xstream.alias("xml", textMessage.getClass());
+        return xstream.toXML(textMessage);
+
+    }
+
+
+    /**
      * 图文消息转化为XML
      *
      * @param newsMessage

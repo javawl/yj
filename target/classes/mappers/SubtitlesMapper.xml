@@ -103,4 +103,13 @@
       video_id = #{videoId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <!--自己添加-->
+  <insert id="insertSubtitles" parameterType="com.yj.pojo.Subtitles" useGeneratedKeys="true" keyProperty="id">
+    insert into subtitles (id, st, et, en,
+                           cn, video_id)
+    values (#{id,jdbcType=INTEGER}, #{st,jdbcType=VARCHAR}, #{et,jdbcType=VARCHAR}, #{en,jdbcType=VARCHAR},
+            #{cn,jdbcType=VARCHAR}, #{videoId,jdbcType=INTEGER})
+  </insert>
 </mapper>

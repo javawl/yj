@@ -5,7 +5,10 @@ import com.google.common.collect.Lists;
 import com.yj.common.*;
 import com.yj.controller.portal.AdminController;
 import com.yj.dao.*;
+import com.yj.pojo.Dictionary;
 import com.yj.pojo.Feeds;
+import com.yj.pojo.Subtitles;
+import com.yj.pojo.Word_video_information;
 import com.yj.service.IAdminService;
 import com.yj.service.IFileService;
 import com.yj.util.ExcelUtil;
@@ -53,6 +56,12 @@ public class AdminServiceImpl implements IAdminService {
 
     @Autowired
     private Reciting_wordsMapper reciting_wordsMapper;
+
+    @Autowired
+    private Word_video_informationMapper word_video_informationMapper;
+
+    @Autowired
+    private SubtitlesMapper subtitlesMapper;
 
     @Autowired
     private IFileService iFileService;
@@ -1740,5 +1749,166 @@ public class AdminServiceImpl implements IAdminService {
 
         return ServerResponse.createBySuccess(dictionaryMapper.countVirtualUserGame(), userInfo);
     }
+
+
+    //展示查看数据
+    @Override
+    public ServerResponse<String> checkAndReplaceDictionaryRepeat(String token, String sourceDictionaryType,String targetDictionaryType,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+            add(sourceDictionaryType);
+            add(targetDictionaryType);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证身份
+        if (!token.equals("TryToCheckIdentityWhenCheckAndReplaceDictionaryRepeat")){
+            return ServerResponse.createByErrorMessage("验证错误!");
+        }
+        //在别的词汇找出本词汇没有的单词(取多少个)
+        List<Map<String, Object>> newWord = common_configMapper.findWordNotExistInThisDictionary(sourceDictionaryType, targetDictionaryType, 800);
+        //找出本词汇重复的单词
+        //找出原词汇表的重复单词，除了第一次出现的，后面不管出现多少词都算入重复单词表
+        List<Map<String, Object>> repeatWord = common_configMapper.findDictionaryRepeatWord(sourceDictionaryType);
+        //开启事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try{
+            Dictionary dictionary = new Dictionary();
+            int flag = 0;
+            //遍历重复单词
+            for (int i = 0; i < repeatWord.size(); i++){
+                //将单词内容替换
+                dictionary.setId(Integer.valueOf(repeatWord.get(i).get("id").toString()));
+                dictionary.setWord(newWord.get(flag).get("word").toString());
+                dictionary.setMeaning(newWord.get(flag).get("meaning").toString());
+                dictionary.setType(Integer.valueOf(sourceDictionaryType));
+                if (newWord.get(flag).get("phonetic_symbol_en") != null){
+                    dictionary.setPhoneticSymbolEn(newWord.get(flag).get("phonetic_symbol_en").toString());
+                }
+                if (newWord.get(flag).get("pronunciation_en") != null){
+                    dictionary.setPronunciationEn(newWord.get(flag).get("pronunciation_en").toString());
+                }
+                if (newWord.get(flag).get("sentence") != null){
+                    dictionary.setSentence(newWord.get(flag).get("sentence").toString());
+                }
+                if (newWord.get(flag).get("pic") != null){
+                    dictionary.setPic(newWord.get(flag).get("pic").toString());
+                }
+                if (newWord.get(flag).get("phonetic_symbol_us") != null){
+                    dictionary.setPhoneticSymbolUs(newWord.get(flag).get("phonetic_symbol_us").toString());
+                }
+                if (newWord.get(flag).get("pronunciation_us") != null){
+                    dictionary.setPronunciationUs(newWord.get(flag).get("pronunciation_us").toString());
+                }
+                if (newWord.get(flag).get("phonetic_symbol") != null){
+                    dictionary.setPhoneticSymbol(newWord.get(flag).get("phonetic_symbol").toString());
+                }
+                if (newWord.get(flag).get("pronunciation") != null){
+                    dictionary.setPronunciation(newWord.get(flag).get("pronunciation").toString());
+                }
+                if (newWord.get(flag).get("sentence_cn") != null){
+                    dictionary.setSentenceCn(newWord.get(flag).get("sentence_cn").toString());
+                }
+                if (newWord.get(flag).get("sentence_audio") != null){
+                    dictionary.setSentenceAudio(newWord.get(flag).get("sentence_audio").toString());
+                }
+                if (newWord.get(flag).get("real_meaning") != null){
+                    dictionary.setRealMeaning(newWord.get(flag).get("real_meaning").toString());
+                }
+                if (newWord.get(flag).get("phonetic_symbol_en_Mumbler") != null){
+                    dictionary.setPhoneticSymbolEnMumbler(newWord.get(flag).get("phonetic_symbol_en_Mumbler").toString());
+                }
+                if (newWord.get(flag).get("pronunciation_en_Mumbler") != null){
+                    dictionary.setPronunciationEnMumbler(newWord.get(flag).get("pronunciation_en_Mumbler").toString());
+                }
+                if (newWord.get(flag).get("phonetic_symbol_us_Mumbler") != null){
+                    dictionary.setPhoneticSymbolUsMumbler(newWord.get(flag).get("phonetic_symbol_us_Mumbler").toString());
+                }
+                if (newWord.get(flag).get("pronunciation_us_Mumbler") != null){
+                    dictionary.setPronunciationUsMumbler(newWord.get(flag).get("pronunciation_us_Mumbler").toString());
+                }
+                if (newWord.get(flag).get("meaning_Mumbler") != null){
+                    dictionary.setMeaningMumbler(newWord.get(flag).get("meaning_Mumbler").toString());
+                }
+                if (newWord.get(flag).get("favours") != null){
+                    dictionary.setFavours(Integer.valueOf(newWord.get(flag).get("favours").toString()));
+                }
+                if (newWord.get(flag).get("paraphrase") != null){
+                    dictionary.setParaphrase(newWord.get(flag).get("paraphrase").toString());
+                }
+                //dictionary.setTv(newWord.get(flag).get("tv").toString());
+                //dictionary.setPhrase(newWord.get(flag).get("phrase").toString());
+                //dictionary.setSynonym(newWord.get(flag).get("synonym").toString());
+                //dictionary.setWordOfSimilarForm(newWord.get(flag).get("word_of_similar_form").toString());
+                //dictionary.setStemAffix(newWord.get(flag).get("stem_affix").toString());
+                //覆盖单词信息
+                dictionaryMapper.updateByPrimaryKey(dictionary);
+                //删除原视频信息及字幕，添加新视频信息信息及字幕
+                //查出所有视频信息（为了删除字幕）
+                List<Map> videoList = dictionaryMapper.selectAdminVideo(repeatWord.get(i).get("id").toString());
+                //删除字幕
+                for (int j = 0; j < videoList.size();j++){
+                    common_configMapper.deleteSubtitlesByVideoId(videoList.get(j).get("id").toString());
+                }
+                //删除视频（所有一起删比一条条删好）
+                common_configMapper.deleteWordVideoInformationByWordId(repeatWord.get(i).get("id").toString());
+                //查出所有新单词的视频信息
+                List<Map> newVideoList = dictionaryMapper.selectAdminVideo(newWord.get(flag).get("id").toString());
+                for (int k = 0; k < newVideoList.size(); k++){
+                    //查出视频的字幕
+                    List<Map> newVideoSubtitlesList = dictionaryMapper.selectAdminSubtitles(newVideoList.get(k).get("id").toString());
+                    //先插入视频并获取id
+                    Word_video_information wordVideoInformation = new Word_video_information();
+                    wordVideoInformation.setWordUsage(newVideoList.get(k).get("word_usage").toString());
+                    wordVideoInformation.setRank(Double.valueOf(newVideoList.get(k).get("rank").toString()));
+                    wordVideoInformation.setSentence(newVideoList.get(k).get("sentence").toString());
+                    wordVideoInformation.setSentenceAudio(newVideoList.get(k).get("sentence_audio").toString());
+                    wordVideoInformation.setTranslation(newVideoList.get(k).get("translation").toString());
+                    wordVideoInformation.setViews(Integer.valueOf(newVideoList.get(k).get("views").toString()));
+                    wordVideoInformation.setComments(Integer.valueOf(newVideoList.get(k).get("comments").toString()));
+                    wordVideoInformation.setFavours(Integer.valueOf(newVideoList.get(k).get("favours").toString()));
+                    wordVideoInformation.setVideoName(newVideoList.get(k).get("video_name").toString());
+                    wordVideoInformation.setImg(newVideoList.get(k).get("img").toString());
+                    wordVideoInformation.setTag(newVideoList.get(k).get("tag").toString());
+                    wordVideoInformation.setVideo(newVideoList.get(k).get("video").toString());
+                    //原单词的id
+                    wordVideoInformation.setWordId(Integer.valueOf(repeatWord.get(i).get("id").toString()));
+                    wordVideoInformation.setFilemd(newVideoList.get(k).get("filemd").toString());
+                    wordVideoInformation.setSubindex(newVideoList.get(k).get("subindex").toString());
+                    //插入并且获取新的id
+                    word_video_informationMapper.insertWordVideoInformation(wordVideoInformation);
+                    int newVideoId = wordVideoInformation.getId();
+                    //插入字幕
+                    for (int l = 0; l < newVideoSubtitlesList.size(); l++){
+                        Subtitles subtitles = new Subtitles();
+                        subtitles.setSt(newVideoSubtitlesList.get(l).get("st").toString());
+                        subtitles.setEt(newVideoSubtitlesList.get(l).get("et").toString());
+                        subtitles.setEn(newVideoSubtitlesList.get(l).get("en").toString());
+                        subtitles.setCn(newVideoSubtitlesList.get(l).get("cn").toString());
+                        subtitles.setVideoId(newVideoId);
+                        subtitlesMapper.insertSubtitles(subtitles);
+                    }
+                }
+
+                flag += 1;
+                //删除单词的笔记
+                common_configMapper.deleteWordNoteByWordId(repeatWord.get(i).get("id").toString());
+//                break;
+            }
+
+            transactionManager.commit(status);
+            return ServerResponse.createBySuccessMessage("成功");
+        }catch (Exception e){
+            transactionManager.rollback(status);
+            e.printStackTrace();
+            return ServerResponse.createByErrorMessage("更新出错！");
+        }
+    }
+
 
 }

@@ -14,4 +14,6 @@ public interface Word_video_informationMapper {
     int updateByPrimaryKeySelective(Word_video_information record);
 
     int updateByPrimaryKey(Word_video_information record);
+
+    int insertWordVideoInformation(Word_video_information record);
 }

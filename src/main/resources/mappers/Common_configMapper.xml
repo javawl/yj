@@ -2430,4 +2430,47 @@
     WHERE user_id = #{user_id}
   </select>
   <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>脚本>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+  <select id="findWordNotExistInThisDictionary" resultType="map">
+    SELECT *
+    FROM dictionary
+    WHERE `type` = #{targetDictionaryType}
+    AND word NOT IN
+    (SELECT word FROM dictionary WHERE `type` = #{sourceDictionaryType})
+    LIMIT #{size}
+  </select>
+
+  <select id="findDictionaryRepeatWord" parameterType="string" resultType="map">
+    SELECT id,word
+    FROM dictionary
+    WHERE `type` = #{sourceDictionaryType}
+      AND NOT EXISTS
+      (SELECT 1
+       FROM
+         (SELECT id
+          FROM dictionary
+          WHERE `type` = #{sourceDictionaryType}
+          GROUP BY word) t1
+       WHERE dictionary.id = t1.id)
+    ORDER BY word
+  </select>
+
+  <delete id="deleteWordVideoInformationByWordId" parameterType="string" >
+    DELETE FROM word_video_information
+    where word_id = #{word_id}
+  </delete>
+
+  <delete id="deleteSubtitlesByVideoId" parameterType="string" >
+    DELETE FROM subtitles
+    where video_id = #{video_id}
+  </delete>
+
+  <delete id="deleteWordNoteByWordId" parameterType="string" >
+    DELETE FROM word_note
+    where word_id = #{word_id}
+  </delete>
+
+  <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
 </mapper>

@@ -14,4 +14,6 @@ public interface SubtitlesMapper {
     int updateByPrimaryKeySelective(Subtitles record);
 
     int updateByPrimaryKey(Subtitles record);
+
+    int insertSubtitles(Subtitles record);
 }

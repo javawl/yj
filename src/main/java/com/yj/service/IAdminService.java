@@ -78,4 +78,6 @@ public interface IAdminService {
     ServerResponse<String> settle_accounts_read_class(String id,HttpServletRequest request);
 
     ServerResponse<String> final_confirm(String id,HttpServletRequest request);
+
+    ServerResponse<String> checkAndReplaceDictionaryRepeat(String token, String sourceDictionaryType,String targetDictionaryType,HttpServletRequest request);
 }

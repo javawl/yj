@@ -4529,4 +4529,18 @@ public class AdminController {
         }
     }
 
+
+    /**
+     * 脚本使用别的词汇里本词汇没有的单词替换本词汇里重复的单词
+     * @param token   token防止别人随意调用
+     * @param sourceDictionaryType   查重的词汇类型
+     * @param targetDictionaryType   别的词汇的词汇类型
+     * @return  成功&失败
+     */
+    @RequestMapping(value = "checkAndReplaceDictionaryRepeat.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> checkAndReplaceDictionaryRepeat(String token, String sourceDictionaryType,String targetDictionaryType,HttpServletRequest request){
+        return iAdminService.checkAndReplaceDictionaryRepeat(token, sourceDictionaryType, targetDictionaryType, request);
+    }
+
 }

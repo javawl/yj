@@ -222,4 +222,22 @@
       subindex = #{subindex,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <!--自己添加-->
+  <insert id="insertWordVideoInformation" parameterType="com.yj.pojo.Word_video_information" useGeneratedKeys="true" keyProperty="id">
+    insert into word_video_information (id, word_usage, rank,
+                                        sentence, sentence_audio, translation,
+                                        views, comments, favours,
+                                        video_name, img, tag,
+                                        video, word_id, filemd,
+                                        subindex)
+    values (#{id,jdbcType=INTEGER}, #{wordUsage,jdbcType=VARCHAR}, #{rank,jdbcType=DOUBLE},
+            #{sentence,jdbcType=VARCHAR}, #{sentenceAudio,jdbcType=VARCHAR}, #{translation,jdbcType=VARCHAR},
+            #{views,jdbcType=INTEGER}, #{comments,jdbcType=INTEGER}, #{favours,jdbcType=INTEGER},
+            #{videoName,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR}, #{tag,jdbcType=VARCHAR},
+            #{video,jdbcType=VARCHAR}, #{wordId,jdbcType=INTEGER}, #{filemd,jdbcType=VARCHAR},
+            #{subindex,jdbcType=VARCHAR})
+  </insert>
 </mapper>

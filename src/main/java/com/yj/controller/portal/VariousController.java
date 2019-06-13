@@ -1945,11 +1945,13 @@ public class VariousController {
     /**
      * 接受信息发送信息
      */
-    @RequestMapping(value="wxMiniProgramCustomerServer.do", method = RequestMethod.POST)
+    @RequestMapping(value="checkWechatMiniProgramCustomerServer.do", method = RequestMethod.POST)
     @ResponseBody
     public void wxMiniProgramCustomerServer(PrintWriter out, HttpServletRequest request){
         //调用service层
-        ServerResponse<String> responseMessage = iVariousService.wxMiniProgramCustomerServer(request);
+        String responseMessage = iVariousService.wxMiniProgramCustomerServer(request);
+        out.print(responseMessage);
+        out.flush();
     }
 
 
@@ -1974,6 +1976,60 @@ public class VariousController {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 测试发送客服消息
+     */
+    @RequestMapping(value="testSendMiniProgramCustomerServerMsg.do", method = RequestMethod.POST)
+    @ResponseBody
+    public void testSendMiniProgramCustomerServerMsg(HttpServletRequest request){
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String normalAccessToken =  access_token.getAccessToken();
+            //判断如果缓存里有的话直接返回
+            String mediaId;
+            if (CommonFunc.cacheContainsKey("WeChatPublicNumberQrCodeMediaId")){
+                mediaId = CommonFunc.getCache("WeChatPublicNumberQrCodeMediaId").toString();
+            }else {
+                mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
+                //存缓存
+                CommonFunc.setCache("WeChatPublicNumberQrCodeMediaId", access_token, 3 * 24 * 60 * 60);
+            }
+            //图片信息整体
+            MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
+            //图片里的media_id
+            MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
+            miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
+            //openid
+            miniProgramCustomerServerImage.setTouser("o-3J75YlfGj21A201k7-j1Kx1ALE");
+            //在这里判断缓存
+            //请求微信
+            //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
+            String requestURL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" + normalAccessToken;
+            //设置media_id
+            System.out.println(mediaId);
+            miniProgramCustomerServerPic.setMedia_id(mediaId);
+
+            miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
+
+            String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
+            System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 微信小程序客服首次验证消息的确来自微信服务器
+     */
+    @RequestMapping(value="checkWechatMiniProgramCustomerServer.do", method = RequestMethod.GET)
+    @ResponseBody
+    public void checkWechatMiniProgramCustomerServer(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response){
+        //调用service层
+        iVariousService.checkWechatMiniProgramCustomerServer(signature, timestamp, nonce, echostr, response);
     }
 
     //-----------------------------------------------------小程序客服（下闭合线）----------------------------------------------------------

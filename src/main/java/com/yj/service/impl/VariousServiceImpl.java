@@ -4952,82 +4952,79 @@ public class VariousServiceImpl implements IVariousService {
     //-----------------------------------------------------------小程序客服---------------------------------------------------------------
 
     //小程序客服消息发送
-    public ServerResponse<String> wxMiniProgramCustomerServer(HttpServletRequest request) {
-//        Map<String, String> map = WechatMessageUtil.xmlToMap(request);
-//        // 发送方帐号（一个OpenID）
-//        String fromUserName = map.get("FromUserName");
-//        // 开发者微信号
-//        String toUserName = map.get("ToUserName");
-//        // 消息类型
-//        String msgType = map.get("MsgType");
-//        // 消息内容
-//        String Content = map.get("Content");
-//        // 默认回复一个"success"
-//        String responseMessage = "success";
-//
-//        // 对消息进行处理
-//        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
-//            //图片信息整体
-//            MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
-//            //图片里的media_id
-//            MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
-//            miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
-//            //openid
-//            miniProgramCustomerServerImage.setTouser(fromUserName);
-//            //在这里判断缓存
-//            //将access_token取出
-//            String requestNormalAccessTokenUrlParam = String.format("grant_type=client_credential&appid=%s&secret=%s", WxConfig.wx_platform_app_id, WxConfig.wx_platform_app_secret);
-//            //发送post请求读取调用微信接口获取openid用户唯一标识
-//            JSONObject normalAccessTokenJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_normal_access_token_url, requestNormalAccessTokenUrlParam ));
-//            if (normalAccessTokenJsonObject.isEmpty()){
-//                //判断抓取网页是否为空
-//                return ServerResponse.createByErrorMessage("获取普通的AccessToken时异常，微信内部错误");
-//            }else {
-//                Boolean normalAccessTokenFail = normalAccessTokenJsonObject.containsKey("errcode");
-//                if (normalAccessTokenFail){
-//                    return ServerResponse.createByErrorMessage(normalAccessTokenJsonObject.get("errcode").toString() + "获取普通的AccessToken时异常" + normalAccessTokenJsonObject.get("errmsg").toString());
-//                }else {
-//                    String normalAccessToken = normalAccessTokenJsonObject.get("access_token").toString();
-//                    //请求微信
-//                    //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
-//
-//                }
-//            }
-//            //设置media_id
-//            miniProgramCustomerServerPic.setMedia_id("35Xo4cvL54ecuRZLwJaJkusJ1VKjtzs5w80qwK38hc_yCcq7gFaMjvVGaxu2rw1C");
-//
-//            miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
-//
-//            responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
-//            return null;
-//        }
+    public String wxMiniProgramCustomerServer(HttpServletRequest request) {
+        Map<String, String> map = WechatMessageUtil.xmlToMap(request);
+        // 发送方帐号（一个OpenID）
+        String fromUserName = map.get("FromUserName");
+        // 开发者微信号
+        String toUserName = map.get("ToUserName");
+        // 消息类型
+        String msgType = map.get("MsgType");
+        // 消息内容
+        String Content = map.get("Content");
+        // 默认回复一个"success"
+        String responseMessage = "你好鸭！";
+
+        // 对消息进行处理
+        if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
+            try {
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                String normalAccessToken =  access_token.getAccessToken();
+                //判断如果缓存里有的话直接返回
+                String mediaId;
+                if (CommonFunc.cacheContainsKey("WeChatPublicNumberQrCodeMediaId")){
+                    mediaId = CommonFunc.getCache("WeChatPublicNumberQrCodeMediaId").toString();
+                }else {
+                    mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
+                    //存缓存
+                    CommonFunc.setCache("WeChatPublicNumberQrCodeMediaId", access_token, 3 * 24 * 60 * 60);
+                }
+                //图片信息整体
+                MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
+                //图片里的media_id
+                MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
+                miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
+                //openid
+                miniProgramCustomerServerImage.setTouser(fromUserName);
+                //在这里判断缓存
+                //请求微信
+                //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
+                String requestURL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" + normalAccessToken;
+                //设置media_id
+                System.out.println(mediaId);
+                miniProgramCustomerServerPic.setMedia_id(mediaId);
+
+                miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
+
+                String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
+                System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
+
+                responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
+            }catch (Exception e){
+                logger.error("回复客服消息失败", e.getStackTrace());
+                logger.error("回复客服消息失败", e);
+                e.printStackTrace();
+            }
+        }
+
+        return responseMessage;
+    }
 
 
-        //图片信息整体
-        MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
-        //图片里的media_id
-        MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
-        miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
-        //openid
-        miniProgramCustomerServerImage.setTouser("o-3J75YlfGj21A201k7-j1Kx1ALE");
-        //在这里判断缓存
-        //获取accessToken
-        AccessToken access_token = CommonFunc.getAccessToken();
-        String normalAccessToken =  access_token.getAccessToken();
-        //请求微信
-        //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
-        String requestURL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" + normalAccessToken;
-        //设置media_id
-        miniProgramCustomerServerPic.setMedia_id("35Xo4cvL54ecuRZLwJaJkusJ1VKjtzs5w80qwK38hc_yCcq7gFaMjvVGaxu2rw1C");
-
-        miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
-
-        String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
-        System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
-
-        return null;
-
-//        return ServerResponse.createByErrorMessage("no");
+    //首次验证消息的确来自微信服务器
+    public void checkWechatMiniProgramCustomerServer(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response){
+        PrintWriter print;
+        // 通过检验signature对请求进行校验，若校验成功则原样返回echostr，表示接入成功，否则接入失败
+        if (signature != null && WechatMiniProgramCustomerServerUtil.checkSignature(signature, timestamp, nonce)) {
+            try {
+                print = response.getWriter();
+                print.write(echostr);
+                print.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
