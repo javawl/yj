@@ -4971,15 +4971,9 @@ public class VariousServiceImpl implements IVariousService {
                 //获取accessToken
                 AccessToken access_token = CommonFunc.getAccessToken();
                 String normalAccessToken =  access_token.getAccessToken();
-                //判断如果缓存里有的话直接返回
+                //用过就会失效
                 String mediaId;
-                if (CommonFunc.cacheContainsKey("WeChatPublicNumberQrCodeMediaId")){
-                    mediaId = CommonFunc.getCache("WeChatPublicNumberQrCodeMediaId").toString();
-                }else {
-                    mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
-                    //存缓存
-                    CommonFunc.setCache("WeChatPublicNumberQrCodeMediaId", access_token, 3 * 24 * 60 * 60);
-                }
+                mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
                 //图片信息整体
                 MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
                 //图片里的media_id
