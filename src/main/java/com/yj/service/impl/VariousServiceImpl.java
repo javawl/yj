@@ -4963,7 +4963,7 @@ public class VariousServiceImpl implements IVariousService {
         // 消息内容
         String Content = map.get("Content");
         // 默认回复一个"success"
-        String responseMessage = "Hello";
+        String responseMessage = "success";
 
         // 对消息进行处理
         if (WechatMessageUtil.MESSAGE_TEXT.equals(msgType)) {// 文本消息
@@ -4999,7 +4999,7 @@ public class VariousServiceImpl implements IVariousService {
 
                 String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
                 String result = HttpsUtil.doPost(requestURL, jsonStr, "UTF-8");
-                logger.error("测试客服", result);
+                logger.error("测试客服"+result);
 
 //                responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
             }catch (Exception e){

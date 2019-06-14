@@ -53,6 +53,7 @@ public class HttpsUtil {
                 HttpEntity resEntity = response.getEntity();
                 if(resEntity != null){
                     result = EntityUtils.toString(resEntity,charset);
+                    System.out.println("kefu_result:"+result);
                 }
             }
         }catch(Exception ex){
