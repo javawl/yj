@@ -35,6 +35,7 @@ public class Const {
     public static final String TMP_OFFICIAL_ACCOUNTS_CHALLENGE_REMIND = "8x5cpavEtgA54Qopgehy5FJSJ2piRxNcS4gbO_QpZgo";   //微信公众号万元挑战赛提醒
     public static final String TMP_OFFICIAL_ACCOUNTS_CHALLENGE_RANK_REMIND = "hs_jV9Y3U-WAXMm5LXDUQZYmzFvf2ywWFNnuLfQ_VXQ";   //微信公众号万元挑战赛排名查看提醒
     public static final String TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND = "a63NGuotsD6qeOvpy22c2p2pyEPbnB46NYgnmi3Ubcg";   //微信公众号退出报名页报名提醒
+    public static final String TMP_READ_FEEDS_REMIND = "qJ2eNCoVi2gL2cXa3UP0nF8Vxm9ROU__jYMIrOKyZoc";   //feeds提醒阅读
     public static final String DRAW_RESULT_PATH = "page/home/pages/prize/prize_result";   //抽奖结果的路径
     public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页
     public static final String WX_HOME_PATH = "page/tabBar/home/home";   //home的路径
@@ -45,6 +46,7 @@ public class Const {
     public static final String WX_CHALLENGE_SUCCESS_RED_PACKET = "page/tabBar/home/home?method=challenge_success_red_packet";   //展示单词挑战成功提醒的路径
     public static final String WX_CHALLENGE_INVITE_RED_PACKET = "page/tabBar/home/home?method=challenge_invite_red_packet";   //展示单词挑战邀请提醒的路径
     public static final String WX_READ_CHALLENGE_TEACHER = "page/discover/pages/teacher/teacher";   //阅读挑战老师页
+    public static final String WX_FEEDS = "page/tabBar/home/home?action=onFeedsTap&feed_id=";   //阅读挑战老师页
     public static final String OFFICIAL_ACCOUNTS_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/challenge_sign_up.html";   //公众号万元挑战赛
     public static final String OFFICIAL_ACCOUNTS_WORD_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/word_sign_up.html";   //公众号单词挑战
     public static final String OFFICIAL_ACCOUNTS_READ_CHALLENGE = "https://file.ourbeibei.com/l_e/static/html/book_sign_up.html";   //公众号阅读

@@ -2457,6 +2457,14 @@
     ORDER BY word
   </select>
 
+  <select id="findNewFeedsTitle" resultType="map">
+    SELECT id,title
+    FROM feeds
+    ORDER BY set_time DESC
+    LIMIT 1
+  </select>
+
+
   <delete id="deleteWordVideoInformationByWordId" parameterType="string" >
     DELETE FROM word_video_information
     where word_id = #{word_id}

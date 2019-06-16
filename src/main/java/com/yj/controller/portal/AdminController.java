@@ -1374,6 +1374,57 @@ public class AdminController {
 
 
     /**
+     * 发送第1个阅读feeds提醒
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "send_read_feeds_remind1.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String send_read_feeds_remind1(String token, HttpServletResponse response){
+        if (!token.equals("beibeifeed1")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            //给所有用户发送
+            List<Map<Object,Object>> all_user =  common_configMapper.getHaveChangeAllWxUserLoginAndNotLogin(CommonFunc.getOneDate(), nowTime);
+            //找出最新的feeds
+            Map<String, Object> feeds = common_configMapper.findNewFeedsTitle();
+            for(int i = 0; i < all_user.size(); i++){
+                common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_READ_FEEDS_REMIND);
+                wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                wxMssVo.setPage(Const.WX_FEEDS + feeds.get("id").toString());
+                wxMssVo.setAccess_token(access_token.getAccessToken());
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("英语趣味阅读有更新","#ffffff"));
+                list.add(new TemplateData(feeds.get("title").toString(),"#ffffff"));
+                list.add(new TemplateData("大家都在看~" ,"#ffffff"));
+                wxMssVo.setParams(list);
+                String info = CommonFunc.sendTemplateMessage(wxMssVo);
+                //记录发送的情况
+                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "英语趣味阅读有更新", info, nowTime);
+//                }
+            }
+            return JSON.toJSONString(all_user);
+        }catch (Exception e){
+            logger.error("英语趣味阅读有更新异常",e.getStackTrace());
+            logger.error("英语趣味阅读有更新异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+
+    /**
      * 开奖
      * @param token       验证令牌
      * @param response    response

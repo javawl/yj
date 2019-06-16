@@ -988,6 +988,10 @@ public interface Common_configMapper {
     List<Map<String, Object>> findDictionaryRepeatWord(@Param("sourceDictionaryType") String sourceDictionaryType);
 
 
+    //找出最新一期的feeds的title
+    Map<String, Object> findNewFeedsTitle();
+
+
     //删除视频表中该单词的视频信息
     int deleteWordVideoInformationByWordId(@Param("word_id") String word_id);
 
