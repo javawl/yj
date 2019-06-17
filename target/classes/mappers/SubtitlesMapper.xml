@@ -112,4 +112,29 @@
     values (#{id,jdbcType=INTEGER}, #{st,jdbcType=VARCHAR}, #{et,jdbcType=VARCHAR}, #{en,jdbcType=VARCHAR},
             #{cn,jdbcType=VARCHAR}, #{videoId,jdbcType=INTEGER})
   </insert>
+
+  <!--运营0.3-->
+  <!--查询-->
+  <select id="checkUserDatingVip" parameterType="string" resultType="map">
+    SELECT dating_vip
+    FROM `user`
+    WHERE `id` = #{user_id}
+  </select>
+
+  <select id="findSuperLikeMeCard" parameterType="string" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE user_id in
+    (SELECT admirers_user_id
+    FROM `dating_like_relationship`
+    WHERE `send_good_card_id` = #{user_id}
+    AND rank = 1)
+    ORDER BY set_time ASC
+  </select>
+  <!--更新-->
+  <!--插入-->
+  <!--删除-->
+
+  <!--运营0.3下闭合线-->
+
 </mapper>

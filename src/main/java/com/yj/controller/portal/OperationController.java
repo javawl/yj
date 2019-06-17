@@ -2,10 +2,7 @@ package com.yj.controller.portal;
 
 
 import com.yj.common.ServerResponse;
-import com.yj.dao.Common_configMapper;
-import com.yj.dao.DictionaryMapper;
-import com.yj.dao.PlansMapper;
-import com.yj.dao.UserMapper;
+import com.yj.dao.*;
 import com.yj.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

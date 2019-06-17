@@ -4993,7 +4993,19 @@ public class VariousServiceImpl implements IVariousService {
 
                 String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
                 String result = HttpsUtil.doPost(requestURL, jsonStr, "UTF-8");
-                logger.error("测试客服"+result);
+                logger.error("测试客服1"+result);
+                //文本信息整体
+                MiniProgramCustomerServerMsg miniProgramCustomerServerMsg = new MiniProgramCustomerServerMsg();
+                //图片里的media_id
+                MiniProgramCustomerServerText miniProgramCustomerServerText = new MiniProgramCustomerServerText();
+                miniProgramCustomerServerMsg.setMsgtype(WechatMessageUtil.MESSAGE_TEXT);
+                //openid
+                miniProgramCustomerServerMsg.setTouser(fromUserName);
+                miniProgramCustomerServerText.setContent("扫码关注公众号，点击万元挑战赛限时领取100元现金！");
+                miniProgramCustomerServerMsg.setText(miniProgramCustomerServerText);
+                String jsonStrTextMsg = JSON.toJSONString(miniProgramCustomerServerMsg);
+                String resultText = HttpsUtil.doPost(requestURL, jsonStrTextMsg, "UTF-8");
+                logger.error("测试客服2"+resultText);
 
 //                responseMessage = WechatMessageUtil.miniProgramCustomerServerMessageToXml(miniProgramCustomerServerImage);
             }catch (Exception e){

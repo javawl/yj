@@ -1988,34 +1988,46 @@ public class VariousController {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
             String normalAccessToken =  access_token.getAccessToken();
-            //判断如果缓存里有的话直接返回
-            String mediaId;
-            if (CommonFunc.cacheContainsKey("WeChatPublicNumberQrCodeMediaId")){
-                mediaId = CommonFunc.getCache("WeChatPublicNumberQrCodeMediaId").toString();
-            }else {
-                mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
-                //存缓存
-                CommonFunc.setCache("WeChatPublicNumberQrCodeMediaId", access_token, 3 * 24 * 60 * 60);
-            }
-            //图片信息整体
-            MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
-            //图片里的media_id
-            MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
-            miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
-            //openid
-            miniProgramCustomerServerImage.setTouser("o-3J75YlfGj21A201k7-j1Kx1ALE");
-            //在这里判断缓存
-            //请求微信
-            //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
+//            //判断如果缓存里有的话直接返回
+//            String mediaId;
+//            if (CommonFunc.cacheContainsKey("WeChatPublicNumberQrCodeMediaId")){
+//                mediaId = CommonFunc.getCache("WeChatPublicNumberQrCodeMediaId").toString();
+//            }else {
+//                mediaId = HttpsUtil.uploadTmpPic("https://file.ourbeibei.com/l_e/common/WeChatPublicNumberQrCode.jpg", normalAccessToken, "image");
+//                //存缓存
+//                CommonFunc.setCache("WeChatPublicNumberQrCodeMediaId", access_token, 3 * 24 * 60 * 60);
+//            }
+//            //图片信息整体
+//            MiniProgramCustomerServerImage miniProgramCustomerServerImage = new MiniProgramCustomerServerImage();
+//            //图片里的media_id
+//            MiniProgramCustomerServerPic miniProgramCustomerServerPic = new MiniProgramCustomerServerPic();
+//            miniProgramCustomerServerImage.setMsgtype(WechatMessageUtil.MESSAtGE_IMAGE);
+//            //openid
+//            miniProgramCustomerServerImage.setTouser("o-3J75YlfGj21A201k7-j1Kx1ALE");
+//            //在这里判断缓存
+//            //请求微信
+//            //https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
             String requestURL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=" + normalAccessToken;
-            //设置media_id
-            System.out.println(mediaId);
-            miniProgramCustomerServerPic.setMedia_id(mediaId);
-
-            miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
-
-            String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
-            System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
+//            //设置media_id
+//            System.out.println(mediaId);
+//            miniProgramCustomerServerPic.setMedia_id(mediaId);
+//
+//            miniProgramCustomerServerImage.setImage(miniProgramCustomerServerPic);
+//
+//            String jsonStr = JSON.toJSONString(miniProgramCustomerServerImage);
+//            System.out.println(HttpsUtil.doPost(requestURL, jsonStr, "UTF-8"));
+            //文本信息整体
+            MiniProgramCustomerServerMsg miniProgramCustomerServerMsg = new MiniProgramCustomerServerMsg();
+            //图片里的media_id
+            MiniProgramCustomerServerText miniProgramCustomerServerText = new MiniProgramCustomerServerText();
+            miniProgramCustomerServerMsg.setMsgtype(WechatMessageUtil.MESSAGE_TEXT);
+            //openid
+            miniProgramCustomerServerMsg.setTouser("o-3J75YlfGj21A201k7-j1Kx1ALE");
+            miniProgramCustomerServerText.setContent("扫码关注公众号，点击万元挑战赛限时领取100元现金！");
+            miniProgramCustomerServerMsg.setText(miniProgramCustomerServerText);
+            String jsonStrTextMsg = JSON.toJSONString(miniProgramCustomerServerMsg);
+            String resultText = HttpsUtil.doPost(requestURL, jsonStrTextMsg, "UTF-8");
+            logger.error("测试客服2"+resultText);
         }catch (Exception e){
             e.printStackTrace();
         }
