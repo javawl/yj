@@ -7,10 +7,13 @@ import com.yj.common.Const;
 import com.yj.common.MySessionContext;
 import com.yj.common.ServerResponse;
 import com.yj.dao.DictionaryMapper;
+import com.yj.dao.UserMapper;
 import com.yj.pojo.User;
 import com.yj.service.ITokenService;
 import com.yj.service.IUserService;
 import com.yj.service.impl.TokenServiceImpl;
+import com.yj.util.AES;
+import com.yj.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -42,6 +45,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private DictionaryMapper dictionaryMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private ApplicationContext ctx;
@@ -575,56 +581,58 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "test3.do", method = RequestMethod.GET)
     @ResponseBody
-    public String test3(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        String value = "";
-        if (cookies != null) {
-            // 遍历数组
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("id")) {
-                    // 取出cookie的值
-                    value = cookie.getValue();
-//                    // 字符串转long
-//                    long time = Long.parseLong(value);
-//                    // 转成日期 Date
-//                    Date date = new Date(time);
-//                    // 创建一个显示的日期格式
-//                    // 参数就是你想要显示的日期格式
-//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-//                    // 格式化时间
-//                    String lastTime = dateFormat.format(date);
-//                    // 响应回浏览器显示
-//                    response.getWriter().write("上次访问时间" + lastTime);
-                }
-            }
-        }
-        return value;
+    public String test3(HttpServletRequest request, HttpServletResponse response){
+        CommonFunc.setGlobalCookie(response, "super_login", "0", 24 * 60 * 60);
+        return null;
     }
 
 
     /**
-     * 测试
+     * 后台登录
      * @return
      */
-    @RequestMapping(value = "test4.do", method = RequestMethod.GET)
+    @RequestMapping(value = "admin_login.do", method = RequestMethod.POST)
     @ResponseBody
-    public String test4(CommonFunc func){
+    public ServerResponse<String> admin_login(HttpServletRequest request,HttpSession session) throws Exception{
+        String username = AES.Decrypt(request.getHeader("username"),AES.KEY);
+        String password = AES.Decrypt(request.getHeader("password"),AES.KEY);
+
+        //todo 密码登录MD5加盐
+        String md5Password = MD5Util.MD5EncodeUtf8(password + Const.LOGIN_SALT);
+        int result = userMapper.adminLogin(username, md5Password);
+        //验证密码
+        if (result == 0){
+            return ServerResponse.createByErrorMessage("用户名或密码错误！");
+        }
+        //加进session
+        session.setAttribute("super_login", "1");
+        //一个钟
+        session.setMaxInactiveInterval(60 * 60);
+
+        return ServerResponse.createBySuccessMessage("success");
+    }
 
 
-//        class A { voi dm() { System.out.println(""outer""); } }
-//        public class TestInners {
-//            public static void main(String[] args) {
-//                new TestInners().go();
-//                }
-//                void go() {
-//                new A().m();
-//                class A { void m() { System.out.println(""inner""); } }
-//                }
-//                class A { void m() { System.out.println(""middle""); } }
-//            }
+    /**
+     * 检验是否登录
+     * @return
+     */
+    @RequestMapping(value = "checkLogin.do", method = RequestMethod.GET)
+    @ResponseBody
+    public String checkLogin(HttpSession session){
+        Object value = session.getAttribute("super_login");
+        System.out.println(value);
+        if (value == null){
+            return "fail";
+        }else {
+            System.out.println(value);
+            if ("1".equals(value.toString())){
+                return "success";
+            }else {
+                return "fail";
+            }
+        }
 
-
-        return func.getRandChars(32);
     }
 
 

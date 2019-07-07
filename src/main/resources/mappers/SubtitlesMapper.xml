@@ -116,9 +116,62 @@
   <!--运营0.3-->
   <!--查询-->
   <select id="checkUserDatingVip" parameterType="string" resultType="map">
-    SELECT dating_vip
+    SELECT dating_vip,dating_first_time_introduce,last_time_click_dating_button,last_time_click_dating_super_light,judge_dating_like_times
     FROM `user`
     WHERE `id` = #{user_id}
+  </select>
+
+  <select id="findLoversInfo" parameterType="string" resultType="map">
+    SELECT username,portrait
+    FROM `user`
+    WHERE `id` = #{user_id}
+  </select>
+
+  <select id="userDatingInfo" parameterType="string" resultType="map">
+    SELECT intention,status,is_in_love
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+    LIMIT 1
+  </select>
+
+  <select id="checkDatingInfoIsComplete" parameterType="string" resultType="map">
+    SELECT id,age,institutions,signature
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+    LIMIT 1
+  </select>
+
+  <select id="getDatingCardViews" parameterType="string" resultType="map">
+    SELECT views
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+    LIMIT 1
+  </select>
+
+  <select id="judgeTodayWhetherRemind" parameterType="string" resultType="map">
+    SELECT views, whether_remind_lover
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+    LIMIT 1
+  </select>
+
+  <select id="findDatingCardTag" parameterType="string" resultType="map">
+    SELECT tag
+    FROM `dating_card_tag`
+    WHERE `card_id` = #{card_id}
+  </select>
+
+  <select id="findAllCardTag" resultType="map">
+    SELECT tag, tb.user_id
+    FROM `dating_card_tag`,
+    (SELECT id,user_id
+    FROM dating_card
+    WHERE user_id
+    IN
+    <foreach collection="info" item="item" open="(" close=")" separator=",">
+      #{item.user_id}
+    </foreach>) tb
+    WHERE `dating_card_tag`.card_id = tb.id
   </select>
 
   <select id="findSuperLikeMeCard" parameterType="string" resultType="map">
@@ -129,11 +182,413 @@
     FROM `dating_like_relationship`
     WHERE `send_good_card_id` = #{user_id}
     AND rank = 1)
+    AND gender = #{gender}
+    AND status = 2
+    AND is_in_love = 0
     ORDER BY set_time ASC
   </select>
+
+  <select id="findSuperLikeMeCardWithOutGender" parameterType="string" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE user_id in
+    (SELECT admirers_user_id
+    FROM `dating_like_relationship`
+    WHERE `send_good_card_id` = #{user_id}
+    AND rank = 1)
+    AND status = 2
+    AND is_in_love = 0
+    ORDER BY set_time ASC
+  </select>
+
+  <select id="findLikeMeCard" parameterType="string" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE user_id in
+    (SELECT admirers_user_id
+    FROM `dating_like_relationship`
+    WHERE `send_good_card_id` = #{user_id}
+    AND rank = 0)
+    AND gender = #{gender}
+    AND status = 2
+    AND is_in_love = 0
+    ORDER BY set_time ASC
+  </select>
+
+  <select id="findLikeMeCardWithOutGender" parameterType="string" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE user_id in
+    (SELECT admirers_user_id
+    FROM `dating_like_relationship`
+    WHERE `send_good_card_id` = #{user_id}
+    AND rank = 0)
+    AND status = 2
+    AND is_in_love = 0
+    ORDER BY set_time ASC
+  </select>
+
+
+  <select id="findLowViewsCard" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE gender = #{gender}
+    AND status = 2
+    AND is_in_love = 0
+    ORDER BY is_virtual ASC,views ASC
+  </select>
+
+
+  <select id="findLowViewsCardWithOut" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE status = 2
+    AND is_in_love = 0
+    ORDER BY is_virtual ASC,views ASC
+  </select>
+
+  <select id="findSeeUserCard" parameterType="string" resultType="string">
+    SELECT be_seen_user_id
+    FROM dating_see_relationship
+    WHERE user_id = #{user_id}
+    AND valid_time > #{now_time}
+  </select>
+
+
+  <select id="findSeeUserCardToday" parameterType="string" resultType="string">
+    SELECT be_seen_user_id
+    FROM dating_see_relationship
+    WHERE user_id = #{user_id}
+    AND see_time = #{now_time}
+    ORDER BY rank
+  </select>
+
+
+  <select id="findExistSeeRecord" resultType="string">
+    SELECT be_seen_user_id
+    FROM dating_see_relationship
+    WHERE user_id = #{user_id}
+    AND be_seen_user_id
+    IN
+    <foreach collection="info" item="item" open="(" close=")" separator=",">
+      #{item.user_id}
+    </foreach>
+  </select>
+
+
+  <select id="findDatingSpecifyCard" parameterType="string" resultType="map">
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card,
+    (
+      SELECT user_id
+      FROM `dating_specify_card`
+      WHERE rank = #{rank}
+      AND set_time = #{set_time}
+      LIMIT 1
+    ) tb
+    WHERE dating_card.user_id = tb.user_id
+  </select>
+
+
+  <select id="findTodayDatingCardInfo" parameterType="java.util.List" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card
+    WHERE user_id
+    IN
+    <foreach collection="userIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+
+  <select id="findDatingSpecifyCardByRankRange" parameterType="string" resultType="map">
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card,
+         (
+            SELECT user_id
+            FROM `dating_specify_card`
+            WHERE rank &lt;= #{upper_rank}
+            AND rank >= #{lower_rank}
+            AND set_time = #{set_time}
+            LIMIT 1
+         ) tb
+    WHERE dating_card.user_id = tb.user_id
+    AND gender = #{gender}
+  </select>
+
+
+  <select id="findDatingSpecifyCardByRankRangeWithOutGender" parameterType="string" resultType="map">
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    FROM dating_card,
+         (
+            SELECT user_id
+            FROM `dating_specify_card`
+            WHERE rank &lt;= #{upper_rank}
+            AND rank >= #{lower_rank}
+            AND set_time = #{set_time}
+            LIMIT 1
+         ) tb
+    WHERE dating_card.user_id = tb.user_id
+  </select>
+
+
+  <select id="findUserName" parameterType="string" resultType="string">
+    SELECT username
+    FROM `user`
+    WHERE id = #{user_id}
+  </select>
+
+
+  <select id="findUserDatingFirstTimeIntroduction" parameterType="string" resultType="string">
+    SELECT dating_first_time_introduce
+    FROM `user`
+    WHERE id = #{user_id}
+  </select>
+  
+  
+  <select id="checkExistSuperLikeRelationship" parameterType="string" resultType="map">
+    SELECT `id`
+    FROM `dating_like_relationship`
+    WHERE admirers_user_id = #{admirers_user_id}
+    AND send_good_card_id = #{send_good_card_id}
+    AND rank = #{rank}
+    LIMIT 1
+  </select>
+
+
+  <select id="findWhetherTargetUserLikeMe" parameterType="string" resultType="map">
+    SELECT `id`
+    FROM `dating_like_relationship`
+    WHERE admirers_user_id = #{targetId}
+    AND send_good_card_id = #{userId}
+    AND rank >= 0
+    LIMIT 1
+  </select>
+
+  <select id="findUserLover" parameterType="string" resultType="map">
+    SELECT lover_one_user_id,lover_another_user_id,word_number,record_like_to_relive_memories_uid
+    FROM `dating_relationship`
+    WHERE lover_one_user_id = #{user_id}
+    OR lover_another_user_id = #{user_id}
+    LIMIT 1
+  </select>
+
+
+  <select id="findDatingUserMeetCode" parameterType="string" resultType="map">
+    SELECT meet_code,id
+    FROM `dating_relationship`
+    WHERE lover_one_user_id = #{user_id}
+    OR lover_another_user_id = #{user_id}
+    LIMIT 1
+  </select>
+  
+
   <!--更新-->
+  <update id="openDatingVip" parameterType="string">
+    UPDATE `user`
+    SET dating_vip = #{dating_vip}
+    WHERE id = #{user_id}
+  </update>
+
+  <update id="renewDatingVip" parameterType="string">
+    UPDATE `user`
+    SET dating_vip = dating_vip + #{dating_vip}
+    WHERE id = #{user_id}
+  </update>
+
+  <update id="recordFirstDatingIntroduction" parameterType="string">
+    UPDATE `user`
+    SET dating_first_time_introduce = #{dating_first_time_introduce}
+    WHERE id = #{user_id}
+  </update>
+
+  <update id="recordLastTimeClickDatingButton" parameterType="string">
+    UPDATE `user`
+    SET last_time_click_dating_button = #{last_time_click_dating_button}
+    WHERE id = #{user_id}
+  </update>
+
+  <update id="recordLastTimeClickDatingSuperExposedButton" parameterType="string">
+    UPDATE `user`
+    SET last_time_click_dating_super_light = #{last_time_click_dating_super_light}
+    WHERE id = #{user_id}
+  </update>
+
+  <update id="addDailyDatingVip">
+    UPDATE `data_info`
+    set `daily_dating_vip_number` = `daily_dating_vip_number` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addDailySuperLikeClick">
+    UPDATE `data_info`
+    set `daily_dating_super_like_click` = `daily_dating_super_like_click` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addDailyReleaseRelationship">
+    UPDATE `data_info`
+    set `daily_dating_release_relationship` = `daily_dating_release_relationship` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addDailySuperLightClick">
+    UPDATE `data_info`
+    set `daily_dating_super_light_click` = `daily_dating_super_light_click` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyDatingLikeClick">
+    UPDATE `data_info`
+    set `daily_dating_like_click` = `daily_dating_like_click` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyDatingPairingNumber">
+    UPDATE `data_info`
+    set `daily_dating_pairing_number` = `daily_dating_pairing_number` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="updateDatingCardViews" parameterType="string">
+    UPDATE `dating_card`
+    SET views = #{views}
+    WHERE id = #{user_id}
+  </update>
+
+
+  <update id="addDatingCardViews" parameterType="string">
+    UPDATE `dating_card`
+    SET views = views + 1
+    WHERE id = #{user_id}
+  </update>
+
+
+  <update id="updateRecordRemindLoverTime" parameterType="string">
+    UPDATE `dating_card`
+    SET whether_remind_lover = #{whether_remind_lover}
+    WHERE id = #{user_id}
+  </update>
+
+
+  <update id="makeUserInLoveStatus" parameterType="string">
+    UPDATE `dating_card`
+    SET is_in_love = #{is_in_love}
+    WHERE id = #{user_id}
+  </update>
+
+
+  <update id="seeRelationshipWholeBack" parameterType="string">
+    UPDATE `dating_see_relationship`
+    SET rank = rank + 1
+    WHERE rank >= 2
+    AND see_time = #{see_time}
+    AND user_id = #{user_id}
+  </update>
+
+
+  <update id="addDatingRelationshipWordNumber">
+    UPDATE `dating_relationship`
+    SET word_number = word_number + #{word_number}
+    WHERE lover_one_user_id = #{user_id}
+    OR lover_another_user_id = #{user_id}
+  </update>
+
+  <update id="reliveMemories">
+    UPDATE `dating_relationship`
+    SET word_number = #{word_number}
+    WHERE (lover_one_user_id = #{userId} AND lover_another_user_id = #{targetId})
+    OR (lover_one_user_id = #{targetId} AND lover_another_user_id = #{userId})
+  </update>
+
+  <update id="updateDatingRelationshipReliveMemoriesUid">
+    UPDATE `dating_relationship`
+    SET record_like_to_relive_memories_uid = #{record_like_to_relive_memories_uid}
+    WHERE (lover_one_user_id = #{userId} AND lover_another_user_id = #{targetId})
+    OR (lover_one_user_id = #{targetId} AND lover_another_user_id = #{userId})
+  </update>
+
+  <update id="updateDatingRelationshipMeetCode">
+    UPDATE `dating_relationship`
+    SET meet_code = #{meetCode}
+    WHERE (lover_one_user_id = #{userId} AND lover_another_user_id = #{targetId})
+    OR (lover_one_user_id = #{targetId} AND lover_another_user_id = #{userId})
+  </update>
+
+
+  <update id="updateSeeRelationship" parameterType="string">
+    UPDATE `dating_see_relationship`
+      SET valid_time = #{valid_time},
+          see_time = #{see_time},
+          rank = CASE be_seen_user_id
+          <foreach collection="inputArr" item="item">
+            WHEN #{item.targetId} THEN #{item.order}
+          </foreach>
+      END,
+          `type` = CASE be_seen_user_id
+          <foreach collection="inputArr" item="item">
+            WHEN #{item.targetId} THEN #{item.type}
+          </foreach>
+      END
+    WHERE user_id = #{user_id}
+    AND be_seen_user_id
+    IN
+    <foreach collection="arr" item="i" open="(" close=")" separator=",">
+      #{i.targetId}
+    </foreach>
+  </update>
   <!--插入-->
+  <insert id="uploadDatingCardInfo" parameterType="string">
+    INSERT INTO dating_card (user_id, cover, wx_name, gender, intention, set_time)
+    VALUES (#{user_id}, #{cover}, #{wx_name}, #{gender}, #{intention}, #{set_time})
+  </insert>
+
+  <insert id="createSuperLikeRelationship" parameterType="string">
+    INSERT INTO dating_like_relationship (admirers_user_id, send_good_card_id, rank, set_time)
+    VALUES (#{admirers_user_id}, #{send_good_card_id}, #{rank}, #{set_time})
+  </insert>
+
+
+  <insert id="insertSeeRelationship" parameterType="string">
+    INSERT INTO dating_see_relationship (user_id, be_seen_user_id, valid_time, see_time, rank, `type`)
+    VALUES
+    <foreach collection="inputArr" index="index" item="item" separator=",">
+      (#{user_id}, #{item.targetId}, #{valid_time}, #{set_time}, #{item.order}, #{item.type})
+    </foreach>
+  </insert>
+
+  <insert id="insertSingleSeeRelationship" parameterType="string">
+    INSERT INTO dating_see_relationship (user_id, be_seen_user_id, valid_time, set_time, rank, `type`)
+    VALUES (#{user_id}, #{be_seen_user_id}, #{valid_time}, #{set_time}, #{rank}, #{type})
+  </insert>
+
+  <insert id="insertDatingRelationship" parameterType="string">
+    INSERT INTO dating_relationship (lover_one_user_id, lover_another_user_id, set_time)
+    VALUES (#{lover_one_user_id}, #{lover_another_user_id}, #{set_time})
+  </insert>
+
   <!--删除-->
+  <delete id="deleteTheLastCardTodaySee" parameterType="string">
+    DELETE FROM dating_see_relationship
+    WHERE see_time = #{see_time}
+    AND user_id = #{user_id}
+    AND be_seen_user_id = #{be_seen_user_id}
+  </delete>
+
+  <delete id="deleteDatingLikeRelationship" parameterType="string">
+    DELETE FROM dating_like_relationship
+    WHERE admirers_user_id = #{admirers_user_id}
+    AND send_good_card_id = #{send_good_card_id}
+  </delete>
+
+  <delete id="deleteDatingRelationship" parameterType="string">
+    DELETE FROM dating_relationship
+    WHERE (lover_one_user_id = #{userId} AND lover_another_user_id = #{targetId})
+    OR (lover_one_user_id = #{targetId} AND lover_another_user_id = #{userId})
+  </delete>
 
   <!--运营0.3下闭合线-->
 

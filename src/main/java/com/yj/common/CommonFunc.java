@@ -413,6 +413,25 @@ public class CommonFunc {
         }
     }
 
+    //从COOKIE中取
+    public static String getCookieBykey(HttpServletRequest request,String key){
+        Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+        if (cookies != null){
+            String value = "";
+            for(Cookie cookie : cookies){
+                //找到
+                if (cookie.getName().equals(key)) {
+                    // 取出cookie的值
+                    value = cookie.getValue();
+                    return value;
+                }
+            }
+        }
+        //没找到返回null
+        return null;
+    }
+
+
 
     //根据sessionid和token和key获取值
     public static Object getCacheValueByKey(String key){
@@ -551,6 +570,22 @@ public class CommonFunc {
         return time + "000";
     }
 
+
+    //获取昨天零点多一秒的时间戳
+    public static String getYesterdayOneDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 1);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
     //获取第二天十二点时间戳
     public static String getNextDate12(){
         Calendar calendar = Calendar.getInstance();
@@ -585,6 +620,20 @@ public class CommonFunc {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.DATE, +6);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        long date =calendar.getTime().getTime();
+        String time = String.valueOf(date);
+        time = time.substring(0,time.length() - 3);
+        return time + "000";
+    }
+
+
+    //获取14天后的时间戳
+    public static String getNextFourteenDayDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, +14);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         long date =calendar.getTime().getTime();

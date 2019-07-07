@@ -171,6 +171,9 @@ public interface UserMapper {
     //查一下用户是否已经添加这个计划了
     Map selectUserPlanExist(@Param("id") String id, @Param("plan") String plan);
 
+    //后台管理员登录
+    int adminLogin(@Param("username") String username, @Param("password") String password);
+
     int check_plan(@Param("plan") String plan);
 
     //获取我的计划、天数、每日学习单词数、坚持天数、上次登录时间、注册时间

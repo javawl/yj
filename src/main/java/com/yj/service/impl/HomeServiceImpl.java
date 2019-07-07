@@ -5,6 +5,7 @@ import com.vdurmont.emoji.EmojiParser;
 import com.yj.common.TemplateData;
 import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
+import com.yj.dao.SubtitlesMapper;
 import com.yj.dao.UserMapper;
 import com.yj.pojo.Common_config;
 import com.yj.service.IHomeService;
@@ -41,6 +42,9 @@ public class HomeServiceImpl implements IHomeService {
 
     @Autowired
     private Common_configMapper common_config;
+
+    @Autowired
+    private SubtitlesMapper subtitlesMapper;
 
     @Autowired
     private ApplicationContext ctx;
@@ -1824,6 +1828,10 @@ public class HomeServiceImpl implements IHomeService {
                         String platformChallengeId = userAttendPlatformChallenge.get("id").toString();
                         common_config.changeWechatPlatformChallengeVirtualUserAddDay(platformChallengeId,id,String.valueOf(learned_word));
                     }
+
+                    //todo 运营0.3增加单词数
+                    subtitlesMapper.addDatingRelationshipWordNumber(learned_word, id);
+
 
                     //获取当天0点多一秒时间戳
                     String one = CommonFunc.getOneDate();

@@ -36,6 +36,8 @@ public class Const {
     public static final String TMP_OFFICIAL_ACCOUNTS_CHALLENGE_RANK_REMIND = "hs_jV9Y3U-WAXMm5LXDUQZYmzFvf2ywWFNnuLfQ_VXQ";   //微信公众号万元挑战赛排名查看提醒
     public static final String TMP_OFFICIAL_ACCOUNTS_ORDER_REMIND = "a63NGuotsD6qeOvpy22c2p2pyEPbnB46NYgnmi3Ubcg";   //微信公众号退出报名页报名提醒
     public static final String TMP_READ_FEEDS_REMIND = "qJ2eNCoVi2gL2cXa3UP0nF8Vxm9ROU__jYMIrOKyZoc";   //feeds提醒阅读
+    public static final String TMP_SUPER_LIKE_REMIND = "n60Hu8hvaSAAzye-s6tgxL3qUp0hLHqlD1dRUDOiX80";   //超级喜欢服务通知
+    public static final String TMP_PAIRING_SUCCESS_REMIND = "5dc2wD_aiqC1QKFHqVFPSFnGDRmqEECiSAyo4_VUSnc";   //配对成功服务通知
     public static final String DRAW_RESULT_PATH = "page/home/pages/prize/prize_result";   //抽奖结果的路径
     public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页
     public static final String WX_HOME_PATH = "page/tabBar/home/home";   //home的路径

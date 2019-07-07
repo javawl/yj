@@ -775,6 +775,14 @@
     AND user_id = #{id}
   </select>
 
+  <select id="adminLogin" resultType="int" parameterType="string">
+    SELECT count(1)
+    FROM super_admin
+    WHERE uname = #{username}
+    AND pwd = #{password}
+    LIMIT 1
+  </select>
+
   <insert id="insertUser" parameterType="com.yj.pojo.User" useGeneratedKeys="true" keyProperty="id">
     insert into user (id, username, password,
     portrait, phone, gender,

@@ -21,6 +21,8 @@ public class WxPayConfig {
     //直播课程助力支付成功后的服务器回调url
 //    public static final String liveCourseHelpNotify = "https://www.ourbeibei.com/various/liveCoursePayHelpNotify.do";
     public static final String liveCourseHelpNotify = "http://47.102.152.102:8080/various/liveCoursePayHelpNotify.do";
+    //约会活动vip支付回调地址
+    public static final String datingVipPayCallBack = "https://www.ourbeibei.com/operation/datingVipPayCallBack.do";
     //签名方式，固定值
     public static final String SIGNTYPE = "MD5";
     //交易类型，小程序支付的固定值为JSAPI
