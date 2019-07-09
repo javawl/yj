@@ -150,7 +150,7 @@ public interface SubtitlesMapper {
     int updateRecordRemindLoverTime(@Param("whether_remind_lover") String whether_remind_lover, @Param("user_id") String user_id);
 
     //将用户改为坠入爱河状态
-    int makeUserInLoveStatus(@Param("is_in_love") String is_in_love, @Param("user_id") String user_id);
+    int makeUserInLoveStatus(@Param("is_in_love") String is_in_love, @Param("user_id") String user_id, @Param("love_times") int love_times);
 
     //为了新的超级喜欢，将二到末位后移一位
     int seeRelationshipWholeBack(@Param("see_time") String see_time, @Param("user_id") String user_id);

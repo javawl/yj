@@ -932,8 +932,8 @@ public class OperationServiceImpl implements IOperationService {
                     //加入匹配关系
                     subtitlesMapper.insertDatingRelationship(uid, targetId, nowTime);
                     //将两个用户卡片的状态改成坠入爱河
-                    subtitlesMapper.makeUserInLoveStatus("1", uid);
-                    subtitlesMapper.makeUserInLoveStatus("1", targetId);
+                    subtitlesMapper.makeUserInLoveStatus("1", uid, 1);
+                    subtitlesMapper.makeUserInLoveStatus("1", targetId, 1);
                     //加入日常统计
                     subtitlesMapper.addDailyDatingPairingNumber(one);
 
@@ -1289,8 +1289,8 @@ public class OperationServiceImpl implements IOperationService {
                     //加入匹配关系
                     subtitlesMapper.insertDatingRelationship(uid, targetId, nowTime);
                     //将两个用户卡片的状态改成坠入爱河
-                    subtitlesMapper.makeUserInLoveStatus("1", uid);
-                    subtitlesMapper.makeUserInLoveStatus("1", targetId);
+                    subtitlesMapper.makeUserInLoveStatus("1", uid, 1);
+                    subtitlesMapper.makeUserInLoveStatus("1", targetId, 1);
                     //加入日常统计
                     subtitlesMapper.addDailyDatingPairingNumber(one);
 
@@ -1468,8 +1468,8 @@ public class OperationServiceImpl implements IOperationService {
                 //删除配对关系
                 subtitlesMapper.deleteDatingRelationship(uid, loverId);
                 //将卡片配对状态改回来
-                subtitlesMapper.makeUserInLoveStatus("0", uid);
-                subtitlesMapper.makeUserInLoveStatus("0", loverId);
+                subtitlesMapper.makeUserInLoveStatus("0", uid, 0);
+                subtitlesMapper.makeUserInLoveStatus("0", loverId, 0);
                 //加入日常统计
                 subtitlesMapper.addDailyReleaseRelationship(one);
 

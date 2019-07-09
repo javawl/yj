@@ -19,6 +19,7 @@
         .main{ width: 87%; height: 1000px; float: right;}
     </style>
     <meta charset="UTF-8">
+    <meta name= "viewport" content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>后台管理系统</title>
     <script src="https://file.ourbeibei.com/l_e/static/js/jquery.js"></script>
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
@@ -61,10 +62,11 @@
                 <p onclick="change_src('show_game_operating_share.jsp?page=1&size=15')">小游戏运营分享</p>
                 <p onclick="change_src('show_game_month_challenge.jsp?page=1&size=15')">小游戏万元挑战</p>
                 <p onclick="change_src('show_live_course.jsp?page=1&size=15')">直播课程</p>
+                <%--<p onclick="change_src('showdatingcard.jsp?page=1&size=15')">审核,修改资料,放展示卡总表</p>--%>
             </center>
         </div>
         <div class="main">
-            <iframe id="iframepage" src="admin_main.jsp" frameborder="0" name="mainFrame" width="100%" height="693px" style="display: flex;box-sizing: border-box;flex-direction: row;justify-content: center;align-content: center"></iframe>
+            <iframe id="iframepage" src="admin_main.jsp" frameborder="0" name="mainFrame" width="100%" height="925px" style="display: flex;box-sizing: border-box;flex-direction: row;justify-content: center;align-content: center"></iframe>
         </div>
     </div>
 </body>

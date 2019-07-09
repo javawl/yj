@@ -1681,16 +1681,15 @@ public class VariousServiceImpl implements IVariousService {
 
     //展现已选课程老师信息
     public ServerResponse<Map<Object,Object>> showSelectReadClassTeacher(HttpServletRequest request){
-//        String token = request.getHeader("token");
-//        //验证参数是否为空
-//        List<Object> l1 = new ArrayList<Object>(){{
-//            add(token);
-//        }};
-//        String CheckNull = CommonFunc.CheckNull(l1);
-//        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
-//        //验证token
-//        String uid = CommonFunc.CheckToken(request,token);
-        String uid = "289";
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");

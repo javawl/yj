@@ -474,9 +474,10 @@
   </update>
 
 
-  <update id="makeUserInLoveStatus" parameterType="string">
+  <update id="makeUserInLoveStatus">
     UPDATE `dating_card`
-    SET is_in_love = #{is_in_love}
+    SET is_in_love = #{is_in_love},
+        love_times = love_times + #{love_times}
     WHERE id = #{user_id}
   </update>
 
