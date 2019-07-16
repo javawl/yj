@@ -1706,6 +1706,7 @@ public class AdminController {
         if (!token.equals("challenge_success_remind")){
             return "false";
         }
+        String nowTime = String.valueOf((new Date()).getTime());
         try{
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
@@ -1729,7 +1730,9 @@ public class AdminController {
                     list.add(new TemplateData("30天单词挑战","#ffffff"));
                     list.add(new TemplateData("你已成功完成单词挑战获得奖金，快快登录小程序领取红包吧~" ,"#ffffff"));
                     wxMssVo.setParams(list);
-                    CommonFunc.sendTemplateMessage(wxMssVo);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "你已成功完成单词挑战获得奖金", wx_info, nowTime);
                 }
             }
 

@@ -88,6 +88,7 @@
             color: purple;
         }
         .pop_up_box{
+            display: none;
             position: absolute;
             left: 50%;
             top: 50%;
@@ -140,6 +141,63 @@
         .heart{ position: absolute; left: 11px; display: inline; top: 3.5px;}
         .time_container{ width: 84px; float: left; margin-top: 2rem; }
         .confirm_button{ width: 150px; height: 20px; color: snow; background-image: linear-gradient(to right,  #FAB6D0, hotpink); padding: 7px 7px 7px 7px; border-radius: 20px; border:solid 2px hotpink; margin-top: 6rem; }
+        .new_virtual_user{
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -200px;
+            margin-top: -300px;
+            background-color: hotpink;
+            width: 400px;
+            height: 600px;
+            border-radius: 50px;
+            background-image: url("https://file.ourbeibei.com/l_e/static/images/admin_love_pop_up_bg.jpg");
+            background-size: 100%;
+            background-repeat: no-repeat;
+            z-index: 5;
+            list-style: none;
+        }
+        .first_line{ width: 170px; height: 40px; display: inline-block; }
+        .first_line input{ width: 85px; }
+        .second_line{ width: 100px; height: 40px; display: inline-block; }
+        .second_line input{ width: 50px; }
+        .new_virtual_user_line_box{width: 400px; height: 40px; display: block;  margin-top: 2rem; }
+        .three_line{width: 400px; height: 40px; display: block;  margin-top: 2rem; }
+        .three_line input{width: 100px; }
+        .four_line{width: 400px; height: 40px; display: block;  margin-top: 2rem; }
+        .four_line input{width: 100px; }
+        .new_virtual_user_title{ width: 180px; height: 20px; color: snow; background-image: linear-gradient(to right,  #FAB6D0, hotpink); padding: 7px 7px 7px 7px; border-radius: 20px; border:solid 2px hotpink; margin-top: 4rem;}
+        .upload_pink{ width: 60px; height: 60px; margin-top: 1.5rem; border: solid 1px hotpink; }
+        .confirm_virtual_button{ width: 150px; height: 20px; color: snow; background-image: linear-gradient(to right,  #FAB6D0, hotpink); padding: 7px 7px 7px 7px; border-radius: 20px; border:solid 2px hotpink; margin-top: 2rem; }
+        .tag_ul{
+            list-style: none;
+            display: block;
+            margin: 0;
+            width: 120px;
+            background-image: url("https://file.ourbeibei.com/l_e/static/images/pink_background.jpg");
+            background-size: 100%;
+            border: solid 1px hotpink;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            color: darkorange;
+            font-size: 17px;
+            padding: 5px 5px 5px 5px;
+            --webkit-box-shadow: 0 1px 3px rgba(0,0,0, .3);
+            -moz-box-shadow: 0 1px 3px rgba(0,0,0, .3);
+            box-shadow: 0 1px 3px rgba(0,0,0, .3);
+        }
+        .tag_ul li:hover{
+            /*background: none;*/
+            /*background-color: snow;*/
+            color: purple;
+        }
+        .tag_delete{
+            float: right;
+            margin-right: 10px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <script type="text/javascript">
@@ -209,38 +267,50 @@
                 for(var i = 0; i < data.length; i++){
                     var string2;
                     var operationButton;
+                    var tag;
                     if (data[i]['pic']==''){
                         string2 = '此资源为空'
                     }else {
                         string2 = '<img style="max-width: 550px; max-height: 550px;" src="'+data[i]['pic']+'">';
                     }
+
+                    tag = '<ul class="tag_ul">' +
+                        '    <li>标签一<img id="heart1" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签二<img id="heart2" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签三<img id="heart3" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签四<img id="heart4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签五<img id="heart5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li style="position: relative"><div style="width: 85px;"><input style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="heart5" style=" position: absolute; bottom: 6px; left: 94px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png"> </li>' +
+                        '</ul>';
+
                     data[i]['status'] = 2;
                     if (data[i]['status'] == 1){
-                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">不合格</div>';
+                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">不合格</div>';
                     }else if (data[i]['status'] == 2) {
-                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">展示</div><div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">封号</div>';
+                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="matchingBoxPopUp('+"'"+data[i]['id']+"'"+')">展示</div><div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">封号</div>';
                     }
                     $("#daily_data").append('<tr>'+
                         '<td>'+data[i]['id']+'</td>'+
-                        '<td>'+data[i]['name']+'</td>'+
-                        // '<td id="introduction'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"'"+')">'+data[i]['introduction']+'</td>'+
-                        '<td>'+data[i]['name']+'</td>'+
-                        '<td>'+data[i]['name']+'</td>'+
-                        '<td>'+data[i]['name']+'</td>'+
-                        '<td>'+data[i]['name']+'</td>'+
+                        // '<td>'+data[i]['name']+'</td>'+
+                        '<td id="wx_name'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','wx_name'"+')">'+data[i]['name']+'</td>'+
+                        '<td id="change_gender'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','change_gender'"+')">'+data[i]['name']+'</td>'+
+                        '<td id="intention'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','intention'"+')">'+data[i]['name']+'</td>'+
+                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td id="status'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','status'"+')">'+data[i]['name']+'</td>'+
+                        '<td id="signature'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','signature'"+')">'+data[i]['name']+'</td>'+
                         // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
                         // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
+                        '<td><div>'+tag+'</div></td>'+
+                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td id="age'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','age'"+')">'+data[i]['name']+'</td>'+
+                        '<td id="vip'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','vip'"+')">'+data[i]['name']+'</td>'+
+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td id="condition'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','condition'"+')">'+data[i]['name']+'</td>'+
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
                         '<td>'+ operationButton +'</td>'+
                         '</tr>');
@@ -269,7 +339,7 @@
         formData.append('upload_file', $('#pic')[0].files[0]);
         formData.append('id', pic_id);
         $.ajax({
-            url:url+"/admin/uploadReadClassPic.do",
+            url:url+"/admin/uploadReadClassPic",
             type:'POST',
             data:formData,
             dataType:'json',
@@ -295,25 +365,81 @@
     // 修改简介(添加输入框)
     //判断是否有输入框
     var exist_introduction = 0;
-    function change_sent(id){
+    var existFlag;
+    var htmlFlag;
+    function change_sent(id, type){
         if (exist_introduction === 0){
+            var input_id = "dating_" + type;
+            existFlag = type + id;
+            htmlFlag = $("#" + existFlag).html();
+            event.stopPropagation();//阻止冒泡
+            var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+input_id+"'"+')">提交</div>';
             exist_introduction = 1;
             flag_id = id;
-            var input_id = "book_introduction" + id;
-            $("#introduction"+id).empty();
-            $("#introduction"+id).append('简介：<input id='+ input_id + ' type="text"><br><button onclick="upload_sent('+"'"+id+"'"+')">提交</button>');
+            $("#"+type+id).empty();
+            $("#"+type+id).append('输入：<input id='+ input_id + ' type="text"><br>'+submitButton);
+        }else {
+            // 复原
+            exist_introduction = 0;
+            $("#" + existFlag).html(htmlFlag);
+            var input_id = "dating_" + type;
+            existFlag = type + id;
+            event.stopPropagation();//阻止冒泡
+            htmlFlag = $("#" + existFlag).html();
+            var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+input_id+"'"+')">提交</div>';
+            exist_introduction = 1;
+            flag_id = id;
+            $("#"+type+id).empty();
+            $("#"+type+id).append('输入：<input id='+ input_id + ' type="text"><br>'+submitButton);
         }
     }
     // 修改简介(上传)
-    function upload_sent(id) {
+    function upload_sent(id, type) {
+        var targetUrl;
+        var paramName;
+        switch (type) {
+            case "wx_name":
+                targetUrl = "/lzy/update_name.do";
+                paramName = 'name';
+                break;
+            case "change_gender":
+                targetUrl = "/lzy/update_gender.do";
+                paramName = "gender";
+                break;
+            case "intention":
+                targetUrl = "/lzy/update_intention.do";
+                paramName = "intention";
+                break;
+            case "signature":
+                targetUrl = "/lzy/update_signature.do";
+                paramName = "signature";
+                break;
+            case "age":
+                targetUrl = "/lzy/update_age.do";
+                paramName = "age";
+                break;
+            case "status":
+                targetUrl = "/lzy/update_status.do";
+                paramName = "status";
+                break;
+            case "vip":
+                targetUrl = "/lzy/update_vip.do";
+                paramName = "vip";
+                break;
+            case "condition":
+                targetUrl = "/lzy/update_condition.do";
+                paramName = "condition";
+                break;
+            default:
+                alert("非法类别");
+        }
+        var formData = new FormData();
+        formData.append(paramName, document.getElementById(type + id).value);
+        formData.append('id', id);
         $.ajax({
-            url:url+"/admin/update_class_book_info.do",
+            url:url+targetUrl,
             type:'POST',
-            data:{
-                inner: document.getElementById("book_introduction" + id).value,
-                id: id,
-                type: "introduction"
-            },
+            data:formData,
             dataType:'json',
             async: false,
             success:function (result) {
@@ -332,60 +458,21 @@
         });
         exist_introduction = 0;
         history.go(0);
-        $("html, body").scrollTop(0).animate({scrollTop: $("#introduction"+id).offset().top});
+        $("html, body").scrollTop(0).animate({scrollTop: $("#"+type+id).offset().top});
     }
-    //--------------------------------------------------------------------
-    //--------------------------------------------------------------------
-    // 修改作者(添加输入框)
-    //判断是否有输入框
-    var exist_author = 0;
-    function change_author(id){
-        if (exist_author === 0){
-            exist_author = 1;
-            flag_id = id;
-            var input_id = "book_author" + id;
-            $("#author"+id).empty();
-            $("#author"+id).append('作者：<input id='+ input_id + ' type="text"><br><button onclick="upload_exist_author('+"'"+id+"'"+')">提交</button>');
-        }
-    }
-    // 修改作者(上传)
-    function upload_exist_author(id) {
-        $.ajax({
-            url:url+"/admin/update_class_book_info.do",
-            type:'POST',
-            data:{
-                inner: document.getElementById("book_author" + id).value,
-                id: id,
-                type: "author"
-            },
-            dataType:'json',
-            async: false,
-            success:function (result) {
-                var code = result['code'];
-                var msg = result['msg'];
-                if (code != 200){
-                    alert(msg);
-                }else {
-                    alert(msg);
-                }
-            },
-            error:function (result) {
-                console.log(result);
-                alert("服务器出错！");
-            }
-        });
-        exist_author = 0;
-        history.go(0);
-        $("html, body").scrollTop(0).animate({scrollTop: $("#author"+id).offset().top});
-    }
-    //--------------------------------------------------------------------
+    $(document).click(function(){
+        // 复原
+        exist_introduction = 0;
+        $("#" + existFlag).html(htmlFlag);
+    });
+
 </script>
 <body id="bd">
 <center>
     <div class="hidden_background" onclick="cleanBackgroundPic()">隐藏背景</div>
     <h1>恋爱卡片</h1>
     <%--弹出选择展位框--%>
-    <div class="pop_up_box">
+    <div class="pop_up_box" id="pop_up_box" onclick="outside = false">
         <div class="rank" style="position: relative;">
             <p style="margin: 0px;">选择卡片位</p>
             <ul>
@@ -405,7 +492,40 @@
         <div class="time_container" style="margin-left: 74px;"><input type="text" name="year" placeholder="年份"></div>
         <div class="time_container"><input type="text" name="month" placeholder="月份(xx)"></div>
         <div class="time_container"><input type="text" name="year" placeholder="日(xx)"></div>
+        <input type="text" style="display: none;" id="card_id">
         <div class="confirm_button">完成</div>
+    </div>
+    <div class="new_virtual_user" id="new_virtual_user" onclick="outside_new = false">
+        <div class="new_virtual_user_title">
+            <p style="margin: 0;">新建虚拟用户</p>
+        </div>
+        <div class="new_virtual_user_line_box">
+            <div class="first_line">
+                <input type="text" name="wx_name" placeholder="微信名">
+            </div>
+            <div class="first_line">
+                <input type="text" name="age" placeholder="年龄">
+            </div>
+        </div>
+        <div class="new_virtual_user_line_box">
+            <div class="second_line">
+                <input type="text" name="gender" placeholder="性别">
+            </div>
+            <div class="second_line">
+                <input type="text" name="intention" placeholder="意向性别">
+            </div>
+            <div class="second_line">
+                <input type="text" name="views" placeholder="曝光量">
+            </div>
+        </div>
+        <div class="three_line">
+            <input type="text" name="signature" placeholder="个性签名">
+        </div>
+        <div class="four_line">
+            <input type="text" name="institutions" placeholder="机构/学校">
+        </div>
+        <img class="upload_pink" src="https://file.ourbeibei.com/l_e/static/icon/upload_pink.png">
+        <div class="confirm_virtual_button">完成</div>
     </div>
     <input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />
     <br>
@@ -432,8 +552,8 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;">
-                <div style="float: right; " id="select" class="pick_button">
-                    <a href="add_welfare_service.jsp" style="text-decoration: none; color: snow;">新增虚拟用户</a>
+                <div style="float: right; " id="select" class="pick_button" onclick="matchingNewVirtualUserBoxPopUp()">
+                    <span style="color: snow;" onclick="matchingNewVirtualUserBoxPopUp()">新增虚拟用户</span>
                 </div>
             </td>
         </tr>
@@ -523,7 +643,62 @@
 </body>
 <script>
     function check_chapter(id) {
-        window.location.href = "read_class_chapter.jsp?id="+id;
+        // window.location.href = "read_class_chapter.jsp?id="+id;
     }
+    function goBlack(id) {
+        $.ajax({
+            url:url+"/lzy/black.do",
+            type:'POST',
+            data:{
+                id : id
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+    var outside = true;
+    var alertBox = document.getElementById("pop_up_box");
+    function matchingBoxPopUp(id) {
+        $(".pop_up_box").css("display", "block");
+        $("#card_id").val(id);
+        // 加了false才能显现出来
+        outside = false;
+    }
+    document.body.addEventListener('click', function () {
+        outside = true;
+    }, true);
+    document.body.addEventListener('click', function() {
+        if(outside){
+            alertBox.style.display = 'none';
+        }
+    });
+    var outside_new = true;
+    var alertNewBox = document.getElementById("new_virtual_user");
+    function matchingNewVirtualUserBoxPopUp() {
+        $(".new_virtual_user").css("display", "block");
+        // 加了false才能显现出来
+        outside_new = false;
+    }
+    document.body.addEventListener('click', function () {
+        outside_new = true;
+    }, true);
+    document.body.addEventListener('click', function() {
+        if(outside_new){
+            alertNewBox.style.display = 'none';
+        }
+    })
 </script>
 </html>

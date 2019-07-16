@@ -174,6 +174,9 @@ public class OperationServiceImpl implements IOperationService {
                             }
 
 
+                            //去重
+                            List<String> forNoRepeat = new ArrayList<>();
+
                             //先找超级喜欢自己的卡片
                             //判断意向性别
                             List<Map<String, Object>> superLikeMe;
@@ -189,12 +192,15 @@ public class OperationServiceImpl implements IOperationService {
                                 if (cardNumber == 0) break;
                                 //如果不包含
                                 if (!seeUserCard.contains(superLikeMe.get(i).get("user_id").toString())){
-                                    //将其插入进去，需要卡片数目减一
-                                    //图片路径
-                                    superLikeMe.get(i).put("cover", CommonFunc.judgePicPath(superLikeMe.get(i).get("cover").toString()));
-                                    superLikeMe.get(i).put("type", "1");
-                                    resultCardList.add(superLikeMe.get(i));
-                                    cardNumber -= 1;
+                                    if (!forNoRepeat.contains(superLikeMe.get(i).get("user_id").toString())){
+                                        //将其插入进去，需要卡片数目减一
+                                        //图片路径
+                                        superLikeMe.get(i).put("cover", CommonFunc.judgePicPath(superLikeMe.get(i).get("cover").toString()));
+                                        superLikeMe.get(i).put("type", "1");
+                                        resultCardList.add(superLikeMe.get(i));
+                                        forNoRepeat.add(superLikeMe.get(i).get("user_id").toString());
+                                        cardNumber -= 1;
+                                    }
                                 }
                             }
                             //如果超级喜欢已经够了，后面就没必要了
@@ -212,12 +218,15 @@ public class OperationServiceImpl implements IOperationService {
                                     if (cardNumber == 0) break;
                                     //如果不包含
                                     if (!seeUserCard.contains(likeMe.get(i).get("user_id").toString())){
-                                        //将其插入进去，需要卡片数目减一
-                                        //图片路径
-                                        likeMe.get(i).put("cover", CommonFunc.judgePicPath(likeMe.get(i).get("cover").toString()));
-                                        likeMe.get(i).put("type", "2");
-                                        resultCardList.add(likeMe.get(i));
-                                        cardNumber -= 1;
+                                        if (!forNoRepeat.contains(likeMe.get(i).get("user_id").toString())){
+                                            //将其插入进去，需要卡片数目减一
+                                            //图片路径
+                                            likeMe.get(i).put("cover", CommonFunc.judgePicPath(likeMe.get(i).get("cover").toString()));
+                                            likeMe.get(i).put("type", "2");
+                                            resultCardList.add(likeMe.get(i));
+                                            forNoRepeat.add(likeMe.get(i).get("user_id").toString());
+                                            cardNumber -= 1;
+                                        }
                                     }
                                 }
 
@@ -236,12 +245,15 @@ public class OperationServiceImpl implements IOperationService {
                                         if (cardNumber == 0) break;
                                         //如果不包含
                                         if (!seeUserCard.contains(datingSpecifyCardByRankRange.get(i).get("user_id").toString())){
-                                            //将其插入进去，需要卡片数目减一
-                                            //图片路径
-                                            datingSpecifyCardByRankRange.get(i).put("cover", CommonFunc.judgePicPath(datingSpecifyCardByRankRange.get(i).get("cover").toString()));
-                                            datingSpecifyCardByRankRange.get(i).put("type", "3");
-                                            resultCardList.add(datingSpecifyCardByRankRange.get(i));
-                                            cardNumber -= 1;
+                                            if (!forNoRepeat.contains(datingSpecifyCardByRankRange.get(i).get("user_id").toString())){
+                                                //将其插入进去，需要卡片数目减一
+                                                //图片路径
+                                                datingSpecifyCardByRankRange.get(i).put("cover", CommonFunc.judgePicPath(datingSpecifyCardByRankRange.get(i).get("cover").toString()));
+                                                datingSpecifyCardByRankRange.get(i).put("type", "3");
+                                                resultCardList.add(datingSpecifyCardByRankRange.get(i));
+                                                forNoRepeat.add(datingSpecifyCardByRankRange.get(i).get("user_id").toString());
+                                                cardNumber -= 1;
+                                            }
                                         }
                                     }
 
@@ -261,12 +273,15 @@ public class OperationServiceImpl implements IOperationService {
                                             if (cardNumber == 0) break;
                                             //如果不包含
                                             if (!seeUserCard.contains(lowViewsCard.get(i).get("user_id").toString())){
-                                                //将其插入进去，需要卡片数目减一
-                                                //图片路径
-                                                lowViewsCard.get(i).put("cover", CommonFunc.judgePicPath(lowViewsCard.get(i).get("cover").toString()));
-                                                lowViewsCard.get(i).put("type", "4");
-                                                resultCardList.add(lowViewsCard.get(i));
-                                                cardNumber -= 1;
+                                                if (!forNoRepeat.contains(lowViewsCard.get(i).get("user_id").toString())){
+                                                    //将其插入进去，需要卡片数目减一
+                                                    //图片路径
+                                                    lowViewsCard.get(i).put("cover", CommonFunc.judgePicPath(lowViewsCard.get(i).get("cover").toString()));
+                                                    lowViewsCard.get(i).put("type", "4");
+                                                    resultCardList.add(lowViewsCard.get(i));
+                                                    forNoRepeat.add(lowViewsCard.get(i).get("user_id").toString());
+                                                    cardNumber -= 1;
+                                                }
                                             }
                                         }
                                     }
@@ -293,27 +308,30 @@ public class OperationServiceImpl implements IOperationService {
                             }
 
 
-                            //将结果一一记录到表中
-                            //先查询表中是否有相应的记录，有的都取出来用程序去过滤哪些是批量插入，哪些是批量更新
-                            List<String> existSeeRecord = subtitlesMapper.findExistSeeRecord(uid, resultCardList);
                             List<Map<String, Object>> updateList = new ArrayList<>();
                             List<Map<String, Object>> insertList = new ArrayList<>();
-                            for (int k = 0; k < resultCardList.size(); k++){
-                                Map<String, Object> tmpMap = new HashMap<>();
-                                tmpMap.put("userId", uid);
-                                tmpMap.put("targetId", resultCardList.get(k).get("user_id").toString());
-                                tmpMap.put("type", resultCardList.get(k).get("type").toString());
-                                tmpMap.put("order", String.valueOf(k + 1));
-                                //如果这条已经在记录里了，更新即可
-                                if (existSeeRecord.contains(resultCardList.get(k).get("user_id").toString())){
-                                    updateList.add(tmpMap);
-                                }else {
-                                    //如果这条不在记录里，插入
-                                    insertList.add(tmpMap);
+                            //将结果一一记录到表中
+                            //先查询表中是否有相应的记录，有的都取出来用程序去过滤哪些是批量插入，哪些是批量更新
+                            if (resultCardList.size() > 0){
+                                List<String> existSeeRecord = subtitlesMapper.findExistSeeRecord(uid, resultCardList);
+                                for (int k = 0; k < resultCardList.size(); k++){
+                                    Map<String, Object> tmpMap = new HashMap<>();
+                                    tmpMap.put("userId", uid);
+                                    tmpMap.put("targetId", resultCardList.get(k).get("user_id").toString());
+                                    tmpMap.put("type", resultCardList.get(k).get("type").toString());
+                                    tmpMap.put("order", String.valueOf(k + 1));
+                                    //如果这条已经在记录里了，更新即可
+                                    if (existSeeRecord.contains(resultCardList.get(k).get("user_id").toString())){
+                                        updateList.add(tmpMap);
+                                    }else {
+                                        //如果这条不在记录里，插入
+                                        insertList.add(tmpMap);
+                                    }
+                                    //标签插进去
+                                    resultCardList.get(k).put("tag", tagMap.get(resultCardList.get(k).get("user_id").toString()));
                                 }
-                                //标签插进去
-                                resultCardList.get(k).put("tag", tagMap.get(resultCardList.get(k).get("user_id").toString()));
                             }
+
                             //事务
                             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
                             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -698,6 +716,10 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            //判断是否上传过
+            if (subtitlesMapper.checkExistDatingCard(uid) != 0){
+                return ServerResponse.createByErrorMessage("已经上传过卡片，不可重复上传！");
+            }
             //验证值是否在0和1之间
             if (!Validate.checkValueInOneZero(Arrays.asList(gender))) return ServerResponse.createByErrorMessage("性别的值不合法");
             if (!Validate.checkValueInOneTwoZero(Arrays.asList(intention))) return ServerResponse.createByErrorMessage("意向的性别的值不合法");
@@ -714,7 +736,7 @@ public class OperationServiceImpl implements IOperationService {
                 String name = iFileService.upload(cover,path,"l_e/operation/dating_cover");
                 String coverUrl = "operation/dating_cover/"+name;
                 String nowTime = String.valueOf((new Date()).getTime());
-                subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime);
+                subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             }catch (Exception e){

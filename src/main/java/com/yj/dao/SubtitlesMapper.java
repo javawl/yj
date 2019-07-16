@@ -39,6 +39,9 @@ public interface SubtitlesMapper {
     //查看卡片的曝光量
     Map<String, Object> getDatingCardViews(@Param("user_id") String user_id);
 
+    //查看是否已经上传过卡片
+    int checkExistDatingCard(@Param("user_id") String user_id);
+
     //判断今天是否已经提醒过对方
     Map<String, Object> judgeTodayWhetherRemind(@Param("user_id") String user_id);
 
@@ -173,7 +176,7 @@ public interface SubtitlesMapper {
 
 
     //上传卡片资料
-    int uploadDatingCardInfo(@Param("user_id") String user_id, @Param("cover") String cover, @Param("wx_name") String wx_name, @Param("intention") String intention, @Param("set_time") String set_time);
+    int uploadDatingCardInfo(@Param("user_id") String user_id, @Param("cover") String cover, @Param("wx_name") String wx_name, @Param("intention") String intention, @Param("set_time") String set_time, @Param("gender") String gender);
 
     //插入超级喜欢关系
     int createSuperLikeRelationship(@Param("admirers_user_id") String admirers_user_id, @Param("send_good_card_id") String send_good_card_id, @Param("rank") String rank, @Param("set_time") String set_time);

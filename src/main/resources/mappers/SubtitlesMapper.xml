@@ -148,6 +148,12 @@
     LIMIT 1
   </select>
 
+  <select id="checkExistDatingCard" parameterType="string" resultType="int">
+    SELECT count(id)
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+  </select>
+
   <select id="judgeTodayWhetherRemind" parameterType="string" resultType="map">
     SELECT views, whether_remind_lover
     FROM `dating_card`
