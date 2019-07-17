@@ -464,7 +464,7 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！" + token);
         }
-        String openid = userMapper.getWechatPlatformOpenId(uid);
+        String openid = userMapper.getOpenId(uid);
         if (openid == null) return ServerResponse.createByErrorMessage("非微信用户！");
         try{
             //时间戳

@@ -138,7 +138,7 @@
         .rank li{
             position: relative;
         }
-        .heart{ position: absolute; left: 11px; display: inline; top: 3.5px;}
+        .heart{ position: absolute; left: 11px; display: none; top: 3.5px;}
         .time_container{ width: 84px; float: left; margin-top: 2rem; }
         .confirm_button{ width: 150px; height: 20px; color: snow; background-image: linear-gradient(to right,  #FAB6D0, hotpink); padding: 7px 7px 7px 7px; border-radius: 20px; border:solid 2px hotpink; margin-top: 6rem; }
         .new_virtual_user{
@@ -222,12 +222,36 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/admin/showReadClassBook.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/zbh/showAllUserData.do?page="+page+"&size="+size+"&type="+type;
+    var genderInit = "-1";
+    var statusInit = "-1";
+    var vipInit = "-1";
+    var isVirtualInit = "-1";
+    var searchInit = "-1";
+    var emotionalStateInit = "-1";
     $(document).ready(function(){
+        loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
+    });
+    function loadData(gender, status, vip, isVirtual, search, emotionalState) {
+        $("#page").html('');
+        $("#daily_data").html('');
+        //清除table中的值
         $.ajax({
             url:all_url,
-            type:'GET',
+            type:'POST',
+            data:{
+                page: page,
+                size: size,
+                gender: gender,
+                status: status,
+                vip: vip,
+                isVirtual: isVirtual,
+                search: search,
+                emotionalState: emotionalState
+            },
             dataType:'json',
+            processData: false,
+            contentType: false,
             success:function (result) {
                 var data = result["data"];
                 count += parseInt(result["msg"]);
@@ -275,17 +299,17 @@
                     }
 
                     tag = '<ul class="tag_ul">' +
-                        '    <li>标签一<img id="heart1" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签二<img id="heart2" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签三<img id="heart3" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签四<img id="heart4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签五<img id="heart5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签一<img id="tag1_1" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签二<img id="tag1_2" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签三<img id="tag1_3" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签四<img id="tag1_4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        '    <li>标签五<img id="tag1_5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
                         '    <li style="position: relative"><div style="width: 85px;"><input style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="heart5" style=" position: absolute; bottom: 6px; left: 94px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png"> </li>' +
                         '</ul>';
 
                     data[i]['status'] = 2;
                     if (data[i]['status'] == 1){
-                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="check_chapter('+"'"+data[i]['id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">不合格</div>';
+                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="qualified('+"'"+data[i]['id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">不合格</div>';
                     }else if (data[i]['status'] == 2) {
                         operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="matchingBoxPopUp('+"'"+data[i]['id']+"'"+')">展示</div><div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">封号</div>';
                     }
@@ -295,7 +319,7 @@
                         '<td id="wx_name'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','wx_name'"+')">'+data[i]['name']+'</td>'+
                         '<td id="change_gender'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','change_gender'"+')">'+data[i]['name']+'</td>'+
                         '<td id="intention'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','intention'"+')">'+data[i]['name']+'</td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
                         '<td id="status'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','status'"+')">'+data[i]['name']+'</td>'+
                         '<td id="signature'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','signature'"+')">'+data[i]['name']+'</td>'+
                         // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
@@ -324,7 +348,7 @@
                 alert("服务器出错！");
             }
         });
-    });
+    }
     //--------------------------------------------------------------------
     // 修改图片(点击隐藏上传框)
     //用来上传图片
@@ -334,7 +358,6 @@
         document.getElementById("pic").click();
     }
     function upload_pic() {
-        alert(pic_id);
         var formData = new FormData();
         formData.append('upload_file', $('#pic')[0].files[0]);
         formData.append('id', pic_id);
@@ -470,30 +493,31 @@
 <body id="bd">
 <center>
     <div class="hidden_background" onclick="cleanBackgroundPic()">隐藏背景</div>
+    <input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic()" />
     <h1>恋爱卡片</h1>
     <%--弹出选择展位框--%>
     <div class="pop_up_box" id="pop_up_box" onclick="outside = false">
         <div class="rank" style="position: relative;">
             <p style="margin: 0px;">选择卡片位</p>
             <ul>
-                <li>卡片位 一<img id="heart1" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 二<img id="heart2" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 三<img id="heart3" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 四<img id="heart4" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 五<img id="heart5" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 六<img id="heart6" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 七<img id="heart7" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 八<img id="heart8" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 九<img id="heart9" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
-                <li>卡片位 十<img id="heart10" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('1')">卡片位 一<img id="heart1" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('2')">卡片位 二<img id="heart2" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('3')">卡片位 三<img id="heart3" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('4')">卡片位 四<img id="heart4" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('5')">卡片位 五<img id="heart5" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('6')">卡片位 六<img id="heart6" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('7')">卡片位 七<img id="heart7" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('8')">卡片位 八<img id="heart8" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('9')">卡片位 九<img id="heart9" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
+                <li onclick="displayHeart('10')">卡片位 十<img id="heart10" class="heart" src="https://file.ourbeibei.com/l_e/static/icon/heart.png"></li>
             </ul>
         </div>
         <div class="time_title">选择日期</div>
-        <div class="time_container" style="margin-left: 74px;"><input type="text" name="year" placeholder="年份"></div>
-        <div class="time_container"><input type="text" name="month" placeholder="月份(xx)"></div>
-        <div class="time_container"><input type="text" name="year" placeholder="日(xx)"></div>
+        <div class="time_container" style="margin-left: 74px;"><input type="text" name="year" id="yearDate" placeholder="年份"></div>
+        <div class="time_container"><input type="text" name="month" id="monthDate" placeholder="月份(xx)"></div>
+        <div class="time_container"><input type="text" name="day" id="dayDate" placeholder="日(xx)"></div>
         <input type="text" style="display: none;" id="card_id">
-        <div class="confirm_button">完成</div>
+        <div class="confirm_button" onclick="setDisplayCard();">完成</div>
     </div>
     <div class="new_virtual_user" id="new_virtual_user" onclick="outside_new = false">
         <div class="new_virtual_user_title">
@@ -501,38 +525,39 @@
         </div>
         <div class="new_virtual_user_line_box">
             <div class="first_line">
-                <input type="text" name="wx_name" placeholder="微信名">
+                <input id="setWxName" type="text" name="wx_name" placeholder="微信名">
             </div>
             <div class="first_line">
-                <input type="text" name="age" placeholder="年龄">
+                <input id="setAge" type="text" name="age" placeholder="年龄">
             </div>
         </div>
         <div class="new_virtual_user_line_box">
             <div class="second_line">
-                <input type="text" name="gender" placeholder="性别">
+                <input id="setGender" type="text" name="gender" placeholder="性别">
             </div>
             <div class="second_line">
-                <input type="text" name="intention" placeholder="意向性别">
+                <input id="setIntention" type="text" name="intention" placeholder="意向性别">
             </div>
             <div class="second_line">
-                <input type="text" name="views" placeholder="曝光量">
+                <input id="setViews" type="text" name="views" placeholder="曝光量">
             </div>
         </div>
         <div class="three_line">
-            <input type="text" name="signature" placeholder="个性签名">
+            <input id="setSignature" type="text" name="signature" placeholder="个性签名">
         </div>
         <div class="four_line">
-            <input type="text" name="institutions" placeholder="机构/学校">
+            <input id="setInstitutions" type="text" name="institutions" placeholder="机构/学校">
         </div>
-        <img class="upload_pink" src="https://file.ourbeibei.com/l_e/static/icon/upload_pink.png">
-        <div class="confirm_virtual_button">完成</div>
+        <img id="upload_pink" class="upload_pink" src="https://file.ourbeibei.com/l_e/static/icon/upload_pink.png" onclick="uploadVirtualCover()">
+        <input type="file" id="setCover" value="上传" style="display: none;" onchange="previewPic()"/>
+        <div class="confirm_virtual_button" onclick="addNewVirtualUser()">完成</div>
     </div>
     <input type="file" id="pic" value="上传" style="display: none;" onchange="upload_pic(id)" />
     <br>
     <table cellpadding="6" width="87%" border="1" cellspacing="0" id="daily_data" style="border-color: pink;">
         <tr>
             <td style="border-right: 0;" colspan="4">
-                <input type="text" name="search" placeholder="搜索帅哥">
+                <input type="text" name="search" id="searchBox" placeholder="搜索帅哥">
             </td>
             <%--<td style="border-left: 0;border-right: 0;"></td>--%>
             <%--<td style="border-left: 0;border-right: 0;"></td>--%>
@@ -567,8 +592,8 @@
             <td style="position: relative;">
                 <p>性别</p>
                 <ul>
-                    <li>男</li>
-                    <li>女</li>
+                    <li onclick="genderInit = '0';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">男</li>
+                    <li onclick="genderInit = '1';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">女</li>
                 </ul>
             </td>
             <td>
@@ -580,8 +605,8 @@
             <td style="position: relative;">
                 <p>状态</p>
                 <ul>
-                    <li>通过</li>
-                    <li>未审核</li>
+                    <li onclick="statusInit = '2';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">通过</li>
+                    <li onclick="statusInit = '1';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">未审核</li>
                 </ul>
             </td>
             <td>
@@ -596,15 +621,15 @@
             <td style="position: relative;">
                 <p>vip</p>
                 <ul>
-                    <li>是vip</li>
-                    <li>不是vip</li>
+                    <li onclick="vipInit = '1';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">是vip</li>
+                    <li onclick="vipInit = '0';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">不是vip</li>
                 </ul>
             </td>
             <td style="position: relative;">
                 <p>是否虚拟</p>
                 <ul>
-                    <li>虚拟</li>
-                    <li>真实</li>
+                    <li onclick="isVirtualInit = '1';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">虚拟</li>
+                    <li onclick="isVirtualInit = '0';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">真实</li>
                 </ul>
             </td>
             <td>
@@ -625,8 +650,8 @@
             <td style="position: relative;">
                 <p>匹配状态</p>
                 <ul>
-                    <li>正在匹配</li>
-                    <li>未匹配</li>
+                    <li onclick="emotionalStateInit = '1';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">正在匹配</li>
+                    <li onclick="emotionalStateInit = '0';loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);">未匹配</li>
                 </ul>
             </td>
             <td>
@@ -645,12 +670,23 @@
     function check_chapter(id) {
         // window.location.href = "read_class_chapter.jsp?id="+id;
     }
+    //判空
+    function isnull(valArr) {
+        for (var i = 0; i < valArr.length; i++){
+            var str = valArr[i].replace(/(^\s*)|(\s*$)/g, '');//去除空格;
+            if (str == '' || str == undefined || str == null) {
+                return true;
+            }
+        }
+        return false;
+    }
     function goBlack(id) {
         $.ajax({
-            url:url+"/lzy/black.do",
+            url:url+"/lzy/update_status.do",
             type:'POST',
             data:{
-                id : id
+                id : id,
+                status: 0
             },
             dataType:'json',
             async: false,
@@ -669,6 +705,153 @@
             }
         });
     }
+    function qualified(id) {
+        $.ajax({
+            url:url+"/lzy/update_status.do",
+            type:'POST',
+            data:{
+                id : id,
+                status: 2
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+    function uploadVirtualCover() {
+        document.getElementById('setCover').click();
+    }
+    function previewPic() {
+        var fileObj = $("#setCover")[0];
+        var windowURL = window.URL || window.webkitURL;
+        var dataURL = windowURL.createObjectURL(fileObj.files[0]);
+        $("#upload_pink").attr('src', dataURL);
+    }
+    function addNewVirtualUser() {
+        //判空
+        var wxName = $("#setWxName").val();
+        var gender = $("#setGender").val();
+        var institutions = $("#setInstitutions").val();
+        var intention = $("#setIntention").val();
+        var signature = $("#setSignature").val();
+        var views = $("#setViews").val();
+        var cover = $('#setCover')[0].files[0];
+        var checkArr = [ wxName, gender, institutions, intention, signature, views ];
+        if (isnull(checkArr)){
+            alert("有参数为空，参数不可为空！");
+            return;
+        }
+        if (!cover){
+            alert("请上传图片");
+            return;
+        }
+        var formData = new FormData();
+        formData.append('upload_file', $('#pic')[0].files[0]);
+        formData.append('wx_name', wxName);
+        formData.append('gender', gender);
+        formData.append('institutions', institutions);
+        formData.append('intention', intention);
+        formData.append('signature', signature);
+        formData.append('views', views);
+        formData.append('cover', cover);
+        $.ajax({
+            url:url+"/zbh/createNewVirtualUser.do",
+            type:'POST',
+            data:formData,
+            dataType:'json',
+            processData: false,
+            contentType: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+    var displayHeartGate = 0;
+    var displayHeartFlag;
+    function displayHeart(number) {
+        if (displayHeartGate === 1) {
+            $("#heart" + displayHeartFlag).css("display", "none");
+        }
+        $("#heart"+number).css("display", "inline");
+        displayHeartFlag = number;
+        displayHeartGate = 1;
+    }
+    function setDisplayCard() {
+        if (displayHeartGate === 0){
+            alert("请先选择卡片位");
+            return;
+        }
+        // 判断时间格式
+        var yearDate = $("#yearDate").val();
+        var monthDate = $("#monthDate").val();
+        var dayDate = $("#dayDate").val();
+        //正则
+        var pattn1 = /[0-9]{2}/;
+        var pattn2 = /[0-9]{4}/;
+        if (!pattn2.test(yearDate)){
+            alert("年份输入格式应为xxxx");
+            return;
+        }
+        if (!pattn1.test(monthDate) || !pattn1.test(dayDate)){
+            alert("月份和日的输入格式应为xx");
+            return;
+        }
+        $.ajax({
+            url:url+"/zbh/setShowTime.do",
+            type:'POST',
+            data:{
+                user_id : $("#card_id").val(),
+                position:displayHeartFlag,
+                data: yearDate + "-" + monthDate + "-" + dayDate
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+    //回车事件
+    document.onkeyup = function (e) {//按键信息对象以函数参数的形式传递进来了，就是那个e
+        var code = e.charCode || e.keyCode;  //取出按键信息中的按键代码(大部分浏览器通过keyCode属性获取按键代码，但少部分浏览器使用的却是charCode)
+        if (code == 13) {
+            //此处编写用户敲回车后的代码
+            searchInit = $("#searchBox").val();
+            loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
+        }
+    };
     var outside = true;
     var alertBox = document.getElementById("pop_up_box");
     function matchingBoxPopUp(id) {
