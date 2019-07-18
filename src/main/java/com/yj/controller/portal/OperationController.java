@@ -1,6 +1,7 @@
 package com.yj.controller.portal;
 
 
+import com.yj.common.CommonFunc;
 import com.yj.common.ServerResponse;
 import com.yj.dao.*;
 import com.yj.service.*;
@@ -36,7 +37,7 @@ public class OperationController {
     private Common_configMapper common_configMapper;
 
     @Autowired
-    private DictionaryMapper dictionaryMapper;
+    private SubtitlesMapper subtitlesMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -192,6 +193,55 @@ public class OperationController {
     @ResponseBody
     public ServerResponse<Map<String, Object>> twoMeet(HttpServletRequest request){
         return iOperationService.twoMeet(request);
+    }
+
+
+
+    /**
+     * 增加日发现页下拉数
+     */
+    @RequestMapping(value = "addDailyFoundPagePullDown.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addDailyFoundPagePullDown(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            //加入日常统计
+            subtitlesMapper.addDailyFoundPagePullDown(one);
+        }else {
+            subtitlesMapper.addDailyFoundPagePullDown(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
+
+
+
+    /**
+     * 增加日弹出vip弹窗次数
+     */
+    @RequestMapping(value = "addDailyPopUpWindowTimes.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> addDailyPopUpWindowTimes(){
+        //获取当天0点多一秒时间戳
+        String one = CommonFunc.getOneDate();
+        //获取当月一号零点的时间戳
+        String Month_one = CommonFunc.getMonthOneDate();
+        //先判断当天有没有数据，有的话更新
+        Map is_exist = userMapper.getDailyDataInfo(one);
+        if (is_exist == null){
+            common_configMapper.insertDataInfo(1,0,one, Month_one);
+            //加入日常统计
+            subtitlesMapper.addDailyPopUpWindowTimes(one);
+        }else {
+            subtitlesMapper.addDailyPopUpWindowTimes(one);
+        }
+        return ServerResponse.createBySuccessMessage("成功");
     }
 
 }

@@ -143,6 +143,21 @@ public interface SubtitlesMapper {
     //日配对数加一
     int addDailyDatingPairingNumber(@Param("set_time") String set_time);
 
+    //日点击时光倒流加一
+    int addDailyDatingBackInTimeClick(@Param("set_time") String set_time);
+
+    //日发现页下拉数加一
+    int addDailyFoundPagePullDown(@Param("set_time") String set_time);
+
+    //日发现页进入次数
+    int addDailyFoundPageTimes(@Param("set_time") String set_time);
+
+    //日提交资料次数
+    int addDailyUploadDataTimes(@Param("set_time") String set_time);
+
+    //日弹出vip弹窗次数
+    int addDailyPopUpWindowTimes(@Param("set_time") String set_time);
+
     //更新约会卡片的曝光量
     int updateDatingCardViews(@Param("views") String views, @Param("user_id") String user_id);
 

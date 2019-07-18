@@ -181,7 +181,7 @@
   </select>
 
   <select id="findSuperLikeMeCard" parameterType="string" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE user_id in
     (SELECT admirers_user_id
@@ -195,7 +195,7 @@
   </select>
 
   <select id="findSuperLikeMeCardWithOutGender" parameterType="string" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE user_id in
     (SELECT admirers_user_id
@@ -208,7 +208,7 @@
   </select>
 
   <select id="findLikeMeCard" parameterType="string" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE user_id in
     (SELECT admirers_user_id
@@ -222,7 +222,7 @@
   </select>
 
   <select id="findLikeMeCardWithOutGender" parameterType="string" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE user_id in
     (SELECT admirers_user_id
@@ -236,7 +236,7 @@
 
 
   <select id="findLowViewsCard" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE gender = #{gender}
     AND status = 2
@@ -246,7 +246,7 @@
 
 
   <select id="findLowViewsCardWithOut" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE status = 2
     AND is_in_love = 0
@@ -283,7 +283,7 @@
 
 
   <select id="findDatingSpecifyCard" parameterType="string" resultType="map">
-    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card,
     (
       SELECT user_id
@@ -297,7 +297,7 @@
 
 
   <select id="findTodayDatingCardInfo" parameterType="java.util.List" resultType="map">
-    SELECT user_id,wx_name,gender,signature,age,cover,status
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
     WHERE user_id
     IN
@@ -308,7 +308,7 @@
 
 
   <select id="findDatingSpecifyCardByRankRange" parameterType="string" resultType="map">
-    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card,
          (
             SELECT user_id
@@ -324,7 +324,7 @@
 
 
   <select id="findDatingSpecifyCardByRankRangeWithOutGender" parameterType="string" resultType="map">
-    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status
+    SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card,
          (
             SELECT user_id
@@ -455,6 +455,40 @@
   <update id="addDailyDatingPairingNumber">
     UPDATE `data_info`
     set `daily_dating_pairing_number` = `daily_dating_pairing_number` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+  <update id="addDailyDatingBackInTimeClick">
+    UPDATE `data_info`
+    set `daily_dating_card_back_in_time_click` = `daily_dating_card_back_in_time_click` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyFoundPagePullDown">
+    UPDATE `data_info`
+    set `daily_found_page_pull_down` = `daily_found_page_pull_down` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyFoundPageTimes">
+    UPDATE `data_info`
+    set `daily_found_page_times` = `daily_found_page_times` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyUploadDataTimes">
+    UPDATE `data_info`
+    set `daily_upload_data_times` = `daily_upload_data_times` + 1
+    WHERE set_time = #{set_time}
+  </update>
+
+
+  <update id="addDailyPopUpWindowTimes">
+    UPDATE `data_info`
+    set `daily_pop_up_window` = `daily_pop_up_window` + 1
     WHERE set_time = #{set_time}
   </update>
 

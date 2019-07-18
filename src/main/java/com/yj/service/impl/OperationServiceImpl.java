@@ -441,6 +441,18 @@ public class OperationServiceImpl implements IOperationService {
                 }
 
             }
+            //日常统计
+            //获取当月一号零点的时间戳
+            String Month_one = CommonFunc.getMonthOneDate();
+            //先判断当天有没有数据，有的话更新
+            Map is_exist = userMapper.getDailyDataInfo(oneDate);
+            if (is_exist == null){
+                common_configMapper.insertDataInfo(1,0,oneDate, Month_one);
+                //加入日常统计
+                subtitlesMapper.addDailyFoundPageTimes(oneDate);
+            }else {
+                subtitlesMapper.addDailyFoundPageTimes(oneDate);
+            }
             return ServerResponse.createBySuccess("成功", result);
         }
     }
@@ -723,6 +735,9 @@ public class OperationServiceImpl implements IOperationService {
             //验证值是否在0和1之间
             if (!Validate.checkValueInOneZero(Arrays.asList(gender))) return ServerResponse.createByErrorMessage("性别的值不合法");
             if (!Validate.checkValueInOneTwoZero(Arrays.asList(intention))) return ServerResponse.createByErrorMessage("意向的性别的值不合法");
+            String oneDate = CommonFunc.getOneDate();
+            //获取当月一号零点的时间戳
+            String Month_one = CommonFunc.getMonthOneDate();
             //事务
             DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -737,6 +752,16 @@ public class OperationServiceImpl implements IOperationService {
                 String coverUrl = "operation/dating_cover/"+name;
                 String nowTime = String.valueOf((new Date()).getTime());
                 subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
+                //日常统计
+                //先判断当天有没有数据，有的话更新
+                Map is_exist = userMapper.getDailyDataInfo(oneDate);
+                if (is_exist == null){
+                    common_configMapper.insertDataInfo(1,0,oneDate, Month_one);
+                    //加入日常统计
+                    subtitlesMapper.addDailyUploadDataTimes(oneDate);
+                }else {
+                    subtitlesMapper.addDailyUploadDataTimes(oneDate);
+                }
                 transactionManager.commit(status);
                 return ServerResponse.createBySuccessMessage("成功");
             }catch (Exception e){
@@ -1246,6 +1271,11 @@ public class OperationServiceImpl implements IOperationService {
                 result.put("datingCards", todayDatingCardInfo);
             }
 
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //加入日常统计
+            subtitlesMapper.addDailyDatingBackInTimeClick(one);
+
             return ServerResponse.createBySuccess("成功", result);
         }
     }
@@ -1730,7 +1760,6 @@ public class OperationServiceImpl implements IOperationService {
             return ServerResponse.createBySuccess("成功", result);
         }
     }
-
 
 
 

@@ -110,6 +110,21 @@
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_drop_down_user']+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_wechat_platform_share_people']+'</td>'+
                             '<td>'+data['daily_data'][i]['daily_advertisement_click_num']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_approve_dating_user']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_pairing_number']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_paired_user_clock']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_remind_lovers_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_release_relationship']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_vip_number']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_like_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_super_like_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_super_light_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_card_more_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_dating_card_back_in_time_click']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_found_page_pull_down']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_found_page_times']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_upload_data_times']+'</td>'+
+                            '<td>'+data['daily_data'][i]['daily_pop_up_window']+'</td>'+
                             '<td>'+data['daily_data'][i]['set_time']+'</td>'+
                             '</tr>');
                 }
@@ -141,7 +156,7 @@
         </tr>
     </table>
     <br>
-    <table cellpadding="9" width="87%" border="1" cellspacing="0" id="daily_data">
+    <table cellpadding="9" border="1" cellspacing="0" id="daily_data" style="margin-left: 85px;">
         <tr>
             <td>日增用户数</td>
             <td>APP日启动次数</td>
@@ -158,6 +173,21 @@
             <td>分享页下拉用户数</td>
             <td>分享出去人数</td>
             <td>每日获取激励视频数</td>
+            <td>日审核通过数</td>
+            <td>日找对象活动日配对对数</td>
+            <td>日配对并且完成打卡的人数</td>
+            <td>日"提醒爱人背单词"点击量</td>
+            <td>日解除关系的对数</td>
+            <td>日增vip数</td>
+            <td>日点击喜欢次数</td>
+            <td>日点击超级喜欢次数</td>
+            <td>日点击超级曝光数</td>
+            <td>日查看更多卡片点击数</td>
+            <td>日点击时光倒流数</td>
+            <td>日发现页下拉数</td>
+            <td>日进入发现页数</td>
+            <td>日提交资料数</td>
+            <td>日弹出vip弹窗数</td>
             <td>日期</td>
         </tr>
     </table>
