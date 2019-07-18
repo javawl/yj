@@ -1732,7 +1732,7 @@ public class AdminController {
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "你已成功完成单词挑战获得奖金", wx_info, nowTime);
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("id").toString(), "你已成功完成单词挑战获得奖金", wx_info, nowTime);
                 }
             }
 

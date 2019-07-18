@@ -62,7 +62,7 @@
                 <p onclick="change_src('show_game_operating_share.jsp?page=1&size=15')">小游戏运营分享</p>
                 <p onclick="change_src('show_game_month_challenge.jsp?page=1&size=15')">小游戏万元挑战</p>
                 <p onclick="change_src('show_live_course.jsp?page=1&size=15')">直播课程</p>
-                <%--<p onclick="change_src('showdatingcard.jsp?page=1&size=15')">审核,修改资料,放展示卡总表</p>--%>
+                <p onclick="change_src('showdatingcard.jsp?page=1&size=15')">审核,修改资料,放展示卡总表</p>
             </center>
         </div>
         <div class="main">
