@@ -480,7 +480,7 @@ public class OperationServiceImpl implements IOperationService {
 
             //组装参数，用户生成统一下单接口的签名
             Map<String, String> packageParams = new HashMap<String, String>();
-            packageParams.put("appid", WxConfig.wx_platform_app_id);
+            packageParams.put("appid", WxConfig.wx_app_id);
             packageParams.put("mch_id", WxPayConfig.mch_id);
             packageParams.put("nonce_str", nonce_str);
             packageParams.put("body", body);
@@ -500,7 +500,7 @@ public class OperationServiceImpl implements IOperationService {
             System.out.println(mysign);
 
             //拼接统一下单接口使用的xml数据，要将上一步生成的签名一起拼接进去
-            String xml = "<xml>" + "<appid>" + WxConfig.wx_platform_app_id + "</appid>"
+            String xml = "<xml>" + "<appid>" + WxConfig.wx_app_id + "</appid>"
                     + "<body><![CDATA[" + body + "]]></body>"
                     + "<mch_id>" + WxPayConfig.mch_id + "</mch_id>"
                     + "<nonce_str>" + nonce_str + "</nonce_str>"
