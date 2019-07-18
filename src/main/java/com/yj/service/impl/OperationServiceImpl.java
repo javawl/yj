@@ -535,12 +535,12 @@ public class OperationServiceImpl implements IOperationService {
                 Long timeStamp = System.currentTimeMillis() / 1000;
                 response.put("timeStamp", timeStamp + "");//这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
                 //拼接签名需要的参数
-                String stringSignTemp = "appId=" + WxConfig.wx_platform_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
+                String stringSignTemp = "appId=" + WxConfig.wx_app_id + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id+ "&signType=MD5&timeStamp=" + timeStamp;
                 //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
                 String paySign = PayUtils.sign(stringSignTemp, WxPayConfig.key, "utf-8").toUpperCase();
 
                 response.put("paySign", paySign);
-                response.put("appid", WxConfig.wx_platform_app_id);
+                response.put("appid", WxConfig.wx_app_id);
                 response.put("signType", WxPayConfig.SIGNTYPE);
                 //这里先记录一下用户的支付情况
                 common_configMapper.insertPayRecord(uid,"datingVip",now_time);
