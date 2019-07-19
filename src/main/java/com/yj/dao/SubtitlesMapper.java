@@ -78,6 +78,9 @@ public interface SubtitlesMapper {
     //找出今天看过的几张卡片的信息
     List<String> findExistSeeRecord(@Param("user_id") String user_id, @Param("info") List<Map<String, Object>> info);
 
+    //找出是vip的几张卡片的信息
+    List<String> findExistVipUsers(@Param("now_time") String now_time, @Param("info") List<Map<String, Object>> info);
+
     //查看指定号位的后台指定卡片
     Map<String, Object> findDatingSpecifyCard(@Param("rank") String rank, @Param("set_time") String set_time);
 
@@ -103,11 +106,20 @@ public interface SubtitlesMapper {
     //查看目标用户是否喜欢自己（用于匹配）
     Map<String, Object> findWhetherTargetUserLikeMe(@Param("targetId") String targetId, @Param("userId") String userId);
 
+    //找出自己喜欢的用户
+    List<String> getMyLikeUsers(@Param("userId") String userId);
+
+    //找出自己超级喜欢的用户
+    List<String> getMySuperLikeUsers(@Param("userId") String userId);
+
     //找出自己的另一半
     Map<String, Object> findUserLover(@Param("user_id") String user_id);
 
     //找出与他相遇的相遇码
     Map<String, Object> findDatingUserMeetCode(@Param("user_id") String user_id);
+
+    //看对方今天是否看了我
+    int whetherTargetSeeMeToday(@Param("user_id") String user_id, @Param("be_seen_user_id") String be_seen_user_id, @Param("see_time") String see_time);
 
 
     //开通找对象的vip
@@ -188,6 +200,14 @@ public interface SubtitlesMapper {
     //更新查看关系的表
     int updateSeeRelationship(@Param("user_id") String user_id,@Param("valid_time") String valid_time, @Param("see_time") String see_time, @Param("inputArr") List<Map<String, Object>> inputArr, @Param("arr") List<Map<String, Object>> arr);
 
+    //修改今天看的卡片的排序关系
+    int updateSeeRelationshipRank(@Param("user_id") String user_id, @Param("see_time")String see_time, @Param("be_seen_user_id")String be_seen_user_id, @Param("rank")String rank);
+
+    //修改今天看的卡片的状态关系
+    int updateSeeRelationshipType(@Param("user_id") String user_id, @Param("see_time")String see_time, @Param("be_seen_user_id")String be_seen_user_id, @Param("type")String type);
+
+    //修改今天看的卡片的排序和状态关系
+    int updateSeeRelationshipRankType(@Param("user_id") String user_id, @Param("see_time")String see_time, @Param("be_seen_user_id")String be_seen_user_id, @Param("rank")String rank, @Param("type")String type);
 
 
     //上传卡片资料

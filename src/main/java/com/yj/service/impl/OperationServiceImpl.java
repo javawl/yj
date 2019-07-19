@@ -144,6 +144,8 @@ public class OperationServiceImpl implements IOperationService {
                             //查出自己14天内看过的用户的id，存入list，为了减小数据库的压力
                             List<String> seeUserCard =  subtitlesMapper.findSeeUserCard(uid, nowTime);
 
+                            //去重
+                            List<String> forNoRepeat = new ArrayList<>();
                             //一号位先按照后台安排，没有按照曝光量
                             Map<String, Object> firstDatingSpecifyCard = subtitlesMapper.findDatingSpecifyCard("1", oneDate);
                             if (firstDatingSpecifyCard != null && !seeUserCard.contains(firstDatingSpecifyCard.get("user_id").toString())){
@@ -152,6 +154,7 @@ public class OperationServiceImpl implements IOperationService {
                                 firstDatingSpecifyCard.put("cover", CommonFunc.judgePicPath(firstDatingSpecifyCard.get("cover").toString()));
                                 firstDatingSpecifyCard.put("type", "3");
                                 resultCardList.add(firstDatingSpecifyCard);
+                                forNoRepeat.add(firstDatingSpecifyCard.get("user_id").toString());
                             }else {
                                 //从曝光量低的用户中选择，优先选真实用户，没有再选虚拟用户
                                 if (userIntentionGender.equals("2")){
@@ -167,6 +170,7 @@ public class OperationServiceImpl implements IOperationService {
                                         lowViewsCard.get(j).put("cover", CommonFunc.judgePicPath(lowViewsCard.get(j).get("cover").toString()));
                                         lowViewsCard.get(j).put("type", "4");
                                         resultCardList.add(lowViewsCard.get(j));
+                                        forNoRepeat.add(lowViewsCard.get(j).get("user_id").toString());
                                         //就要一个(并且1号位不用计数)
                                         break;
                                     }
@@ -174,8 +178,7 @@ public class OperationServiceImpl implements IOperationService {
                             }
 
 
-                            //去重
-                            List<String> forNoRepeat = new ArrayList<>();
+
 
                             //先找超级喜欢自己的卡片
                             //判断意向性别
@@ -308,18 +311,31 @@ public class OperationServiceImpl implements IOperationService {
                             }
 
 
+
                             List<Map<String, Object>> updateList = new ArrayList<>();
                             List<Map<String, Object>> insertList = new ArrayList<>();
                             //将结果一一记录到表中
                             //先查询表中是否有相应的记录，有的都取出来用程序去过滤哪些是批量插入，哪些是批量更新
                             if (resultCardList.size() > 0){
+                                //将自己超级喜欢和喜欢的卡片标记
+                                List<String> mySuperLike = subtitlesMapper.getMySuperLikeUsers(uid);
+                                List<String> myLike = subtitlesMapper.getMyLikeUsers(uid);
                                 List<String> existSeeRecord = subtitlesMapper.findExistSeeRecord(uid, resultCardList);
+                                //取出卡片里的vip
+                                List<String> existVipUsers = subtitlesMapper.findExistVipUsers(nowTime, resultCardList);
+                                int cardOrder = 0;
                                 for (int k = 0; k < resultCardList.size(); k++){
+                                    //判断是否是自己的卡片是的话跳过
+                                    if (uid.equals(resultCardList.get(k).get("user_id").toString())){
+                                        continue;
+                                    }
+                                    //计算卡片的顺序
+                                    cardOrder += 1;
                                     Map<String, Object> tmpMap = new HashMap<>();
                                     tmpMap.put("userId", uid);
                                     tmpMap.put("targetId", resultCardList.get(k).get("user_id").toString());
                                     tmpMap.put("type", resultCardList.get(k).get("type").toString());
-                                    tmpMap.put("order", String.valueOf(k + 1));
+                                    tmpMap.put("order", String.valueOf(cardOrder));
                                     //如果这条已经在记录里了，更新即可
                                     if (existSeeRecord.contains(resultCardList.get(k).get("user_id").toString())){
                                         updateList.add(tmpMap);
@@ -327,8 +343,34 @@ public class OperationServiceImpl implements IOperationService {
                                         //如果这条不在记录里，插入
                                         insertList.add(tmpMap);
                                     }
+                                    //是否是vip
+                                    if (existVipUsers.contains(resultCardList.get(k).get("user_id").toString())){
+                                        //插进去
+                                        resultCardList.get(k).put("isVip", "1");
+                                    }else {
+                                        //插进去
+                                        resultCardList.get(k).put("isVip", "0");
+                                    }
+                                    if (myLike.contains(resultCardList.get(k).get("user_id").toString())){
+                                        //插进去
+                                        resultCardList.get(k).put("isMyLike", "1");
+                                    }else {
+                                        resultCardList.get(k).put("isMyLike", "0");
+                                    }
+                                    if (mySuperLike.contains(resultCardList.get(k).get("user_id").toString())){
+                                        //插进去
+                                        resultCardList.get(k).put("isMySuperLike", "1");
+                                    }else {
+                                        resultCardList.get(k).put("isMySuperLike", "0");
+                                    }
                                     //标签插进去
                                     resultCardList.get(k).put("tag", tagMap.get(resultCardList.get(k).get("user_id").toString()));
+                                }
+                                for (int k = 0; k < resultCardList.size(); k++) {
+                                    //判断是否是自己的卡片是的话跳过
+                                    if (uid.equals(resultCardList.get(k).get("user_id").toString())) {
+                                        resultCardList.remove(k);
+                                    }
                                 }
                             }
 
@@ -368,6 +410,11 @@ public class OperationServiceImpl implements IOperationService {
 
                             Map<String, List<Object>> tagMap = new HashMap<>();
                             if(todayDatingCardInfo.size() > 0){
+                                //将自己超级喜欢和喜欢的卡片标记
+                                List<String> mySuperLike = subtitlesMapper.getMySuperLikeUsers(uid);
+                                List<String> myLike = subtitlesMapper.getMyLikeUsers(uid);
+                                //取出卡片里的vip
+                                List<String> existVipUsers = subtitlesMapper.findExistVipUsers(nowTime, todayDatingCardInfo);
                                 //todo 将大家的标签查出来
                                 List<Map<String, Object>> tag = subtitlesMapper.findAllCardTag(todayDatingCardInfo);
 
@@ -383,16 +430,38 @@ public class OperationServiceImpl implements IOperationService {
                                         tagMap.put(tag.get(l).get("user_id").toString(), tmpList);
                                     }
                                 }
+
+                                for (int k = 0; k < todayDatingCardInfo.size(); k++){
+                                    //图片正确路径
+                                    todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
+
+                                    //标签插进去
+                                    todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
+
+
+                                    //是否是vip
+                                    if (existVipUsers.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                                        //插进去
+                                        todayDatingCardInfo.get(k).put("isVip", "1");
+                                    }else {
+                                        //插进去
+                                        todayDatingCardInfo.get(k).put("isVip", "0");
+                                    }
+                                    if (myLike.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                                        //插进去
+                                        todayDatingCardInfo.get(k).put("isMyLike", "1");
+                                    }else {
+                                        todayDatingCardInfo.get(k).put("isMyLike", "0");
+                                    }
+                                    if (mySuperLike.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                                        //插进去
+                                        todayDatingCardInfo.get(k).put("isMySuperLike", "1");
+                                    }else {
+                                        todayDatingCardInfo.get(k).put("isMySuperLike", "0");
+                                    }
+                                }
                             }
 
-
-                            for (int k = 0; k < todayDatingCardInfo.size(); k++){
-                                //图片正确路径
-                                todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
-
-                                //标签插进去
-                                todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
-                            }
                             //插入结果集
                             result.put("datingCards", todayDatingCardInfo);
                         }
@@ -961,7 +1030,28 @@ public class OperationServiceImpl implements IOperationService {
             }
             //查看是否超级喜欢过该用户
             if (subtitlesMapper.checkExistSuperLikeRelationship(uid, targetId, "1") != null){
-                return ServerResponse.createByErrorMessage("您已经超级喜欢过该用户！");
+                //事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                //隔离级别
+                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus status = transactionManager.getTransaction(def);
+                try{
+                    //删除对方喜欢自己的记录
+                    subtitlesMapper.deleteDatingLikeRelationship(uid, targetId);
+                    //判断对方查看记录里有没有自己，有的话撤掉超级喜欢状态
+                    if (subtitlesMapper.whetherTargetSeeMeToday(targetId, uid, one) > 0){
+                        subtitlesMapper.updateSeeRelationshipType(targetId, one, uid, "4");
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功取消超级喜欢");
+                }catch (Exception e){
+                    transactionManager.rollback(status);
+                    e.printStackTrace();
+                    logger.error("取消超级喜欢异常",e.getStackTrace());
+                    logger.error("取消超级喜欢异常" + e.getMessage());
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
             }
 
             //判断对方是否喜欢或者超级喜欢自己
@@ -1043,7 +1133,7 @@ public class OperationServiceImpl implements IOperationService {
             }else {
                 //单纯喜欢（单方向，单相思）
                 //先判断他当天有没有看过这些卡片
-                List<String> seeUserCardToday = subtitlesMapper.findSeeUserCardToday(uid, one);
+                List<String> seeUserCardToday = subtitlesMapper.findSeeUserCardToday(targetId, one);
                 //事务
                 DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
                 DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -1060,14 +1150,29 @@ public class OperationServiceImpl implements IOperationService {
 
                     if (seeUserCardToday.size() > 0){
                         //标记过
-                        //将最后一位删掉
-                        //最后一位的卡片主人id
-                        String lastCardTargetId = seeUserCardToday.get(seeUserCardToday.size() - 1);
-                        subtitlesMapper.deleteTheLastCardTodaySee(one, uid, lastCardTargetId);
-                        //将二到最后一位后移一位
-                        subtitlesMapper.seeRelationshipWholeBack(one, uid);
-                        //把卡片插到第二位
-                        subtitlesMapper.insertSingleSeeRelationship(uid, targetId, CommonFunc.getNextFourteenDayDate(), one, "2", "1");
+                        //判断自己的卡片是否在对方的卡片堆里
+                        if (seeUserCardToday.contains(uid)){
+                            //如果有
+                            //判断看过几张（下界）
+                            if (seeUserCardToday.size() >= 2){
+                                //第二位变成末位
+                                subtitlesMapper.updateSeeRelationshipRank(targetId, one, seeUserCardToday.get(1), String.valueOf(seeUserCardToday.size()));
+                                //目标位变成第二位
+                                subtitlesMapper.updateSeeRelationshipRankType(targetId, one, uid, "2", "1");
+                            }else {
+                                //只有一张卡
+                                subtitlesMapper.updateSeeRelationshipRankType(targetId, one, uid, "1", "1");
+                            }
+                        }else {
+                            //将最后一位删掉
+                            //最后一位的卡片主人id
+                            String lastCardTargetId = seeUserCardToday.get(seeUserCardToday.size() - 1);
+                            subtitlesMapper.deleteTheLastCardTodaySee(one, targetId, lastCardTargetId);
+                            //将二到最后一位后移一位
+                            subtitlesMapper.seeRelationshipWholeBack(one, targetId);
+                            //把卡片插到第二位
+                            subtitlesMapper.insertSingleSeeRelationship(targetId, uid, CommonFunc.getNextFourteenDayDate(), one, "2", "1");
+                        }
                     }
 
                     transactionManager.commit(status);
@@ -1323,7 +1428,28 @@ public class OperationServiceImpl implements IOperationService {
             }
             //查看是否喜欢过该用户
             if (subtitlesMapper.checkExistSuperLikeRelationship(uid, targetId, "0") != null){
-                return ServerResponse.createByErrorMessage("您已经喜欢过该用户！");
+                //事务
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                //隔离级别
+                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus status = transactionManager.getTransaction(def);
+                try{
+                    //删除对方喜欢自己的记录
+                    subtitlesMapper.deleteDatingLikeRelationship(uid, targetId);
+                    //判断对方查看记录里有没有自己，有的话撤掉喜欢状态
+                    if (subtitlesMapper.whetherTargetSeeMeToday(targetId, uid, one) > 0){
+                        subtitlesMapper.updateSeeRelationshipType(targetId, one, uid, "4");
+                    }
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("成功取消喜欢");
+                }catch (Exception e){
+                    transactionManager.rollback(status);
+                    e.printStackTrace();
+                    logger.error("取消喜欢异常",e.getStackTrace());
+                    logger.error("取消喜欢异常" + e.getMessage());
+                    return ServerResponse.createByErrorMessage("更新出错！");
+                }
             }
 
             //判断对方是否喜欢或者超级喜欢自己
@@ -1414,7 +1540,7 @@ public class OperationServiceImpl implements IOperationService {
                 def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
                 TransactionStatus status = transactionManager.getTransaction(def);
                 try{
-                    //添加入超级喜欢的关系
+                    //添加入喜欢的关系状态0来表示
                     subtitlesMapper.createSuperLikeRelationship(uid, targetId, "0", nowTime);
                     //加入日常统计
                     subtitlesMapper.addDailyDatingLikeClick(one);

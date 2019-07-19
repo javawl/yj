@@ -282,6 +282,18 @@
   </select>
 
 
+  <select id="findExistVipUsers" resultType="string">
+    SELECT id
+    FROM `user`
+    WHERE dating_vip > #{now_time}
+    AND id
+    IN
+    <foreach collection="info" item="item" open="(" close=")" separator=",">
+      #{item.user_id}
+    </foreach>
+  </select>
+
+
   <select id="findDatingSpecifyCard" parameterType="string" resultType="map">
     SELECT dating_card.user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card,
@@ -371,6 +383,22 @@
     LIMIT 1
   </select>
 
+
+  <select id="getMyLikeUsers" parameterType="string" resultType="string">
+    SELECT `send_good_card_id`
+    FROM `dating_like_relationship`
+    WHERE admirers_user_id = #{userId}
+    AND rank = 0
+  </select>
+
+
+  <select id="getMySuperLikeUsers" parameterType="string" resultType="string">
+    SELECT `send_good_card_id`
+    FROM `dating_like_relationship`
+    WHERE admirers_user_id = #{userId}
+    AND rank = 1
+  </select>
+
   <select id="findUserLover" parameterType="string" resultType="map">
     SELECT lover_one_user_id,lover_another_user_id,word_number,record_like_to_relive_memories_uid
     FROM `dating_relationship`
@@ -386,6 +414,15 @@
     WHERE lover_one_user_id = #{user_id}
     OR lover_another_user_id = #{user_id}
     LIMIT 1
+  </select>
+
+
+  <select id="whetherTargetSeeMeToday" parameterType="string" resultType="int">
+    SELECT count(id)
+    FROM `dating_see_relationship`
+    WHERE user_id = #{user_id}
+    AND be_seen_user_id = #{be_seen_user_id}
+    AND see_time = #{see_time}
   </select>
   
 
@@ -581,6 +618,34 @@
       #{i.targetId}
     </foreach>
   </update>
+
+
+  <update id="updateSeeRelationshipRank" parameterType="string">
+    UPDATE `dating_see_relationship`
+    SET `rank` = #{rank}
+    WHERE user_id = #{user_id}
+    AND see_time = #{see_time}
+    AND be_seen_user_id = #{be_seen_user_id}
+  </update>
+
+  <update id="updateSeeRelationshipType" parameterType="string">
+    UPDATE `dating_see_relationship`
+    SET `type` = #{type}
+    WHERE user_id = #{user_id}
+    AND see_time = #{see_time}
+    AND be_seen_user_id = #{be_seen_user_id}
+  </update>
+
+  <update id="updateSeeRelationshipRankType" parameterType="string">
+    UPDATE `dating_see_relationship`
+    SET `rank` = #{rank},
+        `type` = #{type}
+    WHERE user_id = #{user_id}
+    AND see_time = #{see_time}
+    AND be_seen_user_id = #{be_seen_user_id}
+  </update>
+  
+  
   <!--插入-->
   <insert id="uploadDatingCardInfo" parameterType="string">
     INSERT INTO dating_card (user_id, cover, wx_name, gender, intention, set_time)
