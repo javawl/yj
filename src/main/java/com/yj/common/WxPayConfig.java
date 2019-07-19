@@ -16,11 +16,11 @@ public class WxPayConfig {
     //阅读支付成功后的服务器回调url
     public static final String read_help_pay_notify_second = "https://www.ourbeibei.com/various/readChallengeHelpPaySecondNotify.do";
     //直播课程支付成功后的服务器回调url
-//    public static final String liveCourseNotify = "https://www.ourbeibei.com/various/liveCoursePayNotify.do";
-    public static final String liveCourseNotify = "http://47.102.152.102:8080/various/liveCoursePayNotify.do";
+    public static final String liveCourseNotify = "https://www.ourbeibei.com/various/liveCoursePayNotify.do";
+//    public static final String liveCourseNotify = "http://47.102.152.102:8080/various/liveCoursePayNotify.do";
     //直播课程助力支付成功后的服务器回调url
-//    public static final String liveCourseHelpNotify = "https://www.ourbeibei.com/various/liveCoursePayHelpNotify.do";
-    public static final String liveCourseHelpNotify = "http://47.102.152.102:8080/various/liveCoursePayHelpNotify.do";
+    public static final String liveCourseHelpNotify = "https://www.ourbeibei.com/various/liveCoursePayHelpNotify.do";
+//    public static final String liveCourseHelpNotify = "http://47.102.152.102:8080/various/liveCoursePayHelpNotify.do";
     //约会活动vip支付回调地址
 //    public static final String datingVipPayCallBack = "https://www.ourbeibei.com/operation/datingVipPayCallBack.do";
     public static final String datingVipPayCallBack = "http://47.102.152.102:8080/operation/datingVipPayCallBack.do";
