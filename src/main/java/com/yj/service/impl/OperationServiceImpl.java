@@ -1353,6 +1353,13 @@ public class OperationServiceImpl implements IOperationService {
                 List<Map<String, Object>> todayDatingCardInfo = subtitlesMapper.findTodayDatingCardInfo(seeUserCardToday);
                 Map<String, List<Object>> tagMap = new HashMap<>();
                 if (todayDatingCardInfo.size() > 0){
+
+                    //将自己超级喜欢和喜欢的卡片标记
+                    List<String> mySuperLike = subtitlesMapper.getMySuperLikeUsers(uid);
+                    List<String> myLike = subtitlesMapper.getMyLikeUsers(uid);
+                    //取出卡片里的vip
+                    List<String> existVipUsers = subtitlesMapper.findExistVipUsers(nowTime, todayDatingCardInfo);
+
                     //todo 将大家的标签查出来
                     List<Map<String, Object>> tag = subtitlesMapper.findAllCardTag(todayDatingCardInfo);
                     //将list按照用户id转变成Map
@@ -1367,14 +1374,36 @@ public class OperationServiceImpl implements IOperationService {
                             tagMap.put(tag.get(l).get("user_id").toString(), tmpList);
                         }
                     }
+
+                    for (int k = 0; k < todayDatingCardInfo.size(); k++){
+                        todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
+
+                        //标签插进去
+                        todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
+
+                        //是否是vip
+                        if (existVipUsers.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                            //插进去
+                            todayDatingCardInfo.get(k).put("isVip", "1");
+                        }else {
+                            //插进去
+                            todayDatingCardInfo.get(k).put("isVip", "0");
+                        }
+                        if (myLike.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                            //插进去
+                            todayDatingCardInfo.get(k).put("isMyLike", "1");
+                        }else {
+                            todayDatingCardInfo.get(k).put("isMyLike", "0");
+                        }
+                        if (mySuperLike.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
+                            //插进去
+                            todayDatingCardInfo.get(k).put("isMySuperLike", "1");
+                        }else {
+                            todayDatingCardInfo.get(k).put("isMySuperLike", "0");
+                        }
+                    }
                 }
 
-                for (int k = 0; k < todayDatingCardInfo.size(); k++){
-                    todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
-
-                    //标签插进去
-                    todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
-                }
                 //插入结果集
                 result.put("datingCards", todayDatingCardInfo);
             }

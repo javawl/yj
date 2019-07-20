@@ -2117,10 +2117,10 @@ public class VariousServiceImpl implements IVariousService {
             //todo 做判断看看他到底能不能报名
             //报过名不能报(任意一期)
             //查出并判断是否有报名
-            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
-            if (selectBeginningReadClass != null){
-                return ServerResponse.createByErrorMessage("已报名过阅读不可再报！");
-            }
+//            Map<Object,Object> selectBeginningReadClass = common_configMapper.showSelectBeginReadClassSeries(now_time,uid);
+//            if (selectBeginningReadClass != null){
+//                return ServerResponse.createByErrorMessage("已报名过阅读不可再报！");
+//            }
             //判断是否报名助力
             Map<Object,Object> check = common_configMapper.checkReadChallengeHelpAttend(uid);
             if (check == null){
