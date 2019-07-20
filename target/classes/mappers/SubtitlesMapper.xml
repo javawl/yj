@@ -122,9 +122,10 @@
   </select>
 
   <select id="findLoversInfo" parameterType="string" resultType="map">
-    SELECT username,portrait
-    FROM `user`
-    WHERE `id` = #{user_id}
+    SELECT wx_name as username,cover as portrait, gender
+    FROM `dating_card`
+    WHERE `user_id` = #{user_id}
+    LIMIT 1
   </select>
 
   <select id="userDatingInfo" parameterType="string" resultType="map">
@@ -555,7 +556,7 @@
     UPDATE `dating_card`
     SET is_in_love = #{is_in_love},
         love_times = love_times + #{love_times}
-    WHERE id = #{user_id}
+    WHERE user_id = #{user_id}
   </update>
 
 

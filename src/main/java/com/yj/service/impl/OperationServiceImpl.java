@@ -490,6 +490,9 @@ public class OperationServiceImpl implements IOperationService {
                     //头像和名字
                     Map<String, Object> myInfo = subtitlesMapper.findLoversInfo(uid);
                     Map<String, Object> loversInfo = subtitlesMapper.findLoversInfo(loverId);
+                    //头像改对路径
+                    myInfo.put("portrait", CommonFunc.judgePicPath(myInfo.get("portrait").toString()));
+                    loversInfo.put("portrait", CommonFunc.judgePicPath(loversInfo.get("portrait").toString()));
                     result.put("myInfo", myInfo);
                     result.put("loverInfo", loversInfo);
                     //今天是否提醒过
