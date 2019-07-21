@@ -828,6 +828,12 @@ public class CommonFunc {
         }
     }
 
+    //将一个时间戳转化为多少天（比如传入两个时间戳的间隔的大小，返回相隔多少天）
+    public static int getDuringDaysByDuringTimeStamp(Long duringTimeStamp){
+        //向下取整
+        return (int) Math.floor(duringTimeStamp / (24 * 60 * 60 * 1000 * 1.0));
+    }
+
 
     //计算历史打卡
     public static Map<Object,List<Object>> clock_history(List<Map<Object,Object>> time){
@@ -1061,35 +1067,35 @@ public class CommonFunc {
     }
 
     public static AccessToken getAccessToken() {
-        AccessToken token = null;
-        String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
-        String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
-        String access_token;
-        //判断如果缓存里有的话直接返回
-        if (LocalCache.containsKey("wxminiprogramaccesstoken")){
-            access_token = LocalCache.get("wxminiprogramaccesstoken").toString();
-            System.out.println("缓存");
-        }else{
-            // 发起GET请求获取凭证
-            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
-            try {
-                access_token = jsonObject.getString("access_token");
-                //存入缓存
-                LocalCache.put("wxminiprogramaccesstoken", access_token, 7100);
-                System.out.println("生成");
-            } catch (JSONException e) {
-                token = null;
-                // 获取token失败
-                System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
-                return token;
-            }
-        }
-
-        token = new AccessToken();
-        token.setAccessToken(access_token);
-        token.setExpiresIn(7200);
-        return token;
-//        return null;
+//        AccessToken token = null;
+//        String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
+//        String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
+//        String access_token;
+//        //判断如果缓存里有的话直接返回
+//        if (LocalCache.containsKey("wxminiprogramaccesstoken")){
+//            access_token = LocalCache.get("wxminiprogramaccesstoken").toString();
+//            System.out.println("缓存");
+//        }else{
+//            // 发起GET请求获取凭证
+//            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
+//            try {
+//                access_token = jsonObject.getString("access_token");
+//                //存入缓存
+//                LocalCache.put("wxminiprogramaccesstoken", access_token, 7100);
+//                System.out.println("生成");
+//            } catch (JSONException e) {
+//                token = null;
+//                // 获取token失败
+//                System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
+//                return token;
+//            }
+//        }
+//
+//        token = new AccessToken();
+//        token.setAccessToken(access_token);
+//        token.setExpiresIn(7200);
+//        return token;
+        return null;
     }
 
     //发送模板消息

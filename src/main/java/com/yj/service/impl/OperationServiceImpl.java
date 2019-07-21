@@ -510,6 +510,10 @@ public class OperationServiceImpl implements IOperationService {
                     }
                     //单词数
                     result.put("wordNumber", userLover.get("word_number"));
+                    //匹配天数
+                    String startTime = userLover.get("set_time").toString();
+                    Long duringTime = Long.valueOf(nowTime) - Long.valueOf(startTime);
+                    result.put("loveDays", CommonFunc.getDuringDaysByDuringTimeStamp(duringTime));
                 }
 
             }

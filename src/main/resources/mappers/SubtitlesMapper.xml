@@ -401,7 +401,7 @@
   </select>
 
   <select id="findUserLover" parameterType="string" resultType="map">
-    SELECT lover_one_user_id,lover_another_user_id,word_number,record_like_to_relive_memories_uid
+    SELECT lover_one_user_id,lover_another_user_id,word_number,record_like_to_relive_memories_uid,set_time
     FROM `dating_relationship`
     WHERE lover_one_user_id = #{user_id}
     OR lover_another_user_id = #{user_id}
