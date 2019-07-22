@@ -177,6 +177,16 @@ public class OperationController {
 
 
     /**
+     * vip增加匹配背单词数20个
+     */
+    @RequestMapping(value = "datingVipAddWordNumber.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> datingVipAddWordNumber(HttpServletRequest request){
+        return iOperationService.datingVipAddWordNumber(request);
+    }
+
+
+    /**
      * 重温回忆
      */
     @RequestMapping(value = "reliveMemories.do", method = RequestMethod.POST)

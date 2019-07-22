@@ -179,6 +179,9 @@ public interface SubtitlesMapper {
     //更新提醒对方背单词的时间
     int updateRecordRemindLoverTime(@Param("whether_remind_lover") String whether_remind_lover, @Param("user_id") String user_id);
 
+    //更新vip添加单词数的时间
+    int updateVipAddWordNumberTime(@Param("whether_vip_add_word_number") String whether_vip_add_word_number, @Param("user_id") String user_id);
+
     //将用户改为坠入爱河状态
     int makeUserInLoveStatus(@Param("is_in_love") String is_in_love, @Param("user_id") String user_id, @Param("love_times") int love_times);
 

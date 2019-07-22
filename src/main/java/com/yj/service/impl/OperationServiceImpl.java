@@ -514,6 +514,16 @@ public class OperationServiceImpl implements IOperationService {
                     String startTime = userLover.get("set_time").toString();
                     Long duringTime = Long.valueOf(nowTime) - Long.valueOf(startTime);
                     result.put("loveDays", CommonFunc.getDuringDaysByDuringTimeStamp(duringTime));
+                    //对方是否是vip
+                    //查看用户VIP等信息
+                    Map<String, Object> loverCheckVip = subtitlesMapper.checkUserDatingVip(loverId);
+                    if (Long.valueOf(loverCheckVip.get("dating_vip").toString()) >= Long.valueOf(nowTime)){
+                        //是vip
+                        result.put("loverVip", "1");
+                    }else {
+                        //不是vip
+                        result.put("loverVip", "0");
+                    }
                 }
 
             }
@@ -1816,6 +1826,53 @@ public class OperationServiceImpl implements IOperationService {
 
             //记录今天提醒过了
             subtitlesMapper.updateRecordRemindLoverTime(one, uid);
+
+
+            return ServerResponse.createBySuccessMessage("成功");
+        }
+    }
+
+
+    /**
+     * vip开挂+20单词量
+     * @param request  request
+     */
+    public ServerResponse<String> datingVipAddWordNumber(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //当天0点过一秒的时间戳
+            String one = CommonFunc.getOneDate();
+
+            //判断今天是否提醒过对方
+            Map<String, Object> todayWhetherRemind = subtitlesMapper.judgeTodayWhetherRemind(uid);
+
+            if (todayWhetherRemind.get("whether_vip_add_word_number") != null && one.equals(todayWhetherRemind.get("whether_vip_add_word_number").toString()) ){
+                return ServerResponse.createByErrorMessage("一天只能加一次哦");
+            }
+
+            //找出Ta的另一半
+            Map<String, Object> userLover = subtitlesMapper.findUserLover(uid);
+            if (userLover == null){
+                return ServerResponse.createByErrorMessage("你还未配对哦！");
+            }
+
+
+            //单词数+20
+            subtitlesMapper.addDatingRelationshipWordNumber(20, uid);
+
+            //记录今天提醒过了
+            subtitlesMapper.updateVipAddWordNumberTime(one, uid);
 
 
             return ServerResponse.createBySuccessMessage("成功");

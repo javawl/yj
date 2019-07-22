@@ -156,7 +156,7 @@
   </select>
 
   <select id="judgeTodayWhetherRemind" parameterType="string" resultType="map">
-    SELECT views, whether_remind_lover
+    SELECT views, whether_remind_lover, whether_vip_add_word_number
     FROM `dating_card`
     WHERE `user_id` = #{user_id}
     LIMIT 1
@@ -534,21 +534,27 @@
   <update id="updateDatingCardViews" parameterType="string">
     UPDATE `dating_card`
     SET views = #{views}
-    WHERE id = #{user_id}
+    WHERE user_id = #{user_id}
   </update>
 
 
   <update id="addDatingCardViews" parameterType="string">
     UPDATE `dating_card`
     SET views = views + 1
-    WHERE id = #{user_id}
+    WHERE user_id = #{user_id}
   </update>
 
 
   <update id="updateRecordRemindLoverTime" parameterType="string">
     UPDATE `dating_card`
     SET whether_remind_lover = #{whether_remind_lover}
-    WHERE id = #{user_id}
+    WHERE user_id = #{user_id}
+  </update>
+
+  <update id="updateVipAddWordNumberTime" parameterType="string">
+    UPDATE `dating_card`
+    SET whether_vip_add_word_number = #{whether_vip_add_word_number}
+    WHERE user_id = #{user_id}
   </update>
 
 

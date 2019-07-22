@@ -35,6 +35,8 @@ public interface IOperationService {
 
     ServerResponse<String> remindPartnerToMemorizeWord(String msg,HttpServletRequest request);
 
+    ServerResponse<String> datingVipAddWordNumber(HttpServletRequest request);
+
     ServerResponse<String> reliveMemories(HttpServletRequest request);
 
     ServerResponse<Map<String, Object>> twoMeet(HttpServletRequest request);
