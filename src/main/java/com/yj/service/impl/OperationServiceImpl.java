@@ -941,12 +941,17 @@ public class OperationServiceImpl implements IOperationService {
                 return ServerResponse.createByErrorMessage("不是Vip！");
             }
             Map<String, Object> resultMap = new HashMap<>();
+            //将自己超级喜欢和喜欢的卡片标记
+            List<String> mySuperLike = subtitlesMapper.getMySuperLikeUsers(uid);
+            List<String> myLike = subtitlesMapper.getMyLikeUsers(uid);
             //先找超级喜欢自己的卡片
             //判断意向性别
             List<Map<String, Object>> superLikeMe;
             superLikeMe = subtitlesMapper.findSuperLikeMeCardWithOutGender(uid);
             Map<String, List<Object>> tagMap = new HashMap<>();
             if (superLikeMe.size() > 0){
+                //取出卡片里的vip
+                List<String> superLikeMeExistVipUsers = subtitlesMapper.findExistVipUsers(nowTime, superLikeMe);
                 //todo 将大家的标签查出来
                 List<Map<String, Object>> tag = subtitlesMapper.findAllCardTag(superLikeMe);
 
@@ -962,13 +967,39 @@ public class OperationServiceImpl implements IOperationService {
                         tagMap.put(tag.get(l).get("user_id").toString(), tmpList);
                     }
                 }
-            }
-            for (int i = 0; i < superLikeMe.size(); i++){
-                superLikeMe.get(i).put("cover", CommonFunc.judgePicPath(superLikeMe.get(i).get("cover").toString()));
 
-                //标签插进去
-                superLikeMe.get(i).put("tag", tagMap.get(superLikeMe.get(i).get("user_id").toString()));
+
+                for (int i = 0; i < superLikeMe.size(); i++){
+                    superLikeMe.get(i).put("cover", CommonFunc.judgePicPath(superLikeMe.get(i).get("cover").toString()));
+
+                    //标签插进去
+                    superLikeMe.get(i).put("tag", tagMap.get(superLikeMe.get(i).get("user_id").toString()));
+
+                    //是否是vip
+                    if (superLikeMeExistVipUsers.contains(superLikeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        superLikeMe.get(i).put("isVip", "1");
+                    }else {
+                        //插进去
+                        superLikeMe.get(i).put("isVip", "0");
+                    }
+                    if (myLike.contains(superLikeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        superLikeMe.get(i).put("isMyLike", "1");
+                    }else {
+                        superLikeMe.get(i).put("isMyLike", "0");
+                    }
+                    if (mySuperLike.contains(superLikeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        superLikeMe.get(i).put("isMySuperLike", "1");
+                    }else {
+                        superLikeMe.get(i).put("isMySuperLike", "0");
+                    }
+                }
             }
+
+
+
             resultMap.put("superLikeMe", superLikeMe);
             //再找喜欢自己的
             List<Map<String, Object>> likeMe;
@@ -977,6 +1008,8 @@ public class OperationServiceImpl implements IOperationService {
             if (likeMe.size() > 0){
                 //todo 将大家的标签查出来
                 List<Map<String, Object>> tagLikeMe = subtitlesMapper.findAllCardTag(likeMe);
+                //取出卡片里的vip
+                List<String> likeMeExistVipUsers = subtitlesMapper.findExistVipUsers(nowTime, likeMe);
 
                 //将list按照用户id转变成Map
                 for (int l = 0; l < tagLikeMe.size(); l++){
@@ -990,14 +1023,37 @@ public class OperationServiceImpl implements IOperationService {
                         tagLikeMeMap.put(tagLikeMe.get(l).get("user_id").toString(), tmpList);
                     }
                 }
+
+                for (int i = 0; i < likeMe.size(); i++){
+                    likeMe.get(i).put("cover", CommonFunc.judgePicPath(likeMe.get(i).get("cover").toString()));
+
+                    //标签插进去
+                    likeMe.get(i).put("tag", tagLikeMeMap.get(likeMe.get(i).get("user_id").toString()));
+
+                    //是否是vip
+                    if (likeMeExistVipUsers.contains(likeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        likeMe.get(i).put("isVip", "1");
+                    }else {
+                        //插进去
+                        likeMe.get(i).put("isVip", "0");
+                    }
+                    if (myLike.contains(likeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        likeMe.get(i).put("isMyLike", "1");
+                    }else {
+                        likeMe.get(i).put("isMyLike", "0");
+                    }
+                    if (mySuperLike.contains(likeMe.get(i).get("user_id").toString())){
+                        //插进去
+                        likeMe.get(i).put("isMySuperLike", "1");
+                    }else {
+                        likeMe.get(i).put("isMySuperLike", "0");
+                    }
+                }
             }
 
-            for (int i = 0; i < likeMe.size(); i++){
-                likeMe.get(i).put("cover", CommonFunc.judgePicPath(likeMe.get(i).get("cover").toString()));
 
-                //标签插进去
-                likeMe.get(i).put("tag", tagLikeMeMap.get(likeMe.get(i).get("user_id").toString()));
-            }
             resultMap.put("likeMe", likeMe);
             return ServerResponse.createBySuccess("成功", resultMap);
         }
@@ -1665,6 +1721,7 @@ public class OperationServiceImpl implements IOperationService {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
         String uid = CommonFunc.CheckToken(request,token);
+        uid = "70476";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -1675,6 +1732,9 @@ public class OperationServiceImpl implements IOperationService {
             String one = CommonFunc.getOneDate();
             //找出Ta的另一半
             Map<String, Object> userLover = subtitlesMapper.findUserLover(uid);
+            if (userLover == null){
+                return ServerResponse.createByErrorMessage("你还没有匹配对象");
+            }
             String loverId;
             //判断两个id哪个是自己哪个是对方
             if (uid.equals(userLover.get("lover_one_user_id").toString())){

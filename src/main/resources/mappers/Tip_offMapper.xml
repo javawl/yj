@@ -70,4 +70,136 @@
       report_reason = #{reportReason,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <!--下面是自己添加的-->
+  <update id="updateUsername" parameterType="string">
+    update dating_card
+    set `wx_name` = #{name}
+    WHERE user_id = #{id}
+  </update>
+
+  <update id="update_d_Gender" parameterType="string">
+    update dating_card set `gender`= #{gender}
+    where user_id = #{id}
+  </update>
+
+  <update id="updateIntention" parameterType="string">
+    update dating_card set `intention` = #{intention}
+    where user_id = #{id}
+  </update>
+
+  <update id="updateSignature" parameterType="string">
+    update dating_card set `signature` = #{signature}
+    where user_id = #{id}
+  </update>
+
+  <update id="updateStatus" parameterType="string">
+    update dating_card set `status` = #{status}
+    where user_id = #{id}
+  </update>
+
+  <update id="updateVip" parameterType="string">
+    update user set  `dating_vip` = #{vip}
+    where id = #{id}
+  </update>
+
+  <update id="updateAge" parameterType="string">
+    update dating_card set `age`= #{age}
+    where user_id = #{id}
+  </update>
+
+  <update id="updateCondition" parameterType="string">
+    update dating_card  set `is_in_love` = #{condition}
+    where user_id = #{id}
+  </update>
+
+  <select id="selectLover" parameterType="string" resultType="map">
+    select id,lover_one_user_id,lover_another_user_id from
+      dating_relationship
+    where (lover_one_user_id = #{id}) or (lover_another_user_id = #{id})
+  </select>
+
+  <delete id="deleteRelationship" parameterType="string">
+    delete from dating_relationship
+    where lover_one_user_id = #{id} or lover_another_user_id = #{id}
+  </delete>
+
+  <update id="updateCover" >
+    update dating_card set `cover`=#{url}
+    where user_id = #{id}
+  </update>
+
+  <select id="selectCardId" parameterType="string" resultType="string">
+    select id from dating_card
+    where user_id = #{user_id}
+  </select>
+
+  <update id="updateTag" parameterType="string">
+    update dating_card_tag set `tag`=#{tag}
+    where card_id=#{id}
+  </update>
+
+  <select id="isNullTag" parameterType="string" resultType="map">
+    select id from dating_card_tag
+    where card_id = #{id}
+  </select>
+
+  <insert id="insertTag" parameterType="string" >
+    insert into `dating_card_tag` (card_id, tag)
+    values(#{id},#{tag})
+  </insert>
+
+  <delete id = "deleteTag" parameterType="string">
+    delete from `dating_card_tag`
+    where id = #{tag_id}
+  </delete>
+
+  <update id="updateTime" parameterType="string">
+    update dating_specify_card set `set_time`=#{time}
+    where user_id = #{id}
+  </update>
+
+  <select id="selectByWord" parameterType="string" resultType="map">
+    select * from dating_card
+    where `wx_name` like "%"#{word}"%"
+  </select>
+
+  <!--<update id="deleteLoving" parameterType="string">-->
+  <!--update dating_card set `is_in_love` = 0-->
+  <!--where user_id = #{id}-->
+  <!--</update>-->
+
+  <update id="pre_user" parameterType="string">
+    update dating_specify_card set
+                                 `rank` = #{pos}
+                                 `set_time` = #{time}
+    where user_id = #{id}
+  </update>
+
+  <update id="addShowTime" >
+    update dating_card  set
+      show_times = #{showtime}
+    where user_id = #{id}
+  </update>
+
+  <select id = "selectShowTime" parameterType="string" resultType="int">
+    select show_times from dating_card
+    where user_id = #{id}
+  </select>
+
+  <select id = "selectStatus" resultType="int">
+    select status from dating_card
+    where user_id = #{id}
+  </select>
+
+
+  <select id = "isOnShow" resultType="map">
+    select * from dating_specify_card
+    where user_id = #{id}
+  </select>
+
+  <!--<select id = "selectUserByDate" resultType="map">-->
+  <!--select -->
+  <!--</select>-->
 </mapper>

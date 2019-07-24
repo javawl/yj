@@ -92,18 +92,383 @@
       dictionary_type = #{dictionaryType,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  
-  
+
+
 
 
   <!--///////////////////////////////////下面是自己添加的实现/////////////////////////////////////////////////-->
   <!--////////////////////////////////版本0.3Dao层实现/////////////////////////////////////////-->
-  
+
   <insert id="insertIntimateRelationship" parameterType="string">
     INSERT INTO `intimate_relationship` (user_id_one, user_id_two)
     VALUES (#{user_id_one}, #{user_id_two})
   </insert>
 
+  <select id="selectDailySubmitDatingInfo" resultType="map" parameterType="string">
+    SELECT `daily_submit_dating_info` FROM data_info
+  </select>
 
+  <select id="countDataInfo" resultType="string">
+    SELECT count(*) FROM data_info
+  </select>
+
+  <select id="selectDataInfo" resultType="map" >
+    SELECT * FROM data_info ORDER BY set_time DESC
+                                     LIMIT #{start},#{size}
+  </select>
+
+  <select id="getAllData" resultType="map">
+    SELECT SUM(daily_approve_dating_user) FROM data_info
+  </select>
+
+  <!--  //后台管理系统 审核，修改，添加用户，放展示卡总表的  所有信息获取-->
+  <select id="selectAllUserDataInfo" resultType="map">
+    --     select distinct s1.set_time,s2.*
+    --     from `dating_specify_card` s1 right outer join
+    select s1.likes,s2.tag,s2.show_times,s2.love_times,s2.is_in_love,s2.user_id
+    from (
+    select send_good_card_id as id,count(*) as likes from
+    `dating_like_relationship` group by send_good_card_id
+    )s1 right outer join
+    (select s1.tag,s2.* from
+    `dating_card_tag`s1 right outer join
+    (SELECT
+    t2.show_times,t2.love_times,t2.is_in_love,t1.id as user_id,t2.id as card_id
+    FROM `user` t1 inner join
+    `dating_card`t2
+    on t1.id = t2.user_id
+    WHERE
+    <trim>
+      <if test="gender != -1">
+        t2.gender = #{gender}
+      </if>
+      <if test="gender == -1">
+        true
+      </if>
+    </trim>
+    <trim prefix=" and ">
+      <if test=" status != -1">
+        t2.status = #{status}
+      </if>
+      <if test="status == -1">
+        (t2.status = 1 or t2.status = 2)
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="vip == 0">
+        t1.dating_vip = #{vip}
+      </if>
+      <if test="vip == -1">
+        true
+      </if>
+      <if test="vip == 1">
+        t1.dating_vip != 0
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="isVirtual != -1">
+        t2.is_virtual = #{isVirtual}
+      </if>
+      <if test="isVirtual == -1">
+        (t2.is_virtual = 0 or t2.is_virtual = 1)
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="emotionalState != -1 ">
+        t2.is_in_love = #{emotionalState}
+      </if>
+      <if test="emotionalState == -1">
+        (t2.is_in_love = 0 or t2.is_in_love =1)
+      </if>
+    </trim>
+    <trim prefix="and">
+      --     <if test="search != '-1'">
+      t2.`wx_name` like "%"#{search}"%"
+      --     </if>
+      <if test = "search == '-1'">
+        true
+      </if>
+    </trim>
+    ORDER BY t2.set_time  DESC)s2
+    on s1.card_id = s2.card_id
+    )s2
+    --     left outer join
+    --     `dating_specify_card`s3
+    on s1.id = s2.user_id
+    --     =s3.user_id
+
+    --     on  s1.user_id = s2.user_id
+    LIMIT #{start},#{size}
+  </select>
+
+  <select id = "getSettime" resultType="map">
+    select distinct set_time from `dating_specify_card`
+    where user_id = #{id}
+  </select>
+
+  <select id = "getInloveTime" resultType="string">
+    select set_time from `dating_relationship`
+    where lover_one_user_id = #{id} or lover_another_user_id = #{id}
+  </select>
+
+  <select id = "getClockDates" resultType="map">
+    select set_time from `insist_day`
+    where user_id = #{id}
+      and set_time >= #{date}
+  </select>
+
+
+  <select id="countAllUserData" resultType="string">
+    SELECT COUNT(id) FROM user
+  </select>
+
+  <select id="showReversalAllUserDataInfo" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    ORDER BY t2.id  ASC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="selectMaleUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.gender = 0
+    ORDER BY t2.id  DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countMaleUser" resultType="string">
+    SELECT COUNT(id) FROM user
+    WHERE gender = 0
+  </select>
+
+  <select id="selectFemaleUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.gender = 1
+    ORDER BY t2.set_time  DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countFemaleUser" resultType="string">
+    SELECT COUNT(id) FROM user
+    WHERE gender = 1
+  </select>
+
+  <select id="seletPassedUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.status = 2
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countPassedUser" resultType="string">
+    SELECT COUNT(t2.id)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.status = 2
+  </select>
+
+  <select id="selectNotPassedUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.status = 1
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countNotPassedUser" resultType="string">
+    SELECT COUNT(t2.id)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.status = 1
+  </select>
+
+  <select id="selectVipUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.dating_vip != 0
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countVipUser" resultType="string">
+    SELECT COUNT(id)
+    FROM user
+    WHERE dating_vip != 0
+  </select>
+
+  <select id="selectNotVipUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.dating_vip = 0
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countNotVipUSer" resultType="string">
+    SELECT COUNT(id)
+    FROM user
+    WHERE dating_vip = 0
+  </select>
+
+  <select id="selectTrueUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.is_virtual = 0
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countTrueUser" resultType="string">
+    SELECT COUNT(t2.id)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.is_virtual = 0
+  </select>
+
+  <select id="selectVirtualUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.is_virtual = 1
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countVirtualUser" resultType="string">
+    SELECT COUNT(t2.id)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.is_virtual = 1
+  </select>
+
+  <update id="passUser">
+    update `dating_card`
+    set status = 2
+    where id = #{id}
+  </update>
+
+  <update id="notPassUser">
+    update `dating_card`
+    set status = 0
+    where id = #{id}
+  </update>
+
+  <select id="selectWechatByid" resultType="string">
+    SELECT t1.wechat FROM
+      `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.id = #{id}
+  </select>
+
+  <select id="selectIdById" resultType="string">
+    SELECT t1.id FROM
+      `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t2.id = #{id}
+  </select>
+
+  <select id="getFormIdById" resultType="string">
+    SELECT form_id FROM `template_msg`
+    WHERE `template_msg`.user_id = #{user_id}
+  </select>
+
+  <insert id="insertTmpSendMsgRecord" parameterType="string">
+    INSERT INTO tmp_send_msg_record (user_id,remarks,info,set_time)
+    values (#{user_id},#{remarks},#{info},#{set_time})
+  </insert>
+
+  <select id="searchRelatedUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.username LIKE "%"#{name}"%"
+    ORDER BY t2.set_time DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countSearchRelatedSearchUser" resultType="string">
+    SELECT COUNT(*)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.username LIKE "%"#{name}"%"
+  </select>
+
+  <insert id="insertNewVirtualUser" parameterType="string">
+    INSERT INTO `dating_card`(user_id, wx_name, gender, intention, signature, age, institutions, status, views, set_time)
+    VALUES(#{user_id}, #{wx_name}, #{gender}, #{institutions}, #{signature}, #{age}, #{institutions}, #{status}, #{views}, #{set_time})
+  </insert>
+
+  <select id="selectCompletedInfoUser" resultType="map">
+    SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.username != NULL AND t2.signature != NULL AND t2.age != NULL AND t2.institutions != NULL
+    ORDER BY t2.id DESC
+             LIMIT #{start},#{size}
+  </select>
+
+  <select id="countCompletedInfoUser" resultType="string">
+    SELECT COUNT(t2.id)
+    FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
+    WHERE t1.username != NULL AND t2.signature != NULL AND t2.age != NULL AND t2.institutions != NULL
+  </select>
+
+  <insert id="insertNewVirtualUserToUser">
+    <selectKey resultType="string" order="AFTER">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    INSERT INTO `user`(`gender`,`personality_signature`,`register_time`)
+    VALUES (#{gender},#{personality_signature},#{register_time})
+  </insert>
+
+  <!--  <select id="selectDatingStatus" resultType="string">-->
+  <!--    SELECT status-->
+  <!--    FROM dating_card-->
+  <!--    WHERE user_id = #{user_id}-->
+  <!--  </select>-->
+
+  <select id="getDatingUserInfo" resultType="map">
+    SELECT gender, status
+    FROM dating_card
+    WHERE user_id = #{user_id}
+  </select>
+
+  <select id="selectIsSameDateExisted" resultType="map">
+    SELECT user_id
+    FROM dating_specify_card
+    WHERE set_time = #{set_time} AND rank = #{rank}
+  </select>
+
+  <insert id="insertDatingSpecifyCard" parameterType="string">
+    INSERT INTO dating_specify_card(`user_id`,`rank`,`set_time`)
+    VALUES (#{user_id}, #{rank}, #{set_time})
+  </insert>
+
+
+  <select id="getShowTimes" resultType="int">
+    SELECT show_times
+    FROM dating_card
+    WHERE user_id = #{user_id}
+  </select>
+
+  <update id="updateDatingCard">
+    UPDATE dating_card
+    SET show_times = #{show_times}
+    WHERE user_id = #{user_id}
+  </update>
+
+  <select id="getDatingOneGender" resultType="string">
+    SELECT gender
+    FROM dating_card
+    WHERE user_id = #{user_id}
+  </select>
+
+  <select id="getUserShow" resultType="map">
+    SELECT user_id, rank, set_time
+    FROM dating_specify_card
+    WHERE user_id = #{user_id}
+    ORDER BY set_time ASC
+  </select>
+
+  <delete id="deleteUserShow">
+    DELETE FROM dating_specify_card
+    WHERE
+      user_id =  #{user_id}
+      and rank = #{rank}
+      and set_time = #{set_time}
+  </delete>
   <!--////////////////////////////////////版本0.3Dao层实现下闭合线/////////////////////////////////////-->
 </mapper>

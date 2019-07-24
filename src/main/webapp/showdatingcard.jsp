@@ -222,7 +222,7 @@
     var page = parseInt(GetQueryString("page"));
     var type = parseInt(GetQueryString("type"));
     var size = 15;
-    var all_url = url+"/zbh/showAllUserData.do?page="+page+"&size="+size+"&type="+type;
+    var all_url = url+"/zbh/showAllUserData.do";
     var genderInit = "-1";
     var statusInit = "-1";
     var vipInit = "-1";
@@ -250,8 +250,7 @@
                 emotionalState: emotionalState
             },
             dataType:'json',
-            processData: false,
-            contentType: false,
+            async: false,
             success:function (result) {
                 var data = result["data"];
                 count += parseInt(result["msg"]);
@@ -330,12 +329,12 @@
                         '<td id="vip'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','vip'"+')">'+data[i]['name']+'</td>'+
 
                         '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td id="condition'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','condition'"+')">'+data[i]['name']+'</td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td><div>'+data[i]['set_time']+'</div></td>'+
+                        '<td><div>'+data[i]['show_times']+'</div></td>'+
+                        '<td><div>'+data[i]['likes']+'</div></td>'+
+                        '<td><div>'+data[i]['love_times']+'</div></td>'+
+                        '<td id="condition'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','condition'"+')">'+data[i]['is_in_love']+'</td>'+
+                        '<td><div>'+data[i]['days']+'</div></td>'+
                         '<td>'+ operationButton +'</td>'+
                         '</tr>');
                 }

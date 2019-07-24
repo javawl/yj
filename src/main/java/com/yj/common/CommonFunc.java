@@ -249,7 +249,7 @@ public class CommonFunc {
                 return Code;
             }else {
                 logger.error("发送短信验证码异常:",sendSmsResponse);
-                System.out.println("发送短信验证码异常:"+sendSmsResponse);
+                System.out.println("发送短信验证码异常:"+sendSmsResponse.getMessage());
                 return null;
             }
         }catch (ClientException e){
@@ -1095,6 +1095,10 @@ public class CommonFunc {
 //        token.setAccessToken(access_token);
 //        token.setExpiresIn(7200);
 //        return token;
+        AccessToken token = null;
+        token = new AccessToken();
+        token.setAccessToken("test");
+        token.setExpiresIn(7200);
         return null;
     }
 
