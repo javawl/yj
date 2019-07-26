@@ -1,4 +1,4 @@
-<%--
+<%@ page import="com.yj.common.Const" %><%--
   Created by IntelliJ IDEA.
   User: 63254
   Date: 2019/7/7
@@ -48,6 +48,10 @@
 <center><div class="alert2"><center>请输入密码</center></div></center>
 </body>
 <script type="text/javascript">
+    <%
+        String url = Const.DOMAIN_NAME;
+    %>
+    var url = "<%=url %>";
     var info1 = window.localStorage.getItem("username");
     var info2 = window.localStorage.getItem("password");
     if (info1 != null){
@@ -123,14 +127,14 @@
         }
 
         $.ajax({
-            url:"http://localhost:8088/user/admin_login.do",
+            url:url + "/user/admin_login.do",
             type:'POST',
             dataType:'json',
             headers:{'Content-Type':'application/json;charset=utf8','username':username, 'password':password},
             success:function (result) {
                 if (result.status == 200){
                     alert(result.msg);
-                    window.location.href = "http://47.107.62.22:8080/admin.jsp";
+                    window.location.href = url + "/admin.jsp";
                 }else {
                     $(".logo").css("opacity","0.4");
                     $(".form").css("opacity","0.4");
