@@ -393,6 +393,19 @@
   </select>
 
 
+  <select id="getInLoveAllWxUserLogin" resultType="map">
+    SELECT id,form_id,wechat,set_time,tb.*
+    FROM `template_msg`,
+         (SELECT user_id
+          FROM `dating_card`
+          WHERE is_in_love = 1) tb
+    WHERE `template_msg`.set_time > #{set_time}
+    AND `template_msg`.user_id = tb.user_id
+    GROUP BY user_id
+    ORDER BY set_time ASC
+  </select>
+
+
   <!--SELECT id,my_plan,last_login-->
   <!--FROM `user`-->
   <!--WHERE wechat is NOT NULL-->

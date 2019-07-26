@@ -596,7 +596,6 @@ public class UserController extends BaseController {
     public ServerResponse<String> admin_login(HttpServletRequest request,HttpSession session) throws Exception{
         String username = AES.Decrypt(request.getHeader("username"),AES.KEY);
         String password = AES.Decrypt(request.getHeader("password"),AES.KEY);
-
         //todo 密码登录MD5加盐
         String md5Password = MD5Util.MD5EncodeUtf8(password + Const.LOGIN_SALT);
         int result = userMapper.adminLogin(username, md5Password);

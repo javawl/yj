@@ -91,6 +91,22 @@ public class RedisPoolUtil {
         return result;
     }
 
+
+    public static Boolean containsKey(String key) {
+        Jedis jedis = null;
+        Boolean result = false;
+        try {
+            jedis = RedisPool.getJedis();
+            result = jedis.exists(key);
+        }catch (Exception e){
+            RedisPool.returnBrokenResource(jedis);
+            return result;
+        }
+        RedisPool.returnResource(jedis);
+        return result;
+    }
+
+
     public static Long del(String key){
         Jedis jedis = null;
         Long result = null;

@@ -1374,6 +1374,107 @@ public class AdminController {
 
 
     /**
+     * 提醒匹配的人背单词
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "remindLoversMemoryWord.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String remindLoversMemoryWord(String token, HttpServletResponse response){
+        if (!token.equals("remindLoversMemoryWord")){
+            return "false";
+        }
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //查出所有匹配的人
+            List<Map<Object,Object>> all_user =  common_configMapper.getInLoveAllWxUserLogin(nowTime);
+            for(int i = 0; i < all_user.size(); i++){
+                if (dictionaryMapper.checkInsistDayClockInMessage(all_user.get(i).get("user_id").toString(), one) == null){
+                    common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID1);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("“坚持多一天，遇见更优秀的自己”，别忘记背单词了，和优秀的Ta一起进步吧！","#ffffff"));
+                    list.add(new TemplateData("点击开始背单词","#ffffff"));
+                    wxMssVo.setParams(list);
+                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "坚持多一天，遇见更优秀的自己", info, nowTime);
+//                }
+                }
+            }
+        }catch (Exception e){
+            logger.error("提醒匹配用户背单词异常",e.getStackTrace());
+            logger.error("提醒匹配用户背单词异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+    /**
+     * 提醒vip即将到期
+     * @param token       验证令牌
+     * @param response    response
+     * @return            Str
+     */
+    @RequestMapping(value = "remindDatingVipExpire.do", method = RequestMethod.POST)
+    @ResponseBody
+    public String remindDatingVipExpire(String token, HttpServletResponse response){
+        if (!token.equals("remindDatingVipExpire")){
+            return "false";
+        }
+        try {
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //查出所有匹配的人
+            List<Map<Object,Object>> all_user =  common_configMapper.getInLoveAllWxUserLogin(nowTime);
+            for(int i = 0; i < all_user.size(); i++){
+                if (dictionaryMapper.checkInsistDayClockInMessage(all_user.get(i).get("user_id").toString(), one) == null){
+                    common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID1);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_HOME_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("“坚持多一天，遇见更优秀的自己”，别忘记背单词了，和优秀的Ta一起进步吧！","#ffffff"));
+                    list.add(new TemplateData("点击开始背单词","#ffffff"));
+                    wxMssVo.setParams(list);
+                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "坚持多一天，遇见更优秀的自己", info, nowTime);
+//                }
+                }
+            }
+        }catch (Exception e){
+            logger.error("提醒匹配用户背单词异常",e.getStackTrace());
+            logger.error("提醒匹配用户背单词异常",e);
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
+
+
+    /**
      * 发送第1个阅读feeds提醒
      * @param token       验证令牌
      * @param response    response

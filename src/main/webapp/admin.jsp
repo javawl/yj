@@ -70,5 +70,5 @@
         </div>
     </div>
 </body>
-<script src="https://file.ourbeibei.com/l_e/static/js/common-check-login.js"></script>
+<%--<script src="https://file.ourbeibei.com/l_e/static/js/common-check-login.js"></script>--%>
 </html>

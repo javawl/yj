@@ -215,6 +215,9 @@ public interface SubtitlesMapper {
     //修改今天看的卡片的排序和状态关系
     int updateSeeRelationshipRankType(@Param("user_id") String user_id, @Param("see_time")String see_time, @Param("be_seen_user_id")String be_seen_user_id, @Param("rank")String rank, @Param("type")String type);
 
+    //卡片被下降之后重新上架
+    int updateDatingCardInfo(@Param("user_id") String user_id, @Param("cover") String cover, @Param("wx_name") String wx_name, @Param("intention") String intention, @Param("set_time") String set_time, @Param("gender") String gender);
+
 
     //上传卡片资料
     int uploadDatingCardInfo(@Param("user_id") String user_id, @Param("cover") String cover, @Param("wx_name") String wx_name, @Param("intention") String intention, @Param("set_time") String set_time, @Param("gender") String gender);

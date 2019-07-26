@@ -660,6 +660,18 @@
     AND see_time = #{see_time}
     AND be_seen_user_id = #{be_seen_user_id}
   </update>
+
+
+  <update id="updateDatingCardInfo" parameterType="string">
+    UPDATE `dating_card`
+    SET `cover` = #{cover},
+        `wx_name` = #{wx_name},
+        `gender` = #{gender},
+        `intention` = #{intention},
+        `set_time` = #{set_time},
+        `status` = 1
+    WHERE user_id = #{user_id}
+  </update>
   
   
   <!--插入-->
@@ -683,7 +695,7 @@
   </insert>
 
   <insert id="insertSingleSeeRelationship" parameterType="string">
-    INSERT INTO dating_see_relationship (user_id, be_seen_user_id, valid_time, set_time, rank, `type`)
+    INSERT INTO dating_see_relationship (user_id, be_seen_user_id, valid_time, see_time, rank, `type`)
     VALUES (#{user_id}, #{be_seen_user_id}, #{valid_time}, #{set_time}, #{rank}, #{type})
   </insert>
 

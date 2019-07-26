@@ -825,10 +825,6 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
-            //判断是否上传过
-            if (subtitlesMapper.checkExistDatingCard(uid) != 0){
-                return ServerResponse.createByErrorMessage("已经上传过卡片，不可重复上传！");
-            }
             //验证值是否在0和1之间
             if (!Validate.checkValueInOneZero(Arrays.asList(gender))) return ServerResponse.createByErrorMessage("性别的值不合法");
             if (!Validate.checkValueInOneTwoZero(Arrays.asList(intention))) return ServerResponse.createByErrorMessage("意向的性别的值不合法");
@@ -848,7 +844,14 @@ public class OperationServiceImpl implements IOperationService {
                 String name = iFileService.upload_uncompressed(cover,path,"l_e/operation/dating_cover");
                 String coverUrl = "operation/dating_cover/"+name;
                 String nowTime = String.valueOf((new Date()).getTime());
-                subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
+                //判断是否上传过
+                if (subtitlesMapper.checkExistDatingCard(uid) != 0){
+                    //上传过就重新上架
+                    subtitlesMapper.updateDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
+                }else {
+                    subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
+                }
+
                 //日常统计
                 //先判断当天有没有数据，有的话更新
                 Map is_exist = userMapper.getDailyDataInfo(oneDate);
@@ -1085,6 +1088,7 @@ public class OperationServiceImpl implements IOperationService {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
         String uid = CommonFunc.CheckToken(request,token);
+        uid = "1656";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -1563,6 +1567,8 @@ public class OperationServiceImpl implements IOperationService {
                     if (subtitlesMapper.whetherTargetSeeMeToday(targetId, uid, one) > 0){
                         subtitlesMapper.updateSeeRelationshipType(targetId, one, uid, "4");
                     }
+                    //添加喜欢次数
+
                     transactionManager.commit(status);
                     return ServerResponse.createBySuccessMessage("成功取消喜欢");
                 }catch (Exception e){
@@ -1637,7 +1643,7 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
                     wxMssVo.setTouser(info.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setPage(Const.WX_FOUND_PATH_DATING_MATCH_SUCCESS);
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
@@ -1659,7 +1665,7 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
                     wxMssVo.setTouser(selfInfo.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setPage(Const.WX_FOUND_PATH_DATING_MATCH_SUCCESS);
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(selfInfo.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();

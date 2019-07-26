@@ -264,4 +264,17 @@ public class OperationController {
         return iOperationService.judgeUserSubscribe(request);
     }
 
+
+    /**
+     * 测试缓存
+     */
+    @RequestMapping(value = "test.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> test(){
+        CommonFunc.setCache("test", "testa", 7200);
+        System.out.print(CommonFunc.cacheContainsKey("test"));
+        System.out.print(CommonFunc.getCache("test"));
+        return ServerResponse.createBySuccessMessage("成功");
+    }
+
 }

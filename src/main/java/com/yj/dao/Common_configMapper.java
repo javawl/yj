@@ -277,6 +277,9 @@ public interface Common_configMapper {
     //获取所有有机会微信用户id(登录和未登录)
     List<Map<Object,Object>> getHaveChangeAllWxUserLoginAndNotLogin(@Param("last_login") String last_login, @Param("set_time") String set_time);
 
+    //获取所有有机会匹配状态的微信用户id
+    List<Map<Object,Object>> getInLoveAllWxUserLogin(@Param("set_time") String set_time);
+
     //获取所有微信用户id
     List<Map<Object,Object>> getAllAppointmentWxUser(@Param("last_login") String last_login);
 

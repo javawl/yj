@@ -1067,39 +1067,41 @@ public class CommonFunc {
     }
 
     public static AccessToken getAccessToken() {
-//        AccessToken token = null;
-//        String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
-//        String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
-//        String access_token;
-//        //判断如果缓存里有的话直接返回
-//        if (LocalCache.containsKey("wxminiprogramaccesstoken")){
-//            access_token = LocalCache.get("wxminiprogramaccesstoken").toString();
-//            System.out.println("缓存");
-//        }else{
-//            // 发起GET请求获取凭证
-//            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
-//            try {
-//                access_token = jsonObject.getString("access_token");
-//                //存入缓存
-//                LocalCache.put("wxminiprogramaccesstoken", access_token, 7100);
-//                System.out.println("生成");
-//            } catch (JSONException e) {
-//                token = null;
-//                // 获取token失败
-//                System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
-//                return token;
-//            }
-//        }
-//
-//        token = new AccessToken();
-//        token.setAccessToken(access_token);
-//        token.setExpiresIn(7200);
-//        return token;
         AccessToken token = null;
+        String requestUrl = "https://api.weixin.qq.com/cgi-bin/token";
+        String param = "grant_type=client_credential&appid="+ WxConfig.wx_app_id +"&secret="+ WxConfig.wx_app_secret;
+        String access_token;
+        //判断如果缓存里有的话直接返回
+        if (CommonFunc.cacheContainsKey("wxminiprogramaccesstoken")){
+//            access_token = LocalCache.get("wxminiprogramaccesstoken").toString();
+            access_token = CommonFunc.getCache("wxminiprogramaccesstoken").toString();
+            System.out.println("缓存");
+        }else{
+            // 发起GET请求获取凭证
+            JSONObject jsonObject = JSON.parseObject( UrlUtil.sendGet(requestUrl, param));
+            try {
+                access_token = jsonObject.getString("access_token");
+                //存入缓存
+//                LocalCache.put("wxminiprogramaccesstoken", access_token, 7100);
+                CommonFunc.setCache("wxminiprogramaccesstoken", access_token, 7100);
+                System.out.println("生成");
+            } catch (JSONException e) {
+                token = null;
+                // 获取token失败
+                System.out.println("获取token失败 errcode:{"+jsonObject.getInteger("errcode")+"} errmsg:{"+jsonObject.getString("errmsg")+"}");
+                return token;
+            }
+        }
+
         token = new AccessToken();
-        token.setAccessToken("test");
+        token.setAccessToken(access_token);
         token.setExpiresIn(7200);
-        return null;
+        return token;
+//        AccessToken token = null;
+//        token = new AccessToken();
+//        token.setAccessToken("test");
+//        token.setExpiresIn(7200);
+//        return null;
     }
 
     //发送模板消息
@@ -1447,9 +1449,11 @@ public class CommonFunc {
      * @param value
      * @param timeout 有效时长
      */
-    public static void setCache(String key, Object value, int timeout) {
+    public static void setCache(String key, String value, int timeout) {
         //存入缓存
-        LocalCache.put(key, value, timeout);
+//        LocalCache.put(key, value, timeout);
+        //redis
+        RedisPoolUtil.setEx(key, value, timeout);
         System.out.println("生成");
     }
 
@@ -1460,7 +1464,9 @@ public class CommonFunc {
      * @param key
      */
     public static boolean cacheContainsKey(String key)  {
-        return LocalCache.containsKey(key);
+//        return LocalCache.containsKey(key);
+        //redis
+        return RedisPoolUtil.containsKey(key);
     }
 
 
@@ -1470,7 +1476,9 @@ public class CommonFunc {
      * @param key
      */
     public static Object getCache(String key)  {
-        return LocalCache.get(key);
+//        return LocalCache.get(key);
+        //redis
+        return RedisPoolUtil.get(key);
     }
 
 }
