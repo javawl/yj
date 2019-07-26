@@ -1410,6 +1410,36 @@ public class CommonFunc {
         }
     }
 
+
+    /**
+     * 微信公众号通过openid获取用户信息
+     */
+    public static Map<String, String> wxOfficialAccountsUserInfo(String accessToken, String openid) {
+        Map<String, String> result = new HashMap<>();
+        //将access_token取出
+        String requestUserInfoUrlParam = String.format("access_token=%s&openid=%s&lang=zh_CN", accessToken, openid);
+        //发送post请求读取调用微信接口获取openid用户唯一标识
+        JSONObject userInfoJsonObject = JSON.parseObject( UrlUtil.sendGet( WxConfig.wx_platform_get_user_info, requestUserInfoUrlParam ));
+        if (userInfoJsonObject.isEmpty()){
+            //判断抓取网页是否为空
+            result.put("status", "0");
+            result.put("userInfo", "获取普通的AccessToken时异常，微信内部错误");
+            return result;
+        }else {
+            Boolean userInfoFail = userInfoJsonObject.containsKey("errcode");
+            if (userInfoFail){
+                result.put("status", "0");
+                result.put("userInfo", userInfoJsonObject.get("errcode").toString() + "获取微信公众号用户信息时异常" + userInfoJsonObject.get("errmsg").toString());
+                return result;
+            }else {
+                //没有报错
+                result.put("status", "1");
+                result.put("userInfo", JSONObject.toJSONString(userInfoJsonObject));
+                return result;
+            }
+        }
+    }
+
     /**
      * 缓存统一接口设置
      *

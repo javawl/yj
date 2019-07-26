@@ -271,6 +271,15 @@
   </select>
 
 
+  <select id="findSeeUserCardAndTypeToday" parameterType="string" resultType="map">
+    SELECT be_seen_user_id as id,`type`
+    FROM dating_see_relationship
+    WHERE user_id = #{user_id}
+    AND see_time = #{now_time}
+    ORDER BY rank
+  </select>
+
+
   <select id="findExistSeeRecord" resultType="string">
     SELECT be_seen_user_id
     FROM dating_see_relationship
@@ -314,8 +323,8 @@
     FROM dating_card
     WHERE user_id
     IN
-    <foreach collection="userIds" item="id" open="(" close=")" separator=",">
-      #{id}
+    <foreach collection="userIds" item="item" open="(" close=")" separator=",">
+      #{item.id}
     </foreach>
   </select>
 

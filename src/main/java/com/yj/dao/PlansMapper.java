@@ -35,8 +35,11 @@ public interface PlansMapper {
     List<Map<Object,Object>> selectAllUserDataInfo(@Param("start") int start, @Param("size") int size,@Param("gender") String gender,
                                                    @Param("status")String status,@Param("vip") String vip,@Param("isVirtual") String isVirtual,@Param("search") String search,@Param("emotionalState") String emotionalState);
 
+    //根据用户id获取用户卡片标签
+    List<Map<Object,Object>> getAllTag(@Param("id") String id);
+
     //获得展示时间，一个用户可有多个展示时间
-    Map<Object,Object> getSettime(@Param("id") String id);
+    List<Map<Object,Object>> getSettime(@Param("id") String id);
 
     //获取用户匹配时间
     String getInloveTime(@Param("id") String id);

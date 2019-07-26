@@ -75,6 +75,9 @@ public interface SubtitlesMapper {
     //查看我看过的卡片的id，写入list然后用程序排查不用数据库排查
     List<String> findSeeUserCardToday(@Param("user_id") String user_id, @Param("now_time") String now_time);
 
+    //查看我看过的卡片的id，写入list然后用程序排查不用数据库排查
+    List<Map<String, Object>> findSeeUserCardAndTypeToday(@Param("user_id") String user_id, @Param("now_time") String now_time);
+
     //找出今天看过的几张卡片的信息
     List<String> findExistSeeRecord(@Param("user_id") String user_id, @Param("info") List<Map<String, Object>> info);
 
@@ -86,7 +89,7 @@ public interface SubtitlesMapper {
 
 
     //找出今天看过的几张卡片的信息
-    List<Map<String, Object>> findTodayDatingCardInfo(@Param("userIds") List<String> userIds);
+    List<Map<String, Object>> findTodayDatingCardInfo(@Param("userIds") List<Map<String, Object>> userIds);
 
     //查看指定号位的后台指定卡片(按照范围)
     List<Map<String, Object>> findDatingSpecifyCardByRankRange(@Param("upper_rank") String upper_rank, @Param("lower_rank") String lower_rank, @Param("set_time") String set_time, @Param("gender") String gender);

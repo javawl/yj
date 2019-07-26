@@ -88,10 +88,6 @@ public class Zbh1ServiceImpl implements IZbh1Service {
     @Override
     public ServerResponse<Map> showAllUserData(String page, String size,String gender,String status,String vip,String isVirtual,String search,String emotionalState, HttpServletRequest request)
     {
-        System.out.print(page);
-        System.out.print(size);
-        System.out.print(gender);
-        System.out.print(status);
         //验证参数是否为空
         List<Object> l1 = new ArrayList<Object>(){{
             add(page);
@@ -108,17 +104,23 @@ public class Zbh1ServiceImpl implements IZbh1Service {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //将页数和大小转化为limit
         int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
-        //获得用户的展示次数，匹配次数，匹配状态，标签
-        List<Map<Object,Object>> Info = plansMapper.selectAllUserDataInfo(start, Integer.valueOf(size),gender,status,vip,isVirtual,search,emotionalState);
+        //获得用户的展示次数，匹配次数，匹配状态
+        List<Map<Object,Object>> Info = plansMapper.selectAllUserDataInfo(start, Integer.valueOf(size),gender,status,vip,isVirtual,"%" + search + "%",emotionalState);
         String number = String.valueOf(Info.size());
         Map map;
         for(int i = 0;i<Info.size();i++)
         {
+            //封面路径标准化
+            Info.get(i).put("cover", CommonFunc.judgePicPath(Info.get(i).get("cover").toString()));
             map= Info.get(i);
             String user_id=map.get("user_id").toString();
+            String card_id = map.get("card_id").toString();
             //获得用户的展示时间
-            Map set_time = plansMapper.getSettime(user_id);
+            List<Map<Object,Object>> set_time = plansMapper.getSettime(user_id);
             map.put("set_time",set_time);
+            //获得用户标签
+            List<Map<Object,Object>> Tags = plansMapper.getAllTag(card_id);
+            map.put("tags",Tags);
             //获得用户匹配后的打卡天数
             //获取用户匹配时间
             String lovetime = plansMapper.getInloveTime(user_id);

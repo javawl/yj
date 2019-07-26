@@ -1,5 +1,7 @@
 package com.yj.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.*;
 import com.yj.service.IFileService;
@@ -132,7 +134,7 @@ public class OperationServiceImpl implements IOperationService {
                         }
 
                         //todo 判断今天是否已经标记过一组
-                        List<String> seeUserCardToday = subtitlesMapper.findSeeUserCardToday(uid, oneDate);
+                        List<Map<String, Object>> seeUserCardToday = subtitlesMapper.findSeeUserCardAndTypeToday(uid, oneDate);
                         if (seeUserCardToday.size() == 0){
                             //没有标记过需要开始定义今天的卡片
                             List<Map<String, Object>> lowViewsCard = null;
@@ -432,12 +434,21 @@ public class OperationServiceImpl implements IOperationService {
                                 }
 
                                 for (int k = 0; k < todayDatingCardInfo.size(); k++){
+                                    String targetId = todayDatingCardInfo.get(k).get("user_id").toString();
                                     //图片正确路径
                                     todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
 
                                     //标签插进去
-                                    todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
+                                    todayDatingCardInfo.get(k).put("tag", tagMap.get(targetId));
 
+
+                                    //将type找出来
+                                    for (int l = 0; l < seeUserCardToday.size(); l++){
+                                        if (targetId.equals(seeUserCardToday.get(l).get("id").toString())){
+                                            todayDatingCardInfo.get(k).put("type", seeUserCardToday.get(l).get("type"));
+                                            break;
+                                        }
+                                    }
 
                                     //是否是vip
                                     if (existVipUsers.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
@@ -834,7 +845,7 @@ public class OperationServiceImpl implements IOperationService {
                 //上传老师二维码
                 String path = request.getSession().getServletContext().getRealPath("upload");
                 //压缩
-                String name = iFileService.upload(cover,path,"l_e/operation/dating_cover");
+                String name = iFileService.upload_uncompressed(cover,path,"l_e/operation/dating_cover");
                 String coverUrl = "operation/dating_cover/"+name;
                 String nowTime = String.valueOf((new Date()).getTime());
                 subtitlesMapper.uploadDatingCardInfo(uid, coverUrl, subtitlesMapper.findUserName(uid), intention, nowTime, gender);
@@ -1413,7 +1424,7 @@ public class OperationServiceImpl implements IOperationService {
 
             Map<String, Object> result = new HashMap<>();
             //找出昨天看的
-            List<String> seeUserCardToday = subtitlesMapper.findSeeUserCardToday(uid, yesterdayOne);
+            List<Map<String, Object>> seeUserCardToday = subtitlesMapper.findSeeUserCardAndTypeToday(uid, yesterdayOne);
             //找出昨天的卡片展示出来
             //昨天已经有标记一组卡片，直接掏出来
             if (seeUserCardToday.size() == 0){
@@ -1446,10 +1457,19 @@ public class OperationServiceImpl implements IOperationService {
                     }
 
                     for (int k = 0; k < todayDatingCardInfo.size(); k++){
+                        String targetId = todayDatingCardInfo.get(k).get("user_id").toString();
                         todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
 
                         //标签插进去
-                        todayDatingCardInfo.get(k).put("tag", tagMap.get(todayDatingCardInfo.get(k).get("user_id").toString()));
+                        todayDatingCardInfo.get(k).put("tag", tagMap.get(targetId));
+
+                        //将type找出来
+                        for (int l = 0; l < seeUserCardToday.size(); l++){
+                            if (targetId.equals(seeUserCardToday.get(l).get("id").toString())){
+                                todayDatingCardInfo.get(k).put("type", seeUserCardToday.get(l).get("type"));
+                                break;
+                            }
+                        }
 
                         //是否是vip
                         if (existVipUsers.contains(todayDatingCardInfo.get(k).get("user_id").toString())){
@@ -1583,6 +1603,26 @@ public class OperationServiceImpl implements IOperationService {
                     return ServerResponse.createByErrorMessage("更新出错！");
                 }
 
+                //新建匹配成功的数组
+                List<String> paringSuccessSayFirst = new ArrayList<String>() {{
+                    add("“记住你的身份”，从此你就是我的人了！");
+                    add("你不要在我心里造次了，站着别动，我去拥抱你");
+                    add("One universe, Eight planets, Two hundred and four countries, Eight hundred and nine islands and seven continents. I am so hundred to meet you.");
+                    add("Look at the world, Mountains and rivers, sun, moon and stars, Not as good as you.");
+                    add("“我喜欢你~”");
+                    add("昨天很喜欢你，今天很喜欢你，而且预感，明天也会很喜欢你~");
+                }};
+
+                List<String> paringSuccessSaySecond = new ArrayList<String>() {{
+                    add("进来看看你心仪的ta吧~");
+                    add("你喜欢的ta也正在喜欢你，快来看看吧~");
+                    add("一个宇宙，八个行星，204个国家，809个岛屿，7个大洲。我竟能如此荣幸可以遇见你");
+                    add("你看这万千世界，山川河流，日月星辉，哪儿都不如你。");
+                    add("“达成共识！”");
+                    add("你喜欢你的ta也正在喜欢你，快来看看吧！");
+                }};
+
+                int random = (int)(0+Math.random()*(6+1));
 
                 //提交事务之后发送服务通知
                 //获取accessToken
@@ -1601,8 +1641,8 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("恭喜，你和他相互喜欢，匹配成功！接下来好好努力吧！","#ffffff"));
-                    list.add(new TemplateData("进来看看心仪的Ta呗。","#ffffff"));
+                    list.add(new TemplateData(paringSuccessSayFirst.get(random),"#ffffff"));
+                    list.add(new TemplateData(paringSuccessSaySecond.get(random),"#ffffff"));
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
@@ -1623,13 +1663,15 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(selfInfo.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("恭喜，你和他相互喜欢，匹配成功！接下来好好努力吧！","#ffffff"));
-                    list.add(new TemplateData("进来看看心仪的Ta呗。","#ffffff"));
+                    list.add(new TemplateData(paringSuccessSayFirst.get(random),"#ffffff"));
+                    list.add(new TemplateData(paringSuccessSaySecond.get(random),"#ffffff"));
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
                     common_configMapper.insertTmpSendMsgRecord(uid, "发送配对成功服务通知", wx_info, nowTime);
                 }
+
+
 
             }else {
                 //单纯喜欢（单方向，单相思）
@@ -1670,31 +1712,59 @@ public class OperationServiceImpl implements IOperationService {
                     logger.error("超级喜欢异常" + e.getMessage());
                     return ServerResponse.createByErrorMessage("更新出错！");
                 }
+                //新建超级喜欢的数组
+                List<String> superLikeSayFirst = new ArrayList<String>() {{
+                    add("在所有人类里，你最让我心动！");
+                    add("山有木兮木有枝，心悦君兮君不知。");
+                    add("对不起，没有经过你的允许就喜欢上你了");
+                    add("你摸摸我今天衣服的料子，是做你男、女朋友的料吗？");
+                    add("爱是奔赴，是坦诚，是相见。");
+                    add("等风等雨等你，可否等来一场春风得意马蹄疾。");
+                    add("我这人看人很准的，一看就知道你是我的人。");
+                    add("我想变得有趣，变得特别，变成你眼里的一点星光。");
+                    add("铃铛遇到风会响，我遇到你，心里的小鹿会乱撞。");
+                    add("这里荒芜寸草不生，后来你来这儿走了一遭，奇迹般万物生长，这里，是我的心。");
+                }};
 
-//                //提交事务之后发送服务通知
-//                //获取accessToken
-//                AccessToken access_token = CommonFunc.getAccessToken();
-//                //给该用户发送
-//                //查没过期的from_id
-//                Map<Object,Object> info = common_configMapper.getTmpInfo(targetId,nowTime);
-//                if (info != null){
-//                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
-//                    //发送模板消息
-//                    WxMssVo wxMssVo = new WxMssVo();
-//                    wxMssVo.setTemplate_id(Const.TMP_SUPER_LIKE_REMIND);
-//                    wxMssVo.setAccess_token(access_token.getAccessToken());
-//                    wxMssVo.setTouser(info.get("wechat").toString());
-//                    wxMssVo.setPage(Const.WX_FOUND_PATH);
-//                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-//                    wxMssVo.setForm_id(info.get("form_id").toString());
-//                    List<TemplateData> list = new ArrayList<>();
-//                    list.add(new TemplateData("山有木兮木有枝，心悦君兮君不知。","#ffffff"));
-//                    list.add(new TemplateData("你被Ta“超级喜欢”了，看看你是不是也喜欢他吧！","#ffffff"));
-//                    wxMssVo.setParams(list);
-//                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
-//                    //记录发送的情况
-//                    common_configMapper.insertTmpSendMsgRecord(targetId, "发送超级喜欢服务通知", wx_info, nowTime);
-//                }
+                List<String> superLikeSaySecond = new ArrayList<String>() {{
+                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
+                    add("你是三，我是九，我除了你，还是你(ps：超级喜欢你)");
+                    add("你知道我的缺点是什么吗？缺点你~");
+                    add("超级喜欢你，如果要加一个期限的话，希望，是一万年");
+                    add("我“超级喜欢”你，没有犹豫，因为是你。");
+                    add("我“超级喜欢”你，没有犹豫，因为是你。");
+                    add("春风十里不如你~(ps：超级喜欢你)");
+                    add("我想对你说，却害怕都说错：好喜欢你！知不知道？");
+                    add("有一种踏实是你心中有我名字，你是我的关键词。(ps：超级喜欢你)");
+                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
+                }};
+
+                int randomNumber = (int)(0+Math.random()*(9+1));
+
+                //提交事务之后发送服务通知
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
+                //给该用户发送
+                //查没过期的from_id
+                Map<Object,Object> info = common_configMapper.getTmpInfo(targetId,nowTime);
+                if (info != null){
+                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_SUPER_LIKE_REMIND);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(info.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(info.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData(superLikeSayFirst.get(randomNumber),"#ffffff"));
+                    list.add(new TemplateData(superLikeSaySecond.get(randomNumber),"#ffffff"));
+                    wxMssVo.setParams(list);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(targetId, "发送超级喜欢服务通知", wx_info, nowTime);
+                }
             }
 
 
@@ -1721,7 +1791,6 @@ public class OperationServiceImpl implements IOperationService {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
         String uid = CommonFunc.CheckToken(request,token);
-        uid = "70476";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -1776,7 +1845,7 @@ public class OperationServiceImpl implements IOperationService {
                 common_configMapper.deleteTemplateMsg(info.get("id").toString());
                 //发送模板消息
                 WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
+                wxMssVo.setTemplate_id(Const.TMP_TEAM_FAIL_REMIND);
                 wxMssVo.setAccess_token(access_token.getAccessToken());
                 wxMssVo.setTouser(info.get("wechat").toString());
                 wxMssVo.setPage(Const.WX_FOUND_PATH);
@@ -1788,7 +1857,7 @@ public class OperationServiceImpl implements IOperationService {
                 wxMssVo.setParams(list);
                 String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                 //记录发送的情况
-                common_configMapper.insertTmpSendMsgRecord(loverId, "发送配对成功服务通知", wx_info, nowTime);
+                common_configMapper.insertTmpSendMsgRecord(loverId, "发送分手服务通知", wx_info, nowTime);
             }
 
             //给自己发送
@@ -1798,7 +1867,7 @@ public class OperationServiceImpl implements IOperationService {
                 common_configMapper.deleteTemplateMsg(selfInfo.get("id").toString());
                 //发送模板消息
                 WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
+                wxMssVo.setTemplate_id(Const.TMP_TEAM_FAIL_REMIND);
                 wxMssVo.setAccess_token(access_token.getAccessToken());
                 wxMssVo.setTouser(selfInfo.get("wechat").toString());
                 wxMssVo.setPage(Const.WX_FOUND_PATH);
@@ -1810,7 +1879,7 @@ public class OperationServiceImpl implements IOperationService {
                 wxMssVo.setParams(list);
                 String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                 //记录发送的情况
-                common_configMapper.insertTmpSendMsgRecord(uid, "发送配对成功服务通知", wx_info, nowTime);
+                common_configMapper.insertTmpSendMsgRecord(uid, "发送分手服务通知", wx_info, nowTime);
             }
 
 
@@ -1869,7 +1938,7 @@ public class OperationServiceImpl implements IOperationService {
                 common_configMapper.deleteTemplateMsg(info.get("id").toString());
                 //发送模板消息
                 WxMssVo wxMssVo = new WxMssVo();
-                wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
+                wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_REMIND);
                 wxMssVo.setAccess_token(access_token.getAccessToken());
                 wxMssVo.setTouser(info.get("wechat").toString());
                 wxMssVo.setPage(Const.WX_FOUND_PATH);
@@ -1975,7 +2044,29 @@ public class OperationServiceImpl implements IOperationService {
             //如果没有人愿意，为null,只需插入发送服务通知
             if (likeToReliveMemoriesUid == null){
                 subtitlesMapper.updateDatingRelationshipReliveMemoriesUid(uid, uid, loverId);
+                //获取accessToken
+                AccessToken access_token = CommonFunc.getAccessToken();
                 //发服务通知
+                //查没过期的from_id
+                Map<Object,Object> selfInfo = common_configMapper.getTmpInfo(loverId,nowTime);
+                if (selfInfo != null){
+                    common_configMapper.deleteTemplateMsg(selfInfo.get("id").toString());
+                    //发送模板消息
+                    WxMssVo wxMssVo = new WxMssVo();
+                    wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_BEGIN);
+                    wxMssVo.setAccess_token(access_token.getAccessToken());
+                    wxMssVo.setTouser(selfInfo.get("wechat").toString());
+                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                    wxMssVo.setForm_id(selfInfo.get("form_id").toString());
+                    List<TemplateData> list = new ArrayList<>();
+                    list.add(new TemplateData("昨日绚烂，堪回首~我想和你再走一遍我们的足迹，重温回忆~","#ffffff"));
+                    list.add(new TemplateData("进入点击“重温回忆”，和Ta“重温回忆”~","#ffffff"));
+                    wxMssVo.setParams(list);
+                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                    //记录发送的情况
+                    common_configMapper.insertTmpSendMsgRecord(uid, "重温回忆", wx_info, nowTime);
+                }
             }else {
                 //判断那个id不是自己的id，就可以开始了
                 if (!uid.equals(likeToReliveMemoriesUid.toString())){
@@ -1983,6 +2074,50 @@ public class OperationServiceImpl implements IOperationService {
                     subtitlesMapper.reliveMemories("0", uid, loverId);
 
                     //发服务通知
+                    //获取accessToken
+                    AccessToken access_token = CommonFunc.getAccessToken();
+                    //发服务通知
+                    //查没过期的from_id
+                    Map<Object,Object> selfInfo = common_configMapper.getTmpInfo(uid,nowTime);
+                    if (selfInfo != null){
+                        common_configMapper.deleteTemplateMsg(selfInfo.get("id").toString());
+                        //发送模板消息
+                        WxMssVo wxMssVo = new WxMssVo();
+                        wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_BEGIN);
+                        wxMssVo.setAccess_token(access_token.getAccessToken());
+                        wxMssVo.setTouser(selfInfo.get("wechat").toString());
+                        wxMssVo.setPage(Const.WX_FOUND_PATH);
+                        wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                        wxMssVo.setForm_id(selfInfo.get("form_id").toString());
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("昨日绚烂，堪回首~我想和你再走一遍我们的足迹，重温回忆~","#ffffff"));
+                        list.add(new TemplateData("进入点击“重温回忆”，和Ta“重温回忆”~","#ffffff"));
+                        wxMssVo.setParams(list);
+                        String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                        //记录发送的情况
+                        common_configMapper.insertTmpSendMsgRecord(uid, "重温回忆", wx_info, nowTime);
+                    }
+                    //发服务通知
+                    //查没过期的from_id
+                    Map<Object,Object> selfInfoAnther = common_configMapper.getTmpInfo(loverId,nowTime);
+                    if (selfInfoAnther != null){
+                        common_configMapper.deleteTemplateMsg(selfInfoAnther.get("id").toString());
+                        //发送模板消息
+                        WxMssVo wxMssVo = new WxMssVo();
+                        wxMssVo.setTemplate_id(Const.TMP_ID_WORD_CHALLENGE_BEGIN);
+                        wxMssVo.setAccess_token(access_token.getAccessToken());
+                        wxMssVo.setTouser(selfInfoAnther.get("wechat").toString());
+                        wxMssVo.setPage(Const.WX_FOUND_PATH);
+                        wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                        wxMssVo.setForm_id(selfInfoAnther.get("form_id").toString());
+                        List<TemplateData> list = new ArrayList<>();
+                        list.add(new TemplateData("昨日绚烂，堪回首~我想和你再走一遍我们的足迹，重温回忆~","#ffffff"));
+                        list.add(new TemplateData("进入点击“重温回忆”，和Ta“重温回忆”~","#ffffff"));
+                        wxMssVo.setParams(list);
+                        String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
+                        //记录发送的情况
+                        common_configMapper.insertTmpSendMsgRecord(uid, "重温回忆", wx_info, nowTime);
+                    }
                 }
             }
 
@@ -2037,6 +2172,49 @@ public class OperationServiceImpl implements IOperationService {
 
 
             return ServerResponse.createBySuccess("成功", result);
+        }
+    }
+
+
+
+    /**
+     * 判断是否关注公众号
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> judgeUserSubscribe(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //结果集
+            Map<String, Object> result = new HashMap<>();
+            //查出公众号openid
+            String openid = userMapper.getWechatPlatformOpenId(uid);
+            if (null == openid){
+                //0代表没关注
+                result.put("subscribe", 0);
+                return ServerResponse.createBySuccess("成功", result);
+            }else {
+                //获取公众号accessToken
+                String access_token = CommonFunc.wxPlatformNormlaAccessToken().get("access_token").toString();
+                Map<String, String> userInfo = CommonFunc.wxOfficialAccountsUserInfo(access_token, openid);
+                if ("0".equals(userInfo.get("status"))){
+                    return ServerResponse.createByErrorMessage(userInfo.get("userInfo"));
+                }else {
+                    JSONObject info = JSON.parseObject(userInfo.get("userInfo"));
+                    result.put("subscribe", info.get("subscribe"));
+                    return ServerResponse.createBySuccess("成功", result);
+                }
+            }
         }
     }
 

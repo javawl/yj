@@ -71,7 +71,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (feedsResult == 0) {
                 return ServerResponse.createByErrorMessage("修改失败");
             } else {
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
             }
         }
     }
@@ -95,7 +95,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if (feedsResult == 0)
             return ServerResponse.createByErrorMessage("修改失败");
         else {
-            return ServerResponse.createBySuccess("成功");
+            return ServerResponse.createBySuccessMessage("成功");
         }
 
     }
@@ -119,7 +119,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (feedsResult == 0) {
                 return ServerResponse.createByErrorMessage("修改失败");
             } else {
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
             }
         }
     }
@@ -136,7 +136,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (feedsResult == 0) {
                 return ServerResponse.createByErrorMessage("修改失败");
             } else {
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
             }
         }
     }
@@ -191,7 +191,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                 if(result == 0)
                     return ServerResponse.createByErrorMessage("封号失败");
                 else
-                    return ServerResponse.createBySuccess("封号成功");
+                    return ServerResponse.createBySuccessMessage("封号成功");
             }
         }
         //更改审核状态为其他状态
@@ -200,7 +200,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (feedsResult == 0) {
                 return ServerResponse.createByErrorMessage("修改失败");
             } else {
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
             }
         }
     }
@@ -224,7 +224,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (result == 0)
                 return ServerResponse.createByErrorMessage("修改失败");
             else
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
         } else {
             Long nowTime = System.currentTimeMillis();
             String newTime = String.valueOf(nowTime + 31 * 24 * 60 * 60 * 1000L);
@@ -232,7 +232,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (result == 0)
                 return ServerResponse.createByErrorMessage("修改失败");
             else
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
         }
     }
 
@@ -249,7 +249,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             if (feedsResult == 0) {
                 return ServerResponse.createByErrorMessage("修改失败");
             } else {
-                return ServerResponse.createBySuccess("成功");
+                return ServerResponse.createBySuccessMessage("成功");
             }
         }
 
@@ -321,7 +321,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         else{
             String path = request.getSession().getServletContext().getRealPath("upload");
-            String name = iFileService.upload(file,path,"l_e/operation/dating_cover");
+            String name = iFileService.upload_uncompressed(file,path,"l_e/operation/dating_cover");
             String url = "operation/dating_cover/"+name;
             //存到数据库
             int result = tip_offMapper.updateCover(id,url);
@@ -343,7 +343,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if(result == 0)
             return ServerResponse.createByErrorMessage("新建标签失败");
         else
-            return ServerResponse.createBySuccess("新建标签成功");
+            return ServerResponse.createBySuccessMessage("新建标签成功");
     }
 
     //删除用户卡片标签
@@ -357,7 +357,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if(result == 0)
             return ServerResponse.createByErrorMessage("删除标签失败");
         else
-            return ServerResponse.createBySuccess("删除标签成功");
+            return ServerResponse.createBySuccessMessage("删除标签成功");
     }
 
     //更改用户展示时间
@@ -383,7 +383,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if(result==0)
             return ServerResponse.createByErrorMessage("修改失败");
         else
-            return ServerResponse.createBySuccess("修改成功");
+            return ServerResponse.createBySuccessMessage("修改成功");
     }
 
     //查找有关的用户

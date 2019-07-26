@@ -254,4 +254,14 @@ public class OperationController {
         return ServerResponse.createBySuccessMessage("成功");
     }
 
+
+    /**
+     * 判断用户是否关注公众号
+     */
+    @RequestMapping(value = "judgeUserSubscribe.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> judgeUserSubscribe(HttpServletRequest request){
+        return iOperationService.judgeUserSubscribe(request);
+    }
+
 }

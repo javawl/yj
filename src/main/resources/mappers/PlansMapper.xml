@@ -123,18 +123,15 @@
 
   <!--  //后台管理系统 审核，修改，添加用户，放展示卡总表的  所有信息获取-->
   <select id="selectAllUserDataInfo" resultType="map">
-    --     select distinct s1.set_time,s2.*
-    --     from `dating_specify_card` s1 right outer join
-    select s1.likes,s2.tag,s2.show_times,s2.love_times,s2.is_in_love,s2.user_id
+    select s1.likes,s2.*
     from (
     select send_good_card_id as id,count(*) as likes from
     `dating_like_relationship` group by send_good_card_id
     )s1 right outer join
-    (select s1.tag,s2.* from
-    `dating_card_tag`s1 right outer join
     (SELECT
-    t2.show_times,t2.love_times,t2.is_in_love,t1.id as user_id,t2.id as card_id
-    FROM `user` t1 inner join
+    t2.show_times,t2.love_times,t2.is_in_love,t1.id as user_id,t2.id as card_id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,
+    t1.dating_vip,t2.is_virtual,t2.views,t2.intention
+    FROM `user` t1 LEFT OUTER join
     `dating_card`t2
     on t1.id = t2.user_id
     WHERE
@@ -182,23 +179,23 @@
       </if>
     </trim>
     <trim prefix="and">
-      --     <if test="search != '-1'">
-      t2.`wx_name` like "%"#{search}"%"
-      --     </if>
-      <if test = "search == '-1'">
+      <if test = "search == '%-1%'">
         true
+      </if>
+      <if test="search != '%-1%'">
+      t2.`wx_name` like #{search}
       </if>
     </trim>
     ORDER BY t2.set_time  DESC)s2
-    on s1.card_id = s2.card_id
-    )s2
     --     left outer join
     --     `dating_specify_card`s3
     on s1.id = s2.user_id
-    --     =s3.user_id
-
-    --     on  s1.user_id = s2.user_id
     LIMIT #{start},#{size}
+  </select>
+
+  <select id="getAllTag" resultType="map">
+    select id as tag_id,tag from `dating_card_tag`
+    where card_id = #{id}
   </select>
 
   <select id = "getSettime" resultType="map">

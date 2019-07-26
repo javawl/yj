@@ -234,7 +234,8 @@
     });
     function loadData(gender, status, vip, isVirtual, search, emotionalState) {
         $("#page").html('');
-        $("#daily_data").html('');
+        // $("#daily_data").html('');
+        $("#nav").nextAll().remove();
         //清除table中的值
         $.ajax({
             url:all_url,
@@ -252,14 +253,14 @@
             dataType:'json',
             async: false,
             success:function (result) {
-                var data = result["data"];
+                var data = result["data"]["alluserdata"];
                 count += parseInt(result["msg"]);
                 //计算页数
                 var page_no = Math.ceil(count / size);
                 if (page == 1){
                     $("#page").append('<td><p>第一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page=1&size='+size+'">第一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/showdatingcard.jsp?page=1&size='+size+'">第一页</a></td>');
                 }
                 var ff = 0;
                 var f = 0;
@@ -274,7 +275,7 @@
                     if (no == page){
                         $("#page").append('<td><p>'+no+'</p></td>');
                     }else {
-                        $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
+                        $("#page").append('<td><a href="'+url+'/showdatingcard.jsp?page='+no+'&size='+size+'">'+no+'</a></td>');
                     }
                     if (ff == 8)break;
                     ff++;
@@ -285,55 +286,80 @@
                 if (page == page_no){
                     $("#page").append('<td><p>最后一页</p></td>');
                 }else{
-                    $("#page").append('<td><a href="'+url+'/read_class_book.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
+                    $("#page").append('<td><a href="'+url+'/showdatingcard.jsp?page='+page_no+'&size='+size+'">最后一页</a></td>');
                 }
                 for(var i = 0; i < data.length; i++){
                     var string2;
                     var operationButton;
                     var tag;
-                    if (data[i]['pic']==''){
+                    var gender = "";
+                    var intention = "";
+                    var status = "";
+                    var is_virtual = "";
+                    var is_in_love = "";
+                    var dating_vip = "";
+                    if (data[i]['cover']==''){
                         string2 = '此资源为空'
                     }else {
-                        string2 = '<img style="max-width: 550px; max-height: 550px;" src="'+data[i]['pic']+'">';
+                        string2 = '<img style="max-width: 100px; max-height: 100px;" src="'+data[i]['cover']+'">';
                     }
 
+                    if (data[i]['gender']=='0') gender = '男';
+                    else gender = '女';
+                    if (data[i]['intention']=='0') intention = '男';
+                    else if (data[i]['intention']=='1') intention = '女';
+                    else intention = '通吃';
+                    if (data[i]['status']=='0') status = '未通过';
+                    else if (data[i]['status']=='1')  status = '未审核';
+                    else if (data[i]['status']=='2') status = '通过';
+                    if (data[i]['is_virtual']=='0') is_virtual = '正常';
+                    else is_virtual = '虚拟';
+                    if (data[i]['is_in_love']=='0') is_in_love = '无';
+                    else is_in_love = '有';
+                    if (data[i]['dating_vip']=='0') dating_vip = '否';
+                    else dating_vip = '是';
+
+                    var tagInner = "";
+                    for (var k = 0; k < data[i]['tags'].length; k++){
+                        var tmpStr = i + "_" + k;
+                        tagInner += '<li onclick="deleteTag('+"'"+data[i]['tags'][k]['tag_id']+"'"+')">' + data[i]['tags'][k]['tag'] + '<img id="tag' + tmpStr +'" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>';
+                    }
                     tag = '<ul class="tag_ul">' +
-                        '    <li>标签一<img id="tag1_1" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签二<img id="tag1_2" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签三<img id="tag1_3" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签四<img id="tag1_4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li>标签五<img id="tag1_5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
-                        '    <li style="position: relative"><div style="width: 85px;"><input style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="heart5" style=" position: absolute; bottom: 6px; left: 94px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png"> </li>' +
+                        // '    <li>标签一<img id="tag1_1" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        // '    <li>标签二<img id="tag1_2" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        // '    <li>标签三<img id="tag1_3" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        // '    <li>标签四<img id="tag1_4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                        // '    <li>标签五<img id="tag1_5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
+                            tagInner +
+                        '    <li style="position: relative"><div style="width: 85px;"><input id = "input_tag' + tmpStr +'" style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="heart5" style=" position: absolute; bottom: 6px; left: 94px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png" onclick="addTag('+"'"+data[i]['card_id']+"',"+ "'"+tmpStr+"'"+')"> </li>' +
                         '</ul>';
 
-                    data[i]['status'] = 2;
-                    if (data[i]['status'] == 1){
-                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="qualified('+"'"+data[i]['id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">不合格</div>';
-                    }else if (data[i]['status'] == 2) {
-                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="matchingBoxPopUp('+"'"+data[i]['id']+"'"+')">展示</div><div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="goBlack('+"'"+data[i]['id']+"'"+')">封号</div>';
+                    if (data[i]['status'] == '1'){
+                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="qualified('+"'"+data[i]['user_id']+"'"+')">通过</div><div class="operation_button" style="margin-left: 5px;width: 42px;" onclick="goBlack('+"'"+data[i]['user_id']+"'"+')">不合格</div>';
+                    }else if (data[i]['status']=='2') {
+                        operationButton = '<div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="matchingBoxPopUp('+"'"+data[i]['user_id']+"'"+')">展示</div><div class="operation_button" style="margin-left: 5px;width: 28px;" onclick="goBlack('+"'"+data[i]['user_id']+"'"+')">封号</div>';
                     }
                     $("#daily_data").append('<tr>'+
-                        '<td>'+data[i]['id']+'</td>'+
+                        '<td>'+data[i]['user_id']+'</td>'+
                         // '<td>'+data[i]['name']+'</td>'+
-                        '<td id="wx_name'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','wx_name'"+')">'+data[i]['name']+'</td>'+
-                        '<td id="change_gender'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','change_gender'"+')">'+data[i]['name']+'</td>'+
-                        '<td id="intention'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','intention'"+')">'+data[i]['name']+'</td>'+
-                        '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
-                        '<td id="status'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','status'"+')">'+data[i]['name']+'</td>'+
-                        '<td id="signature'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','signature'"+')">'+data[i]['name']+'</td>'+
-                        // '<td onclick="upload_pic_click('+"'"+data[i]['id']+"'"+')">'+string2+'</td>'+
-                        // '<td id="author'+data[i]['id']+'" onclick="change_author('+"'"+data[i]['id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
+                        '<td id="wx_name'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','wx_name'"+')">'+data[i]['username']+'</td>'+
+                        '<td id="change_gender'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','change_gender'"+')">'+gender+'</td>'+
+                        '<td id="intention'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','intention'"+')">'+intention+'</td>'+
+                        '<td onclick="upload_pic_click('+"'"+data[i]['user_id']+"'"+')">'+string2+'</td>'+
+                        '<td id="status'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','status'"+')">'+status+'</td>'+
+                        '<td id="signature'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','signature'"+')">'+data[i]['signature']+'</td>'+
+                        // '<td onclick="upload_pic_click('+"'"+data[i]['user_id']+"'"+')">'+string2+'</td>'+
+                        // '<td id="author'+data[i]['user_id']+'" onclick="change_author('+"'"+data[i]['user_id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
                         '<td><div>'+tag+'</div></td>'+
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
-                        '<td id="age'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','age'"+')">'+data[i]['name']+'</td>'+
-                        '<td id="vip'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','vip'"+')">'+data[i]['name']+'</td>'+
-
-                        '<td><div>'+data[i]['chapter_number']+'</div></td>'+
+                        '<td id="age'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','age'"+')">'+data[i]['age']+'</td>'+
+                        '<td id="vip'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','vip'"+')">'+dating_vip+'</td>'+
+                        '<td><div>'+is_virtual+'</div></td>'+
+                        '<td><div>'+data[i]['views']+'</div></td>'+
                         '<td><div>'+data[i]['set_time']+'</div></td>'+
                         '<td><div>'+data[i]['show_times']+'</div></td>'+
                         '<td><div>'+data[i]['likes']+'</div></td>'+
                         '<td><div>'+data[i]['love_times']+'</div></td>'+
-                        '<td id="condition'+data[i]['id']+'" onclick="change_sent('+"'"+data[i]['id']+"','condition'"+')">'+data[i]['is_in_love']+'</td>'+
+                        '<td id="condition'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','condition'"+')">'+is_in_love+'</td>'+
                         '<td><div>'+data[i]['days']+'</div></td>'+
                         '<td>'+ operationButton +'</td>'+
                         '</tr>');
@@ -358,10 +384,10 @@
     }
     function upload_pic() {
         var formData = new FormData();
-        formData.append('upload_file', $('#pic')[0].files[0]);
+        formData.append('cover', $('#pic')[0].files[0]);
         formData.append('id', pic_id);
         $.ajax({
-            url:url+"/admin/uploadReadClassPic",
+            url:url+"/lzy/update_cover.do",
             type:'POST',
             data:formData,
             dataType:'json',
@@ -375,6 +401,7 @@
                 }else {
                     alert(msg);
                 }
+                window.location.href = "showdatingcard.jsp?page=1&size=15";
             },
             error:function (result) {
                 console.log(result);
@@ -395,24 +422,28 @@
             existFlag = type + id;
             htmlFlag = $("#" + existFlag).html();
             event.stopPropagation();//阻止冒泡
-            var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+input_id+"'"+')">提交</div>';
+            var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+type+"'"+')">提交</div>';
             exist_introduction = 1;
             flag_id = id;
             $("#"+type+id).empty();
-            $("#"+type+id).append('输入：<input id='+ input_id + ' type="text"><br>'+submitButton);
+            $("#"+type+id).append('输入：<br><input id='+ input_id + ' type="text"><br>'+submitButton);
         }else {
             // 复原
             exist_introduction = 0;
-            $("#" + existFlag).html(htmlFlag);
-            var input_id = "dating_" + type;
-            existFlag = type + id;
             event.stopPropagation();//阻止冒泡
-            htmlFlag = $("#" + existFlag).html();
-            var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+input_id+"'"+')">提交</div>';
-            exist_introduction = 1;
-            flag_id = id;
-            $("#"+type+id).empty();
-            $("#"+type+id).append('输入：<input id='+ input_id + ' type="text"><br>'+submitButton);
+            var tmpEqual = (type + id);
+            // 不是自己的才恢复
+            if (existFlag != tmpEqual){
+                $("#" + existFlag).html(htmlFlag);
+                var input_id = "dating_" + type;
+                existFlag = type + id;
+                htmlFlag = $("#" + existFlag).html();
+                var submitButton = '<div class="operation_button" style="width: 25px;" onclick="upload_sent('+"'"+id+"','"+type+"'"+')">提交</div>';
+                exist_introduction = 1;
+                flag_id = id;
+                $("#"+type+id).empty();
+                $("#"+type+id).append('输入：<br><input id='+ input_id + ' type="text"><br>'+submitButton);
+            }
         }
     }
     // 修改简介(上传)
@@ -456,14 +487,15 @@
                 alert("非法类别");
         }
         var formData = new FormData();
-        formData.append(paramName, document.getElementById(type + id).value);
+        formData.append(paramName, document.getElementById("dating_" + type).value);
         formData.append('id', id);
         $.ajax({
             url:url+targetUrl,
             type:'POST',
             data:formData,
             dataType:'json',
-            async: false,
+            processData: false,
+            contentType: false,
             success:function (result) {
                 var code = result['code'];
                 var msg = result['msg'];
@@ -697,6 +729,7 @@
                 }else {
                     alert(msg);
                 }
+                loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
             },
             error:function (result) {
                 console.log(result);
@@ -722,6 +755,59 @@
                 }else {
                     alert(msg);
                 }
+                loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+
+    function addTag(id, number) {
+        $.ajax({
+            url:url+"/lzy/add_tag.do",
+            type:'POST',
+            data:{
+                id : id,
+                tag: $("#input_tag" + number).val()
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+                loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
+            },
+            error:function (result) {
+                console.log(result);
+                alert("服务器出错！");
+            }
+        });
+    }
+    function deleteTag(id) {
+        $.ajax({
+            url:url+"/lzy/delete_tag.do",
+            type:'POST',
+            data:{
+                id : id
+            },
+            dataType:'json',
+            async: false,
+            success:function (result) {
+                var code = result['code'];
+                var msg = result['msg'];
+                if (code != 200){
+                    alert(msg);
+                }else {
+                    alert(msg);
+                }
+                loadData(genderInit, statusInit, vipInit, isVirtualInit, searchInit, emotionalStateInit);
             },
             error:function (result) {
                 console.log(result);
@@ -746,6 +832,7 @@
         var intention = $("#setIntention").val();
         var signature = $("#setSignature").val();
         var views = $("#setViews").val();
+        var age = $("#setAge").val();
         var cover = $('#setCover')[0].files[0];
         var checkArr = [ wxName, gender, institutions, intention, signature, views ];
         if (isnull(checkArr)){
@@ -757,7 +844,6 @@
             return;
         }
         var formData = new FormData();
-        formData.append('upload_file', $('#pic')[0].files[0]);
         formData.append('wx_name', wxName);
         formData.append('gender', gender);
         formData.append('institutions', institutions);
@@ -765,6 +851,7 @@
         formData.append('signature', signature);
         formData.append('views', views);
         formData.append('cover', cover);
+        formData.append('age', age);
         $.ajax({
             url:url+"/zbh/createNewVirtualUser.do",
             type:'POST',
@@ -823,7 +910,7 @@
             data:{
                 user_id : $("#card_id").val(),
                 position:displayHeartFlag,
-                data: yearDate + "-" + monthDate + "-" + dayDate
+                date: yearDate + "-" + monthDate + "-" + dayDate
             },
             dataType:'json',
             async: false,

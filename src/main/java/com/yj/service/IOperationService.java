@@ -40,4 +40,6 @@ public interface IOperationService {
     ServerResponse<String> reliveMemories(HttpServletRequest request);
 
     ServerResponse<Map<String, Object>> twoMeet(HttpServletRequest request);
+
+    ServerResponse<Map<String, Object>> judgeUserSubscribe(HttpServletRequest request);
 }
