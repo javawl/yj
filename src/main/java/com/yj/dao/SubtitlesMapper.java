@@ -57,6 +57,9 @@ public interface SubtitlesMapper {
     //查看超级喜欢我的人并且按照时间从早喜欢到晚喜欢的顺序排序
     List<Map<String, Object>> findSuperLikeMeCardWithOutGender(@Param("user_id") String user_id);
 
+    //没有上传图片的时候随机抽出卡片
+    List<Map<String, Object>> uploadNotYetGetRandomCard(@Param("cardNumber") int cardNumber);
+
     //查看喜欢我的人并且按照时间从早喜欢到晚喜欢的顺序排序
     List<Map<String, Object>> findLikeMeCard(@Param("user_id") String user_id, @Param("gender") String gender);
 
@@ -120,6 +123,9 @@ public interface SubtitlesMapper {
 
     //找出与他相遇的相遇码
     Map<String, Object> findDatingUserMeetCode(@Param("user_id") String user_id);
+
+    //在挑战的用户里随机抽出几个用户头像和名字的信息
+    List<Map<String, Object>> randomGetWordChallengeUsers(@Param("number") int number);
 
     //看对方今天是否看了我
     int whetherTargetSeeMeToday(@Param("user_id") String user_id, @Param("be_seen_user_id") String be_seen_user_id, @Param("see_time") String see_time);
@@ -217,6 +223,9 @@ public interface SubtitlesMapper {
 
     //卡片被下降之后重新上架
     int updateDatingCardInfo(@Param("user_id") String user_id, @Param("cover") String cover, @Param("wx_name") String wx_name, @Param("intention") String intention, @Param("set_time") String set_time, @Param("gender") String gender);
+
+    //更新是否三次喜欢的判断
+    int updateUserJudgeDatingLikeTimes(@Param("user_id") String user_id, @Param("judge_dating_like_times") String judge_dating_like_times);
 
 
     //上传卡片资料

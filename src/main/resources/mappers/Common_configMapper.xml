@@ -406,6 +406,21 @@
   </select>
 
 
+  <select id="getDatingVipExpiringUsers" resultType="map">
+    SELECT id,form_id,wechat,set_time,tb.*
+    FROM `template_msg`,
+         (SELECT id as user_id
+          FROM `user`
+          WHERE wechat is NOT NULL
+          AND dating_vip > #{set_time}
+          AND dating_vip &lt; #{threeDayAfter}) tb
+    WHERE `template_msg`.set_time > #{set_time}
+    AND `template_msg`.user_id = tb.user_id
+    GROUP BY user_id
+    ORDER BY set_time ASC
+  </select>
+
+
   <!--SELECT id,my_plan,last_login-->
   <!--FROM `user`-->
   <!--WHERE wechat is NOT NULL-->

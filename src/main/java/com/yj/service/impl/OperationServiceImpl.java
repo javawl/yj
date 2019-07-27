@@ -111,6 +111,52 @@ public class OperationServiceImpl implements IOperationService {
                 //根本没上传过信息
                 //用户状态，0代表没上传过资料，1代表上传资料还没审核，2代表上传资料审核通过
                 result.put("userStatus", 0);
+
+                //随机抽cardNumber张卡片出来
+                List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber);
+                Map<String, List<Object>> tagMap = new HashMap<>();
+                if (uploadNotYetGetRandomCardInfo.size() > 0){
+                    //todo 将大家的标签查出来
+                    List<Map<String, Object>> tag = subtitlesMapper.findAllCardTag(uploadNotYetGetRandomCardInfo);
+                    //取出卡片里的vip
+                    List<String> existVipUsers = subtitlesMapper.findExistVipUsers(nowTime, uploadNotYetGetRandomCardInfo);
+                    //将list按照用户id转变成Map
+                    for (int l = 0; l < tag.size(); l++){
+                        //判断Map是否有这个userId
+                        if (tagMap.containsKey(tag.get(l).get("user_id").toString())){
+                            tagMap.get(tag.get(l).get("user_id").toString()).add(tag.get(l).get("tag"));
+                        }else {
+                            //没有就插入
+                            List<Object> tmpList = new ArrayList<>();
+                            tmpList.add(tag.get(l).get("tag"));
+                            tagMap.put(tag.get(l).get("user_id").toString(), tmpList);
+                        }
+                    }
+
+                    for (int k = 0; k < uploadNotYetGetRandomCardInfo.size(); k++){
+                        String targetId = uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString();
+                        //图片正确路径
+                        uploadNotYetGetRandomCardInfo.get(k).put("cover", uploadNotYetGetRandomCardInfo.get(k).get("cover").toString());
+
+                        //标签插进去
+                        uploadNotYetGetRandomCardInfo.get(k).put("tag", tagMap.get(targetId));
+
+                        //是否是vip
+                        if (existVipUsers.contains(uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString())){
+                            //插进去
+                            uploadNotYetGetRandomCardInfo.get(k).put("isVip", "1");
+                        }else {
+                            //插进去
+                            uploadNotYetGetRandomCardInfo.get(k).put("isVip", "0");
+                        }
+                        uploadNotYetGetRandomCardInfo.get(k).put("isMyLike", "0");
+                        uploadNotYetGetRandomCardInfo.get(k).put("type", "4");
+                        uploadNotYetGetRandomCardInfo.get(k).put("isMySuperLike", "0");
+
+                    }
+                }
+                //插入结果集
+                result.put("datingCards", uploadNotYetGetRandomCardInfo);
             }else {
                 //上传信息了
                 //是否已经有匹配对象
@@ -178,9 +224,6 @@ public class OperationServiceImpl implements IOperationService {
                                     }
                                 }
                             }
-
-
-
 
                             //先找超级喜欢自己的卡片
                             //判断意向性别
@@ -478,10 +521,55 @@ public class OperationServiceImpl implements IOperationService {
                         }
 
 
-                    }else if (userCardInfo.get("status").toString().equals("1")){
+                    }else if (userCardInfo.get("status").toString().equals("1") || userCardInfo.get("status").toString().equals("0")){
                         //未审核情况
                         //用户状态，0代表没上传过资料，1代表上传资料还没审核，2代表上传资料审核通过
                         result.put("userStatus", 1);
+                        //随机抽cardNumber张卡片出来
+                        List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber);
+                        Map<String, List<Object>> tagMap = new HashMap<>();
+                        if (uploadNotYetGetRandomCardInfo.size() > 0){
+                            //todo 将大家的标签查出来
+                            List<Map<String, Object>> tag = subtitlesMapper.findAllCardTag(uploadNotYetGetRandomCardInfo);
+                            //取出卡片里的vip
+                            List<String> existVipUsers = subtitlesMapper.findExistVipUsers(nowTime, uploadNotYetGetRandomCardInfo);
+                            //将list按照用户id转变成Map
+                            for (int l = 0; l < tag.size(); l++){
+                                //判断Map是否有这个userId
+                                if (tagMap.containsKey(tag.get(l).get("user_id").toString())){
+                                    tagMap.get(tag.get(l).get("user_id").toString()).add(tag.get(l).get("tag"));
+                                }else {
+                                    //没有就插入
+                                    List<Object> tmpList = new ArrayList<>();
+                                    tmpList.add(tag.get(l).get("tag"));
+                                    tagMap.put(tag.get(l).get("user_id").toString(), tmpList);
+                                }
+                            }
+
+                            for (int k = 0; k < uploadNotYetGetRandomCardInfo.size(); k++){
+                                String targetId = uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString();
+                                //图片正确路径
+                                uploadNotYetGetRandomCardInfo.get(k).put("cover", uploadNotYetGetRandomCardInfo.get(k).get("cover").toString());
+
+                                //标签插进去
+                                uploadNotYetGetRandomCardInfo.get(k).put("tag", tagMap.get(targetId));
+
+                                //是否是vip
+                                if (existVipUsers.contains(uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString())){
+                                    //插进去
+                                    uploadNotYetGetRandomCardInfo.get(k).put("isVip", "1");
+                                }else {
+                                    //插进去
+                                    uploadNotYetGetRandomCardInfo.get(k).put("isVip", "0");
+                                }
+                                uploadNotYetGetRandomCardInfo.get(k).put("isMyLike", "0");
+                                uploadNotYetGetRandomCardInfo.get(k).put("type", "4");
+                                uploadNotYetGetRandomCardInfo.get(k).put("isMySuperLike", "0");
+
+                            }
+                        }
+                        //插入结果集
+                        result.put("datingCards", uploadNotYetGetRandomCardInfo);
                     }
                     //记录没有匹配对象
                     result.put("isInLove", 0);
@@ -941,6 +1029,15 @@ public class OperationServiceImpl implements IOperationService {
         }else {
             //查看用户VIP等信息
             Map<String, Object> userInfo = subtitlesMapper.checkUserDatingVip(uid);
+            //查看该用户的卡片信息
+            Map<String, Object> userCardInfo = subtitlesMapper.userDatingInfo(uid);
+            if (userCardInfo == null){
+                return ServerResponse.createByErrorMessage("请先上传资料");
+            }else {
+                if (!"2".equals(userCardInfo.get("status").toString())){
+                    return ServerResponse.createByErrorMessage("还未审核通过卡片");
+                }
+            }
             //时间戳
             String nowTime = String.valueOf((new Date()).getTime());
             //是否是vip
@@ -1092,6 +1189,18 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            if (uid.equals(targetId)){
+                return ServerResponse.createByErrorMessage("不能喜欢自己");
+            }
+            //查看该用户的卡片信息
+            Map<String, Object> userCardInfo = subtitlesMapper.userDatingInfo(uid);
+            if (userCardInfo == null){
+                return ServerResponse.createByErrorMessage("请先上传资料");
+            }else {
+                if (!"2".equals(userCardInfo.get("status").toString())){
+                    return ServerResponse.createByErrorMessage("还未审核通过卡片");
+                }
+            }
             //获取当天0点多一秒时间戳
             String one = CommonFunc.getOneDate();
             //查看用户VIP等信息
@@ -1171,6 +1280,28 @@ public class OperationServiceImpl implements IOperationService {
                 }
 
                 //提交事务之后发送服务通知
+                //新建匹配成功的数组
+                List<String> paringSuccessSayFirst = new ArrayList<String>() {{
+                    add("“记住你的身份”，从此你就是我的人了！");
+                    add("你不要在我心里造次了，站着别动，我去拥抱你");
+                    add("One universe, Eight planets, Two hundred and four countries, Eight hundred and nine islands and seven continents. I am so hundred to meet you.");
+                    add("Look at the world, Mountains and rivers, sun, moon and stars, Not as good as you.");
+                    add("“我喜欢你~”");
+                    add("昨天很喜欢你，今天很喜欢你，而且预感，明天也会很喜欢你~");
+                }};
+
+                List<String> paringSuccessSaySecond = new ArrayList<String>() {{
+                    add("进来看看你心仪的ta吧~");
+                    add("你喜欢的ta也正在喜欢你，快来看看吧~");
+                    add("一个宇宙，八个行星，204个国家，809个岛屿，7个大洲。我竟能如此荣幸可以遇见你");
+                    add("你看这万千世界，山川河流，日月星辉，哪儿都不如你。");
+                    add("“达成共识！”");
+                    add("你喜欢你的ta也正在喜欢你，快来看看吧！");
+                }};
+
+                int random = (int)(0+Math.random()*(6+1));
+
+                //提交事务之后发送服务通知
                 //获取accessToken
                 AccessToken access_token = CommonFunc.getAccessToken();
                 //给目标用户发送
@@ -1183,12 +1314,12 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
                     wxMssVo.setTouser(info.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setPage(Const.WX_FOUND_PATH_DATING_MATCH_SUCCESS);
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("恭喜，你和他相互喜欢，匹配成功！接下来好好努力吧！","#ffffff"));
-                    list.add(new TemplateData("进来看看心仪的Ta呗。","#ffffff"));
+                    list.add(new TemplateData(paringSuccessSayFirst.get(random),"#ffffff"));
+                    list.add(new TemplateData(paringSuccessSaySecond.get(random),"#ffffff"));
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
@@ -1205,12 +1336,12 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setTemplate_id(Const.TMP_PAIRING_SUCCESS_REMIND);
                     wxMssVo.setAccess_token(access_token.getAccessToken());
                     wxMssVo.setTouser(selfInfo.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_FOUND_PATH);
+                    wxMssVo.setPage(Const.WX_FOUND_PATH_DATING_MATCH_SUCCESS);
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(selfInfo.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("恭喜，你和他相互喜欢，匹配成功！接下来好好努力吧！","#ffffff"));
-                    list.add(new TemplateData("进来看看心仪的Ta呗。","#ffffff"));
+                    list.add(new TemplateData(paringSuccessSayFirst.get(random),"#ffffff"));
+                    list.add(new TemplateData(paringSuccessSaySecond.get(random),"#ffffff"));
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
@@ -1272,6 +1403,36 @@ public class OperationServiceImpl implements IOperationService {
                 }
 
                 //提交事务之后发送服务通知
+                //新建超级喜欢的数组
+                List<String> superLikeSayFirst = new ArrayList<String>() {{
+                    add("在所有人类里，你最让我心动！");
+                    add("山有木兮木有枝，心悦君兮君不知。");
+                    add("对不起，没有经过你的允许就喜欢上你了");
+                    add("你摸摸我今天衣服的料子，是做你男、女朋友的料吗？");
+                    add("爱是奔赴，是坦诚，是相见。");
+                    add("等风等雨等你，可否等来一场春风得意马蹄疾。");
+                    add("我这人看人很准的，一看就知道你是我的人。");
+                    add("我想变得有趣，变得特别，变成你眼里的一点星光。");
+                    add("铃铛遇到风会响，我遇到你，心里的小鹿会乱撞。");
+                    add("这里荒芜寸草不生，后来你来这儿走了一遭，奇迹般万物生长，这里，是我的心。");
+                }};
+
+                List<String> superLikeSaySecond = new ArrayList<String>() {{
+                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
+                    add("你是三，我是九，我除了你，还是你(ps：超级喜欢你)");
+                    add("你知道我的缺点是什么吗？缺点你~");
+                    add("超级喜欢你，如果要加一个期限的话，希望，是一万年");
+                    add("我“超级喜欢”你，没有犹豫，因为是你。");
+                    add("我“超级喜欢”你，没有犹豫，因为是你。");
+                    add("春风十里不如你~(ps：超级喜欢你)");
+                    add("我想对你说，却害怕都说错：好喜欢你！知不知道？");
+                    add("有一种踏实是你心中有我名字，你是我的关键词。(ps：超级喜欢你)");
+                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
+                }};
+
+                int randomNumber = (int)(0+Math.random()*(9+1));
+
+                //提交事务之后发送服务通知
                 //获取accessToken
                 AccessToken access_token = CommonFunc.getAccessToken();
                 //给该用户发送
@@ -1288,8 +1449,8 @@ public class OperationServiceImpl implements IOperationService {
                     wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
                     wxMssVo.setForm_id(info.get("form_id").toString());
                     List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("山有木兮木有枝，心悦君兮君不知。","#ffffff"));
-                    list.add(new TemplateData("你被Ta“超级喜欢”了，看看你是不是也喜欢他吧！","#ffffff"));
+                    list.add(new TemplateData(superLikeSayFirst.get(randomNumber),"#ffffff"));
+                    list.add(new TemplateData(superLikeSaySecond.get(randomNumber),"#ffffff"));
                     wxMssVo.setParams(list);
                     String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
                     //记录发送的情况
@@ -1323,6 +1484,15 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            //查看该用户的卡片信息
+            Map<String, Object> userCardInfo = subtitlesMapper.userDatingInfo(uid);
+            if (userCardInfo == null){
+                return ServerResponse.createByErrorMessage("请先上传资料");
+            }else {
+                if (!"2".equals(userCardInfo.get("status").toString())){
+                    return ServerResponse.createByErrorMessage("还未审核通过卡片");
+                }
+            }
             //获取当天0点多一秒时间戳
             String one = CommonFunc.getOneDate();
             //查看用户VIP等信息
@@ -1406,6 +1576,15 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            //查看该用户的卡片信息
+            Map<String, Object> userCardInfo = subtitlesMapper.userDatingInfo(uid);
+            if (userCardInfo == null){
+                return ServerResponse.createByErrorMessage("请先上传资料");
+            }else {
+                if (!"2".equals(userCardInfo.get("status").toString())){
+                    return ServerResponse.createByErrorMessage("还未审核通过卡片");
+                }
+            }
             //获取昨天0点多一秒时间戳
             String yesterdayOne = CommonFunc.getYesterdayOneDate();
             //查看用户VIP等信息
@@ -1529,21 +1708,47 @@ public class OperationServiceImpl implements IOperationService {
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
         }else {
+            if (uid.equals(targetId)){
+                return ServerResponse.createByErrorMessage("不能喜欢自己");
+            }
+            //查看该用户的卡片信息
+            Map<String, Object> userCardInfo = subtitlesMapper.userDatingInfo(uid);
+            if (userCardInfo == null){
+                return ServerResponse.createByErrorMessage("请先上传资料");
+            }else {
+                if (!"2".equals(userCardInfo.get("status").toString())){
+                    return ServerResponse.createByErrorMessage("还未审核通过卡片");
+                }
+            }
             //查看用户VIP等信息
             Map<String, Object> userInfo = subtitlesMapper.checkUserDatingVip(uid);
             //时间戳
             String nowTime = String.valueOf((new Date()).getTime());
             //当天0点过一秒的时间戳
             String one = CommonFunc.getOneDate();
+            String newThreeTimesCondition = null;
             //是否是vip
             //判断用户是否是VIP
-            if (!(!userInfo.get("dating_vip").toString().equals("0") && Long.valueOf(userInfo.get("dating_vip").toString()) >= Long.valueOf(nowTime))){
-                //不是vip或者已过期
-                //判断三次条件
-                String threeTimesCondition = one + "3";
-                Object judgeDatingLikeTimes = userInfo.get("judge_dating_like_times");
-                if (judgeDatingLikeTimes != null && Long.valueOf(threeTimesCondition) <= Long.valueOf(judgeDatingLikeTimes.toString())){
+            //不是vip或者已过期
+            //判断三次条件
+            String threeTimesCondition = one + "3";
+            String threeTimesConditionLowerBound = one + "1";
+            Object judgeDatingLikeTimes = userInfo.get("judge_dating_like_times");
+            if (judgeDatingLikeTimes != null && Long.valueOf(threeTimesCondition) <= Long.valueOf(judgeDatingLikeTimes.toString())){
+                if (!(!userInfo.get("dating_vip").toString().equals("0") && Long.valueOf(userInfo.get("dating_vip").toString()) >= Long.valueOf(nowTime))){
                     return ServerResponse.createByErrorMessage("非Vip用户一天只能喜欢三次哦！");
+                }
+            }
+            //创造新的时间戳插回去
+            if (judgeDatingLikeTimes == null){
+                newThreeTimesCondition = one + "1";
+            }else {
+                if (Long.valueOf(threeTimesConditionLowerBound) > Long.valueOf(judgeDatingLikeTimes.toString())){
+                    //今天还没有喜欢过人
+                    newThreeTimesCondition = one + "1";
+                }else {
+                    //今天喜欢过人了
+                    newThreeTimesCondition  = String.valueOf(Long.valueOf(judgeDatingLikeTimes.toString()) + 1L);
                 }
             }
             //判断该用户是否已经醉入爱河
@@ -1573,8 +1778,8 @@ public class OperationServiceImpl implements IOperationService {
                 }catch (Exception e){
                     transactionManager.rollback(status);
                     e.printStackTrace();
-                    logger.error("取消喜欢异常",e.getStackTrace());
-                    logger.error("取消喜欢异常" + e.getMessage());
+                    logger.error("喜欢异常",e.getStackTrace());
+                    logger.error("喜欢异常" + e.getMessage());
                     return ServerResponse.createByErrorMessage("更新出错！");
                 }
             }
@@ -1596,6 +1801,8 @@ public class OperationServiceImpl implements IOperationService {
                     //将两个用户卡片的状态改成坠入爱河
                     subtitlesMapper.makeUserInLoveStatus("1", uid, 1);
                     subtitlesMapper.makeUserInLoveStatus("1", targetId, 1);
+                    //加入非vip喜欢次数
+                    subtitlesMapper.updateUserJudgeDatingLikeTimes(uid, newThreeTimesCondition);
                     //加入日常统计
                     subtitlesMapper.addDailyDatingPairingNumber(one);
 
@@ -1693,6 +1900,8 @@ public class OperationServiceImpl implements IOperationService {
                     subtitlesMapper.createSuperLikeRelationship(uid, targetId, "0", nowTime);
                     //加入日常统计
                     subtitlesMapper.addDailyDatingLikeClick(one);
+                    //加入非vip喜欢次数
+                    subtitlesMapper.updateUserJudgeDatingLikeTimes(uid, newThreeTimesCondition);
 
                     //下面的代码prd没有，但是不确定后期产品会不会搞事所以保留
 //                    //将自己的卡片加到超级喜欢的人的卡片列表里
@@ -1713,67 +1922,12 @@ public class OperationServiceImpl implements IOperationService {
                 }catch (Exception e){
                     transactionManager.rollback(status);
                     e.printStackTrace();
-                    logger.error("超级喜欢异常",e.getStackTrace());
-                    logger.error("超级喜欢异常" + e.getMessage());
+                    logger.error("喜欢异常",e.getStackTrace());
+                    logger.error("喜欢异常" + e.getMessage());
                     return ServerResponse.createByErrorMessage("更新出错！");
                 }
-                //新建超级喜欢的数组
-                List<String> superLikeSayFirst = new ArrayList<String>() {{
-                    add("在所有人类里，你最让我心动！");
-                    add("山有木兮木有枝，心悦君兮君不知。");
-                    add("对不起，没有经过你的允许就喜欢上你了");
-                    add("你摸摸我今天衣服的料子，是做你男、女朋友的料吗？");
-                    add("爱是奔赴，是坦诚，是相见。");
-                    add("等风等雨等你，可否等来一场春风得意马蹄疾。");
-                    add("我这人看人很准的，一看就知道你是我的人。");
-                    add("我想变得有趣，变得特别，变成你眼里的一点星光。");
-                    add("铃铛遇到风会响，我遇到你，心里的小鹿会乱撞。");
-                    add("这里荒芜寸草不生，后来你来这儿走了一遭，奇迹般万物生长，这里，是我的心。");
-                }};
 
-                List<String> superLikeSaySecond = new ArrayList<String>() {{
-                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
-                    add("你是三，我是九，我除了你，还是你(ps：超级喜欢你)");
-                    add("你知道我的缺点是什么吗？缺点你~");
-                    add("超级喜欢你，如果要加一个期限的话，希望，是一万年");
-                    add("我“超级喜欢”你，没有犹豫，因为是你。");
-                    add("我“超级喜欢”你，没有犹豫，因为是你。");
-                    add("春风十里不如你~(ps：超级喜欢你)");
-                    add("我想对你说，却害怕都说错：好喜欢你！知不知道？");
-                    add("有一种踏实是你心中有我名字，你是我的关键词。(ps：超级喜欢你)");
-                    add("你被ta“超级喜欢”了，快看看是不是你的意中人~");
-                }};
-
-                int randomNumber = (int)(0+Math.random()*(9+1));
-
-                //提交事务之后发送服务通知
-                //获取accessToken
-                AccessToken access_token = CommonFunc.getAccessToken();
-                //给该用户发送
-                //查没过期的from_id
-                Map<Object,Object> info = common_configMapper.getTmpInfo(targetId,nowTime);
-                if (info != null){
-                    common_configMapper.deleteTemplateMsg(info.get("id").toString());
-                    //发送模板消息
-                    WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_SUPER_LIKE_REMIND);
-                    wxMssVo.setAccess_token(access_token.getAccessToken());
-                    wxMssVo.setTouser(info.get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_FOUND_PATH);
-                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                    wxMssVo.setForm_id(info.get("form_id").toString());
-                    List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData(superLikeSayFirst.get(randomNumber),"#ffffff"));
-                    list.add(new TemplateData(superLikeSaySecond.get(randomNumber),"#ffffff"));
-                    wxMssVo.setParams(list);
-                    String wx_info = CommonFunc.sendTemplateMessage(wxMssVo);
-                    //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(targetId, "发送超级喜欢服务通知", wx_info, nowTime);
-                }
             }
-
-
-
             return ServerResponse.createBySuccessMessage("成功");
         }
     }
@@ -2175,6 +2329,38 @@ public class OperationServiceImpl implements IOperationService {
                 result.put("meetCode", meetCode.toString());
             }
 
+
+            return ServerResponse.createBySuccess("成功", result);
+        }
+    }
+
+
+
+    /**
+     * 返回五个随机虚拟用户头像
+     * @param request  request
+     */
+    public ServerResponse<Map<String, Object>> randomGetVirtualUserPortrait(HttpServletRequest request){
+        String token = request.getHeader("token");
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(token);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //验证token
+        String uid = CommonFunc.CheckToken(request,token);
+        if (uid == null){
+            //未找到
+            return ServerResponse.createByErrorMessage("身份认证错误！");
+        }else {
+            //结果集
+            Map<String, Object> result = new HashMap<>();
+            List<Map<String, Object>> randomGetWordChallengeUsersInfo = subtitlesMapper.randomGetWordChallengeUsers(5);
+            for (int i = 0; i < randomGetWordChallengeUsersInfo.size(); i++){
+                randomGetWordChallengeUsersInfo.get(i).put("portrait", CommonFunc.judgePicPath(randomGetWordChallengeUsersInfo.get(i).get("portrait").toString()));
+            }
+            result.put("userInfo", randomGetWordChallengeUsersInfo);
 
             return ServerResponse.createBySuccess("成功", result);
         }

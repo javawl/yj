@@ -12,7 +12,7 @@
     id, type, report_reason
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from tip_off
     where id = #{id,jdbcType=INTEGER}
@@ -23,9 +23,9 @@
   </delete>
   <insert id="insert" parameterType="com.yj.pojo.Tip_off" >
     insert into tip_off (id, type, report_reason
-      )
+    )
     values (#{id,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{reportReason,jdbcType=VARCHAR}
-      )
+           )
   </insert>
   <insert id="insertSelective" parameterType="com.yj.pojo.Tip_off" >
     insert into tip_off
@@ -67,7 +67,7 @@
   <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Tip_off" >
     update tip_off
     set type = #{type,jdbcType=INTEGER},
-      report_reason = #{reportReason,jdbcType=VARCHAR}
+        report_reason = #{reportReason,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -114,6 +114,21 @@
     where user_id = #{id}
   </update>
 
+  <select id="whetherInLove" parameterType="string" resultType="string">
+    select `is_in_love` from dating_card
+    where user_id = #{id}
+  </select>
+
+  <update id = "updateLoveTimes" parameterType="string">
+    update dating_card set `love_times`= love_times + 1
+    where user_id = #{id}
+  </update>
+
+  <insert id = "insertDatingRelationship" parameterType="string">
+    insert into dating_relationship(lover_one_user_id,lover_another_user_id,set_time)
+    values(#{id},#{another_id},#{time} )
+  </insert>
+
   <select id="selectLover" parameterType="string" resultType="map">
     select id,lover_one_user_id,lover_another_user_id from
       dating_relationship
@@ -122,7 +137,7 @@
 
   <delete id="deleteRelationship" parameterType="string">
     delete from dating_relationship
-    where lover_one_user_id = #{id} or lover_another_user_id = #{id}
+    where id = #{id}
   </delete>
 
   <update id="updateCover" >

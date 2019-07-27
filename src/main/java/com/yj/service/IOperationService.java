@@ -41,5 +41,7 @@ public interface IOperationService {
 
     ServerResponse<Map<String, Object>> twoMeet(HttpServletRequest request);
 
+    ServerResponse<Map<String, Object>> randomGetVirtualUserPortrait(HttpServletRequest request);
+
     ServerResponse<Map<String, Object>> judgeUserSubscribe(HttpServletRequest request);
 }

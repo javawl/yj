@@ -208,6 +208,15 @@
     ORDER BY set_time ASC
   </select>
 
+
+  <select id="uploadNotYetGetRandomCard" parameterType="int" resultType="map">
+    SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
+    FROM dating_card
+    WHERE status = 2
+    AND is_in_love = 0
+    ORDER BY rand() LIMIT #{cardNumber}
+  </select>
+
   <select id="findLikeMeCard" parameterType="string" resultType="map">
     SELECT user_id,wx_name,gender,signature,age,cover,status,institutions
     FROM dating_card
@@ -424,6 +433,15 @@
     WHERE lover_one_user_id = #{user_id}
     OR lover_another_user_id = #{user_id}
     LIMIT 1
+  </select>
+
+
+  <select id="randomGetWordChallengeUsers" resultType="map" parameterType="int">
+    SELECT username, portrait
+    FROM `user`,(SELECT user_id
+                 FROM `virtual_user_challenge`
+                 order by rand() limit #{number}) tb
+    WHERE `user`.id = tb.user_id
   </select>
 
 
@@ -671,6 +689,13 @@
         `set_time` = #{set_time},
         `status` = 1
     WHERE user_id = #{user_id}
+  </update>
+
+
+  <update id="updateUserJudgeDatingLikeTimes" parameterType="string">
+    UPDATE `user`
+    SET `judge_dating_like_times` = #{judge_dating_like_times}
+    WHERE id = #{user_id}
   </update>
   
   

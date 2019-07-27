@@ -1378,9 +1378,10 @@ public class CommonFunc {
     public static Map<String, Object> wxPlatformNormlaAccessToken() {
         Map<String, Object> result = new HashMap<>();
         //判断如果session里有的话直接返回
-        if (LocalCache.containsKey("wxplatformaccesstoken")){
+        if (CommonFunc.cacheContainsKey("wxplatformaccesstoken")){
             result.put("status", "1");
-            result.put("access_token", LocalCache.get("wxplatformaccesstoken"));
+//            result.put("access_token", LocalCache.get("wxplatformaccesstoken"));
+            result.put("access_token", CommonFunc.getCache("wxplatformaccesstoken").toString());
             System.out.println("缓存");
             return result;
         }
@@ -1405,7 +1406,8 @@ public class CommonFunc {
                 result.put("status", "1");
                 result.put("access_token", normalAccessToken);
                 //存入缓存
-                LocalCache.put("wxplatformaccesstoken", normalAccessToken, 7100);
+//                LocalCache.put("wxplatformaccesstoken", normalAccessToken, 7100);
+                CommonFunc.setCache("wxplatformaccesstoken", normalAccessToken, 7100);
                 System.out.println("生成");
                 return result;
             }

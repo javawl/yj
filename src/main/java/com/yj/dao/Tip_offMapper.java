@@ -45,6 +45,15 @@ public interface Tip_offMapper {
     //修改用户匹配状态（0或1）
     int updateCondition(@Param("id") String id,@Param("condition") String condition);
 
+    //判断用户是否已在相爱状态
+    String whetherInLove(@Param("id") String id);
+
+    //更新相爱次数(相爱次数加一)
+    int updateLoveTimes(@Param("id") String id);
+
+    //新增匹配关系
+    int insertDatingRelationship(@Param("id") String id,@Param("another_id") String another_id,@Param("time") String time);
+
     //查找匹配关系
     Map<String,Object> selectLover(@Param("id") String id);
 

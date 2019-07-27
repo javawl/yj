@@ -1438,35 +1438,37 @@ public class AdminController {
         try {
             //获取accessToken
             AccessToken access_token = CommonFunc.getAccessToken();
-            String nowTime = String.valueOf((new Date()).getTime());
+            Long nowTimeStamp = (new Date()).getTime();
+            String nowTime = String.valueOf(nowTimeStamp);
+            //计算三天后的时间
+            Long threeDayTimeStamp = 3 * 24 * 60 * 60 * 1000L;
+            String threeDayAfter = String.valueOf(nowTimeStamp + threeDayTimeStamp);
             //获取当天0点多一秒时间戳
             String one = CommonFunc.getOneDate();
             //查出所有匹配的人
-            List<Map<Object,Object>> all_user =  common_configMapper.getInLoveAllWxUserLogin(nowTime);
+            List<Map<Object,Object>> all_user =  common_configMapper.getDatingVipExpiringUsers(nowTime, threeDayAfter);
             for(int i = 0; i < all_user.size(); i++){
-                if (dictionaryMapper.checkInsistDayClockInMessage(all_user.get(i).get("user_id").toString(), one) == null){
-                    common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
-                    //发送模板消息
-                    WxMssVo wxMssVo = new WxMssVo();
-                    wxMssVo.setTemplate_id(Const.TMP_ID1);
-                    wxMssVo.setAccess_token(access_token.getAccessToken());
-                    wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
-                    wxMssVo.setPage(Const.WX_HOME_PATH);
-                    wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-                    wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
-                    List<TemplateData> list = new ArrayList<>();
-                    list.add(new TemplateData("“坚持多一天，遇见更优秀的自己”，别忘记背单词了，和优秀的Ta一起进步吧！","#ffffff"));
-                    list.add(new TemplateData("点击开始背单词","#ffffff"));
-                    wxMssVo.setParams(list);
-                    String info = CommonFunc.sendTemplateMessage(wxMssVo);
-                    //记录发送的情况
-                    common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "坚持多一天，遇见更优秀的自己", info, nowTime);
+                common_configMapper.deleteTemplateMsg(all_user.get(i).get("id").toString());
+                //发送模板消息
+                WxMssVo wxMssVo = new WxMssVo();
+                wxMssVo.setTemplate_id(Const.TMP_DATING_VIP_EXPIRING_REMIND);
+                wxMssVo.setAccess_token(access_token.getAccessToken());
+                wxMssVo.setTouser(all_user.get(i).get("wechat").toString());
+                wxMssVo.setPage(Const.TMP_DATING_VIP_EXPIRING_REMIND);
+                wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+                wxMssVo.setForm_id(all_user.get(i).get("form_id").toString());
+                List<TemplateData> list = new ArrayList<>();
+                list.add(new TemplateData("您的VIP特权就快到期啦，为了更好的匹配与体验，点击我续费吧！","#ffffff"));
+                list.add(new TemplateData("点我延长特权","#ffffff"));
+                wxMssVo.setParams(list);
+                String info = CommonFunc.sendTemplateMessage(wxMssVo);
+                //记录发送的情况
+                common_configMapper.insertTmpSendMsgRecord(all_user.get(i).get("user_id").toString(), "您的VIP特权就快到期啦", info, nowTime);
 //                }
-                }
             }
         }catch (Exception e){
-            logger.error("提醒匹配用户背单词异常",e.getStackTrace());
-            logger.error("提醒匹配用户背单词异常",e);
+            logger.error("提醒约会vip续费",e.getStackTrace());
+            logger.error("提醒约会vip续费",e);
             e.printStackTrace();
         }
         return "success";
@@ -2015,6 +2017,8 @@ public class AdminController {
                         list.add(new TemplateData("点击查看挑战排行榜~~~" ,"#173177"));
                         officialAccountTmpMessage.setParams(list);
                         String info = CommonFunc.sendOfficialAccountsTemplateMessage(officialAccountTmpMessage);
+                        //记录发送的情况
+                        common_configMapper.insertTmpSendMsgRecord(rank.get(j).get("user_id").toString(), "今天快结束啦~快来看看自己挤进前100名了吗？", info, timeStamp);
                         logger.error("公众号模板消息2：" + info);
                     }
                 }

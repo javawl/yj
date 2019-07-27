@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -255,7 +256,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
 
     }
 
-    //解除用户匹配状态
+    //更改用户匹配状态
     public ServerResponse<String> update_condition(String id, String condition, HttpServletRequest request) {
         List<Object> l1 = new ArrayList<Object>() {{
             add(id);
@@ -266,6 +267,15 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         else {
             //解除匹配
             if (condition.equals("0")) {
+                Map<String, Object> userLover = tip_offMapper.selectLover(id);
+                if(userLover == null) return ServerResponse.createByErrorMessage("该用户无匹配关系，解除失败");
+                String loverId;
+                //判断两个id哪个是自己哪个是对方
+                if (id.equals(userLover.get("lover_one_user_id").toString())) {
+                    loverId = userLover.get("lover_another_user_id").toString();
+                } else {
+                    loverId = userLover.get("lover_one_user_id").toString();
+                }
                 //事务
                 DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
                 DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -273,15 +283,6 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                 def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
                 TransactionStatus status = transactionManager.getTransaction(def);
                 try {
-                    //找到其对应的关系
-                    Map<String, Object> userLover = tip_offMapper.selectLover(id);
-                    String loverId;
-                    //判断两个id哪个是自己哪个是对方
-                    if (id.equals(userLover.get("lover_one_user_id").toString())) {
-                        loverId = userLover.get("lover_another_user_id").toString();
-                    } else {
-                        loverId = userLover.get("lover_one_user_id").toString();
-                    }
                     //改变该用户的匹配状态
                     int result = tip_offMapper.updateCondition(id, condition);
                     if (result == 0) {
@@ -305,11 +306,54 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                     return ServerResponse.createByErrorMessage("修改失败！");
                 }
             }
-            else
-                return ServerResponse.createByErrorMessage("无法执行该操作");
-        }
+            else{
+                //判断其是否已在爱河中，如果已在则无法再匹配新的关系
+                if(tip_offMapper.whetherInLove(id).equals("1") ||tip_offMapper.whetherInLove(condition).equals("1") )
+                    return ServerResponse.createByErrorMessage("其已存在匹配关系，需先删除原来的匹配关系");
+                DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+                DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                //隔离级别
+                def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                TransactionStatus status = transactionManager.getTransaction(def);
+                try {
+                    //修改双方的匹配状态
+                    //改变该用户的匹配状态
+                    int result = tip_offMapper.updateCondition(id, "1");
+                    if (result == 0) {
+                        throw new Exception();
+                    }
+                    //改变恋人的匹配状态
+                    int lover_result = tip_offMapper.updateCondition(condition,"1");
+                    if (lover_result == 0) {
+                        throw new Exception();
+                    }
+                    //双方相爱次数加一
+                    result= tip_offMapper.updateLoveTimes(id);
+                    if (result == 0) {
+                        throw new Exception();
+                    }
+                    result = tip_offMapper.updateLoveTimes(condition);
+                    if (result == 0) {
+                        throw new Exception();
+                    }
+                    //获取当前系统时间
+                    String time = String.valueOf(new Date().getTime()) ;
+                    //新增匹配关系
+                    result = tip_offMapper.insertDatingRelationship(id,condition,time);
+                    if(result == 0) throw new Exception();
 
+                    transactionManager.commit(status);
+                    return ServerResponse.createBySuccessMessage("新建匹配关系成功");
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                    transactionManager.rollback(status);
+                    return ServerResponse.createByErrorMessage("修改失败！");
+                }
+            }
+        }
     }
+
 
     //更改用户卡片封面
     public ServerResponse<String> update_cover(String id, MultipartFile file,HttpServletRequest request){

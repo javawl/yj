@@ -256,6 +256,16 @@ public class OperationController {
 
 
     /**
+     * 返回五个随机虚拟用户头像
+     */
+    @RequestMapping(value = "randomGetVirtualUserPortrait.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map<String, Object>> randomGetVirtualUserPortrait(HttpServletRequest request){
+        return iOperationService.randomGetVirtualUserPortrait(request);
+    }
+
+
+    /**
      * 判断用户是否关注公众号
      */
     @RequestMapping(value = "judgeUserSubscribe.do", method = RequestMethod.POST)
@@ -263,6 +273,8 @@ public class OperationController {
     public ServerResponse<Map<String, Object>> judgeUserSubscribe(HttpServletRequest request){
         return iOperationService.judgeUserSubscribe(request);
     }
+
+
 
 
     /**
