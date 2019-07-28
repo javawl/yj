@@ -174,7 +174,7 @@
             list-style: none;
             display: block;
             margin: 0;
-            width: 120px;
+            width: 160px;
             background-image: url("https://file.ourbeibei.com/l_e/static/images/pink_background.jpg");
             background-size: 100%;
             border: solid 1px hotpink;
@@ -321,6 +321,9 @@
 
                     var tagInner = "";
                     for (var k = 0; k < data[i]['tags'].length; k++){
+                        if (data[i]['tags'][k]['tag'] == ""){
+                            data[i]['tags'][k]['tag'] = "null";
+                        }
                         var tmpStr = i + "_" + k;
                         tagInner += '<li onclick="deleteTag('+"'"+data[i]['tags'][k]['tag_id']+"'"+')">' + data[i]['tags'][k]['tag'] + '<img id="tag' + tmpStr +'" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>';
                     }
@@ -331,7 +334,7 @@
                         // '    <li>标签四<img id="tag1_4" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
                         // '    <li>标签五<img id="tag1_5" class="tag_delete" src="https://file.ourbeibei.com/l_e/static/icon/delete.png"></li>' +
                             tagInner +
-                        '    <li style="position: relative"><div style="width: 85px;"><input id = "input_tag' + tmpStr +'" style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="heart5" style=" position: absolute; bottom: 6px; left: 94px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png" onclick="addTag('+"'"+data[i]['card_id']+"',"+ "'"+tmpStr+"'"+')"> </li>' +
+                        '    <li style="position: relative"><div style="width: 85px;"><input id = "input_tag' + data[i]['user_id'] +'" style="height: 25px; margin-top: 4px;" type="text" placeholder="标签"></div><img id="whatever" style=" position: absolute; bottom: 6px; left: 134px;" src="https://file.ourbeibei.com/l_e/static/icon/add.png" onclick="addTag('+"'"+data[i]['card_id']+"',"+ "'"+data[i]['user_id']+"'"+')"> </li>' +
                         '</ul>';
 
                     if (data[i]['status'] == '1'){
@@ -342,12 +345,13 @@
                     $("#daily_data").append('<tr>'+
                         '<td>'+data[i]['user_id']+'</td>'+
                         // '<td>'+data[i]['name']+'</td>'+
-                        '<td id="wx_name'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','wx_name'"+')">'+data[i]['username']+'</td>'+
+                        '<td id="wx_name'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','wx_name'"+')">'+data[i]['wx_name']+'</td>'+
                         '<td id="change_gender'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','change_gender'"+')">'+gender+'</td>'+
                         '<td id="intention'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','intention'"+')">'+intention+'</td>'+
                         '<td onclick="upload_pic_click('+"'"+data[i]['user_id']+"'"+')">'+string2+'</td>'+
                         '<td id="status'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','status'"+')">'+status+'</td>'+
                         '<td id="signature'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','signature'"+')">'+data[i]['signature']+'</td>'+
+                        '<td id="institutions'+data[i]['user_id']+'" onclick="change_sent('+"'"+data[i]['user_id']+"','institutions'"+')">'+data[i]['institutions']+'</td>'+
                         // '<td onclick="upload_pic_click('+"'"+data[i]['user_id']+"'"+')">'+string2+'</td>'+
                         // '<td id="author'+data[i]['user_id']+'" onclick="change_author('+"'"+data[i]['user_id']+"'"+')"><div style="word-wrap:break-word">'+data[i]['author']+'</div></td>'+
                         '<td><div>'+tag+'</div></td>'+
@@ -483,6 +487,10 @@
                 targetUrl = "/lzy/update_condition.do";
                 paramName = "condition";
                 break;
+            case "institutions":
+                targetUrl = "/lzy/update_institutions.do";
+                paramName = "institution";
+                break;
             default:
                 alert("非法类别");
         }
@@ -607,6 +615,11 @@
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
             <td style="border-left: 0;border-right: 0;"></td>
+            <td style="border-left: 0;border-right: 0;">
+                <div style="float: right; " id="specifyCardShow" class="pick_button" onclick="showAllSpecifyCards()">
+                    <span style="color: snow;" onclick="showAllSpecifyCards()">查看展示位</span>
+                </div>
+            </td>
             <td style="border-left: 0;">
                 <div style="float: right; " id="select" class="pick_button" onclick="matchingNewVirtualUserBoxPopUp()">
                     <span style="color: snow;" onclick="matchingNewVirtualUserBoxPopUp()">新增虚拟用户</span>
@@ -642,6 +655,9 @@
             </td>
             <td>
                 <p>个性签名</p>
+            </td>
+            <td>
+                <p>机构/学校</p>
             </td>
             <td>
                 <p>标签</p>
@@ -866,6 +882,7 @@
                     alert(msg);
                 }else {
                     alert(msg);
+                    window.location.href = "showdatingcard.jsp?page=1&size=15";
                 }
             },
             error:function (result) {
@@ -960,6 +977,9 @@
         $(".new_virtual_user").css("display", "block");
         // 加了false才能显现出来
         outside_new = false;
+    }
+    function showAllSpecifyCards() {
+        window.location.href = "showdatingspecifycard.jsp?page=1";
     }
     document.body.addEventListener('click', function () {
         outside_new = true;

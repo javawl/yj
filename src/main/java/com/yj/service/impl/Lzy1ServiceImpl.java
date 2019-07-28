@@ -25,10 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.yj.common.CommonFunc.getFormatTime;
 
 
 @Transactional(readOnly = false)
@@ -441,6 +440,70 @@ public class Lzy1ServiceImpl implements ILzy1Service {
             List<Map<String,Object>> result = tip_offMapper.selectByWord(word);
             return ServerResponse.createBySuccess(result);
         }
+    }
+
+    //展示所有展示位
+    public ServerResponse<Map> show_specify_pos(String page,String size,HttpServletRequest request) {
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(page);
+            add(size);
+        }};
+        //l1全都不为空，CheckNull会=null，只要有一项为空就是一个string
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        //将页数和大小转化为limit
+        int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        List<Map<Object,Object>> show = tip_offMapper.showAllSpecify(start,Integer.valueOf(size));
+        int sum = show.size();
+        for(int i = 0;i<sum;i++){
+            Map map =show.get(i);
+            //封面路径标准化
+            map.put("cover", CommonFunc.judgePicPath(map.get("cover").toString()));
+            //展示时间标准化
+            Long time=Long.valueOf(map.get("set_time").toString());
+            String formatTime = CommonFunc.getFormatTime(time,"YYYY-MM-dd");
+            map.replace("set_time",formatTime);
+            show.remove(i);
+            show.add(i,map);
+        }
+        Map<Object,Object> result = new HashMap<Object,Object>();
+        result.put("size",sum);
+        result.put("data",show );
+
+        return ServerResponse.createBySuccess(result);
+    }
+
+    //删除展示位
+    public ServerResponse<String> delete_show(String id,HttpServletRequest request){
+        //验证参数是否为空
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+
+        int result = tip_offMapper.delete_show(id);
+        if(result == 0)
+            return ServerResponse.createByErrorMessage("删除展示位失败");
+        else
+            return ServerResponse.createBySuccessMessage("删除展示位成功");
+    }
+
+    //更改机构
+    public ServerResponse<String> update_institution(String id,String institution,HttpServletRequest request){
+        List<Object> l1 = new ArrayList<Object>(){{
+            add(id);
+            add(institution);
+        }};
+        String CheckNull = CommonFunc.CheckNull(l1);
+        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        int result = tip_offMapper.update_institution(id,institution);
+        if(result == 0)
+            return ServerResponse.createByErrorMessage("修改失败");
+        else
+            return ServerResponse.createBySuccessMessage("成功");
+
     }
 
     //封号

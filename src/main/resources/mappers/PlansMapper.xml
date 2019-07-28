@@ -14,7 +14,7 @@
     id, plan, word_number, type_id, dictionary_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from plans
     where id = #{id,jdbcType=INTEGER}
@@ -24,10 +24,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.yj.pojo.Plans" >
-    insert into plans (id, plan, word_number, 
-      type_id, dictionary_type)
-    values (#{id,jdbcType=INTEGER}, #{plan,jdbcType=VARCHAR}, #{wordNumber,jdbcType=INTEGER}, 
-      #{typeId,jdbcType=INTEGER}, #{dictionaryType,jdbcType=INTEGER})
+    insert into plans (id, plan, word_number,
+                       type_id, dictionary_type)
+    values (#{id,jdbcType=INTEGER}, #{plan,jdbcType=VARCHAR}, #{wordNumber,jdbcType=INTEGER},
+            #{typeId,jdbcType=INTEGER}, #{dictionaryType,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.yj.pojo.Plans" >
     insert into plans
@@ -87,9 +87,9 @@
   <update id="updateByPrimaryKey" parameterType="com.yj.pojo.Plans" >
     update plans
     set plan = #{plan,jdbcType=VARCHAR},
-      word_number = #{wordNumber,jdbcType=INTEGER},
-      type_id = #{typeId,jdbcType=INTEGER},
-      dictionary_type = #{dictionaryType,jdbcType=INTEGER}
+        word_number = #{wordNumber,jdbcType=INTEGER},
+        type_id = #{typeId,jdbcType=INTEGER},
+        dictionary_type = #{dictionaryType,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -129,8 +129,8 @@
     `dating_like_relationship` group by send_good_card_id
     )s1 right outer join
     (SELECT
-    t2.show_times,t2.love_times,t2.is_in_love,t1.id as user_id,t2.id as card_id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,
-    t1.dating_vip,t2.is_virtual,t2.views,t2.intention
+    t2.show_times,t2.love_times,t2.is_in_love,t1.id as user_id,t2.id as card_id,t2.wx_name,t2.gender,t2.cover,t2.status,t2.signature,t2.age,
+    t1.dating_vip,t2.is_virtual,t2.views,t2.intention,t2.institutions
     FROM `user` t1 LEFT OUTER join
     `dating_card`t2
     on t1.id = t2.user_id
@@ -153,13 +153,13 @@
     </trim>
     <trim prefix="and">
       <if test="vip == 0">
-        t1.dating_vip = #{vip}
+        t1.dating_vip = 0 or t1.dating_vip &lt;#{nowTime}
       </if>
       <if test="vip == -1">
         true
       </if>
       <if test="vip == 1">
-        t1.dating_vip != 0
+        t1.dating_vip &gt;#{nowTime}
       </if>
     </trim>
     <trim prefix="and">
@@ -183,7 +183,7 @@
         true
       </if>
       <if test="search != '%-1%'">
-      t2.`wx_name` like #{search}
+        t2.`wx_name` like #{search}
       </if>
     </trim>
     ORDER BY t2.set_time  DESC)s2
@@ -198,9 +198,11 @@
     where card_id = #{id}
   </select>
 
-  <select id = "getSettime" resultType="map">
-    select distinct set_time from `dating_specify_card`
+  <select id = "getSetTime" resultType="string">
+    select set_time from `dating_specify_card`
     where user_id = #{id}
+    order by set_time DESC
+             limit 1
   </select>
 
   <select id = "getInloveTime" resultType="string">
@@ -404,9 +406,6 @@
   </select>
 
   <insert id="insertNewVirtualUserToUser">
-    <selectKey resultType="string" order="AFTER">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
     INSERT INTO `user`(`gender`,`personality_signature`,`register_time`)
     VALUES (#{gender},#{personality_signature},#{register_time})
   </insert>
@@ -467,5 +466,21 @@
       and rank = #{rank}
       and set_time = #{set_time}
   </delete>
+
+  <select id="getNewVirtualUserId" resultType="string">
+    SELECT id
+    FROM user
+    WHERE register_time = #{register_time}
+  </select>
+
+  <insert id="insertNewVirtualUserToDc">
+    INSERT INTO dating_card(`user_id`,`wx_name`,`gender`,`intention`,`signature`,`age`,`institutions`,`status`,`views`,`set_time`,`cover`,`is_virtual`)
+    VALUES (#{user_id}, #{wx_name}, #{gender}, #{intention}, #{signature}, #{age}, #{institutions}, #{status}, #{views}, #{set_time}, #{cover}, 1)
+  </insert>
+
+  <insert id="insertNewVirtualUserToDc2">
+    INSERT INTO dating_card(`user_id`,`wx_name`,`gender`,`intention`,`signature`,`age`,`institutions`,`status`,`views`,`set_time`,`is_virtual`)
+    VALUES (#{user_id}, #{wx_name}, #{gender}, #{intention}, #{signature}, #{age}, #{institutions}, #{status}, #{views}, #{set_time}, 1)
+  </insert>
   <!--////////////////////////////////////版本0.3Dao层实现下闭合线/////////////////////////////////////-->
 </mapper>

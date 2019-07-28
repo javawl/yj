@@ -113,7 +113,7 @@ public class OperationServiceImpl implements IOperationService {
                 result.put("userStatus", 0);
 
                 //随机抽cardNumber张卡片出来
-                List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber);
+                List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber + 1);
                 Map<String, List<Object>> tagMap = new HashMap<>();
                 if (uploadNotYetGetRandomCardInfo.size() > 0){
                     //todo 将大家的标签查出来
@@ -136,7 +136,7 @@ public class OperationServiceImpl implements IOperationService {
                     for (int k = 0; k < uploadNotYetGetRandomCardInfo.size(); k++){
                         String targetId = uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString();
                         //图片正确路径
-                        uploadNotYetGetRandomCardInfo.get(k).put("cover", uploadNotYetGetRandomCardInfo.get(k).get("cover").toString());
+                        uploadNotYetGetRandomCardInfo.get(k).put("cover", CommonFunc.judgePicPath(uploadNotYetGetRandomCardInfo.get(k).get("cover").toString()));
 
                         //标签插进去
                         uploadNotYetGetRandomCardInfo.get(k).put("tag", tagMap.get(targetId));
@@ -479,7 +479,7 @@ public class OperationServiceImpl implements IOperationService {
                                 for (int k = 0; k < todayDatingCardInfo.size(); k++){
                                     String targetId = todayDatingCardInfo.get(k).get("user_id").toString();
                                     //图片正确路径
-                                    todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
+                                    todayDatingCardInfo.get(k).put("cover", CommonFunc.judgePicPath(todayDatingCardInfo.get(k).get("cover").toString()));
 
                                     //标签插进去
                                     todayDatingCardInfo.get(k).put("tag", tagMap.get(targetId));
@@ -526,7 +526,7 @@ public class OperationServiceImpl implements IOperationService {
                         //用户状态，0代表没上传过资料，1代表上传资料还没审核，2代表上传资料审核通过
                         result.put("userStatus", 1);
                         //随机抽cardNumber张卡片出来
-                        List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber);
+                        List<Map<String, Object>> uploadNotYetGetRandomCardInfo = subtitlesMapper.uploadNotYetGetRandomCard(cardNumber + 1);
                         Map<String, List<Object>> tagMap = new HashMap<>();
                         if (uploadNotYetGetRandomCardInfo.size() > 0){
                             //todo 将大家的标签查出来
@@ -549,7 +549,7 @@ public class OperationServiceImpl implements IOperationService {
                             for (int k = 0; k < uploadNotYetGetRandomCardInfo.size(); k++){
                                 String targetId = uploadNotYetGetRandomCardInfo.get(k).get("user_id").toString();
                                 //图片正确路径
-                                uploadNotYetGetRandomCardInfo.get(k).put("cover", uploadNotYetGetRandomCardInfo.get(k).get("cover").toString());
+                                uploadNotYetGetRandomCardInfo.get(k).put("cover", CommonFunc.judgePicPath(uploadNotYetGetRandomCardInfo.get(k).get("cover").toString()));
 
                                 //标签插进去
                                 uploadNotYetGetRandomCardInfo.get(k).put("tag", tagMap.get(targetId));

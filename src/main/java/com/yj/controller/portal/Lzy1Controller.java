@@ -1,7 +1,6 @@
 package com.yj.controller.portal;
 
 
-
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.ServerResponse;
 import com.yj.dao.*;
@@ -148,7 +147,7 @@ public class Lzy1Controller {
     /**
      * 更改用户匹配状态
      * @Param id 用户id
-     * @Param condition 匹配状态(1为匹配，0为未匹配)
+     * @Param condition 匹配状态(0为取消匹配,其他为创建一个相应的匹配关系)
      */
     @RequestMapping(value = "update_condition.do",method = RequestMethod.POST)
     @ResponseBody
@@ -175,7 +174,7 @@ public class Lzy1Controller {
      */
     @RequestMapping(value = "update_cover.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> update_cover(String id, @RequestParam(value = "cover",required = false) MultipartFile file, HttpServletRequest request){
+    public ServerResponse<String> update_cover( @RequestParam(value = "cover",required = false) MultipartFile file, String id,HttpServletRequest request){
         if(file == null){
             return ServerResponse.createByErrorMessage("请上传图片！");
         }
@@ -201,6 +200,41 @@ public class Lzy1Controller {
     @ResponseBody
     public ServerResponse<String> delete_tag(String id, HttpServletRequest request){
         return iLzy1Service.delete_tag(id,request);
+    }
+
+
+    /**
+     * 展示展示位
+     * @Param page 页数
+     * @Param size 一页大小
+     *
+     */
+    @RequestMapping(value = "show_specify_pos.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<Map> show_specify_pos(String page,String size,HttpServletRequest request)
+    {
+        return iLzy1Service.show_specify_pos(page,size,request);
+    }
+
+    /**
+     * 删除展示位
+     * @Param id 展示位的id
+     */
+    @RequestMapping(value = "delete_show.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> delete_show(String id,HttpServletRequest request){
+        return iLzy1Service.delete_show(id,request);
+    }
+
+    /**
+     * 更改机构名
+     * @Param id 用户id
+     * @Param institution 机构
+     */
+    @RequestMapping(value = "update_institutions.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> update_institutions(String id,String institution,HttpServletRequest request){
+        return iLzy1Service.update_institution(id,institution,request);
     }
 
     /**

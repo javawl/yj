@@ -1,5 +1,6 @@
 package com.yj.controller.portal;
 
+
 import com.alibaba.fastjson.JSONObject;
 import com.yj.common.*;
 import com.yj.dao.Common_configMapper;
@@ -10,6 +11,9 @@ import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
 import com.yj.service.IVariousService;
 import com.yj.service.IZbh1Service;
+import oracle.jrockit.jfr.events.RequestableEventEnvironment;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +22,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.RequestWrapper;
+import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -79,10 +91,9 @@ public class Zbh1Controller {
 
     @RequestMapping(value = "showAllUserData.do", method = RequestMethod.POST)
     @ResponseBody
+    //后台管理系统 审核，修改资料，放展示卡总表
     public ServerResponse<Map> showAllUserData(String page, String size,String gender,String status,String vip,String isVirtual,String search,String emotionalState, HttpServletRequest request)
-
     {
-        //后台管理系统 审核，修改资料，放展示卡总表
         return iZbh1Service.showAllUserData(page,size,gender,status,vip,isVirtual,search,emotionalState,request);
     }
 
@@ -92,6 +103,7 @@ public class Zbh1Controller {
         //后台管理系统 审核，修改资料，放展示卡总表 倒序排列
         return iZbh1Service.showReverse(page, size, request);
     }
+
 
     @RequestMapping(value = "showMaleUser.do", method = RequestMethod.GET)
     @ResponseBody
@@ -148,7 +160,7 @@ public class Zbh1Controller {
     public ServerResponse<Map> showVirtualUser(String page, String size, HttpServletRequest request){
         return iZbh1Service.showVirtualUser(page, size, request);
     }
-//
+    //
 ////    /**
 ////     * 发送第一个学习提醒
 ////     * @param token       验证令牌
@@ -267,16 +279,17 @@ public class Zbh1Controller {
 //        }
 //    }
 //
-//    @RequestMapping(value = "createNewVirtualUser.do", method = RequestMethod.POST)
-//    @ResponseBody
-//    //后台管理系统 审核，修改资料，放展示卡总表 创建新的虚拟用户
-//    public ServerResponse<Map> createNewVirtualUser(String wx_name, String gender, String intention, String signature, String age, String institutions, String status, String views, HttpServletRequest request ){
+    @RequestMapping(value = "createNewVirtualUser.do", method = RequestMethod.POST)
+    @ResponseBody
+    //后台管理系统 审核，修改资料，放展示卡总表 创建新的虚拟用户
+    public ServerResponse<String> createNewVirtualUser(@RequestParam(value = "cover",required = false) MultipartFile file, String wx_name, String gender, String intention, String signature, String age, String institutions, String views, HttpServletRequest request ){
 //        if (iZbh1Service.createNewVirtualUser(wx_name, gender, intention, signature, age, institutions, status, views, request) == 1){
 //            return ServerResponse.createBySuccessMessage("new successfully");
 //        }else {
 //            return ServerResponse.createByErrorCodeMessage(500, "internal error");
 //        }
-//    }
+        return iZbh1Service.createNewVirtualUser(file, wx_name, gender, intention, signature, age, institutions, views, request);
+    }
 
     @RequestMapping(value = "searchUser.do", method = RequestMethod.GET)
     @ResponseBody

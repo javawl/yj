@@ -8,6 +8,7 @@ import com.yj.dao.Common_configMapper;
 import com.yj.dao.DictionaryMapper;
 import com.yj.dao.PlansMapper;
 import com.yj.dao.UserMapper;
+import com.yj.service.IFileService;
 import com.yj.service.IZbh1Service;
 import net.sf.jsqlparser.schema.Server;
 import org.hamcrest.core.Is;
@@ -20,6 +21,8 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.multipart.MultipartFile;
+import org.terracotta.modules.ehcache.store.nonstop.ExceptionOnTimeoutStore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.rmi.MarshalledObject;
@@ -47,6 +50,9 @@ public class Zbh1ServiceImpl implements IZbh1Service {
 
     @Autowired
     private ApplicationContext ctx;
+
+    @Autowired
+    private IFileService iFileService;
 
     private Logger logger = LoggerFactory.getLogger(Zbh1ServiceImpl.class);
 
@@ -104,8 +110,10 @@ public class Zbh1ServiceImpl implements IZbh1Service {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //将页数和大小转化为limit
         int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
+        String nowTime=String.valueOf(new Date().getTime());
         //获得用户的展示次数，匹配次数，匹配状态
-        List<Map<Object,Object>> Info = plansMapper.selectAllUserDataInfo(start, Integer.valueOf(size),gender,status,vip,isVirtual,"%" + search + "%",emotionalState);
+
+        List<Map<Object,Object>> Info = plansMapper.selectAllUserDataInfo(start, Integer.valueOf(size),gender,status,vip,isVirtual,"%" + search + "%",emotionalState,nowTime);
         String number = String.valueOf(Info.size());
         Map map;
         for(int i = 0;i<Info.size();i++)
@@ -115,9 +123,17 @@ public class Zbh1ServiceImpl implements IZbh1Service {
             map= Info.get(i);
             String user_id=map.get("user_id").toString();
             String card_id = map.get("card_id").toString();
-            //获得用户的展示时间
-            List<Map<Object,Object>> set_time = plansMapper.getSettime(user_id);
-            map.put("set_time",set_time);
+            //获得用户最近的展示时间
+            String settime=plansMapper.getSetTime(user_id);
+            if(settime != null) settime = CommonFunc.getFormatTime(Long.valueOf(settime),"YYYY-MM-dd");
+            map.put("set_time",settime);
+            //用户vip日期格式化
+            String formatVip = map.get("dating_vip").toString();
+            if(!formatVip.equals("0")){
+                //若为vip则日期格式化
+                formatVip = CommonFunc.getFormatTime(Long.valueOf(formatVip),"YYYY-MM-dd");
+                map.replace("dating_vip",formatVip);
+            }
             //获得用户标签
             List<Map<Object,Object>> Tags = plansMapper.getAllTag(card_id);
             map.put("tags",Tags);
@@ -343,29 +359,69 @@ public class Zbh1ServiceImpl implements IZbh1Service {
     }
 
     @Override
-    public int createNewVirtualUser(String wx_name, String gender, String intention, String signature, String age, String institutions, String status, String views, HttpServletRequest request){
+    public ServerResponse<String> createNewVirtualUser(MultipartFile file, String wx_name, String gender, String intention, String signature, String age, String institutions, String views, HttpServletRequest request){
         //获取当前时间戳
         String nowTime = String.valueOf((new Date()).getTime());
-        if (wx_name.equals("") || wx_name == null){
+        if (wx_name.equals("")){
             wx_name = "NULL";
-        }else if (gender.equals("") || gender == null){
+        }
+        if (gender.equals("")){
             gender = "0";
-        }else if (intention.equals("") || intention == null){
-            intention = "NULL";
-        }else if (signature.equals("") || signature == null){
+        }
+        if (intention.equals("")){
+            intention = "1";
+        }
+        if (signature.equals("")){
             signature = "NULL";
-        }else if (age.equals("") || age == null){
+        }
+        if (age.equals("")){
             age = "NULL";
-        }else if (institutions.equals("") || institutions == null){
+        }
+        if (institutions.equals("")){
             institutions = "NULL";
-        }else if (status.equals("") || status == null){
-            status = "1";
-        } else if (views.equals("") || views == null){
+        }
+        String status = "2";
+        if (views.equals("")){
             views = "0";
         }
-//        plansMapper.insertNewVirtualUsereToUser(gender,signature,nowTime);
-        String user_id = plansMapper.insertNewVirtualUserToUser(gender, signature, nowTime);
-        return plansMapper.insertNewVirtualUser(user_id, wx_name, gender, intention, signature, age, institutions, status, views, nowTime);
+        //添加事务
+        DataSourceTransactionManager transactionManager = (DataSourceTransactionManager) ctx.getBean("transactionManager");
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        //隔离级别
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status1 = transactionManager.getTransaction(def);
+        if (file != null){
+            //上传了封面图片cover
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String name = iFileService.upload_uncompressed(file,path,"l_e/operation/dating_cover");
+            String url = "operation/dating_cover/"+name;
+            try{
+                plansMapper.insertNewVirtualUserToUser(gender, signature, nowTime);
+                String user_id = plansMapper.getNewVirtualUserId(nowTime);
+                //把封面图片cover路径存起来
+                plansMapper.insertNewVirtualUserToDc(user_id, wx_name, Integer.valueOf(gender), Integer.valueOf(intention), signature, age, institutions, Integer.valueOf(status), Integer.valueOf(views), nowTime, url);
+                transactionManager.commit(status1);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                e.printStackTrace();
+                transactionManager.rollback(status1);
+                return ServerResponse.createByErrorMessage("带图片操作失败");
+            }
+        }else{
+            //封面图片cover没有上传
+            try{
+                plansMapper.insertNewVirtualUserToUser(gender, signature, nowTime);
+                String user_id = plansMapper.getNewVirtualUserId(nowTime);
+                //封面图片cover采用数据库默认值
+                plansMapper.insertNewVirtualUserToDc2(user_id, wx_name, Integer.valueOf(gender), Integer.valueOf(intention), signature, age, institutions, Integer.valueOf(status), Integer.valueOf(views), nowTime);
+                transactionManager.commit(status1);
+                return ServerResponse.createBySuccessMessage("成功");
+            }catch (Exception e){
+                e.printStackTrace();
+                transactionManager.rollback(status1);
+                return ServerResponse.createByErrorMessage("不带图片操作失败");
+            }
+        }
     }
 
     @Override

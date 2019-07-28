@@ -100,9 +100,18 @@ public interface Tip_offMapper {
     //查看审核状态
     int selectStatus(@Param("id") String id);
 
+    //获得所有指定展示时间
+    List<Map<Object,Object>> showAllSpecify(@Param("start") int start,@Param("size") int size);
+
     //查找某天某个位置的用户
 //    List<Map<String,Object>> selectUserByDate(@Param("date") String date,@Param("pos") String pos);
 
     //该用户是否在展示
     List<Map> isOnShow(@Param("id") String id);
+
+    //删除展示位
+    int delete_show(@Param("id") String id);
+
+    //修改机构
+    int update_institution(@Param("id") String id,@Param("institution") String institution);
 }

@@ -1,5 +1,7 @@
 package com.yj.dao;
 
+import com.yj.common.ServerResponse;
+import com.yj.pojo.Mastered_words;
 import com.yj.pojo.Plans;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,13 +35,15 @@ public interface PlansMapper {
 
     //后台管理系统 审核，修改，添加用户，放展示卡总表的  所有信息获取
     List<Map<Object,Object>> selectAllUserDataInfo(@Param("start") int start, @Param("size") int size,@Param("gender") String gender,
-                                                   @Param("status")String status,@Param("vip") String vip,@Param("isVirtual") String isVirtual,@Param("search") String search,@Param("emotionalState") String emotionalState);
+                                                   @Param("status")String status,@Param("vip") String vip,@Param("isVirtual") String isVirtual,@Param("search") String search,@Param("emotionalState") String emotionalState,@Param("nowTime") String nowTime);
+
+
 
     //根据用户id获取用户卡片标签
     List<Map<Object,Object>> getAllTag(@Param("id") String id);
 
     //获得展示时间，一个用户可有多个展示时间
-    List<Map<Object,Object>> getSettime(@Param("id") String id);
+    String getSetTime(@Param("id") String id);
 
     //获取用户匹配时间
     String getInloveTime(@Param("id") String id);
@@ -106,7 +110,7 @@ public interface PlansMapper {
 
     String countCompletedInfoUser();
 
-    String insertNewVirtualUserToUser(@Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("register_time") String register_time);
+    int insertNewVirtualUserToUser(@Param("gender") String gender, @Param("personality_signature") String personality_signature, @Param("register_time") String register_time);
 
 //    String selectDatingStatus(@Param("user_id") String user_id);
 
@@ -126,4 +130,14 @@ public interface PlansMapper {
     List<Map<Object, Object>> getUserShow(@Param("user_id") String user_id);
 
     int deleteUserShow(@Param("user_id") String user_id, @Param("rank") String rank, @Param("set_time") String set_time);
+
+    String getNewVirtualUserId(@Param("register_time") String register_time);
+
+    int insertNewVirtualUserToDc(@Param("user_id") String user_id, @Param("wx_name") String wx_name, @Param("gender") int gender, @Param("intention") int intention,
+                                 @Param("signature") String signature, @Param("age") String age, @Param("institutions") String institutions,
+                                 @Param("status") int status, @Param("views") int views, @Param("set_time") String set_time, @Param("cover") String cover);
+
+    int insertNewVirtualUserToDc2(@Param("user_id") String user_id, @Param("wx_name") String wx_name, @Param("gender") int gender, @Param("intention") int intention,
+                                  @Param("signature") String signature, @Param("age") String age, @Param("institutions") String institutions,
+                                  @Param("status") int status, @Param("views") int views, @Param("set_time") String set_time);
 }

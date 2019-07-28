@@ -1,6 +1,7 @@
 package com.yj.service;
 
 import com.yj.common.ServerResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.rmi.MarshalledObject;
@@ -44,7 +45,7 @@ public interface IZbh1Service {
 
     String notPassUser(String id, HttpServletRequest request);
 
-    int createNewVirtualUser(String wx_name, String gender, String intention, String signature, String age, String institutions, String status, String views, HttpServletRequest request);
+    ServerResponse<String> createNewVirtualUser(MultipartFile file, String wx_name, String gender, String intention, String signature, String age, String institutions, String views, HttpServletRequest request);
 
     ServerResponse<Map> searchUser(String page, String size, String name, HttpServletRequest request);
 

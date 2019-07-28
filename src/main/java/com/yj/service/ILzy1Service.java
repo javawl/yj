@@ -50,6 +50,15 @@ public interface ILzy1Service {
     //用关键词查找用户信息
     ServerResponse<List<Map<String,Object>>> select_user(String word,HttpServletRequest request);
 
+    //展示展示位
+    ServerResponse<Map> show_specify_pos(String page,String size,HttpServletRequest request);
+
+    //删除展示位
+    ServerResponse<String> delete_show(String id,HttpServletRequest request);
+
+    ServerResponse<String> update_institution(String id,String institution,HttpServletRequest request);
+
+
     //封号按钮
 //    ServerResponse<String> black(String id,HttpServletRequest request);
 
