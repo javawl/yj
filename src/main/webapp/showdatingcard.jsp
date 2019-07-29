@@ -203,10 +203,11 @@
 <script type="text/javascript">
     var count = 0;
     <%
-        String url = Const.DOMAIN_NAME;
+//        String url = Const.DOMAIN_NAME;
         String root_url = Const.FTP_PREFIX;
     %>
-    var url = "<%=url %>";
+    <%--var url = "<%=url %>";--%>
+    var url = 'http://47.107.62.22:8080';
     var root_url = "<%=root_url %>";
     // 获取get参数的方法
     function GetQueryString(name)

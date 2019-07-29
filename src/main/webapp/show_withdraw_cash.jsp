@@ -22,8 +22,8 @@
         String url = Const.DOMAIN_NAME;
         String root_url = Const.FTP_PREFIX;
     %>
-    var url = "<%=url %>";
-    //        var url = 'http://47.107.62.22:8080';
+    <%--var url = "<%=url %>";--%>
+           var url = 'http://47.107.62.22:8080';
     var root_url = "<%=root_url %>";
     //        if (url1 == url || url1 == url+'/'){
     //            window.location.href=url+"/show_daily_pic.jsp?page=1&size=15"
