@@ -88,7 +88,7 @@ public interface SubtitlesMapper {
     List<String> findExistVipUsers(@Param("now_time") String now_time, @Param("info") List<Map<String, Object>> info);
 
     //查看指定号位的后台指定卡片
-    Map<String, Object> findDatingSpecifyCard(@Param("rank") String rank, @Param("set_time") String set_time);
+    Map<String, Object> findDatingSpecifyCard(@Param("rank") String rank, @Param("set_time") String set_time, @Param("gender") String gender);
 
 
     //找出今天看过的几张卡片的信息
@@ -253,6 +253,9 @@ public interface SubtitlesMapper {
 
     //删除配对关系
     int deleteDatingRelationship(@Param("userId") String userId, @Param("targetId") String targetId);
+
+    //删除查看关系
+    int deleteDatingSeeRelationship(@Param("userId") String userId);
 
 
     //--------------------------------运营0.3下闭合线---------------------------

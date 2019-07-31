@@ -2,7 +2,7 @@ package com.yj.controller.portal;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.yj.common.ServerResponse;
+import com.yj.common.*;
 import com.yj.dao.*;
 import com.yj.service.IFileService;
 import com.yj.service.ITokenService;
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -120,6 +122,93 @@ public class Lzy1Controller {
         return iLzy1Service.update_VIP(id,vip,request);
     }
 
+
+    /**
+     * 发送第一个学习提醒
+     * @param token       验证令牌
+     * @return            Str
+     */
+//    @RequestMapping(value = "send_remind.do", method = RequestMethod.POST)
+//    @ResponseBody
+    public String send_remind1(String token, String id){
+        if (!token.equals("beibei1")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //给单一用户发送
+            //查找该用户信息
+            List<Map<Object,Object>> one_user = plansMapper.getUserInfoToSendMessage(id, nowTime);
+            //发送模板消息
+            WxMssVo wxMssVo = new WxMssVo();
+            wxMssVo.setTemplate_id(Const.TMP_CHECK_RESULT);
+            wxMssVo.setAccess_token(access_token.getAccessToken());
+            wxMssVo.setTouser(one_user.get(0).get("wechat").toString());
+            wxMssVo.setPage(Const.WX_FOUND_PATH);
+            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+            wxMssVo.setForm_id(one_user.get(0).get("form_id").toString());
+            List<TemplateData> list = new ArrayList<>();
+            list.add(new TemplateData("恭喜！你的信息审核通过啦，快来找Ta一起学习吧！","#ffffff"));
+            wxMssVo.setParams(list);
+            String info = CommonFunc.sendTemplateMessage(wxMssVo);
+            //记录发送的情况
+            plansMapper.insertTmpSendMsgRecord(id,"恭喜！你的信息审核通过啦，快来找Ta一起学习吧！",info, nowTime);
+            if (info != null){
+                common_configMapper.deleteTemplateMsg(one_user.get(0).get("id").toString());
+            }
+            return "success";
+        }catch (Exception e){
+            logger.error("发送模板消息一异常",e.getStackTrace());
+            logger.error("发送模板消息一异常",e);
+            e.printStackTrace();
+            return "false";
+        }
+    }
+
+    public String send_remind2(String token, String id){
+        if (!token.equals("beibei2")){
+            return "false";
+        }
+        try{
+            //获取accessToken
+            AccessToken access_token = CommonFunc.getAccessToken();
+            String nowTime = String.valueOf((new Date()).getTime());
+            //获取当天0点多一秒时间戳
+            String one = CommonFunc.getOneDate();
+            //给单一用户发送
+            //查找该用户信息
+            List<Map<Object,Object>> one_user = plansMapper.getUserInfoToSendMessage(id, nowTime);
+            //发送模板消息
+            WxMssVo wxMssVo = new WxMssVo();
+            wxMssVo.setTemplate_id(Const.TMP_CHECK_RESULT);
+            wxMssVo.setAccess_token(access_token.getAccessToken());
+            wxMssVo.setTouser(one_user.get(0).get("wechat").toString());
+            wxMssVo.setPage(Const.WX_FOUND_PATH);
+            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
+            wxMssVo.setForm_id(one_user.get(0).get("form_id").toString());
+            List<TemplateData> list = new ArrayList<>();
+            list.add(new TemplateData("大佬您的相约背单词申请审核没有通过噢！","#ffffff"));
+            wxMssVo.setParams(list);
+            String info = CommonFunc.sendTemplateMessage(wxMssVo);
+            //记录发送的情况
+            plansMapper.insertTmpSendMsgRecord(id,"大佬您的相约背单词申请审核没有通过噢！",info, nowTime);
+            if (info != null){
+                common_configMapper.deleteTemplateMsg(one_user.get(0).get("id").toString());
+            }
+            return "success";
+        }catch (Exception e){
+            logger.error("发送模板消息一异常",e.getStackTrace());
+            logger.error("发送模板消息一异常",e);
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
+
     /**
      * 更改用户审核状态
      * @Param id 用户id
@@ -129,7 +218,38 @@ public class Lzy1Controller {
     @ResponseBody
     public ServerResponse<String> update_status(String id,String status,HttpServletRequest request)
     {
-        return iLzy1Service.update_status(id,status,request);
+        String result = iLzy1Service.update_status(id,status,request);
+        //若用户审核通过
+        if (result.equals("201")){
+            String res = send_remind1("beibei1",id);
+            if (res.equals("success")){
+                return ServerResponse.createBySuccessMessage("pass successfully");
+            }else{
+                //返回的是false
+                return ServerResponse.createByErrorMessage("pass unsuccessfully");
+            }
+        }
+        //若用户审核未通过
+        if(result.equals("200")){
+            String res = send_remind2("beibei2",id);
+            if (res.equals("success")){
+                return ServerResponse.createBySuccessMessage("notpass successfully");
+            }else{
+                //返回的是false
+                return ServerResponse.createByErrorMessage("notpass  unsuccessfully");
+            }
+        }
+
+        else if (result.equals("400")){
+            //把用户设置成通过时出错
+            return ServerResponse.createByErrorMessage("操作失败");
+        }
+        else if (result.equals("401")) {
+            return ServerResponse.createByErrorMessage("请补全参数");
+        }
+        //参数为空，会执行这个
+        else  return ServerResponse.createByErrorMessage(result);
+
     }
 
     /**
@@ -151,7 +271,7 @@ public class Lzy1Controller {
      */
     @RequestMapping(value = "update_condition.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> update_conditon(String id,String condition,HttpServletRequest request){
+    public ServerResponse<String> update_condition(String id,String condition,HttpServletRequest request){
         return iLzy1Service.update_condition(id,condition,request);
     }
 

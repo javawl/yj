@@ -22,8 +22,8 @@ public class WxPayConfig {
     public static final String liveCourseHelpNotify = "https://www.ourbeibei.com/various/liveCoursePayHelpNotify.do";
 //    public static final String liveCourseHelpNotify = "http://47.102.152.102:8080/various/liveCoursePayHelpNotify.do";
     //约会活动vip支付回调地址
-//    public static final String datingVipPayCallBack = "https://www.ourbeibei.com/operation/datingVipPayCallBack.do";
-    public static final String datingVipPayCallBack = "http://47.102.152.102:8080/operation/datingVipPayCallBack.do";
+    public static final String datingVipPayCallBack = "https://www.ourbeibei.com/operation/datingVipPayCallBack.do";
+//    public static final String datingVipPayCallBack = "http://47.102.152.102:8080/operation/datingVipPayCallBack.do";
     //签名方式，固定值
     public static final String SIGNTYPE = "MD5";
     //交易类型，小程序支付的固定值为JSAPI

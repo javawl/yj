@@ -60,6 +60,7 @@ public class OperationServiceImpl implements IOperationService {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
         String uid = CommonFunc.CheckToken(request,token);
+        uid = "303";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
@@ -92,6 +93,8 @@ public class OperationServiceImpl implements IOperationService {
             }else {
                 result.put("datingVip", 0);
             }
+
+            System.out.print("for test:"+ String.valueOf(cardNumber));
 
 
             //今天是否第一次触碰
@@ -194,8 +197,9 @@ public class OperationServiceImpl implements IOperationService {
 
                             //去重
                             List<String> forNoRepeat = new ArrayList<>();
+                            //todo Case 1
                             //一号位先按照后台安排，没有按照曝光量
-                            Map<String, Object> firstDatingSpecifyCard = subtitlesMapper.findDatingSpecifyCard("1", oneDate);
+                            Map<String, Object> firstDatingSpecifyCard = subtitlesMapper.findDatingSpecifyCard("1", oneDate, userIntentionGender);
                             if (firstDatingSpecifyCard != null && !seeUserCard.contains(firstDatingSpecifyCard.get("user_id").toString())){
                                 //将其插入进去，需要卡片数目减一
                                 //图片路径
@@ -225,6 +229,7 @@ public class OperationServiceImpl implements IOperationService {
                                 }
                             }
 
+                            //todo Case 2
                             //先找超级喜欢自己的卡片
                             //判断意向性别
                             List<Map<String, Object>> superLikeMe;
@@ -253,6 +258,7 @@ public class OperationServiceImpl implements IOperationService {
                             }
                             //如果超级喜欢已经够了，后面就没必要了
                             if (cardNumber > 0){
+                                //todo Case 3
                                 //再找喜欢自己的
                                 List<Map<String, Object>> likeMe;
                                 if (userIntentionGender.equals("2")){
@@ -281,6 +287,7 @@ public class OperationServiceImpl implements IOperationService {
 
                                 //继续从后台指定取
                                 if (cardNumber > 0){
+                                    //todo Case 4
                                     //再找喜欢自己的
                                     List<Map<String, Object>> datingSpecifyCardByRankRange;
                                     if (userIntentionGender.equals("2")){
@@ -307,6 +314,7 @@ public class OperationServiceImpl implements IOperationService {
 
                                     //从曝光量低的用户中选择，优先选真实用户，没有再选虚拟用户
                                     if (cardNumber > 0){
+                                        //todo Case 5
                                         //从曝光量低的用户中选择，优先选真实用户，没有再选虚拟用户
                                         if (lowViewsCard == null){
                                             if (userIntentionGender.equals("2")){
@@ -829,34 +837,10 @@ public class OperationServiceImpl implements IOperationService {
                         subtitlesMapper.addDailyDatingVip(one);
                     }
 
-//                    if (!user_id.equals("no")){
-//                        if (!CommonFunc.isInteger(user_id)){
-//                            logger.error("传入user_id非法！");
-//                        }
-//                        //通过邀请进来的
-//                        common_configMapper.insertWordChallengeInviteRelation(uid,user_id,word_challenge_id,now_time);
-//                        //获取accessToken
-//                        AccessToken access_token = CommonFunc.getAccessToken();
-//                        //给该用户发送
-//                        //查没过期的from_id
-//                        Map<Object,Object> info = common_configMapper.getTmpInfo(user_id,now_time);
-//                        if (info != null){
-//                            common_configMapper.deleteTemplateMsg(info.get("id").toString());
-//                            //发送模板消息
-//                            WxMssVo wxMssVo = new WxMssVo();
-//                            wxMssVo.setTemplate_id(Const.TMP_ID_INVITEE);
-//                            wxMssVo.setAccess_token(access_token.getAccessToken());
-//                            wxMssVo.setTouser(info.get("wechat").toString());
-//                            wxMssVo.setPage(Const.INVITE_DETAIL_PATH);
-//                            wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=" + access_token.getAccessToken());
-//                            wxMssVo.setForm_id(info.get("form_id").toString());
-//                            List<TemplateData> list = new ArrayList<>();
-//                            list.add(new TemplateData("30天单词挑战","#ffffff"));
-//                            list.add(new TemplateData("咦~好像有人接受了你的挑战邀请，点击查看是哪个小可爱~","#ffffff"));
-//                            wxMssVo.setParams(list);
-//                            CommonFunc.sendTemplateMessage(wxMssVo);
-//                        }
-//                    }
+                    //为了查看更多的button效果，删除see_relationship
+                    subtitlesMapper.deleteDatingSeeRelationship(uid);
+
+
                     /**此处添加自己的业务逻辑代码end**/
                     //通知微信服务器已经支付成功
                     resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"

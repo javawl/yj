@@ -208,6 +208,7 @@
     %>
     <%--var url = "<%=url %>";--%>
     var url = 'http://47.107.62.22:8080';
+    // var url = "http://localhost:8088";
     var root_url = "<%=root_url %>";
     // 获取get参数的方法
     function GetQueryString(name)
@@ -883,8 +884,8 @@
                     alert(msg);
                 }else {
                     alert(msg);
-                    window.location.href = "showdatingcard.jsp?page=1&size=15";
                 }
+                window.location.href = "showdatingcard.jsp?page=1&size=15";
             },
             error:function (result) {
                 console.log(result);
@@ -975,6 +976,7 @@
     var outside_new = true;
     var alertNewBox = document.getElementById("new_virtual_user");
     function matchingNewVirtualUserBoxPopUp() {
+        alert("性别0代表男，1代表女；意向性别0代表男，1代表女，2代表通吃；曝光量不想填填0");
         $(".new_virtual_user").css("display", "block");
         // 加了false才能显现出来
         outside_new = false;

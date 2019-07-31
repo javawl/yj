@@ -23,8 +23,8 @@ public interface ILzy1Service {
     //修改用户个性签名
     ServerResponse<String> update_signature(String id,String signature,HttpServletRequest request);
 
-    //修改用户审核状态
-    ServerResponse<String> update_status(String id,String status,HttpServletRequest request);
+    //修改用户审核状态,封号或审核不通过返回200，审核通过返回201
+    String update_status(String id,String status,HttpServletRequest request);
 
     //修改用户VIP状态
     ServerResponse<String> update_VIP(String id,String vip,HttpServletRequest request);

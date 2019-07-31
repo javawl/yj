@@ -54,6 +54,10 @@ public interface PlansMapper {
 
     String countAllUserData();
 
+    String countAllSpecifyCard();
+
+    String countAllUserDataByCondition(@Param("gender") String gender, @Param("status") String status, @Param("vip") String vip, @Param("isVirtual") String isVirtual, @Param("search") String search, @Param("emotionalState") String emotionalState, @Param("nowTime") String nowTime);
+
     List<Map<Object, Object>> showReversalAllUserDataInfo(@Param("start") int start, @Param("size") int size);
 
     List<Map<Object, Object>> selectMaleUser(@Param("start") int start, @Param("size") int size);
@@ -140,4 +144,6 @@ public interface PlansMapper {
     int insertNewVirtualUserToDc2(@Param("user_id") String user_id, @Param("wx_name") String wx_name, @Param("gender") int gender, @Param("intention") int intention,
                                   @Param("signature") String signature, @Param("age") String age, @Param("institutions") String institutions,
                                   @Param("status") int status, @Param("views") int views, @Param("set_time") String set_time);
+
+    List<Map<Object,Object>> getUserInfoToSendMessage(@Param("user_id") String user_id, @Param("set_time") String set_time);
 }

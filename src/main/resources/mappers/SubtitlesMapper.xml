@@ -324,6 +324,14 @@
       LIMIT 1
     ) tb
     WHERE dating_card.user_id = tb.user_id
+    <trim prefix=" and ">
+      <if test="gender == 0">
+        dating_card.gender = 0
+      </if>
+      <if test="gender == 1">
+        dating_card.gender = 1
+      </if>
+    </trim>
   </select>
 
 
@@ -748,6 +756,13 @@
     WHERE (lover_one_user_id = #{userId} AND lover_another_user_id = #{targetId})
     OR (lover_one_user_id = #{targetId} AND lover_another_user_id = #{userId})
   </delete>
+
+
+  <delete id="deleteDatingSeeRelationship" parameterType="string">
+    DELETE FROM dating_see_relationship
+    WHERE user_id = #{userId}
+  </delete>
+
 
   <!--运营0.3下闭合线-->
 

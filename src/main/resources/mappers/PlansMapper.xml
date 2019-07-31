@@ -221,6 +221,71 @@
     SELECT COUNT(id) FROM user
   </select>
 
+  <select id="countAllSpecifyCard" resultType="string">
+    SELECT COUNT(id) FROM dating_specify_card
+  </select>
+
+
+  <select id="countAllUserDataByCondition" resultType="string">
+    SELECT COUNT(t1.id)
+    FROM `user` t1 LEFT OUTER join
+    `dating_card`t2
+    on t1.id = t2.user_id
+    WHERE
+    <trim>
+      <if test="gender != -1">
+        t2.gender = #{gender}
+      </if>
+      <if test="gender == -1">
+        true
+      </if>
+    </trim>
+    <trim prefix=" and ">
+      <if test=" status != -1">
+        t2.status = #{status}
+      </if>
+      <if test="status == -1">
+        (t2.status = 1 or t2.status = 2)
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="vip == 0">
+        t1.dating_vip = 0 or t1.dating_vip &lt;#{nowTime}
+      </if>
+      <if test="vip == -1">
+        true
+      </if>
+      <if test="vip == 1">
+        t1.dating_vip &gt;#{nowTime}
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="isVirtual != -1">
+        t2.is_virtual = #{isVirtual}
+      </if>
+      <if test="isVirtual == -1">
+        (t2.is_virtual = 0 or t2.is_virtual = 1)
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test="emotionalState != -1 ">
+        t2.is_in_love = #{emotionalState}
+      </if>
+      <if test="emotionalState == -1">
+        (t2.is_in_love = 0 or t2.is_in_love =1)
+      </if>
+    </trim>
+    <trim prefix="and">
+      <if test = "search == '%-1%'">
+        true
+      </if>
+      <if test="search != '%-1%'">
+        t2.`wx_name` like #{search}
+      </if>
+    </trim>
+  </select>
+
+
   <select id="showReversalAllUserDataInfo" resultType="map">
     SELECT t2.id,t1.username,t2.gender,t2.cover,t2.status,t2.signature,t2.age,t1.dating_vip,t2.is_virtual
     FROM `user` t1 LEFT OUTER JOIN `dating_card` t2 ON t1.id = t2.user_id
@@ -482,5 +547,18 @@
     INSERT INTO dating_card(`user_id`,`wx_name`,`gender`,`intention`,`signature`,`age`,`institutions`,`status`,`views`,`set_time`,`is_virtual`)
     VALUES (#{user_id}, #{wx_name}, #{gender}, #{intention}, #{signature}, #{age}, #{institutions}, #{status}, #{views}, #{set_time}, 1)
   </insert>
+
+  <select id="getUserInfoToSendMessage" resultType="map">
+    SELECT id,form_id,wechat
+    FROM `template_msg`,
+         (SELECT id as user_id,my_plan,last_login
+          FROM `user`
+          WHERE wechat is NOT NULL
+            AND id = #{user_id}) tb
+    WHERE `template_msg`.set_time > #{set_time}
+      AND `template_msg`.user_id = tb.user_id
+    GROUP BY tb.user_id
+    ORDER BY set_time ASC
+  </select>
   <!--////////////////////////////////////版本0.3Dao层实现下闭合线/////////////////////////////////////-->
 </mapper>

@@ -98,7 +98,7 @@
                         '<td style="width: 4%;">'+data[i]['gender']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['set_time']+'</td>'+
                         '<td style="width: 4%;">'+data[i]['rank']+'</td>'+
-                        '<td style="width: 12%;"><button style="margin-left: 5px;" onclick="handle('+"'"+data[i]['id']+"'"+')">删除</button></td>'+
+                        '<td style="width: 12%;"><button style="margin-left: 5px;" onclick="handle('+"'"+data[i]['id']+"'"+')">取消展示</button></td>'+
                         '</tr>');
                 }
 //                if (result.status == 200){
@@ -114,7 +114,7 @@
 </script>
 <body>
 <center>
-    <h1>提现申请查看</h1>
+    <h1>展示位详情</h1>
     <br>
     <table cellpadding="9" width="87%" border="1" cellspacing="0" id="info">
         <%--<tr>--%>
@@ -145,6 +145,7 @@
 </body>
 <script>
     function handle(id) {
+        alert("注意不可以取消当天的展示位！");
         if (confirm("是否确认")){
             $.ajax({
                 url:url+"/lzy/delete_show.do",
@@ -160,36 +161,8 @@
                         alert(msg);
                     }else {
                         alert(msg);
-                        history.go(0);
                     }
-                },
-                error:function (result) {
-                    console.log(result);
-                    alert("服务器出错！");
-                }
-            });
-        }
-    }
-
-    function set_fail(id,user_id) {
-        if (confirm("是否确认")){
-            $.ajax({
-                url:url+"/admin/changeWithDrawFail.do",
-                type:'POST',
-                data:{
-                    id:id,
-                    user_id:user_id
-                },
-                dataType:'json',
-                success:function (result) {
-                    var code = result['code'];
-                    var msg = result['msg'];
-                    if (code != 200){
-                        alert(msg);
-                    }else {
-                        alert(msg);
-                        history.go(0);
-                    }
+                    window.location.href = "showdatingspecifycard.jsp?page=1&size=15"
                 },
                 error:function (result) {
                     console.log(result);

@@ -39,6 +39,7 @@ public class Const {
     public static final String TMP_SUPER_LIKE_REMIND = "n60Hu8hvaSAAzye-s6tgxL3qUp0hLHqlD1dRUDOiX80";   //超级喜欢服务通知
     public static final String TMP_PAIRING_SUCCESS_REMIND = "5dc2wD_aiqC1QKFHqVFPSFnGDRmqEECiSAyo4_VUSnc";   //配对成功服务通知
     public static final String TMP_TEAM_FAIL_REMIND = "1XVjv6owTvwRdFy0iKw6LxuPpv9bmaDw1yI21zG0A8A";   //组队失败服务通知
+    public static final String TMP_CHECK_RESULT = "z-ZwU517ZqKwM__7ZNDakOiChVTuTBByweavVB5LOgg";   //审核结果通知
     public static final String TMP_DATING_VIP_EXPIRING_REMIND = "DbphFmnILZImENrs7f5yo9q_ZpHeVkPyKXhBVcmyXKA";   //vip续费提醒
     public static final String DRAW_RESULT_PATH = "page/home/pages/prize/prize_result";   //抽奖结果的路径
     public static final String INVITE_DETAIL_PATH = "page/discover/pages/WordChallenge/MyInvitation/MyInvitation";   //邀请详情页

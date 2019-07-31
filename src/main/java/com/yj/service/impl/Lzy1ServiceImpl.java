@@ -142,13 +142,13 @@ public class Lzy1ServiceImpl implements ILzy1Service {
     }
 
     //更改用户的审核状态
-    public ServerResponse<String> update_status(String id, String status, HttpServletRequest request) {
+    public String update_status(String id, String status, HttpServletRequest request) {
         List<Object> l1 = new ArrayList<Object>() {{
             add(id);
             add(status);
         }};
         String CheckNull = CommonFunc.CheckNull(l1);
-        if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
+        if (CheckNull != null) return "401";
         //如果为封号
         if(status.equals("0")){
             //如果存在匹配关系，先解除再封号
@@ -172,7 +172,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                             result = tip_offMapper.updateStatus(id,status);
                             if(result == 0) throw new Exception();
                             transactionManager.commit(T_status);
-                            return ServerResponse.createBySuccessMessage("成功");
+                            return "200";
                         }
                     }
                 }
@@ -180,7 +180,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                 {
                     e.printStackTrace();
                     transactionManager.rollback(T_status);
-                    return ServerResponse.createByErrorMessage("失败");
+                    return "400";
                 }
             }
 
@@ -189,18 +189,23 @@ public class Lzy1ServiceImpl implements ILzy1Service {
                 int result = tip_offMapper.updateStatus(id,status);
 
                 if(result == 0)
-                    return ServerResponse.createByErrorMessage("封号失败");
+                    return "400";
                 else
-                    return ServerResponse.createBySuccessMessage("封号成功");
+                    return "200";
             }
         }
         //更改审核状态为其他状态
         else {
             int feedsResult = tip_offMapper.updateStatus(id,status);
             if (feedsResult == 0) {
-                return ServerResponse.createByErrorMessage("修改失败");
+                return "400";
             } else {
-                return ServerResponse.createBySuccessMessage("成功");
+                //封号或未审核处于200状态，发送同一类型消息
+                if(status.equals("1"))
+                    return "200";
+                    //如果审核通过，则返回审核通过的消息
+                else
+                    return "201";
             }
         }
     }
@@ -471,7 +476,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         result.put("size",sum);
         result.put("data",show );
 
-        return ServerResponse.createBySuccess(result);
+        return ServerResponse.createBySuccess(plansMapper.countAllSpecifyCard(),result);
     }
 
     //删除展示位

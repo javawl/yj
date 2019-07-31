@@ -110,9 +110,9 @@ public class Zbh1ServiceImpl implements IZbh1Service {
         int start = (Integer.valueOf(page) - 1) * Integer.valueOf(size);
         String nowTime=String.valueOf(new Date().getTime());
         //获得用户的展示次数，匹配次数，匹配状态
-
+        //获得满足条件的用户总数
+        String number = plansMapper.countAllUserDataByCondition(gender,status,vip,isVirtual,"%" + search + "%",emotionalState,nowTime);
         List<Map<Object,Object>> Info = plansMapper.selectAllUserDataInfo(start, Integer.valueOf(size),gender,status,vip,isVirtual,"%" + search + "%",emotionalState,nowTime);
-        String number = String.valueOf(Info.size());
         Map map;
         for(int i = 0;i<Info.size();i++)
         {
