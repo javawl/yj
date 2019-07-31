@@ -60,7 +60,6 @@ public class OperationServiceImpl implements IOperationService {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         //验证token
         String uid = CommonFunc.CheckToken(request,token);
-        uid = "303";
         if (uid == null){
             //未找到
             return ServerResponse.createByErrorMessage("身份认证错误！");
