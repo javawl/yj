@@ -391,7 +391,7 @@ public class Zbh1ServiceImpl implements IZbh1Service {
         if (file != null){
             //上传了封面图片cover
             String path = request.getSession().getServletContext().getRealPath("upload");
-            String name = iFileService.upload_uncompressed(file,path,"l_e/operation/dating_cover");
+            String name = iFileService.upload(file,path,"l_e/operation/dating_cover");
             String url = "operation/dating_cover/"+name;
             try{
                 plansMapper.insertNewVirtualUserToUser(gender, signature, nowTime);

@@ -369,7 +369,7 @@ public class Lzy1ServiceImpl implements ILzy1Service {
         if (CheckNull != null) return ServerResponse.createByErrorMessage(CheckNull);
         else{
             String path = request.getSession().getServletContext().getRealPath("upload");
-            String name = iFileService.upload_uncompressed(file,path,"l_e/operation/dating_cover");
+            String name = iFileService.upload(file,path,"l_e/operation/dating_cover");
             String url = "operation/dating_cover/"+name;
             //存到数据库
             int result = tip_offMapper.updateCover(id,url);

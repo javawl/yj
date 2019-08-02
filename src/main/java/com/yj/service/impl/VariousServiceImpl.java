@@ -2503,7 +2503,7 @@ public class VariousServiceImpl implements IVariousService {
             //计算开始到现在的天数
             int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
             if (seriesBooks.size() < beginDay){
-                return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+                return ServerResponse.createByErrorMessage("未保证系列书籍章节数和天数保持一致！");
             }
             Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
             String needChapterId = needToReedBookChapter.get("id").toString();
@@ -2582,7 +2582,7 @@ public class VariousServiceImpl implements IVariousService {
             //计算开始到现在的天数
             int beginDay = CommonFunc.count_interval_days(selectBeginningReadClass.get("st").toString(), now_time);
             if (seriesBooks.size() < beginDay){
-                return ServerResponse.createByErrorMessage("运营出错，未保证系列书籍章节数和天数保持一致！");
+                return ServerResponse.createByErrorMessage("未保证系列书籍章节数和天数保持一致！");
             }
             Map<Object,Object> needToReedBookChapter = seriesBooks.get(beginDay - 1);
             String needChapterId = needToReedBookChapter.get("id").toString();

@@ -912,7 +912,7 @@ public class OperationServiceImpl implements IOperationService {
                 //上传老师二维码
                 String path = request.getSession().getServletContext().getRealPath("upload");
                 //压缩
-                String name = iFileService.upload_uncompressed(cover,path,"l_e/operation/dating_cover");
+                String name = iFileService.upload(cover,path,"l_e/operation/dating_cover");
                 String coverUrl = "operation/dating_cover/"+name;
                 String nowTime = String.valueOf((new Date()).getTime());
                 //判断是否上传过
