@@ -1623,7 +1623,7 @@ public class OperationServiceImpl implements IOperationService {
 
                     for (int k = 0; k < todayDatingCardInfo.size(); k++){
                         String targetId = todayDatingCardInfo.get(k).get("user_id").toString();
-                        todayDatingCardInfo.get(k).put("cover", todayDatingCardInfo.get(k).get("cover").toString());
+                        todayDatingCardInfo.get(k).put("cover", CommonFunc.judgePicPath(todayDatingCardInfo.get(k).get("cover").toString()));
 
                         //标签插进去
                         todayDatingCardInfo.get(k).put("tag", tagMap.get(targetId));
